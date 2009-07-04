@@ -3,4 +3,7 @@
 #
 # Everything app configuration
 
-# nothing at the moment
+# Our Facebook app configuration
+facebook_appid = APP_ID
+facebook_key = API_KEY
+facebook_secret = APP_SECRET

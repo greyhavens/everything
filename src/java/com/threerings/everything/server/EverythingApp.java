@@ -12,6 +12,7 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import com.samskivert.depot.PersistenceContext;
 import com.samskivert.util.Config;
 
 import com.threerings.samsara.app.data.AppCodes;
@@ -44,15 +45,15 @@ public class EverythingApp extends App
     @Override // from App
     public Binding[] getBindings ()
     {
-        List<Binding> bindings = Lists.newArrayList();
-        bindings.add(new Binding.Servlet(EverythingServlet.ENTRY_POINT, EverythingServlet.class));
-        return bindings.toArray(new Binding[bindings.size()]);
+        List<Binding> binds = Lists.newArrayList();
+        binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
+        return binds.toArray(new Binding[binds.size()]);
     }
 
     @Override // from App
     public String getFacebookSecret (String uri)
     {
-        return null; // TODO
+        return _config.getValue("facebook_secret", (String)null);
     }
 
     @Override // from App

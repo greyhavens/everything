@@ -23,6 +23,14 @@ public class EverythingRepository extends DepotRepository
         super(ctx);
     }
 
+    /**
+     * Loads the player with the specified user id. Returns null if none exists.
+     */
+    public PlayerRecord loadPlayer (int userId)
+    {
+        return load(PlayerRecord.getKey(userId));
+    }
+
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {

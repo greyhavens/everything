@@ -10,6 +10,8 @@ import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.data.PlayerName;
+
 /**
  * Maintains persistent state for a player.
  */
@@ -41,6 +43,17 @@ public class PlayerRecord extends PersistentRecord
 
     /** The time this player last started a game session. */
     public Timestamp lastSession;
+
+    /**
+     * Creates a {@link PlayerName} instance from our data.
+     */
+    public PlayerName toName ()
+    {
+        PlayerName pname = new PlayerName();
+        pname.userId = userId;
+        pname.name = name;
+        return pname;
+    }
 
     // AUTO-GENERATED: METHODS START
     /**

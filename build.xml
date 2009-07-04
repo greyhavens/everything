@@ -60,6 +60,7 @@
       <dependency groupId="com.samskivert" artifactId="depot-gwt" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
       <fileset refid="dependency.fileset"/>
