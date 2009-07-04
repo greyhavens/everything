@@ -11,7 +11,7 @@
   <!-- bring in our standard build support -->
   <import file="build/etc/build-support.xml"/>
 
-  <!-- we need all of these libraries to build... -->
+  <!-- we need these libraries to build -->
   <filelist dir="." id="build.libs">
     <file name="${extlibs.dir}/commons-collections.jar"/>
     <file name="${extlibs.dir}/commons-io.jar"/>
@@ -22,9 +22,14 @@
     <file name="${extlibs.dir}/velocity-1.5-dev.jar"/>
   </filelist>
 
-  <!-- ...but we only need these libraries at runtime (the rest are provided by samsara) -->
-  <!--<filelist dir="." id="runtime.libs">
-  </filelist>-->
+  <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
+  <filelist dir="." id="runtime.libs">
+    <file name="${extlibs.dir}/commons-lang.jar"/>
+    <file name="${extlibs.dir}/json.jar"/>
+    <file name="${extlibs.dir}/jvnet-runtime.jar"/>
+    <file name="${extlibs.dir}/facebook-java-api.jar"/>
+    <file name="${extlibs.dir}/facebook-java-api-schema.jar"/>
+  </filelist>
 
   <path id="build.classpath">
     <pathelement location="${deploy.dir}/classes"/>
@@ -50,6 +55,7 @@
     <mkdir dir="${deploy.dir}/lib"/>
     <copyfilelist dest="${deploy.dir}/lib">
       <filelist refid="build.libs"/>
+      <filelist refid="runtime.libs"/>
     </copyfilelist>
   </target>
 
@@ -164,9 +170,9 @@
     <delete dir="${instroot.dir}"/>
     <mkdir dir="${instroot.dir}/lib"/>
     <copy todir="${instroot.dir}/lib" file="${deploy.dir}/${app.ident}.jar"/>
-    <!--<copyfilelist dest="${instroot.dir}/lib">
+    <copyfilelist dest="${instroot.dir}/lib">
       <filelist refid="runtime.libs"/>
-    </copyfilelist>-->
+    </copyfilelist>
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web">
       <fileset dir="src/web" includes="**"/>

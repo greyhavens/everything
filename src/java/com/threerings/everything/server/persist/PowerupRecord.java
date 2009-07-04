@@ -40,7 +40,7 @@ public class PowerupRecord extends PersistentRecord
      * Create and return a primary {@link Key} to identify a {@link PowerupRecord}
      * with the supplied key values.
      */
-    public static Key<PowerupRecord> getKey (int ownerId, int type)
+    public static Key<PowerupRecord> getKey (int ownerId, Powerup type)
     {
         return new Key<PowerupRecord>(
                 PowerupRecord.class,

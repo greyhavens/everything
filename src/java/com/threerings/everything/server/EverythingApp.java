@@ -40,6 +40,22 @@ public class EverythingApp extends App
         }
     }
 
+    /**
+     * Returns our Facebook API key.
+     */
+    public String getFacebookKey ()
+    {
+        return _config.getValue("facebook_key", (String)null);
+    }
+
+    /**
+     * Returns our Facebook app secret.
+     */
+    public String getFacebookSecret ()
+    {
+        return _config.getValue("facebook_secret", (String)null);
+    }
+
     @Override // from App
     public String getIdentifier ()
     {
@@ -50,6 +66,7 @@ public class EverythingApp extends App
     public Binding[] getBindings ()
     {
         List<Binding> binds = Lists.newArrayList();
+        binds.add(new Binding.Servlet("/auth", AuthServlet.class));
         binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
         return binds.toArray(new Binding[binds.size()]);
     }
@@ -57,7 +74,7 @@ public class EverythingApp extends App
     @Override // from App
     public String getFacebookSecret (String uri)
     {
-        return _config.getValue("facebook_secret", (String)null);
+        return getFacebookSecret(); // we don't do per-uri secrets
     }
 
     @Override // from App

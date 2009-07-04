@@ -3,6 +3,8 @@
 
 package com.threerings.everything.server.persist;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Set;
 
 import com.google.inject.Inject;
@@ -29,6 +31,21 @@ public class EverythingRepository extends DepotRepository
     public PlayerRecord loadPlayer (int userId)
     {
         return load(PlayerRecord.getKey(userId));
+    }
+
+    /**
+     * Creates, inserts and returns a new player record.
+     */
+    public PlayerRecord createPlayer (int userId, String name, long birthday)
+    {
+        PlayerRecord record = new PlayerRecord();
+        record.userId = userId;
+        record.name = name;
+        record.birthday = (birthday == 0L) ? null : new Date(birthday);
+        record.joined = new Timestamp(System.currentTimeMillis());
+        record.lastSession = record.joined;
+        insert(record);
+        return record;
     }
 
     @Override // from DepotRepository
