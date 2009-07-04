@@ -1,0 +1,146 @@
+<!-- build configuration -->
+<project name="everything" default="compile" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+  <property name="app.ident" value="everything"/>
+  <property name="src.dir" value="src/java"/>
+  <property name="deploy.dir" value="dist"/>
+  <property name="extlibs.dir" value="extlibs/java"/>
+  <property name="pkg.maintainer.name"  value="Three Rings Design"/>
+  <property name="pkg.maintainer.email" value="ooo-dev@threerings.net"/>
+
+  <!-- bring in our standard build support -->
+  <import file="build/etc/build-support.xml"/>
+
+  <!-- we need all of these libraries to build... -->
+  <filelist dir="." id="build.libs">
+    <file name="${extlibs.dir}/commons-io.jar"/>
+    <file name="${extlibs.dir}/google-collect.jar"/>
+    <file name="${extlibs.dir}/guice.jar"/>
+    <file name="${extlibs.dir}/servlet-api.jar"/>
+  </filelist>
+
+  <!-- ...but we only need these libraries at runtime (the rest are provided by samsara) -->
+  <!--<filelist dir="." id="runtime.libs">
+  </filelist>-->
+
+  <path id="build.classpath">
+    <pathelement location="${deploy.dir}/classes"/>
+    <fileset dir="${deploy.dir}/lib" includes="*.jar"/>
+  </path>
+
+  <target name="prepare">
+    <mkdir dir="${deploy.dir}"/>
+    <mkdir dir="${deploy.dir}/classes"/>
+
+    <!-- obtain our configuration files -->
+    <gatherconfiguration app="${app.ident}" distribution="${ooo.distribution}" dest="${deploy.dir}">
+      <sources refid="ooo.appsconfig.source"/>
+      <sources><directory path="${basedir}/etc"/></sources>
+      <files>
+        <file name="build.properties"/>
+        <file name="everything.properties"/>
+      </files>
+    </gatherconfiguration>
+    <property file="${deploy.dir}/build.properties"/>
+
+    <!-- copy our build dependencies into place -->
+    <mkdir dir="${deploy.dir}/lib"/>
+    <copyfilelist dest="${deploy.dir}/lib">
+      <filelist refid="build.libs"/>
+    </copyfilelist>
+  </target>
+
+  <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
+    <artifact:dependencies filesetId="dependency.fileset">
+      <remoteRepository refid="ooo.maven.depends.repo"/>
+      <dependency groupId="com.samskivert" artifactId="samskivert" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
+    </artifact:dependencies>
+    <copy todir="${deploy.dir}/lib">
+      <fileset refid="dependency.fileset"/>
+      <mapper type="flatten"/>
+    </copy>
+  </target>
+
+  <target name="clean" description="Cleans out the compilation results.">
+    <delete dir="${deploy.dir}/classes"/>
+  </target>
+
+  <target name="distcleanall" description="Cleans out all build data.">
+    <delete dir="${deploy.dir}"/>
+  </target>
+
+  <target name="compile" depends="prepare" description="Compiles the source code.">
+    <javac srcdir="${src.dir}" destdir="${deploy.dir}/classes" debug="on"
+           optimize="off" deprecation="on" includeAntRuntime="no">
+      <classpath refid="build.classpath"/>
+      <compilerarg value="-Xlint"/>
+      <compilerarg value="-Xlint:-serial"/>
+    </javac>
+  </target>
+
+  <target name="dist" depends="prepare,compile" description="Builds our app jar file.">
+    <jar destfile="${deploy.dir}/${app.ident}.jar">
+      <fileset dir="${deploy.dir}/classes" includes="**"/>
+      <fileset dir="${deploy.dir}" includes="everything.properties"/>
+    </jar>
+  </target>
+
+  <target name="distall" depends="mavendeps,dist"
+          description="Fetches dependencies and builds everything.">
+  </target>
+
+  <target name="install-app">
+    <delete dir="${instroot.dir}"/>
+    <mkdir dir="${instroot.dir}/lib"/>
+    <copy todir="${instroot.dir}/lib" file="${deploy.dir}/${app.ident}.jar"/>
+    <!--<copyfilelist dest="${instroot.dir}/lib">
+      <filelist refid="runtime.libs"/>
+    </copyfilelist>-->
+    <mkdir dir="${instroot.dir}/web"/>
+    <copy todir="${instroot.dir}/web">
+      <fileset dir="src/web" includes="**"/>
+    </copy>
+    <manifest file="${instroot.dir}/MANIFEST.MF">
+      <attribute name="Main-Class" value="com.threerings.everything.server.EverythingApp$Module"/>
+    </manifest>
+  </target>
+
+  <target name="install" depends="dist" description="Installs our app into the local Samsara.">
+    <antcall target="install-app">
+      <param name="instroot.dir" value="${local_samsara_dir}/apps/${app.ident}/candidate"/>
+    </antcall>
+  </target>
+
+  <target name="package" depends="distall" description="Builds our deployment package.">
+    <tstamp><format property="pkg.version" pattern="yyyyMMddHHmmss"/></tstamp>
+    <echo>Assigned build version ${pkg.version}</echo>
+
+    <property name="pkgroot.dir" value="${deploy.dir}/packages/${app.ident}-app"/>
+
+    <antcall target="install-app">
+      <param name="instroot.dir"
+             value="${pkgroot.dir}/${ooo.prefix}/samsara/apps/${app.ident}/candidate"/>
+    </antcall>
+
+    <!-- TEMP: define where our .dpkg files will be written -->
+    <propertycopy name="package.output" from="ooo.deprecated.package.deploy"/>
+
+    <!-- build the actual Debian package -->
+    <dpkg output="${package.output}" prefix="${ooo.prefix}/${app.ident}"
+          distribution="${ooo.distribution}">
+      <package destroot="${pkgroot.dir}">
+        <info>
+          <name>${app.ident}-app</name>
+          <version>${pkg.version}</version>
+          <arch>${ooo.architecture}</arch>
+          <description>Everything App</description>
+          <maintainer>
+            <name>${pkg.maintainer.name}</name>
+            <email>${pkg.maintainer.email}</email>
+          </maintainer>
+        </info>
+      </package>
+    </dpkg>
+  </target>
+
+</project>

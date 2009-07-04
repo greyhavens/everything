@@ -1,0 +1,7 @@
+#
+# $Id$
+#
+# Build configuration for the Everything app
+
+# Used when testing with a local samsara installation
+local_samsara_dir = /export/samsara
