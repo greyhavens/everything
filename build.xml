@@ -107,6 +107,7 @@
       <jvmarg value="-XX:CompileCommand=exclude,org/eclipse/jdt/internal/compiler/lookup/ParameterizedMethodBinding,&lt;init&gt;"/>
       <!-- end temp -->
       <jvmarg value="-Djava.awt.headless=true"/>
+      <arg value="-style"/><arg value="pretty"/>
       <arg value="-war"/>
       <arg value="${deploy.dir}/gwt"/>
       <arg value="${app.ident}"/>
@@ -116,12 +117,35 @@
     <apply failonerror="true" executable="gzip">
       <arg value="-c"/>
       <srcfile/>
-      <fileset dir="apps/${app.ident}" includes="*.cache.html"/>
+      <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="*.cache.html"/>
       <redirector>
         <outputmapper type="glob" from="*.cache.html"
-                      to="apps/${app.ident}/*.cache.html.gz"/>
+                      to="${deploy.dir}/gwt/${app.ident}/*.cache.html.gz"/>
       </redirector>
     </apply>
+  </target>
+
+  <target name="gshell" description="Runs our GWT client in HostedMode.">
+    <java fork="true" classname="com.google.gwt.dev.HostedMode">
+      <classpath>
+        <pathelement path="lib/gwt/gwt-dev-linux.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-user.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
+        <pathelement path="${deploy.dir}/lib/depot-gwt-0.0-SNAPSHOT.jar"/>
+        <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
+        <pathelement path="${deploy.dir}/lib/samsara-app-0.0-SNAPSHOT.jar"/>
+        <pathelement path="src/java"/>
+        <pathelement path="src/gwt"/>
+      </classpath>
+      <arg value="-noserver"/>
+      <arg value="-port"/>
+      <arg value="8080"/>
+      <arg value="-startupUrl"/>
+      <arg value="candidate/everything"/>
+      <arg value="-war"/>
+      <arg value="${deploy.dir}/gwt"/>
+      <arg value="everything"/>
+    </java>
   </target>
 
   <target name="dist" depends="prepare,compile" description="Builds our app jar file.">
@@ -145,6 +169,7 @@
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web">
       <fileset dir="src/web" includes="**"/>
+      <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="**"/>
     </copy>
     <manifest file="${instroot.dir}/MANIFEST.MF">
       <attribute name="Main-Class" value="com.threerings.everything.server.EverythingApp$Module"/>
@@ -202,5 +227,4 @@
       <fileset dir="${src.dir}" includes="**/*Record.java"/>
     </grecord>
   </target>
-
 </project>

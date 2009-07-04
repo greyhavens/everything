@@ -45,7 +45,7 @@ public class EverythingApp extends App
     public Binding[] getBindings ()
     {
         List<Binding> bindings = Lists.newArrayList();
-        // bindings.add(new Binding.Servlet("/" + app.trim() + "/", EverythingServlet.class));
+        bindings.add(new Binding.Servlet(EverythingServlet.ENTRY_POINT, EverythingServlet.class));
         return bindings.toArray(new Binding[bindings.size()]);
     }
 

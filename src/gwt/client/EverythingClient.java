@@ -4,9 +4,10 @@
 package client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Widget;
+
+import client.game.MainPanel;
 
 /**
  * The entry point for the Everything client.
@@ -16,10 +17,10 @@ public class EverythingClient implements EntryPoint
     // from interface EntryPoint
     public void onModuleLoad ()
     {
-        setContent(new Label("TODO"));
+        setContent(new MainPanel());
     }
 
-    protected void setContent (Panel content)
+    protected void setContent (Widget content)
     {
         if (_content != null) {
             RootPanel.get(CLIENT_DIV).remove(_content);
@@ -31,7 +32,7 @@ public class EverythingClient implements EntryPoint
         }
     }
 
-    protected Panel _content;
+    protected Widget _content;
 
     protected static final String CLIENT_DIV = "client";
 }

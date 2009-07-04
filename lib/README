@@ -1,0 +1,5 @@
+Create a symlink here to your GWT distribution named gwt, for example:
+
+ln -s /foo/bar/gwt-linux-1.6.4 gwt
+
+This will allow you to run the 'ant gshell' target.
