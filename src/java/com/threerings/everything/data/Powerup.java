@@ -8,8 +8,7 @@ import com.samskivert.depot.ByteEnum;
 /**
  * Defines our different powerup types.
  */
-public enum Powerup
-    implements ByteEnum
+public enum Powerup implements ByteEnum
 {
     //
     // consumable powerups (id starts at 1)

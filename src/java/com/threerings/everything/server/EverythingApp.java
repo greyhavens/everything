@@ -13,11 +13,15 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import com.samskivert.depot.PersistenceContext;
+import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
+import com.threerings.util.PostgresUtil;
 
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.App;
 import com.threerings.samsara.app.server.Binding;
+
+import com.threerings.everything.server.persist.EverythingRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -57,6 +61,12 @@ public class EverythingApp extends App
     }
 
     @Override // from App
+    public ConnectionProvider createConnectionProvider (String ident)
+    {
+        return PostgresUtil.createPoolingProvider(_config, ident);
+    }
+
+    @Override // from App
     public void didInit ()
     {
         log.info("Everything app initialized.", "version", _appvers);
@@ -66,9 +76,15 @@ public class EverythingApp extends App
     public void didDetach ()
     {
         log.info("Everything app detached.", "version", _appvers);
+        // TODO: we want to wait for all of our pending servlets to finish before shutdown
+        shutdown();
     }
 
     protected Config _config = new Config("everything", getClass().getClassLoader());
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+
+    // we need to inject all repositories here to ensure that they are resolved when our app is
+    // resolved so that everything is registered and ready to go when Samsara initializes Depot
+    @Inject protected EverythingRepository _everyRepo;
 }

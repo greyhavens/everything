@@ -3,10 +3,12 @@
 
 package com.threerings.everything.data;
 
+import com.samskivert.depot.ByteEnum;
+
 /**
  * Defines the various rarities of things.
  */
-public enum Rarity
+public enum Rarity implements ByteEnum
 {
     I(0, 10),   II(1, 15),   III(2, 35),   IV(3, 50),  V(4, 85),
     VI(5, 135), VII(6, 220), VIII(7, 355), IX(8, 575), X(9, 930);

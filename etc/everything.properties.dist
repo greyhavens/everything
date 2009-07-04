@@ -7,3 +7,13 @@
 facebook_appid = APP_ID
 facebook_key = API_KEY
 facebook_secret = APP_SECRET
+
+# Our Postgres database configuration
+db.default.server = localhost
+db.default.port = 5432
+db.default.database = everything
+db.default.username = everything
+db.default.password = PASSWORD
+
+db.readonly.maxconns = 1
+db.readwrite.maxconns = 1
