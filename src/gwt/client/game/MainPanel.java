@@ -24,7 +24,7 @@ public class MainPanel extends FlowPanel
                 if (data == null) {
                     add(new Label("You need to add the app! (TODO)."));
                 } else {
-                    add(new Label("Hello " + data.name));
+                    add(new Label("Hello " + data.name.name));
                 }
             }
             public void onFailure (Throwable cause) {

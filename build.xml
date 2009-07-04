@@ -175,7 +175,6 @@
     </copyfilelist>
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web">
-      <fileset dir="src/web" includes="**"/>
       <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="**"/>
     </copy>
     <manifest file="${instroot.dir}/MANIFEST.MF">
