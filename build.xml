@@ -12,10 +12,12 @@
 
   <!-- we need all of these libraries to build... -->
   <filelist dir="." id="build.libs">
+    <file name="${extlibs.dir}/commons-collections.jar"/>
     <file name="${extlibs.dir}/commons-io.jar"/>
     <file name="${extlibs.dir}/google-collect.jar"/>
     <file name="${extlibs.dir}/guice.jar"/>
     <file name="${extlibs.dir}/servlet-api.jar"/>
+    <file name="${extlibs.dir}/velocity-1.5-dev.jar"/>
   </filelist>
 
   <!-- ...but we only need these libraries at runtime (the rest are provided by samsara) -->
@@ -52,7 +54,7 @@
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
     <artifact:dependencies filesetId="dependency.fileset">
       <remoteRepository refid="ooo.maven.depends.repo"/>
-      <dependency groupId="com.samskivert" artifactId="samskivert" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.samskivert" artifactId="depot" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
@@ -141,6 +143,20 @@
         </info>
       </package>
     </dpkg>
+  </target>
+
+  <target name="genrecord" depends="prepare" description="Regenerates PersistentRecord classes.">
+    <taskdef name="grecord" classname="com.samskivert.depot.tools.GenRecordTask"
+             classpathref="build.classpath"/>
+    <!-- make sure the record class files are all compiled -->
+    <javac srcdir="${src.dir}" destdir="${deploy.dir}/classes" debug="on" deprecation="on">
+      <classpath refid="build.classpath"/>
+      <include name="**/*Record.java"/>
+    </javac>
+    <!-- now update the source files -->
+    <grecord classpathref="build.classpath">
+      <fileset dir="${src.dir}" includes="**/*Record.java"/>
+    </grecord>
   </target>
 
 </project>
