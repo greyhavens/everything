@@ -11,6 +11,8 @@ import com.samskivert.depot.annotation.GenerationType;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.data.Rarity;
+
 /**
  * Contains data on a single thing.
  */
@@ -27,6 +29,10 @@ public class ThingRecord extends PersistentRecord
     public static final ColumnExp FACTS = colexp(_R, "facts");
     // AUTO-GENERATED: FIELDS END
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** A unique identifier for this thing. */
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     public int thingId;
@@ -37,8 +43,8 @@ public class ThingRecord extends PersistentRecord
     /** The name of this thing. */
     public String name;
 
-    /** This thing's rarity level (0-9). */
-    public byte rarity;
+    /** This thing's rarity level. */
+    public Rarity rarity;
 
     /** The name of this thing's image (its media hash). */
     public String image;

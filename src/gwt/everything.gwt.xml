@@ -1,0 +1,16 @@
+<module>
+  <inherits name="com.google.gwt.user.User"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name="com.samskivert.Depot"/>
+  <inherits name="com.threerings.gwt.Utils"/>
+  <inherits name="com.threerings.samsara.App"/>
+
+  <source path="com/threerings/everything/client"/>
+  <source path="com/threerings/everything/data"/>
+  <source path="client"/>
+
+  <entry-point class="client.EverythingClient"/>
+  <public path="public"/>
+  <stylesheet src="game.css"/>
+  <stylesheet src="admin.css"/>
+</module>

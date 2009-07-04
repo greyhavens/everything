@@ -19,6 +19,10 @@ public class WishRecord extends PersistentRecord
     public static final ColumnExp SET_ID = colexp(_R, "setId");
     // AUTO-GENERATED: FIELDS END
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** The user that has this wish. */
     @Id public int userId;
 

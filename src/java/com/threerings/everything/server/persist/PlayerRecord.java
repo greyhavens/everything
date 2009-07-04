@@ -23,8 +23,15 @@ public class PlayerRecord extends PersistentRecord
     public static final ColumnExp LAST_SESSION = colexp(_R, "lastSession");
     // AUTO-GENERATED: FIELDS END
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** The Samsara user id of this player. */
     @Id public int userId;
+
+    /** This player's name. */
+    public String name;
 
     /** This player's current coin balance. */
     public int coins;

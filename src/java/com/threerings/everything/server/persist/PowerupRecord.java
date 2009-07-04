@@ -22,6 +22,10 @@ public class PowerupRecord extends PersistentRecord
     public static final ColumnExp COUNT = colexp(_R, "count");
     // AUTO-GENERATED: FIELDS END
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** The player that owns this powerup. */
     @Id public int ownerId;
 
