@@ -8,6 +8,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.inject.Inject;
+
 import com.samskivert.servlet.util.ParameterUtil;
 import com.threerings.user.OOOUser;
 
@@ -31,7 +33,8 @@ public class AuthServlet extends AppServlet
             // if they have no session key, they haven't added the app, if they have a session key
             // they have so we'll create an OOOUser record for them and send them to index.html
             if (!ParameterUtil.isSet(req, "fb_sig_session_key") || getUser(req, rsp) == null) {
-                rsp.sendRedirect("addme.html");
+                rsp.sendRedirect("http://www.facebook.com/login.php?api_key=" +
+                                 _app.getFacebookKey() + "&canvas=1&v=1.0");
             } else {
                 rsp.sendRedirect("index.html");
             }
@@ -40,4 +43,6 @@ public class AuthServlet extends AppServlet
             rsp.sendRedirect("addme.html");
         }
     }
+
+    @Inject protected EverythingApp _app;
 }
