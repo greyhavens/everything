@@ -8,7 +8,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.threerings.samsara.app.client.ServiceException;
 
-import com.threerings.everything.data.Card;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -24,10 +23,4 @@ public interface EverythingService extends RemoteService
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
     SessionData validateSession () throws ServiceException;
-
-    /**
-     * Returns detail information for the specified card, or null if the specified player does not
-     * own a card with the specified thing.
-     */
-    Card getCard (int ownerId, int thingId) throws ServiceException;
 }

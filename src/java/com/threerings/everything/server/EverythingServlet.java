@@ -29,8 +29,8 @@ import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.EverythingCodes;
 import com.threerings.everything.data.SessionData;
-import com.threerings.everything.server.persist.EverythingRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
+import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -48,7 +48,7 @@ public class EverythingServlet extends AppServiceServlet
             throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
         }
 
-        PlayerRecord player = _everyRepo.loadPlayer(user.userId);
+        PlayerRecord player = _playerRepo.loadPlayer(user.userId);
         if (player == null) {
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
             if (fbinfo == null || fbinfo.right == null) {
@@ -87,7 +87,7 @@ public class EverythingServlet extends AppServiceServlet
             } catch (Exception e) {
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
             }
-            player = _everyRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday);
+            player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday);
         }
 
         SessionData data = new SessionData();
@@ -96,13 +96,7 @@ public class EverythingServlet extends AppServiceServlet
         return data;
     }
 
-    // from interface EverythingService
-    public Card getCard (int ownerId, int thingId) throws ServiceException
-    {
-        return null; // TODO
-    }
-
-    @Inject protected EverythingRepository _everyRepo;
+    @Inject protected PlayerRepository _playerRepo;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected UserLogic _userLogic;
 

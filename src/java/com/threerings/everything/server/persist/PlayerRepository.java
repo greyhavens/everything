@@ -15,12 +15,12 @@ import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 
 /**
- * Manages persistent state for the Everything app.
+ * Manages player state for the Everything app.
  */
 @Singleton
-public class EverythingRepository extends DepotRepository
+public class PlayerRepository extends DepotRepository
 {
-    @Inject public EverythingRepository (PersistenceContext ctx)
+    @Inject public PlayerRepository (PersistenceContext ctx)
     {
         super(ctx);
     }
@@ -51,11 +51,9 @@ public class EverythingRepository extends DepotRepository
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
-        classes.add(CardRecord.class);
         classes.add(PlayerRecord.class);
+        classes.add(CardRecord.class);
         classes.add(PowerupRecord.class);
-        classes.add(SetRecord.class);
-        classes.add(ThingRecord.class);
         classes.add(WishRecord.class);
     }
 }
