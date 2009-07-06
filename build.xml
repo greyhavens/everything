@@ -162,7 +162,7 @@
     </jar>
   </target>
 
-  <target name="distall" depends="mavendeps,dist"
+  <target name="distall" depends="mavendeps,dist,gclient"
           description="Fetches dependencies and builds everything.">
   </target>
 
