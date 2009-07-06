@@ -11,6 +11,7 @@
 
   <entry-point class="client.EverythingClient"/>
   <public path="public"/>
+  <stylesheet src="global.css"/>
   <stylesheet src="game.css"/>
   <stylesheet src="admin.css"/>
 </module>
