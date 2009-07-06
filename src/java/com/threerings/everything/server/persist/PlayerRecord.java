@@ -10,6 +10,7 @@ import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.Id;
+import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.data.PlayerName;
@@ -31,7 +32,7 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -50,7 +51,7 @@ public class PlayerRecord extends PersistentRecord
     public Timestamp joined;
 
     /** The time this player last started a game session. */
-    public Timestamp lastSession;
+    @Index public Timestamp lastSession;
 
     /**
      * Creates a {@link PlayerName} instance from our data.
