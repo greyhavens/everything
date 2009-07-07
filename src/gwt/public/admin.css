@@ -9,6 +9,6 @@
   font-weight: bold;
 }
 
-.editThings .gwt-TextBox {
-  padding: 5px 0px;
+.editThings .Column .gwt-TextBox {
+  margin: 5px 0px;
 }

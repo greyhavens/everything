@@ -61,6 +61,7 @@ public class EditThingsPanel extends SmartTable
     protected abstract class Column<T> extends FlowPanel
     {
         public Column (String header, int maxlen) {
+            setStyleName("Column");
             add(Widgets.newLabel(header, "Header"));
             add(_input = Widgets.newTextBox("", maxlen, 15));
             add(_contents = Widgets.newFlowPanel("List"));
@@ -181,6 +182,20 @@ public class EditThingsPanel extends SmartTable
         protected FlowPanel _contents;
         protected TextBox _input;
         protected Label _empty;
+    }
+
+    protected class ThingEditor extends SmartTable
+    {
+        public ThingEditor (Thing thing) {
+            super("Editor", 5, 0);
+            _thing = thing;
+
+            setWidget(0, 0, Widgets.newTextBox(thing.name, Thing.MAX_NAME_LENGTH, 15));
+            setWidget(1, 0, Widgets.newTextBox(thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40));
+            setWidget(2, 0, Widgets.newTextBox(thing.facts, Thing.MAX_FACTS_LENGTH, 40));
+        }
+
+        protected Thing _thing;
     }
 
     protected Column<Category> _cats =
@@ -307,6 +322,16 @@ public class EditThingsPanel extends SmartTable
 
         protected void onDelete (Thing object, AsyncCallback<Void> callback) {
             _adminsvc.deleteThing(object.thingId, callback);
+        }
+
+        @Override public void clear () {
+            super.clear();
+            setText(1, 0, "", getCellCount(0), null);
+        }
+
+        @Override public void setSelected (Thing item) {
+            super.setSelected(item);
+            setWidget(1, 0, new ThingEditor(item), getCellCount(0), null);
         }
 
         protected int _seriesId;
