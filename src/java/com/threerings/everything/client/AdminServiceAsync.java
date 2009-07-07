@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.ThingSet;
+import com.threerings.everything.data.Series;
 
 /**
  * Provides the asynchronous version of {@link AdminService}.
@@ -32,19 +32,19 @@ public interface AdminServiceAsync
     void deleteCategory (int categoryId, AsyncCallback<Void> callback);
 
     /**
-     * The async version of {@link GameService#loadSets}.
+     * The async version of {@link GameService#loadSeries}.
      */
-    void loadSets (int categoryId, AsyncCallback<List<ThingSet>> callback);
+    void loadSeries (int categoryId, AsyncCallback<List<Series>> callback);
 
     /**
-     * The async version of {@link GameService#createSet}.
+     * The async version of {@link GameService#createSeries}.
      */
-    void createSet (ThingSet set, AsyncCallback<Integer> callback);
+    void createSeries (Series series, AsyncCallback<Integer> callback);
 
     /**
-     * The async version of {@link GameService#deleteSet}.
+     * The async version of {@link GameService#deleteSeries}.
      */
-    void deleteSet (int setId, AsyncCallback<Void> callback);
+    void deleteSeries (int seriesId, AsyncCallback<Void> callback);
 
     /**
      * The async version of {@link GameService#loadThings}.

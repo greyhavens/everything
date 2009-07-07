@@ -17,10 +17,10 @@ import com.samskivert.depot.clause.Where;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.ThingSet;
+import com.threerings.everything.data.Series;
 
 /**
- * Manages thing and set data for the Everything app.
+ * Manages category, series and thing data for the Everything app.
  */
 @Singleton
 public class ThingRepository extends DepotRepository
@@ -63,41 +63,41 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads and returns all set records with the specified category id.
+     * Loads and returns all series records with the specified category id.
      */
-    public Iterable<ThingSet> loadSets (int categoryId)
+    public Iterable<Series> loadSeries (int categoryId)
     {
         return Iterables.transform(
-            findAll(SetRecord.class, new Where(SetRecord.CATEGORY_ID.eq(categoryId))),
-            SetRecord.TO_SET);
+            findAll(SeriesRecord.class, new Where(SeriesRecord.CATEGORY_ID.eq(categoryId))),
+            SeriesRecord.TO_SERIES);
     }
 
     /**
-     * Creates a new set.
+     * Creates a new series.
      */
-    public int createSet (ThingSet set, int creatorId)
+    public int createSeries (Series series, int creatorId)
     {
-        SetRecord record = SetRecord.FROM_SET.apply(set);
+        SeriesRecord record = SeriesRecord.FROM_SERIES.apply(series);
         record.creatorId = creatorId;
-        insert(record); // assigns record.setId
-        return record.setId;
+        insert(record); // assigns record.seriesId
+        return record.seriesId;
     }
 
     /**
-     * Deletes the specified set. The caller is responsible for making sure this is a good idea.
+     * Deletes the specified series. The caller is responsible for making sure this is a good idea.
      */
-    public void deleteSet (int setId)
+    public void deleteSeries (int seriesId)
     {
-        delete(SetRecord.getKey(setId));
+        delete(SeriesRecord.getKey(seriesId));
     }
 
     /**
-     * Loads and returns all things in the specified set.
+     * Loads and returns all things in the specified series.
      */
-    public Iterable<Thing> loadThings (int setId)
+    public Iterable<Thing> loadThings (int seriesId)
     {
         return Iterables.transform(
-            findAll(ThingRecord.class, new Where(ThingRecord.SET_ID.eq(setId))),
+            findAll(ThingRecord.class, new Where(ThingRecord.SERIES_ID.eq(seriesId))),
             ThingRecord.TO_THING);
     }
 
@@ -124,7 +124,7 @@ public class ThingRepository extends DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
         classes.add(CategoryRecord.class);
-        classes.add(SetRecord.class);
+        classes.add(SeriesRecord.class);
         classes.add(ThingRecord.class);
     }
 }

@@ -49,7 +49,7 @@ public class CategoryRecord extends PersistentRecord
     @Column(length=Category.MAX_NAME_LENGTH)
     public String name;
 
-    /** The category to which this set belongs. */
+    /** This category's parent or 0 if it is a top-level category. */
     @Index public int parentId;
 
     /** The id of the user that created this category. */

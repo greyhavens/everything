@@ -30,13 +30,13 @@ import com.threerings.everything.client.AdminServiceAsync;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.ThingSet;
+import com.threerings.everything.data.Series;
 
 import client.util.Context;
 import client.util.PopupCallback;
 
 /**
- * Provides an interface for editing categories, sets and things.
+ * Provides an interface for editing categories, series and things.
  */
 public class EditThingsPanel extends SmartTable
 {
@@ -243,33 +243,33 @@ public class EditThingsPanel extends SmartTable
         protected int _parentId;
     };
 
-    protected Column<ThingSet> _series = new Column<ThingSet>("Series", ThingSet.MAX_NAME_LENGTH) {
-        protected void callLoad (AsyncCallback<List<ThingSet>> callback) {
+    protected Column<Series> _series = new Column<Series>("Series", Series.MAX_NAME_LENGTH) {
+        protected void callLoad (AsyncCallback<List<Series>> callback) {
             Category category = _subcats.getSelected();
             if (category != null) {
-                _adminsvc.loadSets(_categoryId = category.categoryId, callback);
+                _adminsvc.loadSeries(_categoryId = category.categoryId, callback);
             }
         }
 
-        protected String getName (ThingSet set) {
-            return set.name;
+        protected String getName (Series series) {
+            return series.name;
         }
 
-        protected ThingSet onCreate (String text, AsyncCallback<Integer> callback) {
-            ThingSet set = new ThingSet();
-            set.name = text;
-            set.categoryId = _categoryId;
-            _adminsvc.createSet(set, callback);
-            return set;
+        protected Series onCreate (String text, AsyncCallback<Integer> callback) {
+            Series series = new Series();
+            series.name = text;
+            series.categoryId = _categoryId;
+            _adminsvc.createSeries(series, callback);
+            return series;
         }
 
-        protected void onCreated (int createdId, ThingSet set) {
-            set.setId = createdId;
-            itemAdded(set);
+        protected void onCreated (int createdId, Series series) {
+            series.seriesId = createdId;
+            itemAdded(series);
         }
 
-        protected void onDelete (ThingSet set, AsyncCallback<Void> callback) {
-            _adminsvc.deleteSet(set.setId, callback);
+        protected void onDelete (Series series, AsyncCallback<Void> callback) {
+            _adminsvc.deleteSeries(series.seriesId, callback);
         }
 
         protected int _categoryId;
@@ -277,9 +277,9 @@ public class EditThingsPanel extends SmartTable
 
     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
         protected void callLoad (AsyncCallback<List<Thing>> callback) {
-            ThingSet set = _series.getSelected();
-            if (set != null) {
-                _adminsvc.loadThings(_setId = set.setId, callback);
+            Series series = _series.getSelected();
+            if (series != null) {
+                _adminsvc.loadThings(_seriesId = series.seriesId, callback);
             }
         }
 
@@ -290,7 +290,7 @@ public class EditThingsPanel extends SmartTable
         protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
             Thing thing = new Thing();
             thing.name = text;
-            thing.setId = _setId;
+            thing.seriesId = _seriesId;
             // set up the thing with defaults which can be edited once it is created
             thing.rarity = Rarity.I;
             thing.image = "";
@@ -309,7 +309,7 @@ public class EditThingsPanel extends SmartTable
             _adminsvc.deleteThing(object.thingId, callback);
         }
 
-        protected int _setId;
+        protected int _seriesId;
     };
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
