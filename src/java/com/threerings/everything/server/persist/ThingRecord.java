@@ -3,8 +3,11 @@
 
 package com.threerings.everything.server.persist;
 
+import com.google.common.base.Function;
+
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.util.RuntimeUtil;
 import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.GeneratedValue;
 import com.samskivert.depot.annotation.GenerationType;
@@ -12,6 +15,7 @@ import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.Thing;
 
 /**
  * Contains data on a single thing.
@@ -27,11 +31,20 @@ public class ThingRecord extends PersistentRecord
     public static final ColumnExp IMAGE = colexp(_R, "image");
     public static final ColumnExp DESCRIP = colexp(_R, "descrip");
     public static final ColumnExp FACTS = colexp(_R, "facts");
+    public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
+
+    /** A function for converting persistent records to runtime records. */
+    public static Function<ThingRecord, Thing> TO_THING =
+        RuntimeUtil.makeToRuntime(ThingRecord.class, Thing.class);
+
+    /** A function for converting runtime records to persistent records. */
+    public static Function<Thing, ThingRecord> FROM_THING =
+        RuntimeUtil.makeToRecord(Thing.class, ThingRecord.class);
 
     /** A unique identifier for this thing. */
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -41,6 +54,7 @@ public class ThingRecord extends PersistentRecord
     public int setId;
 
     /** The name of this thing. */
+    @Column(length=Thing.MAX_NAME_LENGTH)
     public String name;
 
     /** This thing's rarity level. */
@@ -50,11 +64,23 @@ public class ThingRecord extends PersistentRecord
     public String image;
 
     /** This thing's description. */
+    @Column(length=Thing.MAX_DESCRIP_LENGTH)
     public String descrip;
 
     /** Facts about this thing. */
-    @Column(length=2048)
+    @Column(length=Thing.MAX_FACTS_LENGTH)
     public String facts;
+
+    /** The id of the user that created this thing. */
+    public int creatorId;
+
+    /**
+     * Converts this persistent record to a runtime record.
+     */
+    public Thing toThing ()
+    {
+        return TO_THING.apply(this);
+    }
 
     // AUTO-GENERATED: METHODS START
     /**

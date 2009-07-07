@@ -13,6 +13,7 @@ import com.samskivert.depot.annotation.GenerationType;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
+import com.samskivert.depot.util.RuntimeUtil;
 
 import com.threerings.everything.data.ThingSet;
 
@@ -24,7 +25,9 @@ public class SetRecord extends PersistentRecord
     // AUTO-GENERATED: FIELDS START
     public static final Class<SetRecord> _R = SetRecord.class;
     public static final ColumnExp SET_ID = colexp(_R, "setId");
+    public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
@@ -32,11 +35,12 @@ public class SetRecord extends PersistentRecord
     public static final int SCHEMA_VERSION = 2;
 
     /** A function for converting persistent records to runtime records. */
-    public static Function<SetRecord, ThingSet> TO_SET = new Function<SetRecord, ThingSet>() {
-        public ThingSet apply (SetRecord record) {
-            return record.toSet();
-        }
-    };
+    public static Function<SetRecord, ThingSet> TO_SET =
+        RuntimeUtil.makeToRuntime(SetRecord.class, ThingSet.class);
+
+    /** A function for converting runtime records to persistent records. */
+    public static Function<ThingSet, SetRecord> FROM_SET =
+        RuntimeUtil.makeToRecord(ThingSet.class, SetRecord.class);
 
     /** A unique identifier for this set. */
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -56,11 +60,7 @@ public class SetRecord extends PersistentRecord
      */
     public ThingSet toSet ()
     {
-        ThingSet set = new ThingSet();
-        set.setId = setId;
-        set.name = name;
-        set.categoryId = categoryId;
-        return set;
+        return TO_SET.apply(this);
     }
 
     // AUTO-GENERATED: METHODS START

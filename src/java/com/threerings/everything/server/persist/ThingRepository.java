@@ -15,6 +15,8 @@ import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.Where;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingSet;
 
 /**
@@ -40,15 +42,24 @@ public class ThingRepository extends DepotRepository
 
     /**
      * Creates a new category.
+     *
+     * @return the category's newly assigned id.
      */
-    public Category createCategory (String name, int parentId, int creatorId)
+    public int createCategory (Category category, int creatorId)
     {
-        CategoryRecord record = new CategoryRecord();
-        record.name = name;
-        record.parentId = parentId;
+        CategoryRecord record = CategoryRecord.FROM_CATEGORY.apply(category);
         record.creatorId = creatorId;
         insert(record); // assigns record.categoryId
-        return record.toCategory();
+        return record.categoryId;
+    }
+
+    /**
+     * Deletes the specified category. The caller is responsible for making sure this is a good
+     * idea.
+     */
+    public void deleteCategory (int categoryId)
+    {
+        delete(CategoryRecord.getKey(categoryId));
     }
 
     /**
@@ -64,14 +75,49 @@ public class ThingRepository extends DepotRepository
     /**
      * Creates a new set.
      */
-    public ThingSet createSet (String name, int categoryId, int creatorId)
+    public int createSet (ThingSet set, int creatorId)
     {
-        SetRecord record = new SetRecord();
-        record.categoryId = categoryId;
-        record.name = name;
+        SetRecord record = SetRecord.FROM_SET.apply(set);
         record.creatorId = creatorId;
         insert(record); // assigns record.setId
-        return record.toSet();
+        return record.setId;
+    }
+
+    /**
+     * Deletes the specified set. The caller is responsible for making sure this is a good idea.
+     */
+    public void deleteSet (int setId)
+    {
+        delete(SetRecord.getKey(setId));
+    }
+
+    /**
+     * Loads and returns all things in the specified set.
+     */
+    public Iterable<Thing> loadThings (int setId)
+    {
+        return Iterables.transform(
+            findAll(ThingRecord.class, new Where(ThingRecord.SET_ID.eq(setId))),
+            ThingRecord.TO_THING);
+    }
+
+    /**
+     * Creates a new thing.
+     */
+    public int createThing (Thing thing, int creatorId)
+    {
+        ThingRecord record = ThingRecord.FROM_THING.apply(thing);
+        record.creatorId = creatorId;
+        insert(record); // assigns record.thingId
+        return record.thingId;
+    }
+
+    /**
+     * Deletes the specified thing. The caller is responsible for making sure this is a good idea.
+     */
+    public void deleteThing (int thingId)
+    {
+        delete(ThingRecord.getKey(thingId));
     }
 
     @Override // from DepotRepository

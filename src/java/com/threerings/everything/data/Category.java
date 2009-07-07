@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * Contains data for a category or sub-category.
  */
 public class Category
-    implements IsSerializable
+    implements IsSerializable, Comparable<Category>
 {
     /** The maximum length of a category name. */
     public static final int MAX_NAME_LENGTH = 64;
@@ -22,4 +22,10 @@ public class Category
 
     /** The id of this category's parent, if it is a sub-category, or 0. */
     public int parentId;
+
+    // from interface Comparable<Category>
+    public int compareTo (Category other)
+    {
+        return name.compareTo(other.name);
+    }
 }

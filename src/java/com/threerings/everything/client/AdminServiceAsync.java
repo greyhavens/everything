@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingSet;
 
 /**
@@ -23,7 +24,12 @@ public interface AdminServiceAsync
     /**
      * The async version of {@link GameService#createCategory}.
      */
-    void createCategory (String name, int parentId, AsyncCallback<Category> callback);
+    void createCategory (Category category, AsyncCallback<Integer> callback);
+
+    /**
+     * The async version of {@link GameService#deleteCategory}.
+     */
+    void deleteCategory (int categoryId, AsyncCallback<Void> callback);
 
     /**
      * The async version of {@link GameService#loadSets}.
@@ -33,5 +39,25 @@ public interface AdminServiceAsync
     /**
      * The async version of {@link GameService#createSet}.
      */
-    void createSet (String name, int categoryId, AsyncCallback<ThingSet> callback);
+    void createSet (ThingSet set, AsyncCallback<Integer> callback);
+
+    /**
+     * The async version of {@link GameService#deleteSet}.
+     */
+    void deleteSet (int setId, AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link GameService#loadThings}.
+     */
+    void loadThings (int parentId, AsyncCallback<List<Thing>> callback);
+
+    /**
+     * The async version of {@link GameService#createThing}.
+     */
+    void createThing (Thing thing, AsyncCallback<Integer> callback);
+
+    /**
+     * The async version of {@link GameService#deleteThing}.
+     */
+    void deleteThing (int thingId, AsyncCallback<Void> callback);
 }

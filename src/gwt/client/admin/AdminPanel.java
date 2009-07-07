@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
 
@@ -24,13 +25,13 @@ public class AdminPanel extends FlowPanel
         _ctx = ctx;
 
         HorizontalPanel buttons = new HorizontalPanel();
-        buttons.add(new Button("Create Categories", new ClickHandler() {
+        buttons.add(new Button("Edit Things", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                // TODO
+                setContent(new EditThingsPanel(_ctx));
             }
         }));
         buttons.add(Widgets.newShim(5, 5));
-        buttons.add(new Button("Create Sets", new ClickHandler() {
+        buttons.add(new Button("TODO", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 // TODO
             }
@@ -40,5 +41,14 @@ public class AdminPanel extends FlowPanel
         // TODO: download and display some overall statistics
     }
 
+    protected void setContent (Widget content)
+    {
+        if (_content != null) {
+            remove(_content);
+        }
+        add(_content = content);
+    }
+
     protected Context _ctx;
+    protected Widget _content;
 }

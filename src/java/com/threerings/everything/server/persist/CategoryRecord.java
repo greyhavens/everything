@@ -13,6 +13,7 @@ import com.samskivert.depot.annotation.GenerationType;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
+import com.samskivert.depot.util.RuntimeUtil;
 
 import com.threerings.everything.data.Category;
 
@@ -23,9 +24,10 @@ public class CategoryRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<CategoryRecord> _R = CategoryRecord.class;
-    public static final ColumnExp SET_ID = colexp(_R, "setId");
+    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp PARENT_ID = colexp(_R, "parentId");
+    public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
@@ -34,11 +36,11 @@ public class CategoryRecord extends PersistentRecord
 
     /** A function for converting persistent records to runtime records. */
     public static Function<CategoryRecord, Category> TO_CATEGORY =
-        new Function<CategoryRecord, Category>() {
-        public Category apply (CategoryRecord record) {
-            return record.toCategory();
-        }
-    };
+        RuntimeUtil.makeToRuntime(CategoryRecord.class, Category.class);
+
+    /** A function for converting runtime records to persistent records. */
+    public static Function<Category, CategoryRecord> FROM_CATEGORY =
+        RuntimeUtil.makeToRecord(Category.class, CategoryRecord.class);
 
     /** A unique identifier for this category. */
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -58,11 +60,7 @@ public class CategoryRecord extends PersistentRecord
      */
     public Category toCategory ()
     {
-        Category cat = new Category();
-        cat.categoryId = categoryId;
-        cat.name = name;
-        cat.parentId = parentId;
-        return cat;
+        return TO_CATEGORY.apply(this);
     }
 
     // AUTO-GENERATED: METHODS START
@@ -70,12 +68,12 @@ public class CategoryRecord extends PersistentRecord
      * Create and return a primary {@link Key} to identify a {@link CategoryRecord}
      * with the supplied key values.
      */
-    public static Key<CategoryRecord> getKey (int setId)
+    public static Key<CategoryRecord> getKey (int categoryId)
     {
         return new Key<CategoryRecord>(
                 CategoryRecord.class,
-                new ColumnExp[] { SET_ID },
-                new Comparable[] { setId });
+                new ColumnExp[] { CATEGORY_ID },
+                new Comparable[] { categoryId });
     }
     // AUTO-GENERATED: METHODS END
 }

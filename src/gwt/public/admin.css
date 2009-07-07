@@ -3,5 +3,12 @@
  */
 
 .admin {
-  border: 15px solid #FFFFFF;
+}
+
+.editThings .Header {
+  font-weight: bold;
+}
+
+.editThings .gwt-TextBox {
+  padding: 5px 0px;
 }
