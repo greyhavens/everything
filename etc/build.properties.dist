@@ -5,3 +5,7 @@
 
 # Used when testing with a local samsara installation
 local_samsara_dir = /export/samsara
+
+# Used to authenticate when developing with the GWT shell
+gshell_username = USER
+gshell_password = PASS

@@ -4,3 +4,51 @@
 
 .main {
 }
+
+.cardView {
+  width: 280px;
+  height: 380px;
+  border: 1px solid;
+  padding: 5px;
+  font-size: 15px;
+}
+
+.cardView .Title, .cardView .Position, .cardView .Categories, .cardView .Rarity {
+  text-align: center;
+}
+
+.cardView .Title {
+  font-size: 24px;
+}
+
+.cardView .Position, .cardView .Rarity {
+  font-size: 12px;
+}
+
+.cardView .Image {
+  width: 250px;
+  height: 300px;
+  margin: 10px 15px;
+}
+
+.cardView .Descrip {
+  margin: 10px 0px;
+  height: 55px;
+}
+
+.cardView .FactsTitle {
+  font-weight: bold;
+}
+
+.cardView .Facts {
+  height: 150px;
+}
+
+.cardView .Facts ul {
+  margin: none;
+}
+
+.cardView .When, .cardView .Giver, .cardView .Source {
+  font-style: italic;
+  margin: 10px 0px;
+}

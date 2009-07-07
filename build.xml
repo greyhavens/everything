@@ -132,7 +132,7 @@
     </apply>
   </target>
 
-  <target name="gshell" description="Runs our GWT client in HostedMode.">
+  <target name="gshell" depends="prepare" description="Runs our GWT client in HostedMode.">
     <java fork="true" classname="com.google.gwt.dev.HostedMode">
       <classpath>
         <pathelement path="lib/gwt/gwt-dev-linux.jar"/>
@@ -148,7 +148,7 @@
       <arg value="-port"/>
       <arg value="8080"/>
       <arg value="-startupUrl"/>
-      <arg value="candidate/everything"/>
+      <arg value="candidate/everything/auth?user=${gshell_username}&amp;pass=${gshell_password}"/>
       <arg value="-war"/>
       <arg value="${deploy.dir}/gwt"/>
       <arg value="everything"/>

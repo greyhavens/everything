@@ -41,6 +41,11 @@ public interface AdminServiceAsync
     void createThing (Thing thing, AsyncCallback<Integer> callback);
 
     /**
+     * The async version of {@link GameService#updateThing}.
+     */
+    void updateThing (Thing thing, AsyncCallback<Void> callback);
+
+    /**
      * The async version of {@link GameService#deleteThing}.
      */
     void deleteThing (int thingId, AsyncCallback<Void> callback);

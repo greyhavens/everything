@@ -62,6 +62,11 @@ public interface AdminService extends RemoteService
     int createThing (Thing thing) throws ServiceException;
 
     /**
+     * Updates the supplied thing.
+     */
+    void updateThing (Thing thing) throws ServiceException;
+
+    /**
      * Deletes the specified thing.
      */
     void deleteThing (int thingId) throws ServiceException;

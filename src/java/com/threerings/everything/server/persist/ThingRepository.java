@@ -83,6 +83,22 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Updates an existing thing. Returns true if a thing was found and updated, false othwerwise.
+     */
+    public boolean updateThing (Thing thing, int editorId)
+    {
+        ThingRecord orecord = load(ThingRecord.getKey(thing.thingId));
+        if (orecord == null) {
+            return false;
+        }
+        ThingRecord nrecord = ThingRecord.FROM_THING.apply(thing);
+        nrecord.creatorId = orecord.creatorId;
+        // TODO: store last editor id?
+        update(nrecord);
+        return true;
+    }
+
+    /**
      * Deletes the specified thing. The caller is responsible for making sure this is a good idea.
      */
     public void deleteThing (int thingId)

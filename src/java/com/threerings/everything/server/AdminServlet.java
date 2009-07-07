@@ -59,7 +59,7 @@ public class AdminServlet extends AppServiceServlet
     public List<Thing> loadThings (int parentId) throws ServiceException
     {
         requireAdmin();
-        return Lists.newArrayList(_thingRepo.loadThings(parentId));
+        return sort(Lists.newArrayList(_thingRepo.loadThings(parentId)));
     }
 
     // from interface AdminService
@@ -67,6 +67,13 @@ public class AdminServlet extends AppServiceServlet
     {
         OOOUser admin = requireAdmin();
         return _thingRepo.createThing(thing, admin.userId);
+    }
+
+    // from interface AdminService
+    public void updateThing (Thing thing) throws ServiceException
+    {
+        OOOUser admin = requireAdmin();
+        _thingRepo.updateThing(thing, admin.userId);
     }
 
     // from interface AdminService

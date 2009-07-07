@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * Provides data for a thing to the client.
  */
 public class Thing
-    implements IsSerializable
+    implements IsSerializable, Comparable<Thing>
 {
     /** The maximum length of a thing name. */
     public static final int MAX_NAME_LENGTH = 64;
@@ -43,4 +43,11 @@ public class Thing
 
     /** The URL from which this thing's information was obtained. */
     public String source;
+
+    // from interface Comparable<Thing>
+    public int compareTo (Thing other)
+    {
+        return (rarity != other.rarity) ? rarity.compareTo(other.rarity) :
+            name.compareTo(other.name);
+    }
 }

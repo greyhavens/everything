@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.inject.Inject;
 
 import com.samskivert.servlet.util.ParameterUtil;
+import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
@@ -29,6 +30,19 @@ public class AuthServlet extends AppServlet
     protected void doGet (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
     {
+        // if we have auth info on our URL, use that (for gshell)
+        String username = ParameterUtil.getParameter(req, "user", true);
+        String passwd = ParameterUtil.getParameter(req, "pass", true);
+        if (username != null && passwd != null) {
+            try {
+                _servletLogic.logon(username, StringUtil.md5hex(passwd), 2, rsp);
+                rsp.sendRedirect("index.html");
+                return;
+            } catch (ServiceException se) {
+                log.warning("Failed to logon", "user", username, "pass", passwd, "se", se);
+            }
+        }
+
         try {
             // if they have no session key, they haven't added the app, if they have a session key
             // they have so we'll create an OOOUser record for them and send them to index.html

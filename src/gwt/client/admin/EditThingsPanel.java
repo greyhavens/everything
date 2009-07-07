@@ -4,11 +4,17 @@
 package client.admin;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -16,6 +22,8 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -23,14 +31,16 @@ import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.ClickCallback;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
+import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
+import client.game.CardView;
+import client.util.ClickCallback;
 import client.util.Context;
 import client.util.PopupCallback;
 
@@ -51,6 +61,7 @@ public class EditThingsPanel extends SmartTable
             getFlexCellFormatter().setVerticalAlignment(0, col, HasAlignment.ALIGN_TOP);
         }
 
+        _ctx = ctx;
         _cats.setChild(_subcats);
         _subcats.setChild(_series);
         _series.setChild(_things);
@@ -82,9 +93,6 @@ public class EditThingsPanel extends SmartTable
                     _item = null;
                     _input.setText("");
                     return true;
-                }
-                protected void reportFailure (Throwable cause) {
-                    Popups.errorNear(cause.getMessage(), _input);
                 }
                 protected T _item;
             };
@@ -213,18 +221,94 @@ public class EditThingsPanel extends SmartTable
         protected int _parentId;
     }
 
-    protected class ThingEditor extends SmartTable
+    protected class ThingEditor extends FlowPanel
     {
-        public ThingEditor (Thing thing) {
-            super("Editor", 5, 0);
-            _thing = thing;
+        public ThingEditor (final Card card) {
+            setStyleName("Editor");
+            SmartTable bits = new SmartTable(5, 0);
+            add(bits);
 
-            setWidget(0, 0, Widgets.newTextBox(thing.name, Thing.MAX_NAME_LENGTH, 15));
-            setWidget(1, 0, Widgets.newTextBox(thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40));
-            setWidget(2, 0, Widgets.newTextBox(thing.facts, Thing.MAX_FACTS_LENGTH, 40));
+            int row = 0;
+            bits.setText(row, 0, "Name");
+            final TextBox name = Widgets.newTextBox(card.thing.name, Thing.MAX_NAME_LENGTH, 15);
+            bits.setWidget(row++, 1, name);
+
+            bits.setText(row, 0, "Rarity");
+            final ListBox rarity = new ListBox();
+            for (Rarity rv : Rarity.values()) {
+                rarity.addItem(rv.toString());
+                if (rv == card.thing.rarity) {
+                    rarity.setSelectedIndex(rarity.getItemCount()-1);
+                }
+            }
+            bits.setWidget(row++, 1, rarity);
+            rarity.addChangeHandler(new ChangeHandler() {
+                public void onChange (ChangeEvent event) {
+                    card.thing.rarity = Enum.valueOf(
+                        Rarity.class, rarity.getItemText(rarity.getSelectedIndex()));
+                    updateCard(card);
+                }
+            });
+
+            bits.setText(row, 0, "Descrip");
+            final TextBox descrip =
+                Widgets.newTextBox(card.thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40);
+            bits.setWidget(row++, 1, descrip);
+
+            bits.setText(row, 0, "Facts");
+            final TextArea facts = Widgets.newTextArea(card.thing.facts, 40, 3);
+            bits.setWidget(row++, 1, facts);
+
+            bits.setText(row, 0, "Source");
+            final TextBox source = Widgets.newTextBox(card.thing.descrip, 255, 40);
+            bits.setWidget(row++, 1, source);
+
+            final Button save = new Button("Save");
+            bits.setWidget(row++, 1, save);
+            new ClickCallback<Void>(save) {
+                protected boolean callService () {
+                    _adminsvc.updateThing(card.thing, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    Popups.infoNear("Thing saved.", save);
+                    return true;
+                }
+            };
+
+            final Timer updater = new Timer() {
+                @Override public void run () {
+                    card.thing.name = name.getText().trim();
+                    card.thing.descrip = descrip.getText().trim();
+                    card.thing.facts = facts.getText().trim();
+                    card.thing.source = source.getText().trim();
+                    updateCard(card);
+                }
+            };
+
+            KeyPressHandler trigger = new KeyPressHandler() {
+                public void onKeyPress (KeyPressEvent event) {
+                    updater.cancel();
+                    updater.schedule(250);
+                }
+            };
+            name.addKeyPressHandler(trigger);
+            descrip.addKeyPressHandler(trigger);
+            facts.addKeyPressHandler(trigger);
+            source.addKeyPressHandler(trigger);
+
+            updateCard(card);
         }
 
-        protected Thing _thing;
+        protected void updateCard (Card card) {
+            while (getWidgetCount() > 1) {
+                remove(1);
+            }
+            SmartTable pair = new SmartTable(5, 0);
+            pair.setWidget(0, 0, new CardView.Front(card));
+            pair.setWidget(0, 1, new CardView.Back(card));
+            add(pair);
+        }
     }
 
     protected CategoryColumn _cats = new CategoryColumn("Categories") {
@@ -293,11 +377,20 @@ public class EditThingsPanel extends SmartTable
 
         @Override public void setSelected (Thing item) {
             super.setSelected(item);
-            setWidget(1, 0, new ThingEditor(item), getCellCount(0), null);
+            // create a fake card and display it
+            Card card = new Card();
+            card.owner = _ctx.getMe();
+            card.categories = new Category[] {
+                _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
+            card.thing = item;
+            card.created = new Date();
+            setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
         }
 
         protected int _categoryId;
     };
+
+    protected Context _ctx;
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
 }
