@@ -5,11 +5,11 @@ package client.admin;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
 import client.util.Context;
@@ -24,21 +24,20 @@ public class AdminPanel extends FlowPanel
         setStyleName("admin");
         _ctx = ctx;
 
-        HorizontalPanel buttons = new HorizontalPanel();
-        buttons.add(new Button("Edit Things", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                setContent(new EditThingsPanel(_ctx));
-            }
-        }));
-        buttons.add(Widgets.newShim(5, 5));
-        buttons.add(new Button("TODO", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                // TODO
-            }
-        }));
-        add(buttons);
+        SmartTable links = new SmartTable(5, 0);
+        links.setText(0, 0, "Admin:");
+        links.setWidget(0, 1, new Hyperlink("Edit Things", "admin-edit"));
+        links.setWidget(0, 2, new Hyperlink("TODO", "admin-todo"));
+        add(links);
+    }
 
-        // TODO: download and display some overall statistics
+    public void setToken (String token)
+    {
+        if (token.equals("edit")) {
+            setContent(new EditThingsPanel(_ctx));
+        } else {
+            // TODO: download and display some overall statistics
+        }
     }
 
     protected void setContent (Widget content)

@@ -22,12 +22,12 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
+import com.threerings.gwt.ui.EnumListBox;
+import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
@@ -229,42 +229,38 @@ public class EditThingsPanel extends SmartTable
             add(bits);
 
             int row = 0;
-            bits.setText(row, 0, "Name");
+            bits.setText(row, 0, "Name", 1, "Label");
             final TextBox name = Widgets.newTextBox(card.thing.name, Thing.MAX_NAME_LENGTH, 15);
-            bits.setWidget(row++, 1, name);
+            bits.setWidget(row, 1, name);
 
-            bits.setText(row, 0, "Rarity");
-            final ListBox rarity = new ListBox();
-            for (Rarity rv : Rarity.values()) {
-                rarity.addItem(rv.toString());
-                if (rv == card.thing.rarity) {
-                    rarity.setSelectedIndex(rarity.getItemCount()-1);
-                }
-            }
-            bits.setWidget(row++, 1, rarity);
+            bits.setText(row, 2, "Rarity", 1, "Label");
+            final EnumListBox<Rarity> rarity = new EnumListBox<Rarity>(Rarity.class);
+            rarity.setSelectedValue(card.thing.rarity);
+            bits.setWidget(row++, 3, rarity);
             rarity.addChangeHandler(new ChangeHandler() {
                 public void onChange (ChangeEvent event) {
-                    card.thing.rarity = Enum.valueOf(
-                        Rarity.class, rarity.getItemText(rarity.getSelectedIndex()));
+                    card.thing.rarity = rarity.getSelectedValue();
                     updateCard(card);
                 }
             });
 
-            bits.setText(row, 0, "Descrip");
-            final TextBox descrip =
-                Widgets.newTextBox(card.thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40);
-            bits.setWidget(row++, 1, descrip);
+            bits.setText(row, 0, "Descrip", 1, "Label");
+            final LimitedTextArea descrip = Widgets.newTextArea(
+                card.thing.descrip, -1, 2, Thing.MAX_DESCRIP_LENGTH);
+            bits.setWidget(row++, 1, descrip, 3, "Wide");
 
-            bits.setText(row, 0, "Facts");
-            final TextArea facts = Widgets.newTextArea(card.thing.facts, 40, 3);
-            bits.setWidget(row++, 1, facts);
+            bits.setText(row, 0, "Facts", 1, "Label");
+            final LimitedTextArea facts = Widgets.newTextArea(
+                card.thing.facts, -1, 4, Thing.MAX_FACTS_LENGTH);
+            bits.setWidget(row++, 1, facts, 3, "Wide");
 
-            bits.setText(row, 0, "Source");
-            final TextBox source = Widgets.newTextBox(card.thing.descrip, 255, 40);
-            bits.setWidget(row++, 1, source);
+            bits.setText(row, 0, "Source", 1, "Label");
+            final TextBox source = Widgets.newTextBox(card.thing.descrip, 255, -1);
+            bits.setWidget(row++, 1, source, 3, "Wide");
 
             final Button save = new Button("Save");
-            bits.setWidget(row++, 1, save);
+            bits.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
+            bits.setWidget(row++, 1, save, 3, null);
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
                     _adminsvc.updateThing(card.thing, this);
@@ -293,8 +289,8 @@ public class EditThingsPanel extends SmartTable
                 }
             };
             name.addKeyPressHandler(trigger);
-            descrip.addKeyPressHandler(trigger);
-            facts.addKeyPressHandler(trigger);
+            descrip.getTextArea().addKeyPressHandler(trigger);
+            facts.getTextArea().addKeyPressHandler(trigger);
             source.addKeyPressHandler(trigger);
 
             updateCard(card);

@@ -29,6 +29,7 @@
   width: 250px;
   height: 300px;
   margin: 10px 15px;
+  display: block;
 }
 
 .cardView .Descrip {
@@ -42,10 +43,6 @@
 
 .cardView .Facts {
   height: 150px;
-}
-
-.cardView .Facts ul {
-  margin: none;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Source {

@@ -12,3 +12,11 @@
 .editThings .Column .gwt-TextBox {
   margin: 5px 0px;
 }
+
+.editThings .Editor .Label {
+  text-align: right;
+}
+
+.editThings .Editor .Wide .gwt-TextArea, .editThings .Editor .Wide .gwt-TextBox {
+  width: 500px;
+}

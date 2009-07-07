@@ -188,6 +188,13 @@
     </antcall>
   </target>
 
+  <target name="styles" depends="prepare" 
+          description="Copies updated style sheets into the local installed app.">
+    <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/">
+      <fileset dir="src/gwt/public" includes="*.css"/>
+    </copy>
+  </target>
+
   <target name="package" depends="distall" description="Builds our deployment package.">
     <tstamp><format property="pkg.version" pattern="yyyyMMddHHmmss"/></tstamp>
     <echo>Assigned build version ${pkg.version}</echo>
