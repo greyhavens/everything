@@ -255,7 +255,7 @@ public class EditThingsPanel extends SmartTable
             bits.setWidget(row++, 1, facts, 3, "Wide");
 
             bits.setText(row, 0, "Source", 1, "Label");
-            final TextBox source = Widgets.newTextBox(card.thing.descrip, 255, -1);
+            final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
             bits.setWidget(row++, 1, source, 3, "Wide");
 
             final Button save = new Button("Save");
