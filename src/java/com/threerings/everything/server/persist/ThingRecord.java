@@ -36,7 +36,7 @@ public class ThingRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<ThingRecord, Thing> TO_THING =
@@ -70,6 +70,9 @@ public class ThingRecord extends PersistentRecord
     /** Facts about this thing. */
     @Column(length=Thing.MAX_FACTS_LENGTH)
     public String facts;
+
+    /** The URL from which this thing's information was obtained. */
+    public String source;
 
     /** The id of the user that created this thing. */
     public int creatorId;

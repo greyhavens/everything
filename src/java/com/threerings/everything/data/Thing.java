@@ -40,4 +40,7 @@ public class Thing
 
     /** Facts about this thing. */
     public String facts;
+
+    /** The URL from which this thing's information was obtained. */
+    public String source;
 }
