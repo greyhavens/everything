@@ -5,6 +5,7 @@
   <property name="gsrc.dir" value="src/gwt"/>
   <property name="deploy.dir" value="dist"/>
   <property name="extlibs.dir" value="extlibs/java"/>
+  <property name="pkg.user" value="_samsara"/>
   <property name="pkg.maintainer.name" value="Three Rings Design"/>
   <property name="pkg.maintainer.email" value="ooo-dev@threerings.net"/>
 
@@ -223,6 +224,11 @@
             <email>${pkg.maintainer.email}</email>
           </maintainer>
         </info>
+        <permissions>
+          <permission user="${pkg.user}" group="${pkg.user}" mode="755" recursive="false">
+            <path>.</path>
+          </permission>
+        </permissions>
       </package>
     </dpkg>
   </target>
