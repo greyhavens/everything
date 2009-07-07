@@ -17,10 +17,9 @@ import com.samskivert.depot.clause.Where;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.Series;
 
 /**
- * Manages category, series and thing data for the Everything app.
+ * Manages category and thing data for the Everything app.
  */
 @Singleton
 public class ThingRepository extends DepotRepository
@@ -63,41 +62,12 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads and returns all series records with the specified category id.
+     * Loads and returns all things in the specified category.
      */
-    public Iterable<Series> loadSeries (int categoryId)
+    public Iterable<Thing> loadThings (int categoryId)
     {
         return Iterables.transform(
-            findAll(SeriesRecord.class, new Where(SeriesRecord.CATEGORY_ID.eq(categoryId))),
-            SeriesRecord.TO_SERIES);
-    }
-
-    /**
-     * Creates a new series.
-     */
-    public int createSeries (Series series, int creatorId)
-    {
-        SeriesRecord record = SeriesRecord.FROM_SERIES.apply(series);
-        record.creatorId = creatorId;
-        insert(record); // assigns record.seriesId
-        return record.seriesId;
-    }
-
-    /**
-     * Deletes the specified series. The caller is responsible for making sure this is a good idea.
-     */
-    public void deleteSeries (int seriesId)
-    {
-        delete(SeriesRecord.getKey(seriesId));
-    }
-
-    /**
-     * Loads and returns all things in the specified series.
-     */
-    public Iterable<Thing> loadThings (int seriesId)
-    {
-        return Iterables.transform(
-            findAll(ThingRecord.class, new Where(ThingRecord.SERIES_ID.eq(seriesId))),
+            findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))),
             ThingRecord.TO_THING);
     }
 
@@ -124,7 +94,6 @@ public class ThingRepository extends DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
         classes.add(CategoryRecord.class);
-        classes.add(SeriesRecord.class);
         classes.add(ThingRecord.class);
     }
 }

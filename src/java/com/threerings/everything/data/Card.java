@@ -16,6 +16,9 @@ public class Card
     /** The player that owns this card. */
     public PlayerName owner;
 
+    /** The categories of this card. */
+    public Category[] categories;
+
     /** The thing that's on this card. */
     public Thing thing;
 

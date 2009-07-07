@@ -23,8 +23,8 @@ public class Thing
     /** A unique identifier for this thing. */
     public int thingId;
 
-    /** The series to which this thing belongs. */
-    public int seriesId;
+    /** The (leaf) category to which this thing belongs. */
+    public int categoryId;
 
     /** The name of this thing. */
     public String name;

@@ -17,7 +17,6 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.Series;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -49,36 +48,11 @@ public class AdminServlet extends AppServiceServlet
         if (_thingRepo.loadCategories(categoryId).iterator().hasNext()) {
             throw new ServiceException(AdminService.E_CAT_HAS_SUBCATS);
         }
-        if (_thingRepo.loadSeries(categoryId).iterator().hasNext()) {
-            throw new ServiceException(AdminService.E_CAT_HAS_SERIES);
+        if (_thingRepo.loadThings(categoryId).iterator().hasNext()) {
+            throw new ServiceException(AdminService.E_CAT_HAS_THINGS);
         }
         log.info("Deleting category", "who", admin.username, "catId", categoryId);
         _thingRepo.deleteCategory(categoryId);
-    }
-
-    // from interface AdminService
-    public List<Series> loadSeries (int categoryId) throws ServiceException
-    {
-        requireAdmin();
-        return Lists.newArrayList(_thingRepo.loadSeries(categoryId));
-    }
-
-    // from interface AdminService
-    public int createSeries (Series series) throws ServiceException
-    {
-        OOOUser admin = requireAdmin();
-        return _thingRepo.createSeries(series, admin.userId);
-    }
-
-    // from interface AdminService
-    public void deleteSeries (int seriesId) throws ServiceException
-    {
-        OOOUser admin = requireAdmin();
-        if (_thingRepo.loadThings(seriesId).iterator().hasNext()) {
-            throw new ServiceException(AdminService.E_SERIES_HAS_THINGS);
-        }
-        log.info("Deleting series", "who", admin.username, "seriesId", seriesId);
-        _thingRepo.deleteSeries(seriesId);
     }
 
     // from interface AdminService

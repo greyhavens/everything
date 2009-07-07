@@ -30,13 +30,12 @@ import com.threerings.everything.client.AdminServiceAsync;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.data.Series;
 
 import client.util.Context;
 import client.util.PopupCallback;
 
 /**
- * Provides an interface for editing categories, series and things.
+ * Provides an interface for editing categories and things.
  */
 public class EditThingsPanel extends SmartTable
 {
@@ -184,54 +183,10 @@ public class EditThingsPanel extends SmartTable
         protected Label _empty;
     }
 
-    protected class ThingEditor extends SmartTable
+    protected abstract class CategoryColumn extends Column<Category>
     {
-        public ThingEditor (Thing thing) {
-            super("Editor", 5, 0);
-            _thing = thing;
-
-            setWidget(0, 0, Widgets.newTextBox(thing.name, Thing.MAX_NAME_LENGTH, 15));
-            setWidget(1, 0, Widgets.newTextBox(thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40));
-            setWidget(2, 0, Widgets.newTextBox(thing.facts, Thing.MAX_FACTS_LENGTH, 40));
-        }
-
-        protected Thing _thing;
-    }
-
-    protected Column<Category> _cats =
-        new Column<Category>("Categories", Category.MAX_NAME_LENGTH) {
-        protected void callLoad (AsyncCallback<List<Category>> callback) {
-            _adminsvc.loadCategories(0, callback);
-        }
-
-        protected String getName (Category category) {
-            return category.name;
-        }
-
-        protected Category onCreate (String text, AsyncCallback<Integer> callback) {
-            Category cat = new Category();
-            cat.name = text;
-            _adminsvc.createCategory(cat, callback);
-            return cat;
-        }
-
-        protected void onCreated (int createdId, Category cat) {
-            cat.categoryId = createdId;
-            itemAdded(cat);
-        }
-
-        protected void onDelete (Category category, AsyncCallback<Void> callback) {
-            _adminsvc.deleteCategory(category.categoryId, callback);
-        }
-    };
-
-    protected Column<Category> _subcats =
-        new Column<Category>("Sub-categories", Category.MAX_NAME_LENGTH) {
-        protected void callLoad (AsyncCallback<List<Category>> callback) {
-            Category parent = _cats.getSelected();
-            if (parent != null) {
-                _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
-            }
+        public CategoryColumn (String title) {
+            super(title, Category.MAX_NAME_LENGTH);
         }
 
         protected String getName (Category category) {
@@ -246,9 +201,9 @@ public class EditThingsPanel extends SmartTable
             return cat;
         }
 
-        protected void onCreated (int createdId, Category category) {
-            category.categoryId = createdId;
-            itemAdded(category);
+        protected void onCreated (int createdId, Category cat) {
+            cat.categoryId = createdId;
+            itemAdded(cat);
         }
 
         protected void onDelete (Category category, AsyncCallback<Void> callback) {
@@ -256,45 +211,51 @@ public class EditThingsPanel extends SmartTable
         }
 
         protected int _parentId;
+    }
+
+    protected class ThingEditor extends SmartTable
+    {
+        public ThingEditor (Thing thing) {
+            super("Editor", 5, 0);
+            _thing = thing;
+
+            setWidget(0, 0, Widgets.newTextBox(thing.name, Thing.MAX_NAME_LENGTH, 15));
+            setWidget(1, 0, Widgets.newTextBox(thing.descrip, Thing.MAX_DESCRIP_LENGTH, 40));
+            setWidget(2, 0, Widgets.newTextBox(thing.facts, Thing.MAX_FACTS_LENGTH, 40));
+        }
+
+        protected Thing _thing;
+    }
+
+    protected CategoryColumn _cats = new CategoryColumn("Categories") {
+        protected void callLoad (AsyncCallback<List<Category>> callback) {
+            _adminsvc.loadCategories(0, callback);
+        }
     };
 
-    protected Column<Series> _series = new Column<Series>("Series", Series.MAX_NAME_LENGTH) {
-        protected void callLoad (AsyncCallback<List<Series>> callback) {
-            Category category = _subcats.getSelected();
-            if (category != null) {
-                _adminsvc.loadSeries(_categoryId = category.categoryId, callback);
+    protected CategoryColumn _subcats = new CategoryColumn("Sub-categories") {
+        protected void callLoad (AsyncCallback<List<Category>> callback) {
+            Category parent = _cats.getSelected();
+            if (parent != null) {
+                _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
             }
         }
+    };
 
-        protected String getName (Series series) {
-            return series.name;
+    protected CategoryColumn _series = new CategoryColumn("Series") {
+        protected void callLoad (AsyncCallback<List<Category>> callback) {
+            Category parent = _subcats.getSelected();
+            if (parent != null) {
+                _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
+            }
         }
-
-        protected Series onCreate (String text, AsyncCallback<Integer> callback) {
-            Series series = new Series();
-            series.name = text;
-            series.categoryId = _categoryId;
-            _adminsvc.createSeries(series, callback);
-            return series;
-        }
-
-        protected void onCreated (int createdId, Series series) {
-            series.seriesId = createdId;
-            itemAdded(series);
-        }
-
-        protected void onDelete (Series series, AsyncCallback<Void> callback) {
-            _adminsvc.deleteSeries(series.seriesId, callback);
-        }
-
-        protected int _categoryId;
     };
 
     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
         protected void callLoad (AsyncCallback<List<Thing>> callback) {
-            Series series = _series.getSelected();
-            if (series != null) {
-                _adminsvc.loadThings(_seriesId = series.seriesId, callback);
+            Category category = _series.getSelected();
+            if (category != null) {
+                _adminsvc.loadThings(_categoryId = category.categoryId, callback);
             }
         }
 
@@ -305,12 +266,13 @@ public class EditThingsPanel extends SmartTable
         protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
             Thing thing = new Thing();
             thing.name = text;
-            thing.seriesId = _seriesId;
+            thing.categoryId = _categoryId;
             // set up the thing with defaults which can be edited once it is created
             thing.rarity = Rarity.I;
             thing.image = "";
             thing.descrip = "TODO";
             thing.facts = "TODO";
+            thing.source = "TODO";
             _adminsvc.createThing(thing, callback);
             return thing;
         }
@@ -334,7 +296,7 @@ public class EditThingsPanel extends SmartTable
             setWidget(1, 0, new ThingEditor(item), getCellCount(0), null);
         }
 
-        protected int _seriesId;
+        protected int _categoryId;
     };
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);

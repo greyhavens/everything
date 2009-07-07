@@ -25,7 +25,7 @@ public class ThingRecord extends PersistentRecord
     // AUTO-GENERATED: FIELDS START
     public static final Class<ThingRecord> _R = ThingRecord.class;
     public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp SERIES_ID = colexp(_R, "seriesId");
+    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp RARITY = colexp(_R, "rarity");
     public static final ColumnExp IMAGE = colexp(_R, "image");
@@ -50,8 +50,8 @@ public class ThingRecord extends PersistentRecord
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     public int thingId;
 
-    /** The series to which this thing belongs. */
-    public int seriesId;
+    /** The (leaf) category to which this thing belongs. */
+    public int categoryId;
 
     /** The name of this thing. */
     @Column(length=Thing.MAX_NAME_LENGTH)
