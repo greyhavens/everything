@@ -38,7 +38,7 @@ public abstract class CardView extends FlowPanel
             }
             add(newHTML(buf.toString(), "Categories"));
 
-            add(boxImage(card.thing.image));
+            add(boxImage(card.thing.getImageURL()));
 
             add(newHTML(card.thing.rarity + " - &curren;" + card.thing.rarity.value, "Rarity"));
         }
@@ -101,7 +101,7 @@ public abstract class CardView extends FlowPanel
     protected static Widget boxImage (String path)
     {
         SmartTable table = new SmartTable("Image", 0, 0);
-        table.setWidget(0, 0, new Image(path.length() == 0 ? "images/placeholder.png" : path));
+        table.setWidget(0, 0, new Image(path));
         table.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
         table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
         return table;

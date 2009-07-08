@@ -17,3 +17,8 @@ db.default.password = PASSWORD
 
 db.readonly.maxconns = 1
 db.readwrite.maxconns = 1
+
+# Our S3 media store configuration
+mediastore_id = S3ID
+mediastore_key = S3KEY
+mediastore_bucket = S3BUCKET

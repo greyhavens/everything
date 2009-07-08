@@ -57,6 +57,30 @@ public class EverythingApp extends App
         return _config.getValue("facebook_secret", (String)null);
     }
 
+    /**
+     * Returns the id of our S3 media store.
+     */
+    public String getMediaStoreId ()
+    {
+        return _config.getValue("mediastore_id", (String)null);
+    }
+
+    /**
+     * Returns the secret key to our S3 media store.
+     */
+    public String getMediaStoreKey ()
+    {
+        return _config.getValue("mediastore_key", (String)null);
+    }
+
+    /**
+     * Returns the S3 bucket to which to upload when saving to our media store.
+     */
+    public String getMediaStoreBucket ()
+    {
+        return _config.getValue("mediastore_bucket", (String)null);
+    }
+
     @Override // from App
     public String getIdentifier ()
     {
@@ -68,6 +92,7 @@ public class EverythingApp extends App
     {
         List<Binding> binds = Lists.newArrayList();
         binds.add(new Binding.Servlet("/auth", AuthServlet.class));
+        binds.add(new Binding.Servlet("/upload", MediaUploadServlet.class));
         binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
         binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));

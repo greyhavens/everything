@@ -26,10 +26,12 @@
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
   <filelist dir="." id="runtime.libs">
     <file name="${extlibs.dir}/commons-lang.jar"/>
+    <file name="${extlibs.dir}/commons-fileupload.jar"/>
     <file name="${extlibs.dir}/json.jar"/>
     <file name="${extlibs.dir}/jvnet-runtime.jar"/>
     <file name="${extlibs.dir}/facebook-java-api.jar"/>
     <file name="${extlibs.dir}/facebook-java-api-schema.jar"/>
+    <file name="${extlibs.dir}/s3lib.jar"/>
   </filelist>
 
   <path id="build.classpath">

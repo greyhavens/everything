@@ -42,6 +42,7 @@ import com.threerings.everything.data.Thing;
 import client.game.CardView;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.MediaUploader;
 import client.util.PopupCallback;
 
 /**
@@ -243,6 +244,14 @@ public class EditThingsPanel extends SmartTable
                     updateCard(card);
                 }
             });
+
+            bits.setText(row, 0, "Image", 1, "Label");
+            bits.setWidget(row++, 1, new MediaUploader(new MediaUploader.Listener() {
+                public void mediaUploaded (String name) {
+                    card.thing.image = name;
+                    updateCard(card);
+                }
+            }));
 
             bits.setText(row, 0, "Descrip", 1, "Label");
             final LimitedTextArea descrip = Widgets.newTextArea(
