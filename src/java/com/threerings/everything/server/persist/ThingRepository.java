@@ -51,10 +51,9 @@ public class ThingRepository extends DepotRepository
      *
      * @return the category's newly assigned id.
      */
-    public int createCategory (Category category, int creatorId)
+    public int createCategory (Category category)
     {
         CategoryRecord record = CategoryRecord.FROM_CATEGORY.apply(category);
-        record.creatorId = creatorId;
         insert(record); // assigns record.categoryId
         return record.categoryId;
     }
@@ -63,16 +62,9 @@ public class ThingRepository extends DepotRepository
      * Updates an existing category. Returns true if a category was found and updated, false
      * othwerwise.
      */
-    public boolean updateCategory (Category category, int editorId)
+    public boolean updateCategory (Category category)
     {
-        CategoryRecord orecord = load(CategoryRecord.getKey(category.categoryId));
-        if (orecord == null) {
-            return false;
-        }
-        CategoryRecord nrecord = CategoryRecord.FROM_CATEGORY.apply(category);
-        nrecord.creatorId = orecord.creatorId;
-        update(nrecord);
-        return true;
+        return update(CategoryRecord.FROM_CATEGORY.apply(category)) == 1;
     }
 
     /**
@@ -112,11 +104,12 @@ public class ThingRepository extends DepotRepository
 
     /**
      * Creates a new thing.
+     *
+     * @return the thing's newly assigned unique id.
      */
-    public int createThing (Thing thing, int creatorId)
+    public int createThing (Thing thing)
     {
         ThingRecord record = ThingRecord.FROM_THING.apply(thing);
-        record.creatorId = creatorId;
         insert(record); // assigns record.thingId
         return record.thingId;
     }
@@ -124,16 +117,9 @@ public class ThingRepository extends DepotRepository
     /**
      * Updates an existing thing. Returns true if a thing was found and updated, false othwerwise.
      */
-    public boolean updateThing (Thing thing, int editorId)
+    public boolean updateThing (Thing thing)
     {
-        ThingRecord orecord = load(ThingRecord.getKey(thing.thingId));
-        if (orecord == null) {
-            return false;
-        }
-        ThingRecord nrecord = ThingRecord.FROM_THING.apply(thing);
-        nrecord.creatorId = orecord.creatorId;
-        update(nrecord);
-        return true;
+        return update(ThingRecord.FROM_THING.apply(thing)) == 1;
     }
 
     /**

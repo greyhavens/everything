@@ -31,19 +31,6 @@ public enum Powerup implements ByteEnum
     /** Grants an extra free card flip each day. */
     EXTRA_FLIP(64, 5000, 1);
 
-    /**
-     * Returns the {@link Powerup} associated with the supplied code or null.
-     */
-    public static Powerup fromByte (byte code)
-    {
-        for (Powerup value : Powerup.values()) {
-            if (value.toByte() == code) {
-                return value;
-            }
-        }
-        return null;
-    }
-
     // from interface ByteEnum
     public byte toByte ()
     {

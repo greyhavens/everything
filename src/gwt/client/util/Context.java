@@ -18,6 +18,9 @@ public interface Context
     /** Returns this player's name. */
     public PlayerName getMe ();
 
-    /** Returns whether this player is an admin. */
+    /** Returns whether this player has editor privileges. */
+    public boolean isEditor ();
+
+    /** Returns whether this player has admin privileges. */
     public boolean isAdmin ();
 }

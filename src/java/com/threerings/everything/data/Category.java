@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * Contains data for a category or sub-category.
  */
 public class Category
-    implements IsSerializable, Comparable<Category>
+    implements Created, IsSerializable, Comparable<Category>
 {
     /** The maximum length of a category name. */
     public static final int MAX_NAME_LENGTH = 64;
@@ -25,6 +25,15 @@ public class Category
 
     /** True if this category is active (and hence items in it are usable in the game). */
     public boolean active;
+
+    /** The id of the creator of this category. */
+    public int creatorId;
+
+    // from interface Created
+    public int getCreatorId ()
+    {
+        return creatorId;
+    }
 
     // from interface Comparable<Category>
     public int compareTo (Category other)

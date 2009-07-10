@@ -12,11 +12,14 @@ import com.google.inject.Inject;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
+import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.Created;
 import com.threerings.everything.data.Thing;
+import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -24,7 +27,7 @@ import static com.threerings.everything.Log.log;
 /**
  * Implements {@link AdminService}.
  */
-public class AdminServlet extends AppServiceServlet
+public class AdminServlet extends EveryServiceServlet
     implements AdminService
 {
     // from interface AdminService
@@ -37,35 +40,55 @@ public class AdminServlet extends AppServiceServlet
     // from interface AdminService
     public int createCategory (Category category) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
-        return _thingRepo.createCategory(category, admin.userId);
+        PlayerRecord editor = requireEditor();
+        category.creatorId = editor.userId;
+        category.categoryId = _thingRepo.createCategory(category);
+        _adminLogic.noteAction(editor, "created", category);
+        return category.categoryId;
     }
 
     // from interface AdminService
     public void updateCategory (Category category) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
+        // make sure they have editing privileges on this object (and that it exists)
         Category ocategory = _thingRepo.loadCategory(category.categoryId);
-        _thingRepo.updateCategory(category, admin.userId);
+        PlayerRecord editor = checkEditor(ocategory);
+
+        // actually update the category
+        _thingRepo.updateCategory(category);
 
         // if a category changed active state, queue a reload of the thing index
+        String action;
         if (ocategory.active != category.active) {
             log.info("Category active status changed. TODO: reload thing index.");
+            action = (category.active) ? "activated" : "deactivated";
+        } else {
+            action = "updated";
         }
+
+        // note that this action was taken
+        _adminLogic.noteAction(editor, action, category);
     }
 
     // from interface AdminService
     public void deleteCategory (int categoryId) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
+        // make sure they have editing privileges on this object (and that it exists)
+        PlayerRecord editor = checkEditor(_thingRepo.loadCategory(categoryId));
+
+        // make sure the category can be deleted
         if (_thingRepo.loadCategories(categoryId).iterator().hasNext()) {
             throw new ServiceException(AdminService.E_CAT_HAS_SUBCATS);
         }
         if (_thingRepo.loadThings(categoryId).iterator().hasNext()) {
             throw new ServiceException(AdminService.E_CAT_HAS_THINGS);
         }
-        log.info("Deleting category", "who", admin.username, "catId", categoryId);
+
+        // delete the category
         _thingRepo.deleteCategory(categoryId);
+
+        // note that this action was taken
+        _adminLogic.noteDeleted(editor, "category " + categoryId);
     }
 
     // from interface AdminService
@@ -78,24 +101,54 @@ public class AdminServlet extends AppServiceServlet
     // from interface AdminService
     public int createThing (Thing thing) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
-        return _thingRepo.createThing(thing, admin.userId);
+        PlayerRecord editor = requireEditor();
+        thing.creatorId = editor.userId;
+        thing.thingId = _thingRepo.createThing(thing);
+        _adminLogic.noteAction(editor, "created", thing);
+        return thing.thingId;
     }
 
     // from interface AdminService
     public void updateThing (Thing thing) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
-        _thingRepo.updateThing(thing, admin.userId);
+        // make sure they have editing privileges on this object (and that it exists)
+        PlayerRecord editor = checkEditor(_thingRepo.loadThing(thing.thingId));
+
+        // actually update the thing
+        _thingRepo.updateThing(thing);
+
+        // note that this action was taken
+        _adminLogic.noteAction(editor, "updated", thing);
     }
 
     // from interface AdminService
     public void deleteThing (int thingId) throws ServiceException
     {
-        OOOUser admin = requireAdmin();
+        // make sure they have editing privileges on this object (and that it exists)
+        PlayerRecord editor = checkEditor(_thingRepo.loadThing(thingId));
+
         // TODO: check whether cards are using this thing
-        log.info("Deleting thing", "who", admin.username, "thingId", thingId);
+
+        // delete the thing
         _thingRepo.deleteThing(thingId);
+
+        // note that this action was taken
+        _adminLogic.noteDeleted(editor, "thing " + thingId);
+    }
+
+    protected PlayerRecord checkEditor (Created created)
+        throws ServiceException
+    {
+        OOOUser user = requireUser();
+        PlayerRecord editor = requireEditor(user);
+        if (created == null) {
+            log.warning("Requested to edit non-existent object", "who", editor.who());
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+        if (!user.isAdmin() && created.getCreatorId() != user.userId) {
+            throw new ServiceException(AppCodes.E_ACCESS_DENIED);
+        }
+        return editor;
     }
 
     protected static <T extends Comparable<T>> List<T> sort (List<T> list) {
@@ -103,5 +156,6 @@ public class AdminServlet extends AppServiceServlet
         return list;
     }
 
+    @Inject protected AdminLogic _adminLogic;
     @Inject protected ThingRepository _thingRepo;
 }

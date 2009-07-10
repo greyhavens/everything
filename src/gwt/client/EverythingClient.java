@@ -70,6 +70,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public boolean isEditor ()
+    {
+        return _data.isEditor || _data.isAdmin;
+    }
+
+    // from interface Context
     public boolean isAdmin ()
     {
         return _data.isAdmin;

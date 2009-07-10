@@ -34,7 +34,7 @@ public class MainPanel extends FlowPanel
         SmartTable links = new SmartTable(5, 0);
         links.setText(0, 0, "Hello:");
         links.setText(0, 1, ctx.getMe().name);
-        if (ctx.isAdmin()) {
+        if (ctx.isEditor()) {
             links.setWidget(0, 2, new Hyperlink("Create Sets", "admin-edit"));
         }
         add(links);

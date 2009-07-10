@@ -28,8 +28,10 @@ public class PlayerRecord extends PersistentRecord
     public static final Class<PlayerRecord> _R = PlayerRecord.class;
     public static final ColumnExp USER_ID = colexp(_R, "userId");
     public static final ColumnExp NAME = colexp(_R, "name");
+    public static final ColumnExp SURNAME = colexp(_R, "surname");
     public static final ColumnExp BIRTHDAY = colexp(_R, "birthday");
     public static final ColumnExp TIMEZONE = colexp(_R, "timezone");
+    public static final ColumnExp IS_EDITOR = colexp(_R, "isEditor");
     public static final ColumnExp JOINED = colexp(_R, "joined");
     public static final ColumnExp LAST_SESSION = colexp(_R, "lastSession");
     public static final ColumnExp COINS = colexp(_R, "coins");
@@ -46,7 +48,7 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 5;
+    public static final int SCHEMA_VERSION = 6;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -64,6 +66,9 @@ public class PlayerRecord extends PersistentRecord
 
     /** This player's preferred timezone (which dictates when their grids expire). */
     public String timezone;
+
+    /** Whether or not this player has editor privileges. */
+    public boolean isEditor;
 
     /** The time this player started playing the game. */
     public Timestamp joined;

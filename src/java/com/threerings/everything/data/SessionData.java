@@ -14,6 +14,9 @@ public class SessionData
     /** Our name and user id. */
     public PlayerName name;
 
+    /** Whether or not this player is an editor. */
+    public boolean isEditor;
+
     /** Whether or not this player is an admin. */
     public boolean isAdmin;
 }

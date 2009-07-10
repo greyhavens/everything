@@ -24,7 +24,7 @@ import static com.threerings.everything.Log.log;
 /**
  * Implements {@link GameService}.
  */
-public class GameServlet extends AppServiceServlet
+public class GameServlet extends EveryServiceServlet
     implements GameService
 {
     // from interface GameService
@@ -145,23 +145,6 @@ public class GameServlet extends AppServiceServlet
         }
     }
 
-    protected PlayerRecord requirePlayer ()
-        throws ServiceException
-    {
-        return requirePlayer(requireUser());
-    }
-
-    protected PlayerRecord requirePlayer (OOOUser user)
-        throws ServiceException
-    {
-        PlayerRecord player = _playerRepo.loadPlayer(user.userId);
-        if (player == null) {
-            throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
-        }
-        return player;
-    }
-
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected PlayerRepository _playerRepo;
 }
