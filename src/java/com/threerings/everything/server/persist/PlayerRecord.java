@@ -59,7 +59,6 @@ public class PlayerRecord extends PersistentRecord
     public Date birthday;
 
     /** This player's preferred timezone (which dictates when their grids expire). */
-    @Column(defaultValue="'PST'") // temp remove after migration
     public String timezone;
 
     /** The time this player started playing the game. */
