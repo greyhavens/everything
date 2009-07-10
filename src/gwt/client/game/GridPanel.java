@@ -87,7 +87,8 @@ public class GridPanel extends FlowPanel
     protected void flipCard (final GameService.GridResult data, final int position)
     {
         // TODO: disable all click handlers
-        _gamesvc.flipCard(data.grid.gridId, position, data.status.nextFlipCost, new PopupCallback<GameService.FlipResult>() {
+        _gamesvc.flipCard(data.grid.gridId, position, data.status.nextFlipCost,
+                          new PopupCallback<GameService.FlipResult>() {
                 public void onSuccess (GameService.FlipResult result) {
                     // convert the card to a thing card and display it in the grid
                     ThingCard card = new ThingCard();
