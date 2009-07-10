@@ -93,10 +93,10 @@ public class EverythingServlet extends AppServiceServlet
         // if this is not their first session, update their last session and grant free flips
         // they've accumulated since their previous session
         if (!player.joined.equals(player.lastSession)) {
-            long now = System.currentTimeMillis();
-            long lastSession = player.lastSession.getTime();
-            _playerRepo.recordSession(player.userId, now, _gameLogic.computeFreeFlipsEarned(
-                                          player.freeFlips, now - lastSession));
+            long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
+            float extraFlips = _gameLogic.computeFreeFlipsEarned(player.freeFlips, elapsed);
+            _playerRepo.recordSession(player.userId, now, extraFlips);
+            log.info("Welcome back", "who", user.username, "gone", elapsed, "flips", extraFlips);
         }
 
         SessionData data = new SessionData();
