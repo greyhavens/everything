@@ -46,13 +46,17 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 4;
+    public static final int SCHEMA_VERSION = 5;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
 
-    /** This player's name. */
+    /** This player's first name (shown in some places in the game). */
     public String name;
+
+    /** This player's last name (only shown to admins). */
+    @Column(defaultValue="''") // temp
+    public String surname;
 
     /** This player's birthday (we'll send them something nice on their birthday). */
     @Column(nullable=true)

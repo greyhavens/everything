@@ -51,11 +51,13 @@ public class PlayerRepository extends DepotRepository
     /**
      * Creates, inserts and returns a new player record.
      */
-    public PlayerRecord createPlayer (int userId, String name, long birthday, String timezone)
+    public PlayerRecord createPlayer (int userId, String name, String surname, long birthday,
+                                      String timezone)
     {
         PlayerRecord record = new PlayerRecord();
         record.userId = userId;
         record.name = name;
+        record.surname = surname;
         record.birthday = (birthday == 0L) ? null : new Date(birthday);
         record.timezone = timezone;
         record.joined = new Timestamp(System.currentTimeMillis());

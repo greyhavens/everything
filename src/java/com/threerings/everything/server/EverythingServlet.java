@@ -61,7 +61,7 @@ public class EverythingServlet extends AppServiceServlet
             FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbinfo.right);
             Set<Long> ids = Collections.singleton(Long.parseLong(fbinfo.left));
             EnumSet<ProfileField> fields = EnumSet.of(
-                ProfileField.FIRST_NAME, ProfileField.BIRTHDAY);
+                ProfileField.FIRST_NAME, ProfileField.LAST_NAME, ProfileField.BIRTHDAY);
             UsersGetInfoResponse uinfo;
             try {
                 uinfo = (UsersGetInfoResponse)fbclient.users_getInfo(ids, fields);
@@ -90,7 +90,8 @@ public class EverythingServlet extends AppServiceServlet
             } catch (Exception e) {
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
             }
-            player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday, tz);
+            player = _playerRepo.createPlayer(
+                user.userId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
 
         } else {
