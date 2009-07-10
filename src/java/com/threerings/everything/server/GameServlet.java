@@ -41,7 +41,7 @@ public class GameServlet extends AppServiceServlet
             _gameRepo.storeGrid(grid);
             _gameRepo.resetFlipped(player.userId);
 
-            log.info("Generated grid", "for", player.userId, "things", grid.thingIds,
+            log.info("Generated grid", "for", player.who(), "things", grid.thingIds,
                      "expires", grid.expires);
         }
 
@@ -94,7 +94,7 @@ public class GameServlet extends AppServiceServlet
         result.status = _gameLogic.getGameStatus(
             _playerRepo.loadPlayer(player.userId), grid.unflipped);
 
-        log.info("Yay! Card flipped", "who", player.userId, "thing", result.card.thing.name,
+        log.info("Yay! Card flipped", "who", player.who(), "thing", result.card.thing.name,
                  "rarity", result.card.thing.rarity, "paid", expectedCost);
         return result;
     }

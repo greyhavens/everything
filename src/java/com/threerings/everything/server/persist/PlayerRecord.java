@@ -97,6 +97,14 @@ public class PlayerRecord extends PersistentRecord
         return 0; // will be filled in by caller
     }
 
+    /**
+     * Reports a useful string identifying this player for logging.
+     */
+    public String who ()
+    {
+        return name + "/" + userId;
+    }
+
     // AUTO-GENERATED: METHODS START
     /**
      * Create and return a primary {@link Key} to identify a {@link PlayerRecord}

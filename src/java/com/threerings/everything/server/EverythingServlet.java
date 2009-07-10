@@ -91,7 +91,7 @@ public class EverythingServlet extends AppServiceServlet
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
             }
             player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday, tz);
-            log.info("Hello newbie!", "who", user.username, "name", player.name, "tz", tz);
+            log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
 
         } else {
             // if this is not their first session, update their last session and grant free flips
@@ -99,7 +99,7 @@ public class EverythingServlet extends AppServiceServlet
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
             float extraFlips = _gameLogic.computeFreeFlipsEarned(player.freeFlips, elapsed);
             _playerRepo.recordSession(player.userId, now, extraFlips);
-            log.info("Welcome back", "who", user.username, "gone", elapsed, "flips", extraFlips);
+            log.info("Welcome back", "who", player.who(), "gone", elapsed, "flips", extraFlips);
         }
 
         SessionData data = new SessionData();
