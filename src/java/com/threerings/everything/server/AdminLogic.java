@@ -21,19 +21,18 @@ public class AdminLogic
     public void noteAction (PlayerRecord editor, String action, Category category)
     {
         _adminRepo.recordAction(editor.userId, Action.Target.CATEGORY, category.categoryId,
-                                editor.who() + " " + action + " category " + category.name);
+                                action + " category " + category.name);
     }
 
     public void noteAction (PlayerRecord editor, String action, Thing thing)
     {
         _adminRepo.recordAction(editor.userId, Action.Target.THING, thing.thingId,
-                                editor.who() + " " + action + " thing " + thing.name);
+                                action + " thing " + thing.name);
     }
 
     public void noteDeleted (PlayerRecord editor, String what)
     {
-        _adminRepo.recordAction(editor.userId, Action.Target.NONE, 0,
-                                editor.who() + " deleted " + what);
+        _adminRepo.recordAction(editor.userId, Action.Target.NONE, 0, "deleted " + what);
     }
 
     @Inject protected AdminRepository _adminRepo;

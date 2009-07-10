@@ -3,6 +3,7 @@
 
 package com.threerings.everything.server.persist;
 
+import java.sql.Timestamp;
 import java.util.Set;
 
 import com.google.inject.Inject;
@@ -32,6 +33,7 @@ public class AdminRepository extends DepotRepository
     {
         ActionRecord record = new ActionRecord();
         record.userId = userId;
+        record.when = new Timestamp(System.currentTimeMillis());
         record.target = target;
         record.targetId = targetId;
         record.action = action;
