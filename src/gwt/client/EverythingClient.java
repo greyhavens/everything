@@ -20,8 +20,10 @@ import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
-import client.admin.AdminPanel;
-import client.game.MainPanel;
+import client.admin.EditThingsPanel;
+import client.game.BrowsePanel;
+import client.game.GridPanel;
+import client.game.LandingPanel;
 import client.util.Context;
 
 /**
@@ -40,8 +42,7 @@ public class EverythingClient
                 if (data == null) {
                     setInfoContent("TODO: Redirect to splash/fbconnect page.");
                 } else {
-                    _data = data;
-                    History.fireCurrentHistoryState();
+                    gotSessionData(data);
                 }
             }
             public void onFailure (Throwable cause) {
@@ -84,30 +85,28 @@ public class EverythingClient
     // from interface ValueChangeHandler<String>
     public void onValueChange (ValueChangeEvent<String> event)
     {
-        String token = event.getValue();
-        if (token.startsWith("admin")) {
-            if (!(_content instanceof AdminPanel)) {
-                setContent(new AdminPanel(this));
-            }
-            String[] toks = token.split("-", 2);
-            ((AdminPanel)_content).setToken(toks.length == 2 ? toks[1] : "");
+        Page page;
+        try {
+            page = Enum.valueOf(Page.class, event.getValue());
+        } catch (Exception e) {
+            page = Page.LANDING;
+        }
 
-        } else {
-            if (!(_content instanceof MainPanel)) {
-                setContent(new MainPanel(this));
-            }
-            ((MainPanel)_content).setToken(token);
+        switch (page) {
+        default:
+        case LANDING: setContent(new LandingPanel(this)); break;
+        case FLIP: setContent(new GridPanel(this)); break;
+        case BROWSE: setContent(new BrowsePanel(this)); break;
+        case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
         }
     }
 
-    protected Widget createMainContent ()
+    protected void gotSessionData (SessionData data)
     {
-        String token = History.getToken();
-        if (token.startsWith("admin")) {
-            return new AdminPanel(this);
-        } else {
-            return new MainPanel(this);
-        }
+        _data = data;
+        setContent(null);
+        RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
+        History.fireCurrentHistoryState();
     }
 
     protected void setInfoContent (String message)
@@ -120,6 +119,7 @@ public class EverythingClient
     }-*/;
 
     protected SessionData _data;
+    protected HeaderPanel _header;
     protected Widget _content;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
