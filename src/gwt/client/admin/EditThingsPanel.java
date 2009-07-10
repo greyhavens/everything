@@ -72,6 +72,14 @@ public class EditThingsPanel extends SmartTable
         _cats.load();
     }
 
+    protected static class Row<T> extends HorizontalPanel
+    {
+        public final T item;
+        public Row (T item) {
+            this.item = item;
+        }
+    }
+
     protected abstract class Column<T> extends FlowPanel
     {
         public Column (String header, int maxlen) {
@@ -141,8 +149,16 @@ public class EditThingsPanel extends SmartTable
         }
 
         public void setSelected (T item) {
+            // deselect the old item row and select the new
+            for (int ii = 0; ii < _contents.getWidgetCount(); ii++) {
+                Row<T> row = (Row<T>)_contents.getWidget(ii);
+                if (row.item == _selected) {
+                    initItemRow(row, false);
+                } else if (row.item == item) {
+                    initItemRow(row, true);
+                }
+            }
             _selected = item;
-            // TODO: restyle our labels
             if (_child != null) {
                 if (_selected != null) {
                     _child.load();
@@ -153,24 +169,26 @@ public class EditThingsPanel extends SmartTable
         }
 
         public void addItem (T item) {
-            HorizontalPanel row = new HorizontalPanel();
-            initItemRow(row, item);
+            Row<T> row = new Row<T>(item);
+            initItemRow(row, false);
             _contents.add(row);
         }
 
-        protected void initItemRow (final HorizontalPanel row, final T item)
+        protected void initItemRow (final Row<T> row, boolean selected)
         {
-            final Label label = Widgets.newActionLabel(getName(item), new ClickHandler() {
+            row.clear();
+            final Label label = selected ? Widgets.newLabel(getName(row.item), "Selected") :
+                Widgets.newActionLabel(getName(row.item), new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    setSelected(item);
+                    setSelected(row.item);
                 }
             });
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    onDelete(item, new PopupCallback<Void>(label) {
+                    onDelete(row.item, new PopupCallback<Void>(label) {
                         public void onSuccess (Void result) {
                             _contents.remove(row);
-                            if (item == _selected) {
+                            if (row.item == _selected) {
                                 setSelected(null);
                             }
                         }
@@ -347,8 +365,8 @@ public class EditThingsPanel extends SmartTable
             }
         }
 
-        @Override protected void initItemRow (HorizontalPanel row, final Category category) {
-            super.initItemRow(row, category);
+        @Override protected void initItemRow (final Row<Category> row, boolean selected) {
+            super.initItemRow(row, selected);
             // only admins get a checkbox to activate/deactivate a category
             if (!_ctx.isAdmin()) {
                 return;
@@ -357,14 +375,14 @@ public class EditThingsPanel extends SmartTable
             final CheckBox active = new CheckBox();
             row.add(active);
             active.setTitle("Series Active");
-            active.setValue(category.active);
+            active.setValue(row.item.active);
             active.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
                 public void onValueChange (ValueChangeEvent<Boolean> event) {
-                    category.active = event.getValue();
+                    row.item.active = event.getValue();
                     active.setEnabled(false);
-                    _adminsvc.updateCategory(category, new PopupCallback<Void>() {
+                    _adminsvc.updateCategory(row.item, new PopupCallback<Void>() {
                         public void onSuccess (Void result) {
-                            String msg = category.active ?
+                            String msg = row.item.active ?
                                 "Category activated." : "Category deactivated.";
                             Popups.infoNear(msg, active);
                             active.setEnabled(true);
@@ -427,10 +445,10 @@ public class EditThingsPanel extends SmartTable
             setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
         }
 
-        @Override protected void initItemRow (HorizontalPanel row, Thing thing) {
-            super.initItemRow(row, thing);
+        @Override protected void initItemRow (Row<Thing> row, boolean selected) {
+            super.initItemRow(row, selected);
             row.add(Widgets.newShim(5, 5));
-            row.add(Widgets.newLabel(thing.rarity.toString(), null));
+            row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
         }
 
         protected int _categoryId;

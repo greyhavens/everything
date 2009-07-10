@@ -5,7 +5,7 @@
 .admin {
 }
 
-.editThings .Header {
+.editThings .Header, .editThings .Selected {
   font-weight: bold;
 }
 
