@@ -346,8 +346,13 @@ public class EditThingsPanel extends SmartTable
                 _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
             }
         }
+
         @Override protected void initItemRow (HorizontalPanel row, final Category category) {
             super.initItemRow(row, category);
+            // only admins get a checkbox to activate/deactivate a category
+            if (!_ctx.isAdmin()) {
+                return;
+            }
             row.add(Widgets.newShim(5, 5));
             final CheckBox active = new CheckBox();
             row.add(active);
