@@ -30,6 +30,7 @@ import static com.threerings.everything.Log.log;
 /**
  * The main entry point for the Everything app.
  */
+@Singleton
 public class EverythingApp extends App
 {
     /** Our app identifier. */
