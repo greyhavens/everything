@@ -21,6 +21,7 @@ import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.App;
 import com.threerings.samsara.app.server.Binding;
 
+import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
 
@@ -131,6 +132,7 @@ public class EverythingApp extends App
 
     // we need to inject all repositories here to ensure that they are resolved when our app is
     // resolved so that everything is registered and ready to go when Samsara initializes Depot
+    @Inject protected GameRepository _gameRepo;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;
 }

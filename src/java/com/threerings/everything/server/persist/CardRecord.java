@@ -25,7 +25,7 @@ public class CardRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     /** The id of the player that owns this card. */
     @Id public int ownerId;
@@ -34,7 +34,7 @@ public class CardRecord extends PersistentRecord
     @Id public int thingId;
 
     /** The time at which this card was created. */
-    public Timestamp created;
+    @Id public Timestamp created;
 
     /** The id of the player that gave this card to the owner or 0. */
     public int giverId;
@@ -44,12 +44,12 @@ public class CardRecord extends PersistentRecord
      * Create and return a primary {@link Key} to identify a {@link CardRecord}
      * with the supplied key values.
      */
-    public static Key<CardRecord> getKey (int ownerId, int thingId)
+    public static Key<CardRecord> getKey (int ownerId, int thingId, Timestamp created)
     {
         return new Key<CardRecord>(
                 CardRecord.class,
-                new ColumnExp[] { OWNER_ID, THING_ID },
-                new Comparable[] { ownerId, thingId });
+                new ColumnExp[] { OWNER_ID, THING_ID, CREATED },
+                new Comparable[] { ownerId, thingId, created });
     }
     // AUTO-GENERATED: METHODS END
 }

@@ -90,6 +90,15 @@ public class EverythingServlet extends AppServiceServlet
             player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday);
         }
 
+        // if this is not their first session, update their last session and grant free flips
+        // they've accumulated since their previous session
+        if (!player.joined.equals(player.lastSession)) {
+            long now = System.currentTimeMillis();
+            long lastSession = player.lastSession.getTime();
+            _playerRepo.recordSession(player.userId, now, _gameLogic.computeFreeFlipsEarned(
+                                          player.freeFlips, now - lastSession));
+        }
+
         SessionData data = new SessionData();
         data.name = player.toName();
         data.isAdmin = user.isAdmin();
@@ -99,6 +108,7 @@ public class EverythingServlet extends AppServiceServlet
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected UserLogic _userLogic;
+    @Inject protected GameLogic _gameLogic;
 
     /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");

@@ -16,6 +16,7 @@ import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
+import com.threerings.everything.data.ThingCard;
 
 /**
  * Contains data on a single thing.
@@ -31,6 +32,7 @@ public class ThingRecord extends PersistentRecord
     public static final ColumnExp IMAGE = colexp(_R, "image");
     public static final ColumnExp DESCRIP = colexp(_R, "descrip");
     public static final ColumnExp FACTS = colexp(_R, "facts");
+    public static final ColumnExp SOURCE = colexp(_R, "source");
     public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     // AUTO-GENERATED: FIELDS END
 
@@ -41,6 +43,10 @@ public class ThingRecord extends PersistentRecord
     /** A function for converting persistent records to runtime records. */
     public static Function<ThingRecord, Thing> TO_THING =
         RuntimeUtil.makeToRuntime(ThingRecord.class, Thing.class);
+
+    /** A function for converting this record to {@link ThingCards}. */
+    public static Function<ThingRecord, ThingCard> TO_CARD =
+        RuntimeUtil.makeToRuntime(ThingRecord.class, ThingCard.class);
 
     /** A function for converting runtime records to persistent records. */
     public static Function<Thing, ThingRecord> FROM_THING =

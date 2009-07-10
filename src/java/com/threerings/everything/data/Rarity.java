@@ -10,8 +10,8 @@ import com.samskivert.depot.ByteEnum;
  */
 public enum Rarity implements ByteEnum
 {
-    I(0, 10),   II(1, 15),   III(2, 35),   IV(3, 50),  V(4, 85),
-    VI(5, 135), VII(6, 220), VIII(7, 355), IX(8, 575), X(9, 930);
+    I(0, 10),   II(1, 20),   III(2, 35),   IV(3, 55),  V(4, 90),
+    VI(5, 145), VII(6, 235), VIII(7, 380), IX(8, 615), X(9, 995);
 
     /** The coin value of a card of this rarity. */
     public final int value;
@@ -29,6 +29,11 @@ public enum Rarity implements ByteEnum
         return null;
     }
 
+    public int weight ()
+    {
+        return MAX_VALUE - value + EXTRA_WEIGHT;
+    }
+
     // from interface ByteEnum
     public byte toByte ()
     {
@@ -42,4 +47,19 @@ public enum Rarity implements ByteEnum
 
     /** This rarity's byte code. */
     protected byte _code;
+
+    protected static int computeMaxValue ()
+    {
+        int maxValue = 0;
+        for (Rarity rarity : Rarity.values()) {
+            maxValue = Math.max(maxValue, rarity.value);
+        }
+        return maxValue;
+    }
+
+    /** The maximum value of any rarity. */
+    protected static final int MAX_VALUE = computeMaxValue();
+
+    /** Extra weight added to every card to make the rarest card not insanely rare. */
+    protected static final int EXTRA_WEIGHT = 50;
 }

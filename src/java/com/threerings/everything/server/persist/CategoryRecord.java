@@ -28,11 +28,12 @@ public class CategoryRecord extends PersistentRecord
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp PARENT_ID = colexp(_R, "parentId");
     public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
+    public static final ColumnExp ACTIVE = colexp(_R, "active");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<CategoryRecord, Category> TO_CATEGORY =
@@ -54,6 +55,9 @@ public class CategoryRecord extends PersistentRecord
 
     /** The id of the user that created this category. */
     public int creatorId;
+
+    /** True if this category is active (and hence items in it are usable in the game). */
+    public boolean active;
 
     /**
      * Converts this persistent record to a runtime record.

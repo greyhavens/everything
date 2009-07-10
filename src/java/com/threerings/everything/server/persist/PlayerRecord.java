@@ -6,13 +6,17 @@ package com.threerings.everything.server.persist;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import com.google.common.base.Function;
+
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.util.RuntimeUtil;
 import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -24,15 +28,25 @@ public class PlayerRecord extends PersistentRecord
     public static final Class<PlayerRecord> _R = PlayerRecord.class;
     public static final ColumnExp USER_ID = colexp(_R, "userId");
     public static final ColumnExp NAME = colexp(_R, "name");
-    public static final ColumnExp COINS = colexp(_R, "coins");
     public static final ColumnExp BIRTHDAY = colexp(_R, "birthday");
+    public static final ColumnExp TIMEZONE = colexp(_R, "timezone");
     public static final ColumnExp JOINED = colexp(_R, "joined");
     public static final ColumnExp LAST_SESSION = colexp(_R, "lastSession");
+    public static final ColumnExp COINS = colexp(_R, "coins");
+    public static final ColumnExp FREE_FLIPS = colexp(_R, "freeFlips");
     // AUTO-GENERATED: FIELDS END
+
+    /** A function for converting this record to a {@link PlayerName}. */
+    public static Function<PlayerRecord, PlayerName> TO_NAME =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerName.class);
+
+    /** A function for converting this record to a {@link GameStatus}. */
+    public static Function<PlayerRecord, GameStatus> TO_STATUS =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, GameStatus.class);
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 3;
+    public static final int SCHEMA_VERSION = 4;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -40,12 +54,13 @@ public class PlayerRecord extends PersistentRecord
     /** This player's name. */
     public String name;
 
-    /** This player's current coin balance. */
-    public int coins;
-
     /** This player's birthday (we'll send them something nice on their birthday). */
     @Column(nullable=true)
     public Date birthday;
+
+    /** This player's preferred timezone (which dictates when their grids expire). */
+    @Column(defaultValue="'PST'") // temp remove after migration
+    public String timezone;
 
     /** The time this player started playing the game. */
     public Timestamp joined;
@@ -53,15 +68,34 @@ public class PlayerRecord extends PersistentRecord
     /** The time this player last started a game session. */
     @Index public Timestamp lastSession;
 
+    /** This player's current coin balance. */
+    public int coins;
+
+    /** This player's accumulated free flips. */
+    public float freeFlips;
+
     /**
      * Creates a {@link PlayerName} instance from our data.
      */
     public PlayerName toName ()
     {
-        PlayerName pname = new PlayerName();
-        pname.userId = userId;
-        pname.name = name;
-        return pname;
+        return TO_NAME.apply(this);
+    }
+
+    /**
+     * Initializes {@link GameStatus#freeFlips}.
+     */
+    public int getFreeFlips ()
+    {
+        return (int)Math.floor(freeFlips);
+    }
+
+    /**
+     * Initializes {@link GameStatus#nextFlipCost}.
+     */
+    public int getNextFlipCost ()
+    {
+        return 0; // will be filled in by caller
     }
 
     // AUTO-GENERATED: METHODS START

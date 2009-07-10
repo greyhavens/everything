@@ -23,6 +23,9 @@ public class Category
     /** The id of this category's parent, if it is a sub-category, or 0. */
     public int parentId;
 
+    /** True if this category is active (and hence items in it are usable in the game). */
+    public boolean active;
+
     // from interface Comparable<Category>
     public int compareTo (Category other)
     {

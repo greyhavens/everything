@@ -79,8 +79,11 @@ public class MediaUploadServlet extends AppServlet
                 throw new ServiceException("e.internal_error");
             }
 
-            // convert the image to our desired format, possibly scaling it in the process
+            // decode the uploaded image
             BufferedImage image = ImageIO.read(file.getInputStream());
+            if (image == null) {
+                throw new ServiceException("e.unsupported_image_type");
+            }
 
             float tratio = Thing.MAX_IMAGE_WIDTH / (float)Thing.MAX_IMAGE_HEIGHT;
             float iratio = image.getWidth() / (float)image.getHeight();

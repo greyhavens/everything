@@ -19,6 +19,7 @@
     <file name="${extlibs.dir}/google-collect.jar"/>
     <file name="${extlibs.dir}/guice.jar"/>
     <file name="${extlibs.dir}/gwt-user.jar"/>
+    <file name="${extlibs.dir}/junit4.jar"/>
     <file name="${extlibs.dir}/servlet-api.jar"/>
     <file name="${extlibs.dir}/velocity-1.5-dev.jar"/>
   </filelist>
@@ -160,13 +161,25 @@
 
   <target name="dist" depends="prepare,compile" description="Builds our app jar file.">
     <jar destfile="${deploy.dir}/${app.ident}.jar">
-      <fileset dir="${deploy.dir}/classes" includes="**"/>
+      <fileset dir="${deploy.dir}/classes" includes="**" excludes="**/tests/**"/>
       <fileset dir="${deploy.dir}" includes="everything.properties"/>
     </jar>
   </target>
 
   <target name="distall" depends="mavendeps,dist,gclient"
           description="Fetches dependencies and builds everything.">
+  </target>
+
+  <target name="tests" depends="compile" description="Runs unit tests.">
+    <taskdef name="unit" classpathref="build.classpath"
+      classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"/>
+    <unit printsummary="off" haltonfailure="yes">
+      <classpath refid="build.classpath"/>
+      <formatter type="brief" usefile="false"/>
+      <batchtest>
+        <fileset dir="${src.dir}" includes="**/*Test.java"/>
+      </batchtest>
+    </unit>
   </target>
 
   <target name="install-app">
