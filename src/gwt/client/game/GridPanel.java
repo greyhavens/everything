@@ -9,6 +9,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 
+import com.samskivert.depot.util.ByteEnumUtil;
+
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
@@ -70,7 +72,8 @@ public class GridPanel extends FlowPanel
                 continue;
             }
             buf.append((buf.length() > 0) ? "&nbsp;&nbsp;&nbsp;&nbsp;" : "");
-            buf.append(Rarity.fromByte((byte)ii)).append("-").append(unflipped[ii]);
+            Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
+            buf.append(rarity).append("-").append(unflipped[ii]);
         }
         _remaining.setHTML("Remaining: " + buf);
     }
@@ -104,8 +107,9 @@ public class GridPanel extends FlowPanel
                     updateRemaining(data.grid.unflipped);
                     updateStatus(data.status = result.status);
 
-                    // TODO: display the card big and fancy and allow them to keep it, gift to a
-                    // friend or cash it in
+                    // display the card big and fancy and allow them to keep it, gift to a friend
+                    // or cash it in
+                    new CardPopup(result.card).center();
                 }
             });
     }

@@ -96,7 +96,7 @@ public class EverythingClient
         default:
         case LANDING: setContent(new LandingPanel(this)); break;
         case FLIP: setContent(new GridPanel(this)); break;
-        case BROWSE: setContent(new BrowsePanel(this)); break;
+        case BROWSE: setContent(new BrowsePanel(this, getMe().userId)); break;
         case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
         }
     }

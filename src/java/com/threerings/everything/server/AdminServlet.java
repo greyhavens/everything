@@ -79,21 +79,22 @@ public class AdminServlet extends EveryServiceServlet
     public void deleteCategory (int categoryId) throws ServiceException
     {
         // make sure they have editing privileges on this object (and that it exists)
-        PlayerRecord editor = checkEditor(_thingRepo.loadCategory(categoryId));
+        Category category = _thingRepo.loadCategory(categoryId);
+        PlayerRecord editor = checkEditor(category);
 
         // make sure the category can be deleted
         if (_thingRepo.loadCategories(categoryId).iterator().hasNext()) {
             throw new ServiceException(AdminService.E_CAT_HAS_SUBCATS);
         }
-        if (_thingRepo.loadThings(categoryId).iterator().hasNext()) {
+        if (_thingRepo.getThingCount(categoryId) > 0) {
             throw new ServiceException(AdminService.E_CAT_HAS_THINGS);
         }
 
         // delete the category
-        _thingRepo.deleteCategory(categoryId);
+        _thingRepo.deleteCategory(category);
 
         // note that this action was taken
-        _adminLogic.noteDeleted(editor, "category " + categoryId);
+        _adminLogic.noteAction(editor, "deleted", category);
     }
 
     // from interface AdminService
@@ -130,15 +131,16 @@ public class AdminServlet extends EveryServiceServlet
     public void deleteThing (int thingId) throws ServiceException
     {
         // make sure they have editing privileges on this object (and that it exists)
-        PlayerRecord editor = checkEditor(_thingRepo.loadThing(thingId));
+        Thing thing = _thingRepo.loadThing(thingId);
+        PlayerRecord editor = checkEditor(thing);
 
         // TODO: check whether cards are using this thing
 
         // delete the thing
-        _thingRepo.deleteThing(thingId);
+        _thingRepo.deleteThing(thing);
 
         // note that this action was taken
-        _adminLogic.noteDeleted(editor, "thing " + thingId);
+        _adminLogic.noteAction(editor, "deleted", thing);
     }
 
     protected PlayerRecord checkEditor (Created created)

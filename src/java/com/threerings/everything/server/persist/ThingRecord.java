@@ -12,6 +12,7 @@ import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.GeneratedValue;
 import com.samskivert.depot.annotation.GenerationType;
 import com.samskivert.depot.annotation.Id;
+import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.data.Rarity;
@@ -38,7 +39,7 @@ public class ThingRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 3;
+    public static final int SCHEMA_VERSION = 4;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<ThingRecord, Thing> TO_THING =
@@ -57,7 +58,7 @@ public class ThingRecord extends PersistentRecord
     public int thingId;
 
     /** The (leaf) category to which this thing belongs. */
-    public int categoryId;
+    @Index public int categoryId;
 
     /** The name of this thing. */
     @Column(length=Thing.MAX_NAME_LENGTH)
@@ -89,6 +90,14 @@ public class ThingRecord extends PersistentRecord
     public Thing toThing ()
     {
         return TO_THING.apply(this);
+    }
+
+    /**
+     * Initializes {@link ThingCard#created} with 0L.
+     */
+    public long getCreated ()
+    {
+        return 0L;
     }
 
     // AUTO-GENERATED: METHODS START

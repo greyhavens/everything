@@ -30,10 +30,5 @@ public class AdminLogic
                                 action + " thing " + thing.name);
     }
 
-    public void noteDeleted (PlayerRecord editor, String what)
-    {
-        _adminRepo.recordAction(editor.userId, Action.Target.NONE, 0, "deleted " + what);
-    }
-
     @Inject protected AdminRepository _adminRepo;
 }

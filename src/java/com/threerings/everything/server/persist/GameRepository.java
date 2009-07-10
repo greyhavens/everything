@@ -27,20 +27,11 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Loads the specified player's current grid.
+     * Loads the specified card from the repository.
      */
-    public GridRecord loadGrid (int userId)
+    public CardRecord loadCard (int ownerId, int thingId, long created)
     {
-        return load(GridRecord.getKey(userId));
-    }
-
-    /**
-     * Stores the supplied grid in the repository, overwriting any previous grid for the owning
-     * player.
-     */
-    public void storeGrid (GridRecord record)
-    {
-        store(record);
+        return load(CardRecord.getKey(ownerId, thingId, new Timestamp(created)));
     }
 
     /**
@@ -58,11 +49,20 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Loads the specified card from the repository.
+     * Loads the specified player's current grid.
      */
-    public CardRecord loadCard (int ownerId, int thingId, long created)
+    public GridRecord loadGrid (int userId)
     {
-        return load(CardRecord.getKey(ownerId, thingId, new Timestamp(created)));
+        return load(GridRecord.getKey(userId));
+    }
+
+    /**
+     * Stores the supplied grid in the repository, overwriting any previous grid for the owning
+     * player.
+     */
+    public void storeGrid (GridRecord record)
+    {
+        store(record);
     }
 
     /**

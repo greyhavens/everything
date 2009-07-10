@@ -12,6 +12,8 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
+import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.Series;
 
 /**
  * Provides game services to the client.
@@ -21,6 +23,9 @@ public interface GameService extends RemoteService
 {
     /** The path at which this servlet is mapped. */
     public static final String ENTRY_POINT = "game";
+
+    /** Thrown by {@link #getCollection} if the user in question does not exist. */
+    public static final String E_UNKNOWN_USER = "e.unknown_user";
 
     /** Thrown by {@link #flipCard} if the grid in question has expired. */
     public static final String E_GRID_EXPIRED = "e.grid_expired";
@@ -58,6 +63,22 @@ public interface GameService extends RemoteService
     }
 
     /**
+     * Returns the collection of the specified player.
+     */
+    PlayerCollection getCollection (int ownerId) throws ServiceException;
+
+    /**
+     * Returns the series data for the specified player's series.
+     */
+    Series getSeries (int ownerId, int categoryId) throws ServiceException;
+
+    /**
+     * Returns detail information for the specified card, or null if the specified player does not
+     * own that card.
+     */
+    Card getCard (int ownerId, int thingId, long created) throws ServiceException;
+
+    /**
      * Returns the player's current grid.
      */
     GridResult getGrid () throws ServiceException;
@@ -66,10 +87,4 @@ public interface GameService extends RemoteService
      * Requests to flip the card at the specified position in the specified grid.
      */
     FlipResult flipCard (int gridId, int position, int expectedCost) throws ServiceException;
-
-    /**
-     * Returns detail information for the specified card, or null if the specified player does not
-     * own that card.
-     */
-    Card getCard (int ownerId, int thingId, long created) throws ServiceException;
 }

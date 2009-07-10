@@ -16,6 +16,7 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.util.RuntimeUtil;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.SeriesCard;
 
 /**
  * Defines a particular category or sub-category.
@@ -29,15 +30,20 @@ public class CategoryRecord extends PersistentRecord
     public static final ColumnExp PARENT_ID = colexp(_R, "parentId");
     public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     public static final ColumnExp ACTIVE = colexp(_R, "active");
+    public static final ColumnExp THINGS = colexp(_R, "things");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<CategoryRecord, Category> TO_CATEGORY =
         RuntimeUtil.makeToRuntime(CategoryRecord.class, Category.class);
+
+    /** A function for converting persistent records to runtime records. */
+    public static Function<CategoryRecord, SeriesCard> TO_SERIES_CARD =
+        RuntimeUtil.makeToRuntime(CategoryRecord.class, SeriesCard.class);
 
     /** A function for converting runtime records to persistent records. */
     public static Function<Category, CategoryRecord> FROM_CATEGORY =
@@ -59,12 +65,23 @@ public class CategoryRecord extends PersistentRecord
     /** True if this category is active (and hence items in it are usable in the game). */
     public boolean active;
 
+    /** The number of things in this category (only valid for leaf categories). */
+    public int things;
+
     /**
      * Converts this persistent record to a runtime record.
      */
     public Category toCategory ()
     {
         return TO_CATEGORY.apply(this);
+    }
+
+    /**
+     * Fills in 0 for {@link SeriesCard#owned}. Caller actually populates.
+     */
+    public int getOwned ()
+    {
+        return 0;
     }
 
     // AUTO-GENERATED: METHODS START

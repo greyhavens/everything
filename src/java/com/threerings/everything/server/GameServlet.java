@@ -3,7 +3,15 @@
 
 package com.threerings.everything.server;
 
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
+
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
@@ -12,12 +20,17 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Grid;
+import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.Series;
+import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -27,6 +40,61 @@ import static com.threerings.everything.Log.log;
 public class GameServlet extends EveryServiceServlet
     implements GameService
 {
+    // from interface GameService
+    public PlayerCollection getCollection (int ownerId) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        // TODO: require that the caller be a friend of owner?
+
+        PlayerCollection coll = new PlayerCollection();
+        coll.owner = _playerRepo.loadPlayerName(ownerId);
+        if (coll.owner == null) {
+            throw new ServiceException(E_UNKNOWN_USER);
+        }
+
+        // first load up all of the series
+        Multimap<Integer, SeriesCard> series = HashMultimap.create();
+        for (SeriesCard card : _thingRepo.loadPlayerSeries(ownerId)) {
+            series.put(card.parentId, card);
+        }
+
+        // load up the series' parents, the sub-categories
+        Multimap<Integer, Category> subcats = HashMultimap.create();
+        for (Category subcat : _thingRepo.loadCategories(series.keySet())) {
+            subcats.put(subcat.parentId, subcat);
+        }
+
+        // finally load up the top-level categories and build everything back down
+        coll.series = Maps.newHashMap();
+        for (Category cat : _thingRepo.loadCategories(subcats.keySet())) {
+            Map<String, List<SeriesCard>> scats = Maps.newHashMap();
+            for (Category scat : subcats.get(cat.categoryId)) {
+                scats.put(scat.name, Lists.newArrayList(series.get(scat.categoryId)));
+            }
+            coll.series.put(cat.name, scats);
+        }
+
+        return coll;
+    }
+
+    // from interface GameService
+    public Series getSeries (int ownerId, int categoryId) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        // TODO: require that the caller be a friend of owner?
+
+        Series series = new Series();
+        return series;
+    }
+
+    // from interface GameService
+    public Card getCard (int ownerId, int thingId, long created) throws ServiceException
+    {
+        // TODO: show less info if the caller is not the owner?
+        CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
+        return (card == null) ? null : _gameLogic.resolveCard(card);
+    }
+
     // from interface GameService
     public GridResult getGrid () throws ServiceException
     {
@@ -99,14 +167,6 @@ public class GameServlet extends EveryServiceServlet
         return result;
     }
 
-    // from interface GameService
-    public Card getCard (int ownerId, int thingId, long created) throws ServiceException
-    {
-        // TODO: show less info if the caller is not the owner?
-        CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
-        return (card == null) ? null : _gameLogic.resolveCard(card);
-    }
-
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)
         throws ServiceException
     {
@@ -147,4 +207,5 @@ public class GameServlet extends EveryServiceServlet
 
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected ThingRepository _thingRepo;
 }

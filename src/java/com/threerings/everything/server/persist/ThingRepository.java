@@ -3,18 +3,25 @@
 
 package com.threerings.everything.server.persist;
 
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.clause.FromOverride;
+import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 
@@ -47,6 +54,41 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Loads data on all series owned by the specified player.
+     */
+    public List<SeriesCard> loadPlayerSeries (int ownerId)
+    {
+        IntIntMap owned = new IntIntMap();
+        for (OwnedRecord orec : findAll(OwnedRecord.class,
+                                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
+                                        ThingRecord.THING_ID.join(CardRecord.THING_ID),
+                                        new GroupBy(CategoryRecord.CATEGORY_ID),
+                                        new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
+            owned.put(orec.categoryId, orec.owned);
+        }
+
+        // now load up the category info for those categories
+        List<SeriesCard> cards = Lists.newArrayList();
+        for (CategoryRecord crec :
+                 findAll(CategoryRecord.class,
+                         new Where(CategoryRecord.CATEGORY_ID.in(owned.keySet())))) {
+            SeriesCard card = CategoryRecord.TO_SERIES_CARD.apply(crec);
+            card.owned = owned.getOrElse(crec.categoryId, 0);
+            cards.add(card);
+        }
+        return cards;
+    }
+
+    /**
+     * Loads all categories with ids in the supplied set.
+     */
+    public Iterable<Category> loadCategories (Set<Integer> ids)
+    {
+        return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))).
+            map(CategoryRecord.TO_CATEGORY);
+    }
+
+    /**
      * Creates a new category.
      *
      * @return the category's newly assigned id.
@@ -71,9 +113,9 @@ public class ThingRepository extends DepotRepository
      * Deletes the specified category. The caller is responsible for making sure this is a good
      * idea.
      */
-    public void deleteCategory (int categoryId)
+    public void deleteCategory (Category category)
     {
-        delete(CategoryRecord.getKey(categoryId));
+        delete(CategoryRecord.getKey(category.categoryId));
     }
 
     /**
@@ -103,6 +145,16 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Returns the number of things in the specified category. Only valid for leaf categories.
+     */
+    public int getThingCount (int categoryId)
+    {
+        return load(CountRecord.class,
+                    new FromOverride(ThingRecord.class),
+                    new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).count;
+    }
+
+    /**
      * Creates a new thing.
      *
      * @return the thing's newly assigned unique id.
@@ -111,6 +163,8 @@ public class ThingRepository extends DepotRepository
     {
         ThingRecord record = ThingRecord.FROM_THING.apply(thing);
         insert(record); // assigns record.thingId
+        updatePartial(CategoryRecord.getKey(thing.categoryId),
+                      CategoryRecord.THINGS, getThingCount(thing.categoryId));
         return record.thingId;
     }
 
@@ -125,9 +179,11 @@ public class ThingRepository extends DepotRepository
     /**
      * Deletes the specified thing. The caller is responsible for making sure this is a good idea.
      */
-    public void deleteThing (int thingId)
+    public void deleteThing (Thing thing)
     {
-        delete(ThingRecord.getKey(thingId));
+        delete(ThingRecord.getKey(thing.thingId));
+        updatePartial(CategoryRecord.getKey(thing.categoryId),
+                      CategoryRecord.THINGS, getThingCount(thing.categoryId));
     }
 
     /**
@@ -148,6 +204,12 @@ public class ThingRepository extends DepotRepository
                        CacheStrategy.NONE,
                        ThingRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
                        new Where(CategoryRecord.ACTIVE.eq(true)));
+    }
+
+    protected void updateCategoryThingCount (int categoryId)
+    {
+        updatePartial(CategoryRecord.getKey(categoryId),
+                      CategoryRecord.THINGS, getThingCount(categoryId));
     }
 
     @Override // from DepotRepository
