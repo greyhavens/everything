@@ -54,14 +54,19 @@ public class AdminServlet extends EveryServiceServlet
         Category ocategory = _thingRepo.loadCategory(category.categoryId);
         PlayerRecord editor = checkEditor(ocategory);
 
+        // only admins can activate categories
+        if (!ocategory.active && category.active) {
+            requireAdmin();
+        }
+
         // actually update the category
         _thingRepo.updateCategory(category);
 
-        // if a category changed active state, queue a reload of the thing index
         String action;
         if (ocategory.active != category.active) {
-            log.info("Category active status changed. TODO: reload thing index.");
             action = (category.active) ? "activated" : "deactivated";
+            // if a category changed active state, queue a reload of the thing index
+            log.info("Category active status changed. TODO: reload thing index.");
         } else {
             action = "updated";
         }
