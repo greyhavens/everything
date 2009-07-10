@@ -1,0 +1,52 @@
+//
+// $Id$
+
+package client.util;
+
+import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
+
+import com.threerings.gwt.ui.SmartTable;
+
+/**
+ * Image related utility methods.
+ */
+public class ImageUtil
+{
+    /**
+     * Returns the URL that can be used to display the supplied image. If the image is blank or
+     * null, the unknown image will be shown.
+     */
+    public static String getImageURL (String image)
+    {
+        return (image == null || image.length() == 0) ? "images/unknown.png" :
+            "http://s3.amazonaws.com/everything.threerings.net/" + image;
+    }
+
+    /**
+     * Returns a widget that will display the specified card image, centered within it.
+     */
+    public static Widget getImageBox (String image)
+    {
+        return getImageBox(image, "imageBox");
+    }
+
+    /**
+     * Returns a widget that will display the specified card image, scaled to mini-size, centered
+     * within the box.
+     */
+    public static Widget getMiniImageBox (String image)
+    {
+        return getImageBox(image, "miniImageBox");
+    }
+
+    protected static Widget getImageBox (String image, String styleName)
+    {
+        SmartTable table = new SmartTable(styleName, 0, 0);
+        table.setWidget(0, 0, new Image(getImageURL(image)));
+        table.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
+        table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
+        return table;
+    }
+}

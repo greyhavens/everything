@@ -45,6 +45,11 @@ public interface AdminService extends RemoteService
     int createCategory (Category category) throws ServiceException;
 
     /**
+     * Updates the specified category.
+     */
+    void updateCategory (Category category) throws ServiceException;
+
+    /**
      * Deletes the specified category, which must have no child categories, nor things.
      */
     void deleteCategory (int categoryId) throws ServiceException;

@@ -26,6 +26,11 @@ public interface AdminServiceAsync
     void createCategory (Category category, AsyncCallback<Integer> callback);
 
     /**
+     * The async version of {@link GameService#updateCategory}.
+     */
+    void updateCategory (Category category, AsyncCallback<Void> callback);
+
+    /**
      * The async version of {@link GameService#deleteCategory}.
      */
     void deleteCategory (int categoryId, AsyncCallback<Void> callback);

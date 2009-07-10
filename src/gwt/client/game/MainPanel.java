@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 
+import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.EverythingService;
@@ -30,13 +31,16 @@ public class MainPanel extends FlowPanel
         setStyleName("main");
         _ctx = ctx;
 
-        add(new Label("Hello " + ctx.getMe().name));
-
+        SmartTable links = new SmartTable(5, 0);
+        links.setText(0, 0, "Hello:");
+        links.setText(0, 1, ctx.getMe().name);
         if (ctx.isAdmin()) {
-            add(new Hyperlink("Admin bits", "admin"));
+            links.setWidget(0, 2, new Hyperlink("Create Sets", "admin-edit"));
         }
+        add(links);
 
-        // TODO the main UI
+        // for now display the player's current grid by default
+        add(new GridPanel(ctx));
     }
 
     public void setToken (String token)

@@ -73,6 +73,8 @@ public class GameLogic
         // if the grid generated won't live for at least two hours, push its expiry out a day
         long duration = System.currentTimeMillis() - cal.getTimeInMillis();
         if (duration < MIN_GRID_DURATION) {
+            log.info("Rolling grid forward an extra day", "zone", player.timezone, "had", duration,
+                     "odate", cal.getTime());
             cal.add(Calendar.DATE, 1);
         }
         grid.expires = new Timestamp(cal.getTimeInMillis());

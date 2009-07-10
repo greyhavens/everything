@@ -40,6 +40,9 @@ public class GameServlet extends AppServiceServlet
             // store the new grid in ze database and reset the player's flipped status
             _gameRepo.storeGrid(grid);
             _gameRepo.resetFlipped(player.userId);
+
+            log.info("Generated grid", "for", player.userId, "things", grid.thingIds,
+                     "expires", grid.expires);
         }
 
         GridResult result = new GridResult();

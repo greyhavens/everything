@@ -27,7 +27,7 @@ public class AdminPanel extends FlowPanel
         SmartTable links = new SmartTable(5, 0);
         links.setText(0, 0, "Admin:");
         links.setWidget(0, 1, new Hyperlink("Edit Things", "admin-edit"));
-        links.setWidget(0, 2, new Hyperlink("TODO", "admin-todo"));
+        links.setWidget(0, 2, new Hyperlink("Play Game", ""));
         add(links);
     }
 

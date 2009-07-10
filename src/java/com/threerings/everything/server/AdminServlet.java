@@ -42,6 +42,19 @@ public class AdminServlet extends AppServiceServlet
     }
 
     // from interface AdminService
+    public void updateCategory (Category category) throws ServiceException
+    {
+        OOOUser admin = requireAdmin();
+        Category ocategory = _thingRepo.loadCategory(category.categoryId);
+        _thingRepo.updateCategory(category, admin.userId);
+
+        // if a category changed active state, queue a reload of the thing index
+        if (ocategory.active != category.active) {
+            log.info("Category active status changed. TODO: reload thing index.");
+        }
+    }
+
+    // from interface AdminService
     public void deleteCategory (int categoryId) throws ServiceException
     {
         OOOUser admin = requireAdmin();

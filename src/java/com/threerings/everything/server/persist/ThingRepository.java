@@ -60,6 +60,22 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Updates an existing category. Returns true if a category was found and updated, false
+     * othwerwise.
+     */
+    public boolean updateCategory (Category category, int editorId)
+    {
+        CategoryRecord orecord = load(CategoryRecord.getKey(category.categoryId));
+        if (orecord == null) {
+            return false;
+        }
+        CategoryRecord nrecord = CategoryRecord.FROM_CATEGORY.apply(category);
+        nrecord.creatorId = orecord.creatorId;
+        update(nrecord);
+        return true;
+    }
+
+    /**
      * Deletes the specified category. The caller is responsible for making sure this is a good
      * idea.
      */

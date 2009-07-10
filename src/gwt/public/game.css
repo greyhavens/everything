@@ -2,9 +2,29 @@
  * $Id$
  */
 
+/** MainPanel styles */
 .main {
 }
 
+/** ImageUtil styles */
+.imageBox {
+  width: 250px;
+  height: 300px;
+  margin: 10px 15px;
+}
+
+.miniImageBox {
+  width: 125px;
+  height: 150px;
+  margin: 5px 5px;
+}
+
+.miniImageBox .gwt-Image {
+  max-width: 125px;
+  max-height: 150px;
+}
+
+/** CardView styles */
 .cardView {
   width: 280px;
   height: 380px;
@@ -23,12 +43,6 @@
 
 .cardView .Position, .cardView .Rarity {
   font-size: 12px;
-}
-
-.cardView .Image {
-  width: 250px;
-  height: 300px;
-  margin: 10px 15px;
 }
 
 .cardView .Image .gwt-Image {
@@ -51,4 +65,24 @@
 .cardView .When, .cardView .Giver, .cardView .Source {
   font-style: italic;
   margin: 10px 0px;
+}
+
+/** ThingCardView styles */
+.thingCard {
+  border: 1px solid;
+  text-align: center;
+}
+
+.thingCard .Name, .thingCard .Rarity {
+  font-weight: bold;
+}
+
+/** GridPanel styles */
+.grid {
+  width: 600px;
+}
+
+.grid .Remaining, .grid .Status {
+  text-align: center;
+  font-weight: bold;
 }

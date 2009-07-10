@@ -16,6 +16,8 @@ import com.threerings.gwt.ui.Widgets;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 
+import client.util.ImageUtil;
+
 /**
  * Handles the display of the front and back of a card.
  */
@@ -38,7 +40,7 @@ public abstract class CardView extends FlowPanel
             }
             add(newHTML(buf.toString(), "Categories"));
 
-            add(boxImage(card.thing.getImageURL()));
+            add(ImageUtil.getImageBox(card.thing.image));
 
             add(newHTML(card.thing.rarity + " - &curren;" + card.thing.rarity.value, "Rarity"));
         }
@@ -96,15 +98,6 @@ public abstract class CardView extends FlowPanel
         HTML html = new HTML(text);
         html.setStyleName(styleName);
         return html;
-    }
-
-    protected static Widget boxImage (String path)
-    {
-        SmartTable table = new SmartTable("Image", 0, 0);
-        table.setWidget(0, 0, new Image(path));
-        table.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
-        table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
-        return table;
     }
 
     protected static String formatFacts (String facts)

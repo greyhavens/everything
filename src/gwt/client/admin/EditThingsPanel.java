@@ -14,9 +14,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -149,8 +152,14 @@ public class EditThingsPanel extends SmartTable
             }
         }
 
-        public void addItem (final T item) {
-            final HorizontalPanel row = new HorizontalPanel();
+        public void addItem (T item) {
+            HorizontalPanel row = new HorizontalPanel();
+            initItemRow(row, item);
+            _contents.add(row);
+        }
+
+        protected void initItemRow (final HorizontalPanel row, final T item)
+        {
             final Label label = Widgets.newActionLabel(getName(item), new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     setSelected(item);
@@ -170,7 +179,6 @@ public class EditThingsPanel extends SmartTable
             }));
             row.add(Widgets.newShim(5, 5));
             row.add(label);
-            _contents.add(row);
         }
 
         protected void itemAdded (T item) {
@@ -338,6 +346,28 @@ public class EditThingsPanel extends SmartTable
                 _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
             }
         }
+        @Override protected void initItemRow (HorizontalPanel row, final Category category) {
+            super.initItemRow(row, category);
+            row.add(Widgets.newShim(5, 5));
+            final CheckBox active = new CheckBox();
+            row.add(active);
+            active.setTitle("Series Active");
+            active.setValue(category.active);
+            active.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+                public void onValueChange (ValueChangeEvent<Boolean> event) {
+                    category.active = event.getValue();
+                    active.setEnabled(false);
+                    _adminsvc.updateCategory(category, new PopupCallback<Void>() {
+                        public void onSuccess (Void result) {
+                            String msg = category.active ?
+                                "Category activated." : "Category deactivated.";
+                            Popups.infoNear(msg, active);
+                            active.setEnabled(true);
+                        }
+                    });
+                }
+            });
+        }
     };
 
     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
@@ -390,6 +420,12 @@ public class EditThingsPanel extends SmartTable
             card.thing = item;
             card.created = new Date();
             setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
+        }
+
+        @Override protected void initItemRow (HorizontalPanel row, Thing thing) {
+            super.initItemRow(row, thing);
+            row.add(Widgets.newShim(5, 5));
+            row.add(Widgets.newLabel(thing.rarity.toString(), null));
         }
 
         protected int _categoryId;

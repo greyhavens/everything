@@ -17,6 +17,8 @@ import com.samskivert.util.IntIntMap;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
+import static com.threerings.everything.Log.log;
+
 /**
  * Contains a brief summary of all things in the repository. Used for selecting cards randomly and
  * properly accounting for their rarity.
@@ -42,6 +44,8 @@ public class ThingIndex
         }
         // finally shuffle our things to avoid aliasing if the RNG is not perfect
         Collections.shuffle(_things);
+
+        log.info("Updated things index", "things", _things.size(), "tweight", _totalWeight);
     }
 
     // TODO: support category or other limitations on thing selection
@@ -52,7 +56,7 @@ public class ThingIndex
      */
     public int[] selectThings (int count)
     {
-        Preconditions.checkArgument(_things.size() < count,
+        Preconditions.checkArgument(_things.size() >= count,
                                     "Cannot select " + count + " things. " +
                                     "Index only contains " + _things.size() + " things.");
 
@@ -81,6 +85,7 @@ public class ThingIndex
             if (rando < info.weight) {
                 return info.thingId;
             }
+            rando -= info.weight;
         }
         throw new IllegalStateException("Random weight exceeded total weight! So impossible!");
     }

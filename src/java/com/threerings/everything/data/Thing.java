@@ -50,15 +50,6 @@ public class Thing
     /** The URL from which this thing's information was obtained. */
     public String source;
 
-    /**
-     * Returns the URL that can be used to display this thing's image.
-     */
-    public String getImageURL ()
-    {
-        return image.length() == 0 ? "images/placeholder.png" :
-            "http://s3.amazonaws.com/everything.threerings.net/" + image;
-    }
-
     // from interface Comparable<Thing>
     public int compareTo (Thing other)
     {

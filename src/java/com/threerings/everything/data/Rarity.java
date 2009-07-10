@@ -29,6 +29,9 @@ public enum Rarity implements ByteEnum
         return null;
     }
 
+    /**
+     * Returns this rarity's weight for use when building grids of cards.
+     */
     public int weight ()
     {
         return MAX_VALUE - value + EXTRA_WEIGHT;
