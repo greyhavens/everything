@@ -15,5 +15,5 @@ public interface EverythingServiceAsync
     /**
      * The async version of {@link EverythingService#validateSession}.
      */
-    void validateSession (AsyncCallback<SessionData> callback);
+    void validateSession (int tzOffset, AsyncCallback<SessionData> callback);
 }

@@ -22,5 +22,5 @@ public interface EverythingService extends RemoteService
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
-    SessionData validateSession () throws ServiceException;
+    SessionData validateSession (int tzOffset) throws ServiceException;
 }

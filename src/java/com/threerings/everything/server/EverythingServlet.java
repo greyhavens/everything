@@ -41,7 +41,7 @@ public class EverythingServlet extends AppServiceServlet
     implements EverythingService
 {
     // from interface EverythingService
-    public SessionData validateSession () throws ServiceException
+    public SessionData validateSession (int tzOffset) throws ServiceException
     {
         OOOUser user = getUser();
         if (user == null) {
@@ -76,6 +76,9 @@ public class EverythingServlet extends AppServiceServlet
                 throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
             }
 
+            // compute the player's timezone (note: tzOffset is minutes *before* GMT)
+            String tz = String.format("GMT%+03d:%02d", -tzOffset/60, tzOffset%60);
+
             // create a new player with their Facebook data
             User fbuser = uinfo.getUser().get(0);
             String bdstr = fbuser.getBirthday();
@@ -87,12 +90,12 @@ public class EverythingServlet extends AppServiceServlet
             } catch (Exception e) {
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
             }
-            player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday);
-        }
+            player = _playerRepo.createPlayer(user.userId, fbuser.getFirstName(), birthday, tz);
+            log.info("Hello newbie!", "who", user.username, "name", player.name, "tz", tz);
 
-        // if this is not their first session, update their last session and grant free flips
-        // they've accumulated since their previous session
-        if (!player.joined.equals(player.lastSession)) {
+        } else {
+            // if this is not their first session, update their last session and grant free flips
+            // they've accumulated since their previous session
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
             float extraFlips = _gameLogic.computeFreeFlipsEarned(player.freeFlips, elapsed);
             _playerRepo.recordSession(player.userId, now, extraFlips);

@@ -35,7 +35,7 @@ public class EverythingClient
     {
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
-        _everysvc.validateSession(new AsyncCallback<SessionData>() {
+        _everysvc.validateSession(getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 if (data == null) {
                     setInfoContent("TODO: Redirect to splash/fbconnect page.");
@@ -108,6 +108,10 @@ public class EverythingClient
     {
         setContent(Widgets.newLabel(message, "infoLabel"));
     }
+
+    protected static native int getTimezoneOffset () /*-{
+        return new Date().getTimezoneOffset();
+    }-*/;
 
     protected SessionData _data;
     protected Widget _content;
