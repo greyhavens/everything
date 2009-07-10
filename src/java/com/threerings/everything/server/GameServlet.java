@@ -47,7 +47,7 @@ public class GameServlet extends AppServiceServlet
 
         GridResult result = new GridResult();
         result.grid = _gameLogic.resolveGrid(grid);
-        result.status = _gameLogic.getGameStatus(player, result.grid);
+        result.status = _gameLogic.getGameStatus(player, result.grid.unflipped);
         return result;
     }
 
@@ -57,13 +57,14 @@ public class GameServlet extends AppServiceServlet
         PlayerRecord player = requirePlayer();
 
         // load up the grid they're flipping
-        GridRecord grid = _gameRepo.loadGrid(player.userId);
-        if (grid == null || grid.gridId != gridId) {
+        GridRecord grec = _gameRepo.loadGrid(player.userId);
+        if (grec == null || grec.gridId != gridId) {
             throw new ServiceException(E_GRID_EXPIRED);
         }
 
         // compute the cost of this flip
-        int flipCost = _gameLogic.getNextFlipCost(GridRecord.TO_GRID.apply(grid));
+        Grid grid = _gameLogic.resolveGrid(grec);
+        int flipCost = _gameLogic.getNextFlipCost(grid.unflipped);
 
         // make sure they look like they can afford it (or have a freebie)
         checkCanPayForFlip(player, flipCost, expectedCost);
@@ -82,13 +83,19 @@ public class GameServlet extends AppServiceServlet
         }
 
         // create the card and add it to the player's collection
-        CardRecord card = _gameRepo.createCard(player.userId, grid.thingIds[position]);
+        CardRecord card = _gameRepo.createCard(player.userId, grec.thingIds[position]);
 
         // resolve the runtime data for the card and report our result
         FlipResult result = new FlipResult();
         result.card = _gameLogic.resolveCard(card);
-        result.status = _gameLogic.getGameStatus(_playerRepo.loadPlayer(player.userId),
-                                                 _gameLogic.resolveGrid(grid));
+        // decrement the unflipped count for the flipped card's rarity so that we can properly
+        // compute the new next flip cost
+        grid.unflipped[result.card.thing.rarity.ordinal()]--;
+        result.status = _gameLogic.getGameStatus(
+            _playerRepo.loadPlayer(player.userId), grid.unflipped);
+
+        log.info("Yay! Card flipped", "who", player.userId, "thing", result.card.thing.name,
+                 "rarity", result.card.thing.rarity, "paid", expectedCost);
         return result;
     }
 

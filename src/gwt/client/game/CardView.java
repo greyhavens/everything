@@ -38,11 +38,12 @@ public abstract class CardView extends FlowPanel
                 }
                 buf.append(cat.name);
             }
-            add(newHTML(buf.toString(), "Categories"));
+            add(Widgets.newHTML(buf.toString(), "Categories"));
 
             add(ImageUtil.getImageBox(card.thing.image));
 
-            add(newHTML(card.thing.rarity + " - &curren;" + card.thing.rarity.value, "Rarity"));
+            add(Widgets.newHTML(card.thing.rarity + " - &curren;" + card.thing.rarity.value,
+                                "Rarity"));
         }
     }
 
@@ -59,15 +60,15 @@ public abstract class CardView extends FlowPanel
 
             add(Widgets.newLabel("Facts:", "FactsTitle"));
 
-            add(newHTML(formatFacts(card.thing.facts), "Facts"));
+            add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
 
             add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
             if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver.name, "Giver"));
             }
 
-            add(newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
-                        nameSource(card.thing.source) + "</a>", "Source"));
+            add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
+                                nameSource(card.thing.source) + "</a>", "Source"));
         }
     }
 
@@ -91,13 +92,6 @@ public abstract class CardView extends FlowPanel
         } else {
             return source.substring(ssidx+2, eidx);
         }
-    }
-
-    protected static HTML newHTML (String text, String styleName)
-    {
-        HTML html = new HTML(text);
-        html.setStyleName(styleName);
-        return html;
     }
 
     protected static String formatFacts (String facts)

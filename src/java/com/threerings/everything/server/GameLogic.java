@@ -47,11 +47,11 @@ public class GameLogic
     /**
      * Computes this player's game status given a freshly loaded player and grid record.
      */
-    public GameStatus getGameStatus (PlayerRecord player, Grid grid)
+    public GameStatus getGameStatus (PlayerRecord player, int[] unflipped)
     {
         GameStatus status = PlayerRecord.TO_STATUS.apply(player);
         if (status.freeFlips == 0) {
-            status.nextFlipCost = getNextFlipCost(grid);
+            status.nextFlipCost = getNextFlipCost(unflipped);
         }
         return status;
     }
@@ -130,14 +130,14 @@ public class GameLogic
     }
 
     /**
-     * Returns the cost of the next flip for the specified grid.
+     * Returns the cost of the next flip for the specified unflipped set.
      */
-    public int getNextFlipCost (Grid grid)
+    public int getNextFlipCost (int[] unflipped)
     {
         // the cost of a flip is the expected value of the card
         int total = 0, count = 0;
         for (Rarity rarity : Rarity.values()) {
-            int cards = grid.unflipped[rarity.ordinal()];
+            int cards = unflipped[rarity.ordinal()];
             total += cards * rarity.value;
             count += cards;
         }

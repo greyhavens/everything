@@ -3,6 +3,7 @@
 
 package client.game;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 import com.threerings.gwt.ui.Widgets;
@@ -16,12 +17,12 @@ import client.util.ImageUtil;
  */
 public class ThingCardView extends FlowPanel
 {
-    public ThingCardView (ThingCard card)
+    public ThingCardView (ThingCard card, ClickHandler onClick)
     {
         setStyleName("thingCard");
         String name = (card == null || card.name == null) ? "?" : card.name;
         add(Widgets.newLabel(name, "Name"));
-        add(ImageUtil.getMiniImageBox(card == null ? null : card.image));
+        add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
         add(Widgets.newLabel(card == null ? "?" : card.rarity.toString(), "Rarity"));
     }
 }
