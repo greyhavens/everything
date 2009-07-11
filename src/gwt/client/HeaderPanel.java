@@ -3,9 +3,12 @@
 
 package client;
 
+import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 
 import com.threerings.gwt.ui.SmartTable;
+
+import com.threerings.everything.data.Build;
 
 import client.util.Context;
 
@@ -25,5 +28,10 @@ public class HeaderPanel extends SmartTable
         if (ctx.isEditor()) {
             setWidget(0, col++, new Hyperlink("Add Things", ""+Page.EDIT_THINGS));
         }
+
+        // finally display the game build on the right
+        getFlexCellFormatter().setHorizontalAlignment(0, col, HasAlignment.ALIGN_RIGHT);
+        getFlexCellFormatter().setWidth(0, col, "100%");
+        setText(0, col++, "Build: " + Build.VERSION);
     }
 }

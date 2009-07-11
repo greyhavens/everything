@@ -61,6 +61,17 @@
       <filelist refid="build.libs"/>
       <filelist refid="runtime.libs"/>
     </copyfilelist>
+
+    <!-- generate a build version and create our Build.java file -->
+    <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
+    <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
+    <copy file="${src.dir}/com/threerings/everything/data/Build.java.tmpl"
+          tofile="${src.dir}/com/threerings/everything/data/Build.java" overwrite="true">
+      <filterset>
+        <filter token="build_time" value="${build.time}"/>
+        <filter token="build_version" value="${build.version}"/>
+      </filterset>
+    </copy>
   </target>
 
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
@@ -80,9 +91,10 @@
 
   <target name="clean" description="Cleans out the compilation results.">
     <delete dir="${deploy.dir}/classes"/>
+    <delete file="${src.dir}/com/threerings/everything/data/Build.java"/>
   </target>
 
-  <target name="distcleanall" description="Cleans out all build data.">
+  <target name="distcleanall" depends="clean" description="Cleans out all build data.">
     <delete dir="${deploy.dir}"/>
   </target>
 
@@ -212,9 +224,6 @@
   </target>
 
   <target name="package" depends="distall" description="Builds our deployment package.">
-    <tstamp><format property="pkg.version" pattern="yyyyMMddHHmmss"/></tstamp>
-    <echo>Assigned build version ${pkg.version}</echo>
-
     <property name="pkgroot.dir" value="${deploy.dir}/packages/${app.ident}-app"/>
 
     <antcall target="install-app">
@@ -231,7 +240,7 @@
       <package destroot="${pkgroot.dir}">
         <info>
           <name>${app.ident}-app</name>
-          <version>${pkg.version}</version>
+          <version>${build.version}</version>
           <arch>${ooo.architecture}</arch>
           <description>Everything App</description>
           <maintainer>

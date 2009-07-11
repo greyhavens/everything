@@ -24,6 +24,15 @@
   max-height: 150px;
 }
 
+/** HeaderPanel styles */
+.header {
+  width: 100%;
+}
+
+.header td {
+  white-space: nowrap;
+}
+
 /** CardView styles */
 .cardView {
   width: 280px;
