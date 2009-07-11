@@ -201,7 +201,7 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public int cashInCard (int thingId, long created) throws ServiceException
+    public int sellCard (int thingId, long created) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
 
@@ -211,7 +211,7 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // players receive half the value of the thing for cashing in a card
-        int coins = _thingRepo.loadThing(card.thingId).rarity.value/2;
+        int coins = _thingRepo.loadThing(card.thingId).rarity.saleValue();
 
         // we grant the coins and then delete the card; it's possible that this means that a
         // database failure will result in them getting money and keeping their card but it seems

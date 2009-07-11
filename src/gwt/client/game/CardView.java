@@ -42,8 +42,8 @@ public abstract class CardView extends FlowPanel
 
             add(ImageUtil.getImageBox(card.thing.image));
 
-            add(Widgets.newHTML(card.thing.rarity + " - &curren;" + card.thing.rarity.value,
-                                "Rarity"));
+            add(Widgets.newFlowPanel("Rarity", Widgets.newInlineLabel(card.thing.rarity + " - "),
+                                     new CoinLabel(card.thing.rarity.value)));
         }
     }
 

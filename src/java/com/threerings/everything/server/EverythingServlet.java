@@ -107,6 +107,7 @@ public class EverythingServlet extends AppServiceServlet
         data.name = player.toName();
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
+        data.coins = player.coins;
         return data;
     }
 

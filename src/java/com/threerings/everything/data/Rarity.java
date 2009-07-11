@@ -30,6 +30,14 @@ public enum Rarity implements ByteEnum
     }
 
     /**
+     * Returns the value obtained when selling a card of this rarity.
+     */
+    public int saleValue ()
+    {
+        return value/2;
+    }
+
+    /**
      * Returns this rarity's weight for use when building grids of cards.
      */
     public int weight ()

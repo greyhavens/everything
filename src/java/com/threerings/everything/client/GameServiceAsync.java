@@ -42,7 +42,7 @@ public interface GameServiceAsync
                    AsyncCallback<GameService.FlipResult> callback);
 
     /**
-     * The async version of {@link GameService#cashInCard}.
+     * The async version of {@link GameService#sellCard}.
      */
-    void cashInCard (int thingId, long created, AsyncCallback<Integer> callback);
+    void sellCard (int thingId, long created, AsyncCallback<Integer> callback);
 }

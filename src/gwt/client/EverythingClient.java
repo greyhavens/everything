@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.PopupStack;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
@@ -85,6 +86,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public Value<Integer> getCoins ()
+    {
+        return _coins;
+    }
+
+    // from interface Context
     public void displayPopup (PopupPanel popup)
     {
         _pstack.show(popup);
@@ -115,6 +122,7 @@ public class EverythingClient
     protected void gotSessionData (SessionData data)
     {
         _data = data;
+        _coins = new Value<Integer>(data.coins);
         setContent(null);
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
         History.fireCurrentHistoryState();
@@ -130,9 +138,10 @@ public class EverythingClient
     }-*/;
 
     protected SessionData _data;
+    protected Value<Integer> _coins;
+
     protected HeaderPanel _header;
     protected Widget _content;
-
     protected PopupStack _pstack = new PopupStack();
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);

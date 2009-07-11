@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
@@ -60,7 +61,7 @@ public class GridPanel extends FlowPanel
             _cards.setWidget(row, col, new ThingCardView(data.grid.flipped[ii], onClick));
         }
 
-        add(_status = Widgets.newHTML("", "Status"));
+        add(_status = Widgets.newSimplePanel(null, "Status"));
         updateStatus(data.status);
     }
 
@@ -78,12 +79,17 @@ public class GridPanel extends FlowPanel
         _remaining.setHTML("Remaining: " + buf);
     }
 
-    protected void updateStatus (GameStatus status)
+    protected void updateStatus (final GameStatus status)
     {
+        // let the context know that we know of a fresher coins value
+        _ctx.getCoins().update(status.coins);
+
         if (status.freeFlips > 0) {
-            _status.setHTML("Free flips: " + status.freeFlips);
+            _status.setWidget(Widgets.newLabel("Free flips: " + status.freeFlips, null));
         } else {
-            _status.setHTML("Next flip: " + status.nextFlipCost + " You have: " + status.coins);
+            String next = "Next flip: " + status.nextFlipCost + " You have: ";
+            _status.setWidget(Widgets.newFlowPanel(null, Widgets.newInlineLabel(next),
+                                                   new CoinLabel(_ctx.getCoins())));
         }
     }
 
@@ -109,14 +115,15 @@ public class GridPanel extends FlowPanel
 
                     // display the card big and fancy and allow them to keep it, gift to a friend
                     // or cash it in
-                    _ctx.displayPopup(new CardPopup(result.card));
+                    _ctx.displayPopup(new CardPopup(_ctx, result.card));
                 }
             });
     }
 
     protected Context _ctx;
     protected SmartTable _cards;
-    protected HTML _remaining, _status;
+    protected HTML _remaining;
+    protected SimplePanel _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 

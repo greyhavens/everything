@@ -45,7 +45,7 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #flipCard} if the user can't afford the flip they requested. */
     public static final String E_NSF_FOR_FLIP = "e.nsf_for_flip";
 
-    /** Thrown by {@link #getCard} or {@link #cashInCard} if the card in question does not exist. */
+    /** Thrown by {@link #getCard} or {@link #sellCard} if the card in question does not exist. */
     public static final String E_UNKNOWN_CARD = "e.unknown_card";
 
     /** Provides results for {@link #getGrid}. */
@@ -94,7 +94,7 @@ public interface GameService extends RemoteService
     FlipResult flipCard (int gridId, int position, int expectedCost) throws ServiceException;
 
     /**
-     * Requests to cash in the specified card. Returns the caller's new coin balance.
+     * Requests to sell the specified card. Returns the caller's new coin balance.
      */
-    int cashInCard (int thingId, long created) throws ServiceException;
+    int sellCard (int thingId, long created) throws ServiceException;
 }
