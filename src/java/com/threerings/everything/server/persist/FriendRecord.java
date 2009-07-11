@@ -19,6 +19,10 @@ public class FriendRecord extends PersistentRecord
     public static final ColumnExp FRIEND_ID = colexp(_R, "friendId");
     // AUTO-GENERATED: FIELDS END
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** The id of the user in question. */
     @Id public int userId;
 
