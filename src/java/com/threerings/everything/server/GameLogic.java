@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -123,6 +124,7 @@ public class GameLogic
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
         card.thing = _thingRepo.loadThing(record.thingId);
         card.categories = resolveCategories(card.thing);
+        card.created = new Date(record.created.getTime());
         if (record.giverId != 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         }

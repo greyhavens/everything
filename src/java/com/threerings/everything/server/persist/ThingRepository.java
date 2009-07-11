@@ -136,6 +136,15 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Loads and returns cards for all things in the specified category.
+     */
+    public Iterable<ThingCard> loadThingCards (int categoryId)
+    {
+        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
+            map(ThingRecord.TO_CARD);
+    }
+
+    /**
      * Loads and returns cards for the supplied set of things.
      */
     public Iterable<ThingCard> loadThingCards (Set<Integer> thingIds)

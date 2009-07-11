@@ -10,6 +10,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 import com.threerings.user.OOOUser;
@@ -25,6 +26,7 @@ import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
+import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -83,7 +85,35 @@ public class GameServlet extends EveryServiceServlet
         PlayerRecord player = requirePlayer();
         // TODO: require that the caller be a friend of owner?
 
+        Category category = _thingRepo.loadCategory(categoryId);
+        if (category == null) {
+            throw new ServiceException(E_UNKNOWN_SERIES);
+        }
+
+        // load up the cards owned by this player
+        List<CardRecord> crecs = _gameRepo.loadCards(ownerId, categoryId);
+        List<ThingCard> cards = Lists.newArrayList();
+
+        // then load up all things in the series so that we can fill in blanks
+        for (ThingCard thing : Sets.newTreeSet(_thingRepo.loadThingCards(categoryId))) {
+            boolean added = false;
+            for (CardRecord crec : crecs) {
+                if (crec.thingId == thing.thingId) {
+                    ThingCard card = ThingCard.clone(thing);
+                    card.created = crec.created.getTime();
+                    cards.add(card);
+                    added = true;
+                }
+            }
+            if (!added) {
+                cards.add(null); // add a blank spot for this thing
+            }
+        }
+
         Series series = new Series();
+        series.categoryId = categoryId;
+        series.name = category.name;
+        series.things = cards.toArray(new ThingCard[cards.size()]);
         return series;
     }
 

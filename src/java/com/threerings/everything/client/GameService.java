@@ -27,6 +27,9 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #getCollection} if the user in question does not exist. */
     public static final String E_UNKNOWN_USER = "e.unknown_user";
 
+    /** Thrown by {@link #getSeries} if the user in series does not exist. */
+    public static final String E_UNKNOWN_SERIES = "e.unknown_series";
+
     /** Thrown by {@link #flipCard} if the grid in question has expired. */
     public static final String E_GRID_EXPIRED = "e.grid_expired";
 

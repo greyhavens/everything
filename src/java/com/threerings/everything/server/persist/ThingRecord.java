@@ -45,7 +45,7 @@ public class ThingRecord extends PersistentRecord
     public static Function<ThingRecord, Thing> TO_THING =
         RuntimeUtil.makeToRuntime(ThingRecord.class, Thing.class);
 
-    /** A function for converting this record to {@link ThingCards}. */
+    /** A function for converting this record to {@link ThingCard}. */
     public static Function<ThingRecord, ThingCard> TO_CARD =
         RuntimeUtil.makeToRuntime(ThingRecord.class, ThingCard.class);
 

@@ -4,6 +4,7 @@
 package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Inject;
@@ -32,6 +33,17 @@ public class GameRepository extends DepotRepository
     public CardRecord loadCard (int ownerId, int thingId, long created)
     {
         return load(CardRecord.getKey(ownerId, thingId, new Timestamp(created)));
+    }
+
+    /**
+     * Loads all cards owned by the specified player in the specified category.
+     */
+    public List<CardRecord> loadCards (int ownerId, int categoryId)
+    {
+        return findAll(CardRecord.class,
+                       CardRecord.THING_ID.join(ThingRecord.THING_ID),
+                       new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
+                                         ThingRecord.CATEGORY_ID.eq(categoryId))));
     }
 
     /**

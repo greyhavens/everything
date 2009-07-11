@@ -77,6 +77,16 @@
   font-weight: bold;
 }
 
+/** BrowsePanel styles */
+.browse .Title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.browse .Series {
+  display: inline;
+}
+
 /** GridPanel styles */
 .grid {
   width: 600px;
@@ -85,4 +95,24 @@
 .grid .Remaining, .grid .Status {
   text-align: center;
   font-weight: bold;
+}
+
+/** SeriesPopup styles */
+.series {
+  border: 1px solid;
+  background: #FFFFFF;
+  padding: 5px;
+}
+
+.series .Title {
+  font-weight: bold;
+}
+
+/** CardPopup styles */
+.card {
+  background: #FFFFFF;
+}
+
+.card table {
+  margin: 0px auto;
 }

@@ -3,29 +3,56 @@
 
 package client.game;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
 
+import com.threerings.everything.client.GameService;
+import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
+
+import client.util.PopupCallback;
 
 /**
  * Displays a full-sized card in a nice looking popup.
  */
 public class CardPopup extends PopupPanel
 {
+    public CardPopup (int ownerId, int thingId, long created)
+    {
+        this();
+        setWidget(Widgets.newLabel("Loading...", "infoLabel"));
+        _gamesvc.getCard(ownerId, thingId, created, new PopupCallback<Card>() {
+            public void onSuccess (Card card) {
+                init(card);
+            }
+        });
+    }
+
     public CardPopup (final Card card)
     {
-        // TODO: disable auto-dismiss
+        this();
+        init(card);
+    }
 
+    protected CardPopup ()
+    {
+        setStyleName("card");
+    }
+
+    protected void init (final Card card)
+    {
         final FlowPanel contents = new FlowPanel();
-        setWidget(contents);
         contents.add(new CardView.Front(card));
-        contents.add(Widgets.newActionLabel("<flip>", new ClickHandler() {
+        HorizontalPanel buttons = new HorizontalPanel();
+        buttons.add(new Button("Flip", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 Widget face = contents.getWidget(0);
                 contents.remove(0);
@@ -36,5 +63,16 @@ public class CardPopup extends PopupPanel
                 }
             }
         }));
+        buttons.add(Widgets.newShim(5, 5));
+        buttons.add(new Button("Done", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                CardPopup.this.hide();
+            }
+        }));
+        contents.add(buttons);
+        setWidget(contents);
+        center();
     }
+
+    protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
