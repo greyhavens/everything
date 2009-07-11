@@ -69,6 +69,25 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Creates friend mappings for the specified user to the specified set of friends. The mapping
+     * will be created in both directions so that as players join Everything old players will be
+     * connected to joining friends when the friend joins.
+     */
+    public void addFriends (int userId, Iterable<Integer> friendIds)
+    {
+        for (Integer friendId : friendIds) {
+            FriendRecord record = new FriendRecord();
+            record.userId = userId;
+            record.friendId = friendId;
+            store(record);
+            record = new FriendRecord();
+            record.userId = friendId;
+            record.friendId = userId;
+            store(record);
+        }
+    }
+
+    /**
      * Updates the specified user's last session stamp and grants them free flips earned since
      * their previous session.
      */
@@ -131,6 +150,7 @@ public class PlayerRepository extends DepotRepository
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
+        classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
         classes.add(WishRecord.class);
     }

@@ -6,9 +6,11 @@ package com.threerings.everything.server;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Inject;
+import com.google.common.collect.Lists;
 
 import com.google.code.facebookapi.FacebookException;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
@@ -93,6 +95,22 @@ public class EverythingServlet extends AppServiceServlet
             player = _playerRepo.createPlayer(
                 user.userId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
+
+            // look up their friends' facebook ids and make friend mappings for them
+            try {
+                List<String> friendIds = Lists.newArrayList();
+                for (Long uid : fbclient.friends_get().getUid()) {
+                    friendIds.add(uid.toString());
+                }
+                if (friendIds.size() > 0) {
+                    log.info("Wiring up friends", "who", user.username, "friends", friendIds);
+                    _playerRepo.addFriends(
+                        user.userId, _userLogic.mapFacebookIds(friendIds).values());
+                }
+            } catch (Exception e) {
+                log.info("Failed to look up Facebook friends", "who", user.username,
+                         "error", e.getMessage());
+            }
 
         } else {
             // if this is not their first session, update their last session and grant free flips
