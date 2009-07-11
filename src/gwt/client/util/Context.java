@@ -3,6 +3,7 @@
 
 package client.util;
 
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.everything.data.PlayerName;
@@ -23,4 +24,8 @@ public interface Context
 
     /** Returns whether this player has admin privileges. */
     public boolean isAdmin ();
+
+    /** Displays a popup, hiding any existing popup (which will be restored when this popup is
+     * cleared). */
+    public void displayPopup (PopupPanel popup);
 }

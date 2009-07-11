@@ -20,15 +20,27 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.ThingCard;
 
+import client.util.Context;
+
 /**
  * Displays thumbnails for all cards in a player's series.
  */
 public class SeriesPopup extends PopupPanel
 {
-    public SeriesPopup (final int ownerId, int categoryId)
+    public static ClickHandler onClick (final Context ctx, final int ownerId, final int categoryId)
+    {
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                ctx.displayPopup(new SeriesPopup(ctx, ownerId, categoryId));
+            }
+        };
+    }
+
+    public SeriesPopup (Context ctx, final int ownerId, int categoryId)
     {
         setStyleName("series");
         setWidget(Widgets.newLabel("Loading...", "infoLabel"));
+        _ctx = ctx;
         _gamesvc.getSeries(ownerId, categoryId, new AsyncCallback<Series>() {
             public void onSuccess (Series series) {
                 init(ownerId, series);
@@ -39,18 +51,15 @@ public class SeriesPopup extends PopupPanel
         });
     }
 
-    protected void init (final int ownerId, Series series)
+    protected void init (int ownerId, Series series)
     {
         SmartTable grid = new SmartTable(5, 0);
         grid.addText(series.name, COLUMNS, "Title");
         for (int ii = 0; ii < series.things.length; ii++) {
             int row = ii/COLUMNS+1, col = ii%COLUMNS;
-            final ThingCard card = series.things[ii];
-            ClickHandler onClick = (card == null) ? null : new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    new CardPopup(ownerId, card.thingId, card.created).center();
-                }
-            };
+            ThingCard card = series.things[ii];
+            ClickHandler onClick = (card == null) ? null :
+                CardPopup.onClick(_ctx, ownerId, card.thingId, card.created);
             grid.setWidget(row, col, new ThingCardView(card, onClick));
         }
         int row = grid.addWidget(new Button("Done", new ClickHandler() {
@@ -63,7 +72,8 @@ public class SeriesPopup extends PopupPanel
         center();
     }
 
-    protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
+    protected Context _ctx;
 
+    protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
     protected static final int COLUMNS = 4;
 }

@@ -18,6 +18,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 
+import client.util.Context;
 import client.util.PopupCallback;
 
 /**
@@ -25,6 +26,16 @@ import client.util.PopupCallback;
  */
 public class CardPopup extends PopupPanel
 {
+    public static ClickHandler onClick (
+        final Context ctx, final int ownerId, final int thingId, final long created)
+    {
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                ctx.displayPopup(new CardPopup(ownerId, thingId, created));
+            }
+        };
+    }
+
     public CardPopup (int ownerId, int thingId, long created)
     {
         this();

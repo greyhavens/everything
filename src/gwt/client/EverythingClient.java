@@ -3,13 +3,19 @@
 
 package client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -82,6 +88,33 @@ public class EverythingClient
         return _data.isAdmin;
     }
 
+    // from interface Context
+    public void displayPopup (PopupPanel popup)
+    {
+        if (_showingPopup != null) {
+            // clear out _showingPopup before hiding this popup to avoid triggering the close
+            // handler logic
+            PopupPanel toClose = _showingPopup;
+            _popups.add(_showingPopup);
+            _showingPopup = null;
+            toClose.hide();
+        }
+        popup.addCloseHandler(new CloseHandler<PopupPanel>() {
+            public void onClose (CloseEvent<PopupPanel> event) {
+                if (_showingPopup == event.getTarget()) {
+                    if (_popups.size() > 0) {
+                        _showingPopup = _popups.remove(_popups.size()-1);
+                        _showingPopup.center();
+                    } else {
+                        _showingPopup = null;
+                    }
+                }
+            }
+        });
+        _showingPopup = popup;
+        _showingPopup.center();
+    }
+
     // from interface ValueChangeHandler<String>
     public void onValueChange (ValueChangeEvent<String> event)
     {
@@ -98,6 +131,13 @@ public class EverythingClient
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, getMe().userId)); break;
         case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
+        }
+
+        // if we have showing popups, clear them out
+        _popups.clear();
+        if (_showingPopup != null) {
+            _showingPopup.hide();
+            _showingPopup = null;
         }
     }
 
@@ -121,6 +161,9 @@ public class EverythingClient
     protected SessionData _data;
     protected HeaderPanel _header;
     protected Widget _content;
+
+    protected PopupPanel _showingPopup;
+    protected List<PopupPanel> _popups = new ArrayList<PopupPanel>();
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 

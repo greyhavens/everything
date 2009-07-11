@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,6 +31,7 @@ public class BrowsePanel extends FlowPanel
     {
         setStyleName("browse");
         add(Widgets.newLabel("Loading...", "infoLabel"));
+        _ctx = ctx;
         _gamesvc.getCollection(ownerId, new PanelCallback<PlayerCollection>(this) {
             public void onSuccess (PlayerCollection coll) {
                 init(coll);
@@ -40,7 +39,7 @@ public class BrowsePanel extends FlowPanel
         });
     }
 
-    protected void init (final PlayerCollection coll)
+    protected void init (PlayerCollection coll)
     {
         SmartTable table = new SmartTable(5, 0);
         table.addText(coll.owner.name + "'s Collection", 3, "Title");
@@ -49,12 +48,9 @@ public class BrowsePanel extends FlowPanel
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
                 String subcatname = subcat.getKey();
                 FlowPanel cards = new FlowPanel();
-                for (final SeriesCard card : subcat.getValue()) {
-                    cards.add(Widgets.newActionLabel(card.name, "Series", new ClickHandler() {
-                        public void onClick (ClickEvent event) {
-                            new SeriesPopup(coll.owner.userId, card.categoryId).center();
-                        }
-                    }));
+                for (SeriesCard card : subcat.getValue()) {
+                    cards.add(Widgets.newActionLabel(card.name, "Series",
+                                  SeriesPopup.onClick(_ctx, coll.owner.userId, card.categoryId)));
                     cards.add(Widgets.newLabel(" (" + card.owned + " of " + card.things + ")",
                                                "Series"));
                 }
@@ -69,5 +65,6 @@ public class BrowsePanel extends FlowPanel
         add(table);
     }
 
+    protected Context _ctx;
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }

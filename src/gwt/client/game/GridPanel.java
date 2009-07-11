@@ -109,7 +109,7 @@ public class GridPanel extends FlowPanel
 
                     // display the card big and fancy and allow them to keep it, gift to a friend
                     // or cash it in
-                    new CardPopup(result.card).center();
+                    _ctx.displayPopup(new CardPopup(result.card));
                 }
             });
     }
