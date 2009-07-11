@@ -51,7 +51,6 @@
 
 .cardView .Descrip {
   margin: 10px 0px;
-  height: 55px;
 }
 
 .cardView .FactsTitle {
@@ -59,7 +58,6 @@
 }
 
 .cardView .Facts {
-  height: 150px;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Source {
