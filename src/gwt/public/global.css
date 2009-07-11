@@ -14,3 +14,9 @@ html, body {
   font-size: 18px;
   padding: 25px;
 }
+
+/** ClickCallback styles */
+.confirm {
+  border: 1px solid;
+  background: #FFFFFF;
+}
