@@ -4,6 +4,8 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,8 +49,13 @@ public class AuthServlet extends AppServlet
             // if they have no session key, they haven't added the app, if they have a session key
             // they have so we'll create an OOOUser record for them and send them to index.html
             if (!ParameterUtil.isSet(req, "fb_sig_session_key") || getUser(req, rsp) == null) {
-                rsp.sendRedirect("http://www.facebook.com/login.php?api_key=" +
-                                 _app.getFacebookKey() + "&canvas=1&v=1.0");
+                // we're in an iframe so we have to send down some JavaScript that jimmies
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(rsp.getOutputStream()));
+                out.println("<html><head><script language=\"JavaScript\">");
+                out.println("window.top.location = 'http://www.facebook.com/login.php?api_key=" +
+                            _app.getFacebookKey() + "&canvas=1&v=1.0';");
+                out.println("</script></head></html>");
+                out.close();
             } else {
                 rsp.sendRedirect("index.html");
             }
