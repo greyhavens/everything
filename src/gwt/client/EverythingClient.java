@@ -3,13 +3,8 @@
 
 package client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -20,6 +15,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.PopupStack;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
@@ -91,28 +87,7 @@ public class EverythingClient
     // from interface Context
     public void displayPopup (PopupPanel popup)
     {
-        if (_showingPopup != null) {
-            // clear out _showingPopup before hiding this popup to avoid triggering the close
-            // handler logic
-            PopupPanel toClose = _showingPopup;
-            _popups.add(_showingPopup);
-            _showingPopup = null;
-            toClose.hide();
-        }
-        popup.addCloseHandler(new CloseHandler<PopupPanel>() {
-            public void onClose (CloseEvent<PopupPanel> event) {
-                if (_showingPopup == event.getTarget()) {
-                    if (_popups.size() > 0) {
-                        _showingPopup = _popups.remove(_popups.size()-1);
-                        _showingPopup.center();
-                    } else {
-                        _showingPopup = null;
-                    }
-                }
-            }
-        });
-        _showingPopup = popup;
-        _showingPopup.center();
+        _pstack.show(popup);
     }
 
     // from interface ValueChangeHandler<String>
@@ -134,11 +109,7 @@ public class EverythingClient
         }
 
         // if we have showing popups, clear them out
-        _popups.clear();
-        if (_showingPopup != null) {
-            _showingPopup.hide();
-            _showingPopup = null;
-        }
+        _pstack.clear();
     }
 
     protected void gotSessionData (SessionData data)
@@ -162,8 +133,7 @@ public class EverythingClient
     protected HeaderPanel _header;
     protected Widget _content;
 
-    protected PopupPanel _showingPopup;
-    protected List<PopupPanel> _popups = new ArrayList<PopupPanel>();
+    protected PopupStack _pstack = new PopupStack();
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 
