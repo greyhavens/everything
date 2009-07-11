@@ -122,7 +122,10 @@ public class GameServlet extends EveryServiceServlet
     {
         // TODO: show less info if the caller is not the owner?
         CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
-        return (card == null) ? null : _gameLogic.resolveCard(card);
+        if (card == null) {
+            throw new ServiceException(E_UNKNOWN_CARD);
+        }
+        return _gameLogic.resolveCard(card);
     }
 
     // from interface GameService
@@ -195,6 +198,29 @@ public class GameServlet extends EveryServiceServlet
         log.info("Yay! Card flipped", "who", player.who(), "thing", result.card.thing.name,
                  "rarity", result.card.thing.rarity, "paid", expectedCost);
         return result;
+    }
+
+    // from interface GameService
+    public int cashInCard (int thingId, long created) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+
+        CardRecord card = _gameRepo.loadCard(player.userId, thingId, created);
+        if (card == null) {
+            throw new ServiceException(E_UNKNOWN_CARD);
+        }
+
+        // players receive half the value of the thing for cashing in a card
+        int coins = _thingRepo.loadThing(card.thingId).rarity.value/2;
+
+        // we grant the coins and then delete the card; it's possible that this means that a
+        // database failure will result in them getting money and keeping their card but it seems
+        // quite unlikely that they'll get to take advantage of such a failure more than once...
+        _playerRepo.grantCoins(player.userId, coins);
+        _gameRepo.deleteCard(card);
+
+        // return their new coin balance (this doesn't have to be absolutely correct)
+        return player.coins + coins;
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)

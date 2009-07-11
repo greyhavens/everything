@@ -40,4 +40,9 @@ public interface GameServiceAsync
      */
     void flipCard (int gridId, int position, int expectedCost,
                    AsyncCallback<GameService.FlipResult> callback);
+
+    /**
+     * The async version of {@link GameService#cashInCard}.
+     */
+    void cashInCard (int thingId, long created, AsyncCallback<Integer> callback);
 }

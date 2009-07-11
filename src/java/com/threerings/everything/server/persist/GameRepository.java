@@ -61,6 +61,14 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Deletes the specified card.
+     */
+    public void deleteCard (CardRecord card)
+    {
+        delete(card);
+    }
+
+    /**
      * Loads the specified player's current grid.
      */
     public GridRecord loadGrid (int userId)

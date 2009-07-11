@@ -45,6 +45,9 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #flipCard} if the user can't afford the flip they requested. */
     public static final String E_NSF_FOR_FLIP = "e.nsf_for_flip";
 
+    /** Thrown by {@link #getCard} or {@link #cashInCard} if the card in question does not exist. */
+    public static final String E_UNKNOWN_CARD = "e.unknown_card";
+
     /** Provides results for {@link #getGrid}. */
     public static class GridResult implements IsSerializable
     {
@@ -76,8 +79,7 @@ public interface GameService extends RemoteService
     Series getSeries (int ownerId, int categoryId) throws ServiceException;
 
     /**
-     * Returns detail information for the specified card, or null if the specified player does not
-     * own that card.
+     * Returns detail information for the specified card.
      */
     Card getCard (int ownerId, int thingId, long created) throws ServiceException;
 
@@ -90,4 +92,9 @@ public interface GameService extends RemoteService
      * Requests to flip the card at the specified position in the specified grid.
      */
     FlipResult flipCard (int gridId, int position, int expectedCost) throws ServiceException;
+
+    /**
+     * Requests to cash in the specified card. Returns the caller's new coin balance.
+     */
+    int cashInCard (int thingId, long created) throws ServiceException;
 }
