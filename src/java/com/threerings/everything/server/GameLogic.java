@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -203,6 +204,7 @@ public class GameLogic
                 categoryId = cat.parentId;
             }
         }
+        Collections.reverse(cats);
         return cats.toArray(new Category[cats.size()]);
     }
 
