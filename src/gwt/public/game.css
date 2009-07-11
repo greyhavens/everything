@@ -57,7 +57,9 @@
   font-weight: bold;
 }
 
-.cardView .Facts {
+.cardView .Facts ul {
+  margin: 10px 0px;
+  padding-left: 25px;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Source {
