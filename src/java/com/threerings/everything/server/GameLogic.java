@@ -144,7 +144,7 @@ public class GameLogic
             total += cards * rarity.value;
             count += cards;
         }
-        return total / count;
+        return (count == 0) ? 0 : (total / count);
     }
 
     /**
