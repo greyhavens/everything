@@ -3,8 +3,10 @@
 
 package com.threerings.everything.server;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -12,6 +14,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+
+import com.samskivert.util.IntIntMap;
+import com.samskivert.util.IntMap;
 
 import com.threerings.user.OOOUser;
 
@@ -22,8 +27,10 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.ThingCard;
@@ -121,11 +128,7 @@ public class GameServlet extends EveryServiceServlet
     public Card getCard (int ownerId, int thingId, long created) throws ServiceException
     {
         // TODO: show less info if the caller is not the owner?
-        CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
-        if (card == null) {
-            throw new ServiceException(E_UNKNOWN_CARD);
-        }
-        return _gameLogic.resolveCard(card);
+        return _gameLogic.resolveCard(requireCard(ownerId, thingId, created));
     }
 
     // from interface GameService
@@ -146,6 +149,7 @@ public class GameServlet extends EveryServiceServlet
                      "expires", grid.expires);
         }
 
+        log.info("Returning grid", "for", player.who(), "things", grid.thingIds);
         GridResult result = new GridResult();
         result.grid = _gameLogic.resolveGrid(grid);
         result.status = _gameLogic.getGameStatus(player, result.grid.unflipped);
@@ -204,11 +208,7 @@ public class GameServlet extends EveryServiceServlet
     public int sellCard (int thingId, long created) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-
-        CardRecord card = _gameRepo.loadCard(player.userId, thingId, created);
-        if (card == null) {
-            throw new ServiceException(E_UNKNOWN_CARD);
-        }
+        CardRecord card = requireCard(player.userId, thingId, created);
 
         // players receive half the value of the thing for cashing in a card
         int coins = _thingRepo.loadThing(card.thingId).rarity.saleValue();
@@ -221,6 +221,53 @@ public class GameServlet extends EveryServiceServlet
 
         // return their new coin balance (this doesn't have to be absolutely correct)
         return player.coins + coins;
+    }
+
+    // from interface GameService
+    public GiftInfoResult getGiftCardInfo (int thingId, long created) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        CardRecord card = requireCard(player.userId, thingId, created);
+
+        // load up data on the things in this set
+        Set<Integer> thingIds = Sets.newHashSet();
+        for (ThingCard thing : _thingRepo.loadThingCards(
+                 _thingRepo.loadThing(thingId).categoryId)) {
+            thingIds.add(thing.thingId);
+        }
+
+        // determine which friends do not have a card with this thing on it
+        Set<Integer> friendIds = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
+        friendIds.removeAll(_gameRepo.countCardHoldings(
+                                friendIds, Collections.singleton(thingId)).keySet());
+
+        // count up how many of the cards in this series are held by these friends
+        IntIntMap holdings = _gameRepo.countCardHoldings(friendIds, thingIds);
+
+        // load up the names of those friends
+        IntMap<PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
+
+        // TODO: load up wishlist info on this thing
+
+        GiftInfoResult result = new GiftInfoResult();
+        result.things = thingIds.size();
+        result.friends = Lists.newArrayList();
+        for (Integer friendId : friendIds) {
+            FriendCardInfo info = new FriendCardInfo();
+            info.friend = names.get(friendId);
+            info.hasThings = holdings.getOrElse(friendId, 0);
+            info.onWishlist = false; // TODO
+            result.friends.add(info);
+        }
+        return result;
+    }
+
+    // from interface GameService
+    public void giftCard (int thingId, long created, int friendId) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        CardRecord card = requireCard(player.userId, thingId, created);
+        // TODOOZ!
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)
@@ -259,6 +306,16 @@ public class GameServlet extends EveryServiceServlet
         if (!_playerRepo.consumeCoins(player.userId, expectedCost)) {
             throw new ServiceException(E_NSF_FOR_FLIP);
         }
+    }
+
+    protected CardRecord requireCard (int ownerId, int thingId, long created)
+        throws ServiceException
+    {
+        CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
+        if (card == null) {
+            throw new ServiceException(E_UNKNOWN_CARD);
+        }
+        return card;
     }
 
     @Inject protected GameLogic _gameLogic;

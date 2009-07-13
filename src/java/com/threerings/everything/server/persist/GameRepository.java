@@ -10,10 +10,13 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.samskivert.util.IntIntMap;
+
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Where;
 
 /**
@@ -66,6 +69,22 @@ public class GameRepository extends DepotRepository
     public void deleteCard (CardRecord card)
     {
         delete(card);
+    }
+
+    /**
+     * Counts up and returns the number of cards in the supplied set of things that are held by
+     * each of the specified owners.
+     */
+    public IntIntMap countCardHoldings (Set<Integer> ownerIds, Set<Integer> thingIds)
+    {
+        IntIntMap data = new IntIntMap();
+        for (OwnerRecord orec : findAll(OwnerRecord.class,
+                                        new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
+                                                          CardRecord.THING_ID.in(thingIds))),
+                                        new GroupBy(CardRecord.OWNER_ID))) {
+            data.put(orec.ownerId, orec.count);
+        }
+        return data;
     }
 
     /**

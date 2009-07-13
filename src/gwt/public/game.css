@@ -125,3 +125,8 @@
 .card table {
   margin: 0px auto;
 }
+
+/** GiftCardPopup styles */
+.giftCard .Wishlist {
+  font-weight: bold;
+}

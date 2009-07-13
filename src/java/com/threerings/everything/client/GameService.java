@@ -3,6 +3,8 @@
 
 package com.threerings.everything.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -10,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
@@ -45,7 +48,7 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #flipCard} if the user can't afford the flip they requested. */
     public static final String E_NSF_FOR_FLIP = "e.nsf_for_flip";
 
-    /** Thrown by {@link #getCard} or {@link #sellCard} if the card in question does not exist. */
+    /** Thrown by various card-related methods if the card in question does not exist. */
     public static final String E_UNKNOWN_CARD = "e.unknown_card";
 
     /** Provides results for {@link #getGrid}. */
@@ -66,6 +69,16 @@ public interface GameService extends RemoteService
 
         /** The player's new game status after the flip. */
         public GameStatus status;
+    }
+
+    /** Provides results for {@link #getGiftCardInfo}. */
+    public class GiftInfoResult implements IsSerializable
+    {
+        /** The number of things in the series of the card being considered for gifting. */
+        public int things;
+
+        /** The status of each of this player's friends that do not already have the card. */
+        public List<FriendCardInfo> friends;
     }
 
     /**
@@ -97,4 +110,14 @@ public interface GameService extends RemoteService
      * Requests to sell the specified card. Returns the caller's new coin balance.
      */
     int sellCard (int thingId, long created) throws ServiceException;
+
+    /**
+     * Requests data on this player's friends who do not already have the specified card.
+     */
+    GiftInfoResult getGiftCardInfo (int thingId, long created) throws ServiceException;
+
+    /**
+     * Gifts the specified card to the specified friend.
+     */
+    void giftCard (int thingId, long created, int friendId) throws ServiceException;
 }

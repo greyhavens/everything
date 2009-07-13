@@ -7,14 +7,19 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.util.IntMap;
+import com.samskivert.util.IntMaps;
+import com.samskivert.depot.clause.Join;
 import com.samskivert.depot.clause.Where;
 
 import com.threerings.everything.client.GameCodes;
@@ -46,6 +51,19 @@ public class PlayerRepository extends DepotRepository
     public PlayerName loadPlayerName (int userId)
     {
         return PlayerRecord.TO_NAME.apply(loadPlayer(userId));
+    }
+
+    /**
+     * Loads and returns the names for the supplied set of players, mapped by user id.
+     */
+    public IntMap<PlayerName> loadPlayerNames (Set<Integer> userIds)
+    {
+        IntMap<PlayerName> names = IntMaps.newHashIntMap();
+        for (PlayerRecord prec : findAll(PlayerRecord.class,
+                                         new Where(PlayerRecord.USER_ID.in(userIds)))) {
+            names.put(prec.userId, PlayerRecord.TO_NAME.apply(prec));
+        }
+        return names;
     }
 
     /**
@@ -85,6 +103,19 @@ public class PlayerRepository extends DepotRepository
             record.friendId = userId;
             store(record);
         }
+    }
+
+    /**
+     * Loads the ids of all friends of the specified user.
+     */
+    public Iterable<Integer> loadFriendIds (int userId)
+    {
+        return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId))).map(
+            new Function<FriendRecord, Integer>() {
+                public Integer apply (FriendRecord record) {
+                    return record.friendId;
+                }
+            });
     }
 
     /**

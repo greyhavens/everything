@@ -19,10 +19,10 @@ public class OwnedRecord extends PersistentRecord
     public static final ColumnExp OWNED = colexp(_R, "owned");
     // AUTO-GENERATED: FIELDS END
 
-    /** The category in question. */
+    /** The category id of the series in question. */
     public int categoryId;
 
-    /** The number of cards owned in this category. */
+    /** The number of cards owned in this series. */
     @Computed(fieldDefinition="count(*)")
     public int owned;
 }
