@@ -411,7 +411,7 @@ public class EditThingsPanel extends SmartTable
             thing.image = "";
             thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
                 "your description and facts fit on the Thing display.";
-            thing.facts = "Enter facts about your thing here. Press enter to end one " +
+            thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
                 "bullet point and start the next.";
             thing.source = "http://wikipedia.org/Todo";
             _editorsvc.createThing(thing, callback);
