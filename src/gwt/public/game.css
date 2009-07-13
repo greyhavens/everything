@@ -133,6 +133,10 @@
   margin: 0px auto;
 }
 
+.card .cardView {
+  margin-bottom: 5px;
+}
+
 /** GiftCardPopup styles */
 .giftCard .Wishlist {
   font-weight: bold;

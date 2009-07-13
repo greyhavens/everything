@@ -40,12 +40,14 @@ public class CardPopup extends DataPopup<Card>
     public CardPopup (Context ctx, int ownerId, int thingId, long created, Value<String> status)
     {
         this(ctx, status);
+        _doneLabel = "Close"; // we're viewing something from our collection
         _gamesvc.getCard(ownerId, thingId, created, createCallback());
     }
 
     public CardPopup (Context ctx, final Card card, Value<String> status)
     {
         this(ctx, status);
+        _doneLabel = "Keep"; // we're viewing a just flipped card
         setWidget(createContents(card));
     }
 
@@ -98,11 +100,12 @@ public class CardPopup extends DataPopup<Card>
                 return false;
             }
         };
-        Button done = new Button("Done", onHide());
-        contents.add(Widgets.newRow(flip, sell, gift, done));
+        Button done = new Button(_doneLabel, onHide());
+        contents.add(Widgets.newRow(sell, gift, flip, done));
         return contents;
     }
 
+    protected String _doneLabel;
     protected Value<String> _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

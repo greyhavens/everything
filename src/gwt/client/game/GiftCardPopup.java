@@ -79,7 +79,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         } else {
             grid.addText("Friends that already have this card are not shown.", 4, null);
         }
-        int row = grid.addWidget(new Button("Done", onHide()), 4, null);
+        int row = grid.addWidget(new Button("Never Mind", onHide()), 4, null);
         grid.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
         return grid;
     }

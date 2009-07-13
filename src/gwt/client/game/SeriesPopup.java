@@ -90,7 +90,7 @@ public class SeriesPopup extends PopupPanel
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);
         }
-        int row = grid.addWidget(new Button("Done", new ClickHandler() {
+        int row = grid.addWidget(new Button("Close", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 SeriesPopup.this.hide();
             }
