@@ -84,6 +84,7 @@
 
 .thingCard .Name, .thingCard .Rarity {
   font-weight: bold;
+  margin-top: 4px;
 }
 
 .microCard .miniImageBox {
