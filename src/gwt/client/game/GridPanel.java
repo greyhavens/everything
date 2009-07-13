@@ -91,9 +91,8 @@ public class GridPanel extends FlowPanel
             _status.setText(0, 0, "Free flips: " + status.freeFlips, 1, "Bold");
             _status.setText(0, 1, "");
         } else {
-            _status.setText(0, 0, "Next flip: " + status.nextFlipCost, 1, "Bold");
-            _status.setWidget(0, 1, Widgets.newFlowPanel(Widgets.newInlineLabel("You have: "),
-                                                         new CoinLabel(_ctx.getCoins())));
+            _status.setWidget(0, 0, new CoinLabel("Next flip ", status.nextFlipCost), 1, "Bold");
+            _status.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()));
         }
     }
 

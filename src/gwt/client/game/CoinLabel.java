@@ -24,7 +24,15 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public CoinLabel (int coins)
     {
-        this(new Value<Integer>(coins));
+        this("", coins);
+    }
+
+    /**
+     * Creates a coin label with a non-changing coin value and the supplied prefix label.
+     */
+    public CoinLabel (String label, int coins)
+    {
+        this(label, new Value<Integer>(coins));
     }
 
     /**
@@ -32,13 +40,24 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public CoinLabel (Value<Integer> coins)
     {
+        this("", coins);
+    }
+
+    /**
+     * Creates a coin label with a dynamically changing coin value and the supplied prefix label.
+     */
+    public CoinLabel (String label, Value<Integer> coins)
+    {
         super(coins);
         addStyleName("inline");
+        _label = label;
     }
 
     @Override // from ValueHTML<Integer>
     protected String getHTML (Integer coins)
     {
-        return getCoinHTML(coins);
+        return _label + getCoinHTML(coins);
     }
+
+    protected String _label;
 }
