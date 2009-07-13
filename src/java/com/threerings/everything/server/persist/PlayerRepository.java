@@ -105,6 +105,7 @@ public class PlayerRepository extends DepotRepository
         record.lastSession = record.joined;
         record.coins = GameCodes.NEW_USER_FREE_COINS;
         record.freeFlips = GameCodes.NEW_USER_FREE_FLIPS;
+        record.isEditor = true; // TEMP
         insert(record);
         return record;
     }
