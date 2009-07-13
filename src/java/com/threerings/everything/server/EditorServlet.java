@@ -120,6 +120,9 @@ public class EditorServlet extends EveryServiceServlet
         // make sure they have editing privileges on this object (and that it exists)
         PlayerRecord editor = checkEditor(_thingRepo.loadThing(thing.thingId));
 
+        // make sure they're not doing anything funny
+        thing.creatorId = editor.userId;
+
         // actually update the thing
         _thingRepo.updateThing(thing);
 
