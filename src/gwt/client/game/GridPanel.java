@@ -65,7 +65,6 @@ public class GridPanel extends FlowPanel
 
         add(_status = new SmartTable(5, 0));
         updateStatus(data.status);
-        // TODO: _status.setText(0, 2, "Next free flip at " + _expfmt(data.nextFreeFlip));
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -87,12 +86,15 @@ public class GridPanel extends FlowPanel
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
 
+        _status.setWidget(0, 0, new CoinLabel("You have ", _ctx.getCoins()));
         if (status.freeFlips > 0) {
-            _status.setText(0, 0, "Free flips: " + status.freeFlips, 1, "Bold");
-            _status.setText(0, 1, "");
+            _status.setText(0, 1, "Next flip is free!", 1, "Bold");
+            _status.setText(0, 2, "Free flips left: " + status.freeFlips);
         } else {
-            _status.setWidget(0, 0, new CoinLabel("Next flip ", status.nextFlipCost), 1, "Bold");
-            _status.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()));
+            _status.setWidget(
+                0, 1, new CoinLabel("Next flip costs ", status.nextFlipCost), 1, "Bold");
+            _status.setText(0, 2, "");
+            // TODO: _status.setText(0, 2, "Next free flip at " + _expfmt(data.nextFreeFlip));
         }
     }
 
