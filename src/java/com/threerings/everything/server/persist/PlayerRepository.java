@@ -17,13 +17,16 @@ import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.clause.Join;
+import com.samskivert.depot.clause.Limit;
+import com.samskivert.depot.clause.OrderBy;
+import com.samskivert.depot.clause.Where;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
-import com.samskivert.depot.clause.Join;
-import com.samskivert.depot.clause.Where;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.GameStatus;
+import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -54,6 +57,14 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Load and returns the full name of the specified player, or null if they don't exist.
+     */
+    public PlayerFullName loadPlayerFullName (int userId)
+    {
+        return PlayerRecord.TO_FULL_NAME.apply(loadPlayer(userId));
+    }
+
+    /**
      * Loads and returns the names for the supplied set of players, mapped by user id.
      */
     public IntMap<PlayerName> loadPlayerNames (Set<Integer> userIds)
@@ -64,6 +75,17 @@ public class PlayerRepository extends DepotRepository
             names.put(prec.userId, PlayerRecord.TO_NAME.apply(prec));
         }
         return names;
+    }
+
+    /**
+     * Loads players that have recently joined.
+     */
+    public Iterable<PlayerFullName> loadRecentPlayers (int count)
+    {
+        Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24*60*60*1000L);
+        return findAll(PlayerRecord.class, new Where(PlayerRecord.JOINED.greaterEq(yesterday)),
+                       OrderBy.descending(PlayerRecord.LAST_SESSION),
+                       new Limit(0, count)).map(PlayerRecord.TO_FULL_NAME);
     }
 
     /**
@@ -84,6 +106,14 @@ public class PlayerRepository extends DepotRepository
         record.freeFlips = GameCodes.NEW_USER_FREE_FLIPS;
         insert(record);
         return record;
+    }
+
+    /**
+     * Updates the specified player's editor status.
+     */
+    public void updateIsEditor (int userId, boolean isEditor)
+    {
+        updatePartial(PlayerRecord.getKey(userId), PlayerRecord.IS_EDITOR, isEditor);
     }
 
     /**

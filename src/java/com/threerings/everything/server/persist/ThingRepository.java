@@ -24,6 +24,7 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.data.ThingStats;
 
 /**
  * Manages category and thing data for the Everything app.
@@ -34,6 +35,20 @@ public class ThingRepository extends DepotRepository
     @Inject public ThingRepository (PersistenceContext ctx)
     {
         super(ctx);
+    }
+
+    /**
+     * Loads and returns stats on the thing database.
+     */
+    public ThingStats loadStats ()
+    {
+        ThingStats stats = new ThingStats();
+        stats.totalThings = load(CountRecord.class, new FromOverride(ThingRecord.class)).count;
+        stats.totalCategories =
+            load(CountRecord.class, new FromOverride(CategoryRecord.class)).count;
+        stats.totalPlayers = load(CountRecord.class, new FromOverride(PlayerRecord.class)).count;
+        stats.totalCards = load(CountRecord.class, new FromOverride(CardRecord.class)).count;
+        return stats;
     }
 
     /**
@@ -54,37 +69,20 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads data on all series owned by the specified player.
-     */
-    public List<SeriesCard> loadPlayerSeries (int ownerId)
-    {
-        IntIntMap owned = new IntIntMap();
-        for (OwnedRecord orec : findAll(OwnedRecord.class,
-                                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
-                                        ThingRecord.THING_ID.join(CardRecord.THING_ID),
-                                        new GroupBy(CategoryRecord.CATEGORY_ID),
-                                        new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
-            owned.put(orec.categoryId, orec.owned);
-        }
-
-        // now load up the category info for those categories
-        List<SeriesCard> cards = Lists.newArrayList();
-        for (CategoryRecord crec :
-                 findAll(CategoryRecord.class,
-                         new Where(CategoryRecord.CATEGORY_ID.in(owned.keySet())))) {
-            SeriesCard card = CategoryRecord.TO_SERIES_CARD.apply(crec);
-            card.owned = owned.getOrElse(crec.categoryId, 0);
-            cards.add(card);
-        }
-        return cards;
-    }
-
-    /**
      * Loads all categories with ids in the supplied set.
      */
     public Iterable<Category> loadCategories (Set<Integer> ids)
     {
         return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))).
+            map(CategoryRecord.TO_CATEGORY);
+    }
+
+    /**
+     * Loads all categories that are not yet marked active.
+     */
+    public Iterable<Category> loadPendingCategories ()
+    {
+        return findAll(CategoryRecord.class, new Where(CategoryRecord.ACTIVE.eq(false))).
             map(CategoryRecord.TO_CATEGORY);
     }
 
@@ -213,6 +211,32 @@ public class ThingRepository extends DepotRepository
                        CacheStrategy.NONE,
                        ThingRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
                        new Where(CategoryRecord.ACTIVE.eq(true)));
+    }
+
+    /**
+     * Loads data on all series owned by the specified player.
+     */
+    public List<SeriesCard> loadPlayerSeries (int ownerId)
+    {
+        IntIntMap owned = new IntIntMap();
+        for (OwnedRecord orec : findAll(OwnedRecord.class,
+                                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
+                                        ThingRecord.THING_ID.join(CardRecord.THING_ID),
+                                        new GroupBy(CategoryRecord.CATEGORY_ID),
+                                        new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
+            owned.put(orec.categoryId, orec.owned);
+        }
+
+        // now load up the category info for those categories
+        List<SeriesCard> cards = Lists.newArrayList();
+        for (CategoryRecord crec :
+                 findAll(CategoryRecord.class,
+                         new Where(CategoryRecord.CATEGORY_ID.in(owned.keySet())))) {
+            SeriesCard card = CategoryRecord.TO_SERIES_CARD.apply(crec);
+            card.owned = owned.getOrElse(crec.categoryId, 0);
+            cards.add(card);
+        }
+        return cards;
     }
 
     protected void updateCategoryThingCount (int categoryId)

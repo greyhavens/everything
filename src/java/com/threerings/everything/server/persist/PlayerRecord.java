@@ -17,6 +17,8 @@ import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.data.GameStatus;
+import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -42,9 +44,17 @@ public class PlayerRecord extends PersistentRecord
     public static Function<PlayerRecord, PlayerName> TO_NAME =
         RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerName.class);
 
+    /** A function for converting this record to a {@link PlayerFullName}. */
+    public static Function<PlayerRecord, PlayerFullName> TO_FULL_NAME =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerFullName.class);
+
     /** A function for converting this record to a {@link GameStatus}. */
     public static Function<PlayerRecord, GameStatus> TO_STATUS =
         RuntimeUtil.makeToRuntime(PlayerRecord.class, GameStatus.class);
+
+    /** A function for converting this record to a {@link GameStatus}. */
+    public static Function<PlayerRecord, PlayerDetails> TO_DETAILS =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerDetails.class);
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
@@ -104,6 +114,22 @@ public class PlayerRecord extends PersistentRecord
     public int getNextFlipCost ()
     {
         return 0; // will be filled in by caller
+    }
+
+    /**
+     * Initializes {@link PlayerDetails#fullName}.
+     */
+    public PlayerFullName getFullName ()
+    {
+        return TO_FULL_NAME.apply(this);
+    }
+
+    /**
+     * Initializes {@link PlayerDetails#isAdmin}.
+     */
+    public boolean getIsAdmin ()
+    {
+        return false; // caller will fill this in
     }
 
     /**
