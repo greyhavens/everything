@@ -61,6 +61,7 @@ public class CardPopup extends DataPopup<Card>
     {
         final FlowPanel contents = new FlowPanel();
         contents.add(new CardView.Front(card));
+
         Button flip = new Button("Flip", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 Widget face = contents.getWidget(0);
@@ -72,22 +73,16 @@ public class CardPopup extends DataPopup<Card>
                 }
             }
         });
+
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
                 CardPopup.this.hide();
                 _status.update("Gifted!");
             }
         }));
+
         Button sell = new Button("Sell");
         new ClickCallback<Integer>(sell) {
-            protected String getConfirmMessage () {
-                return "You can sell the <b>" + card.thing.name + "</b> card for <b>" +
-                    CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) +
-                    "</b>. Do you want to sell it?";
-            }
-            protected boolean confirmMessageIsHTML () {
-                return true;
-            }
             protected boolean callService () {
                 _gamesvc.sellCard(card.thing.thingId, card.created.getTime(), this);
                 return true;
@@ -99,7 +94,10 @@ public class CardPopup extends DataPopup<Card>
                 _status.update("Sold!");
                 return false;
             }
-        };
+        }.setConfirmHTML("You can sell the <b>" + card.thing.name + "</b> card for <b>" +
+                         CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
+                         "Do you want to sell it?");
+
         Button done = new Button(_doneLabel, onHide());
         contents.add(Widgets.newRow(sell, gift, flip, done));
         return contents;
