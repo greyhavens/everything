@@ -87,7 +87,7 @@ public class CardPopup extends DataPopup<Card>
                          "Do you want to sell it?");
 
         Button done = new Button(_doneLabel, onHide());
-        contents.add(Widgets.newRow(sell, gift, done));
+        contents.add(Widgets.newRow("Buttons", sell, gift, done));
         return contents;
     }
 

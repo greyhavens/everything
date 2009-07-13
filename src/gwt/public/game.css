@@ -22,7 +22,7 @@
 
 /** CardView styles */
 .cardView {
-  width: 280px;
+  width: 565px;
   height: 380px;
   border: 1px solid;
   padding: 5px;
@@ -151,7 +151,7 @@
   background: #FFFFFF;
 }
 
-.card table {
+.card .Buttons {
   margin: 0px auto;
 }
 

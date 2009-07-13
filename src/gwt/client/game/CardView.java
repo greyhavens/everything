@@ -28,12 +28,11 @@ public abstract class CardView extends FlowPanel
      */
     public static Widget create (Card card)
     {
-        return Widgets.newRow(new CardView.Left(card), new CardView.Right(card));
-    }
-
-    protected CardView ()
-    {
-        setStyleName("cardView");
+        SmartTable box = new SmartTable("cardView", 0, 0);
+        box.setWidget(0, 0, new CardView.Left(card), 1, "Left");
+        box.setWidget(0, 1, Widgets.newShim(5, 5));
+        box.setWidget(0, 2, new CardView.Right(card), 1, "Right");
+        return box;
     }
 
     protected static String nameSource (String source)
@@ -67,8 +66,6 @@ public abstract class CardView extends FlowPanel
     {
         public Left (Card card)
         {
-            addStyleName("Left");
-
             add(Widgets.newLabel(card.thing.name, "Title"));
 
             StringBuilder buf = new StringBuilder();
@@ -92,8 +89,6 @@ public abstract class CardView extends FlowPanel
     {
         public Right (Card card)
         {
-            addStyleName("Right");
-
             // add(Widgets.newLabel(card.thing.name, "Title"));
             add(Widgets.newLabel("N of M", "Position"));
 
