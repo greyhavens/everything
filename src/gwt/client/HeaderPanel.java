@@ -10,7 +10,9 @@ import com.threerings.gwt.ui.SmartTable;
 
 import com.threerings.everything.data.Build;
 
+import client.util.Args;
 import client.util.Context;
+import client.util.Page;
 
 /**
  * Displays a simple header and navigation.
@@ -23,14 +25,14 @@ public class HeaderPanel extends SmartTable
 
         int col = 0;
         setText(0, col++, "Hello: " + ctx.getMe().name);
-        setWidget(0, col++, new Hyperlink("News", ""+Page.LANDING));
-        setWidget(0, col++, new Hyperlink("Your Collection", ""+Page.BROWSE));
-        setWidget(0, col++, new Hyperlink("Flip Cards", ""+Page.FLIP));
+        setWidget(0, col++, Args.createLink("News", Page.LANDING));
+        setWidget(0, col++, Args.createLink("Your Collection", Page.BROWSE));
+        setWidget(0, col++, Args.createLink("Flip Cards", Page.FLIP));
         if (ctx.isEditor()) {
-            setWidget(0, col++, new Hyperlink("Add Things", ""+Page.EDIT_THINGS));
+            setWidget(0, col++, Args.createLink("Add Things", Page.EDIT_THINGS));
         }
         if (ctx.isAdmin()) {
-            setWidget(0, col++, new Hyperlink("Dashboard", ""+Page.DASHBOARD));
+            setWidget(0, col++, Args.createLink("Dashboard", Page.DASHBOARD));
         }
 
         // finally display the game build on the right

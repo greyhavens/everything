@@ -3,11 +3,14 @@
 
 package com.threerings.everything.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.threerings.samsara.app.client.ServiceException;
 
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -23,4 +26,9 @@ public interface EverythingService extends RemoteService
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
     SessionData validateSession (int tzOffset) throws ServiceException;
+
+    /**
+     * Returns a list of recent activity for the calling user.
+     */
+    List<FeedItem> getRecentFeed () throws ServiceException;
 }

@@ -24,12 +24,12 @@ import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AppServiceServlet;
 import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.EverythingCodes;
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
@@ -39,7 +39,7 @@ import static com.threerings.everything.Log.log;
 /**
  * Implements {@link EverythingService}.
  */
-public class EverythingServlet extends AppServiceServlet
+public class EverythingServlet extends EveryServiceServlet
     implements EverythingService
 {
     // from interface EverythingService
@@ -129,11 +129,20 @@ public class EverythingServlet extends AppServiceServlet
         return data;
     }
 
-    @Inject protected PlayerRepository _playerRepo;
+    // from interface EverythingService
+    public List<FeedItem> getRecentFeed () throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        return _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS);
+    }
+
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected UserLogic _userLogic;
     @Inject protected GameLogic _gameLogic;
 
     /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");
+
+    /** The maximum number of recent feed items returned. */
+    protected static final int RECENT_FEED_ITEMS = 50;
 }

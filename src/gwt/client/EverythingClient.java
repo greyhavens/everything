@@ -28,6 +28,7 @@ import client.admin.EditThingsPanel;
 import client.game.BrowsePanel;
 import client.game.GridPanel;
 import client.game.LandingPanel;
+import client.util.Args;
 import client.util.Context;
 
 /**
@@ -101,18 +102,13 @@ public class EverythingClient
     // from interface ValueChangeHandler<String>
     public void onValueChange (ValueChangeEvent<String> event)
     {
-        Page page;
-        try {
-            page = Enum.valueOf(Page.class, event.getValue());
-        } catch (Exception e) {
-            page = Page.LANDING;
-        }
+        Args args = new Args(event.getValue());
 
-        switch (page) {
+        switch (args.page) {
         default:
         case LANDING: setContent(new LandingPanel(this)); break;
         case FLIP: setContent(new GridPanel(this)); break;
-        case BROWSE: setContent(new BrowsePanel(this, getMe().userId)); break;
+        case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
         case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
         case DASHBOARD: setContent(new DashboardPanel(this)); break;
         }

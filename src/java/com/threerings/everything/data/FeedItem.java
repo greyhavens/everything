@@ -7,10 +7,13 @@ import java.util.Date;
 
 import com.samskivert.depot.ByteEnum;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * Contains information on a player action, for display in the "recent happenings" feed.
  */
 public class FeedItem
+    implements IsSerializable
 {
     /** Identifies the different types of feed items. */
     public enum Type implements ByteEnum {

@@ -30,7 +30,7 @@ public class LandingPanel extends FlowPanel
         add(Widgets.newHTML(NEWS, "Text")); // TODO: load from DB
 
         add(Widgets.newLabel("Recent Happenings", "Title"));
-        add(Widgets.newHTML("Coming soon!", "Text"));
+        add(new FeedPanel(ctx));
     }
 
     protected static final String[] INTRO_HTML = {

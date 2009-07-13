@@ -5,10 +5,13 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -222,6 +225,42 @@ public class PlayerRepository extends DepotRepository
         record.targetId = targetId;
         record.object = object;
         insert(record);
+    }
+
+    /**
+     * Returns up to the specified maximum number of feed items for the specified player. Also
+     * resolves the names of all players in the feed in question.
+     */
+    public List<FeedItem> loadRecentFeed (int userId, int maxItems)
+    {
+        // load up this player's friends and add them to the list of actors
+        Set<Integer> actorIds = Sets.newHashSet(loadFriendIds(userId));
+        actorIds.add(userId);
+
+        // load up the feed items in question
+        Set<Integer> nameIds = Sets.newHashSet();
+        List<FeedItem> items = Lists.newArrayList();
+        for (FeedItem item : findAll(FeedItemRecord.class,
+                                     new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
+                                     OrderBy.descending(FeedItemRecord.WHEN),
+                                     new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM)) {
+            items.add(item);
+            nameIds.add(item.actor.userId);
+            if (item.target != null) {
+                nameIds.add(item.target.userId);
+            }
+        }
+
+        // resolve the names for all included feed items
+        IntMap<PlayerName> names = loadPlayerNames(nameIds);
+        for (FeedItem item : items) {
+            item.actor = names.get(item.actor.userId);
+            if (item.target != null) {
+                item.target = names.get(item.target.userId);
+            }
+        }
+
+        return items;
     }
 
     @Override // from DepotRepository
