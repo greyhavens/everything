@@ -15,7 +15,6 @@
   <!-- we need these libraries to build -->
   <filelist dir="." id="build.libs">
     <file name="${extlibs.dir}/commons-collections.jar"/>
-    <file name="${extlibs.dir}/commons-io.jar"/>
     <file name="${extlibs.dir}/google-collect.jar"/>
     <file name="${extlibs.dir}/guice.jar"/>
     <file name="${extlibs.dir}/gwt-user.jar"/>
@@ -28,6 +27,7 @@
   <filelist dir="." id="runtime.libs">
     <file name="${extlibs.dir}/commons-lang.jar"/>
     <file name="${extlibs.dir}/commons-fileupload.jar"/>
+    <file name="${extlibs.dir}/commons-io.jar"/>
     <file name="${extlibs.dir}/json.jar"/>
     <file name="${extlibs.dir}/jvnet-runtime.jar"/>
     <file name="${extlibs.dir}/facebook-java-api.jar"/>
