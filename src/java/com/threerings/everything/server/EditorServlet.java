@@ -108,7 +108,20 @@ public class EditorServlet extends EveryServiceServlet
     // from interface EditorService
     public int createThing (Thing thing) throws ServiceException
     {
-        PlayerRecord editor = requireEditor();
+        OOOUser user = requireUser();
+        PlayerRecord editor = requireEditor(user);
+
+        // make sure the series exists, they own it and that it's not active (these should be
+        // checked on the client as well)
+        Category series = _thingRepo.loadCategory(thing.categoryId);
+        if (series == null) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+        if (series.active || (series.creatorId != editor.userId && !user.isAdmin())) {
+            throw new ServiceException(AppCodes.E_ACCESS_DENIED);
+        }
+
+        // do the deed
         thing.creatorId = editor.userId;
         thing.thingId = _thingRepo.createThing(thing);
         _adminLogic.noteAction(editor, "created", thing);

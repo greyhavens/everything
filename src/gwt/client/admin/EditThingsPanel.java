@@ -127,7 +127,7 @@ public class EditThingsPanel extends SmartTable
                         addItem(item);
                     }
                     _empty.setVisible(items.size() == 0);
-                    setEnabled(true);
+                    setEnabled(isEditable());
                 }
             });
         }
@@ -172,6 +172,10 @@ public class EditThingsPanel extends SmartTable
             Row<T> row = new Row<T>(item);
             initItemRow(row, false);
             _contents.add(row);
+        }
+
+        protected boolean isEditable () {
+            return true;
         }
 
         protected void initItemRow (final Row<T> row, boolean selected)
@@ -383,6 +387,7 @@ public class EditThingsPanel extends SmartTable
                                 "Category activated." : "Category deactivated.";
                             Popups.infoNear(msg, active);
                             active.setEnabled(true);
+                            _child.load(); // reload the thing list which will re-en/disable
                         }
                     });
                 }
@@ -391,6 +396,23 @@ public class EditThingsPanel extends SmartTable
     };
 
     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
+        @Override public void clear () {
+            super.clear();
+            setText(1, 0, "", getCellCount(0), null);
+        }
+
+        @Override public void setSelected (Thing item) {
+            super.setSelected(item);
+            // create a fake card and display it
+            Card card = new Card();
+            card.owner = _ctx.getMe();
+            card.categories = new Category[] {
+                _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
+            card.thing = item;
+            card.created = new Date();
+            setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
+        }
+
         protected void callLoad (AsyncCallback<List<Thing>> callback) {
             Category category = _series.getSelected();
             if (category != null) {
@@ -400,6 +422,17 @@ public class EditThingsPanel extends SmartTable
 
         protected String getName (Thing thing) {
             return thing.name;
+        }
+
+        @Override protected boolean isEditable () {
+            Category series = _series.getSelected();
+            return !series.active && (series.creatorId == _ctx.getMe().userId || _ctx.isAdmin());
+        }
+
+        @Override protected void initItemRow (Row<Thing> row, boolean selected) {
+            super.initItemRow(row, selected);
+            row.add(Widgets.newShim(5, 5));
+            row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
         }
 
         protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
@@ -425,29 +458,6 @@ public class EditThingsPanel extends SmartTable
 
         protected void onDelete (Thing object, AsyncCallback<Void> callback) {
             _editorsvc.deleteThing(object.thingId, callback);
-        }
-
-        @Override public void clear () {
-            super.clear();
-            setText(1, 0, "", getCellCount(0), null);
-        }
-
-        @Override public void setSelected (Thing item) {
-            super.setSelected(item);
-            // create a fake card and display it
-            Card card = new Card();
-            card.owner = _ctx.getMe();
-            card.categories = new Category[] {
-                _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
-            card.thing = item;
-            card.created = new Date();
-            setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
-        }
-
-        @Override protected void initItemRow (Row<Thing> row, boolean selected) {
-            super.initItemRow(row, selected);
-            row.add(Widgets.newShim(5, 5));
-            row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
         }
 
         protected int _categoryId;
