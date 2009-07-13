@@ -23,6 +23,7 @@ public class HeaderPanel extends SmartTable
 
         int col = 0;
         setText(0, col++, "Hello: " + ctx.getMe().name);
+        setWidget(0, col++, new Hyperlink("News", ""+Page.LANDING));
         setWidget(0, col++, new Hyperlink("Your Collection", ""+Page.BROWSE));
         setWidget(0, col++, new Hyperlink("Flip Cards", ""+Page.FLIP));
         if (ctx.isEditor()) {

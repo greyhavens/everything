@@ -2,10 +2,6 @@
  * $Id$
  */
 
-/** MainPanel styles */
-.main {
-}
-
 /** ImageUtil styles */
 .imageBox {
   width: 250px;
@@ -22,15 +18,6 @@
 .miniImageBox .gwt-Image {
   max-width: 125px;
   max-height: 150px;
-}
-
-/** HeaderPanel styles */
-.header {
-  width: 100%;
-}
-
-.header td {
-  white-space: nowrap;
 }
 
 /** CardView styles */
@@ -92,10 +79,33 @@
   height: 100px;
   margin: 5px auto;
 }
-
+landing
 .microCard .miniImageBox .gwt-Image {
   max-width: 83px;
   max-height: 100px;
+}
+
+/** HeaderPanel styles */
+.header {
+  width: 100%;
+}
+
+.header td {
+  white-space: nowrap;
+}
+
+/** LandingPanel styles */
+.landing {
+  margin: 10px;
+}
+
+.landing .Title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.landing .Text {
+  margin: 5px 0px;
 }
 
 /** BrowsePanel styles */
