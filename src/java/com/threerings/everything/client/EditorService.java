@@ -14,13 +14,13 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Thing;
 
 /**
- * Provides admin services to the Everything client.
+ * Provides editor services to the Everything client.
  */
-@RemoteServiceRelativePath(AdminService.ENTRY_POINT)
-public interface AdminService extends RemoteService
+@RemoteServiceRelativePath(EditorService.ENTRY_POINT)
+public interface EditorService extends RemoteService
 {
     /** The path at which this servlet is mapped. */
-    public static final String ENTRY_POINT = "admin";
+    public static final String ENTRY_POINT = "editor";
 
     /** Thrown by {@link #deleteCategory} if the category in question has subcategories. */
     public static final String E_CAT_HAS_SUBCATS = "e.cat_has_subcats";

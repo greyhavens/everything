@@ -98,7 +98,7 @@ public class EverythingApp extends App
         binds.add(new Binding.Servlet("/upload", MediaUploadServlet.class));
         binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
-        binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
+        binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
         return binds.toArray(new Binding[binds.size()]);
     }
 

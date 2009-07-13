@@ -13,10 +13,10 @@ import com.threerings.everything.server.persist.AdminRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 
 /**
- * Provides admin services to server entities.
+ * Provides editor services to server entities.
  */
 @Singleton
-public class AdminLogic
+public class EditorLogic
 {
     public void noteAction (PlayerRecord editor, String action, Category category)
     {

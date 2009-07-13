@@ -36,8 +36,8 @@ import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.ClickCallback;
 
-import com.threerings.everything.client.AdminService;
-import com.threerings.everything.client.AdminServiceAsync;
+import com.threerings.everything.client.EditorService;
+import com.threerings.everything.client.EditorServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
@@ -232,7 +232,7 @@ public class EditThingsPanel extends SmartTable
             Category cat = new Category();
             cat.name = text;
             cat.parentId = _parentId;
-            _adminsvc.createCategory(cat, callback);
+            _editorsvc.createCategory(cat, callback);
             return cat;
         }
 
@@ -242,7 +242,7 @@ public class EditThingsPanel extends SmartTable
         }
 
         protected void onDelete (Category category, AsyncCallback<Void> callback) {
-            _adminsvc.deleteCategory(category.categoryId, callback);
+            _editorsvc.deleteCategory(category.categoryId, callback);
         }
 
         protected int _parentId;
@@ -298,7 +298,7 @@ public class EditThingsPanel extends SmartTable
             bits.setWidget(row++, 1, save, 3, null);
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
-                    _adminsvc.updateThing(card.thing, this);
+                    _editorsvc.updateThing(card.thing, this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {
@@ -344,7 +344,7 @@ public class EditThingsPanel extends SmartTable
 
     protected CategoryColumn _cats = new CategoryColumn("Categories") {
         protected void callLoad (AsyncCallback<List<Category>> callback) {
-            _adminsvc.loadCategories(0, callback);
+            _editorsvc.loadCategories(0, callback);
         }
     };
 
@@ -352,7 +352,7 @@ public class EditThingsPanel extends SmartTable
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             Category parent = _cats.getSelected();
             if (parent != null) {
-                _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
+                _editorsvc.loadCategories(_parentId = parent.categoryId, callback);
             }
         }
     };
@@ -361,7 +361,7 @@ public class EditThingsPanel extends SmartTable
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             Category parent = _subcats.getSelected();
             if (parent != null) {
-                _adminsvc.loadCategories(_parentId = parent.categoryId, callback);
+                _editorsvc.loadCategories(_parentId = parent.categoryId, callback);
             }
         }
 
@@ -380,7 +380,7 @@ public class EditThingsPanel extends SmartTable
                 public void onValueChange (ValueChangeEvent<Boolean> event) {
                     row.item.active = event.getValue();
                     active.setEnabled(false);
-                    _adminsvc.updateCategory(row.item, new PopupCallback<Void>() {
+                    _editorsvc.updateCategory(row.item, new PopupCallback<Void>() {
                         public void onSuccess (Void result) {
                             String msg = row.item.active ?
                                 "Category activated." : "Category deactivated.";
@@ -397,7 +397,7 @@ public class EditThingsPanel extends SmartTable
         protected void callLoad (AsyncCallback<List<Thing>> callback) {
             Category category = _series.getSelected();
             if (category != null) {
-                _adminsvc.loadThings(_categoryId = category.categoryId, callback);
+                _editorsvc.loadThings(_categoryId = category.categoryId, callback);
             }
         }
 
@@ -415,7 +415,7 @@ public class EditThingsPanel extends SmartTable
             thing.descrip = "TODO";
             thing.facts = "TODO";
             thing.source = "TODO";
-            _adminsvc.createThing(thing, callback);
+            _editorsvc.createThing(thing, callback);
             return thing;
         }
 
@@ -425,7 +425,7 @@ public class EditThingsPanel extends SmartTable
         }
 
         protected void onDelete (Thing object, AsyncCallback<Void> callback) {
-            _adminsvc.deleteThing(object.thingId, callback);
+            _editorsvc.deleteThing(object.thingId, callback);
         }
 
         @Override public void clear () {
@@ -456,5 +456,5 @@ public class EditThingsPanel extends SmartTable
 
     protected Context _ctx;
 
-    protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
+    protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);
 }

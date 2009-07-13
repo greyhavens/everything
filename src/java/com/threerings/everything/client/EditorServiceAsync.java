@@ -11,47 +11,47 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Thing;
 
 /**
- * Provides the asynchronous version of {@link AdminService}.
+ * Provides the asynchronous version of {@link EditorService}.
  */
-public interface AdminServiceAsync
+public interface EditorServiceAsync
 {
     /**
-     * The async version of {@link GameService#loadCategories}.
+     * The async version of {@link EditorService#loadCategories}.
      */
     void loadCategories (int parentId, AsyncCallback<List<Category>> callback);
 
     /**
-     * The async version of {@link GameService#createCategory}.
+     * The async version of {@link EditorService#createCategory}.
      */
     void createCategory (Category category, AsyncCallback<Integer> callback);
 
     /**
-     * The async version of {@link GameService#updateCategory}.
+     * The async version of {@link EditorService#updateCategory}.
      */
     void updateCategory (Category category, AsyncCallback<Void> callback);
 
     /**
-     * The async version of {@link GameService#deleteCategory}.
+     * The async version of {@link EditorService#deleteCategory}.
      */
     void deleteCategory (int categoryId, AsyncCallback<Void> callback);
 
     /**
-     * The async version of {@link GameService#loadThings}.
+     * The async version of {@link EditorService#loadThings}.
      */
     void loadThings (int parentId, AsyncCallback<List<Thing>> callback);
 
     /**
-     * The async version of {@link GameService#createThing}.
+     * The async version of {@link EditorService#createThing}.
      */
     void createThing (Thing thing, AsyncCallback<Integer> callback);
 
     /**
-     * The async version of {@link GameService#updateThing}.
+     * The async version of {@link EditorService#updateThing}.
      */
     void updateThing (Thing thing, AsyncCallback<Void> callback);
 
     /**
-     * The async version of {@link GameService#deleteThing}.
+     * The async version of {@link EditorService#deleteThing}.
      */
     void deleteThing (int thingId, AsyncCallback<Void> callback);
 }
