@@ -104,5 +104,5 @@ public class SeriesPopup extends PopupPanel
     protected Value<Integer> _count;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-    protected static final int COLUMNS = 5;
+    protected static final int COLUMNS = 4;
 }
