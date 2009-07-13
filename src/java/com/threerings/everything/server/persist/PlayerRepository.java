@@ -226,6 +226,7 @@ public class PlayerRepository extends DepotRepository
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
+        classes.add(FeedItemRecord.class);
         classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
         classes.add(WishRecord.class);
