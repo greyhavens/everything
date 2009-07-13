@@ -267,7 +267,7 @@ public class GameServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
         CardRecord card = requireCard(player.userId, thingId, created);
-        // TODOOZ!
+        _gameRepo.giftCard(card, friendId);
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)

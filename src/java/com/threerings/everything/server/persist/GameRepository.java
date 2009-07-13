@@ -72,6 +72,16 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Transfers the supplied card from it's current owner to the specified recipient.
+     */
+    public void giftCard (CardRecord card, int toUserId)
+    {
+        updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.created),
+                      CardRecord.OWNER_ID, toUserId,
+                      CardRecord.GIVER_ID, card.ownerId);
+    }
+
+    /**
      * Counts up and returns the number of cards in the supplied set of things that are held by
      * each of the specified owners.
      */
