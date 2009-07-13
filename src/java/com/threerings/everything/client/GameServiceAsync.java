@@ -6,6 +6,7 @@ package com.threerings.everything.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Series;
@@ -28,7 +29,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#getCard}.
      */
-    void getCard (int playerId, int thingId, long created, AsyncCallback<Card> callback);
+    void getCard (CardIdent ident, AsyncCallback<Card> callback);
 
     /**
      * The async version of {@link GameService#getGrid}.

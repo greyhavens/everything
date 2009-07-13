@@ -26,6 +26,7 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendCardInfo;
@@ -127,10 +128,10 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public Card getCard (int ownerId, int thingId, long created) throws ServiceException
+    public Card getCard (CardIdent ident) throws ServiceException
     {
         // TODO: show less info if the caller is not the owner?
-        return _gameLogic.resolveCard(requireCard(ownerId, thingId, created));
+        return _gameLogic.resolveCard(requireCard(ident.ownerId, ident.thingId, ident.created));
     }
 
     // from interface GameService
@@ -189,11 +190,15 @@ public class GameServlet extends EveryServiceServlet
             throw se;
         }
 
+        // count up the number of the selected thing already owned by this player before we create
+        // this new card
+        FlipResult result = new FlipResult();
+        result.haveCount = _gameRepo.countCardHoldings(player.userId, grec.thingIds[position]);
+
         // create the card and add it to the player's collection
         CardRecord card = _gameRepo.createCard(player.userId, grec.thingIds[position]);
 
         // resolve the runtime data for the card and report our result
-        FlipResult result = new FlipResult();
         result.card = _gameLogic.resolveCard(card);
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost

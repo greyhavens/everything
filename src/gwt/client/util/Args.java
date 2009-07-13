@@ -91,5 +91,5 @@ public class Args
 
     protected String[] _args;
 
-    protected static final String SEPARATOR = "_";
+    protected static final String SEPARATOR = "~";
 }

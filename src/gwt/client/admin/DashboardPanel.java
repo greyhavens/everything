@@ -114,6 +114,7 @@ public class DashboardPanel extends FlowPanel
             addDatum("Joined", _dfmt.format(details.joined));
             addDatum("Last seen", _dfmt.format(details.lastSession));
             addDatum("Coins", details.coins);
+            addDatum("Free flips", details.freeFlips);
             addDatum("Birthday", _bfmt.format(details.birthday));
             addDatum("Timezone", details.timezone);
 

@@ -23,6 +23,7 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.ThingCard;
 
@@ -85,7 +86,7 @@ public class SeriesPopup extends PopupPanel
                 }
             });
             ClickHandler onClick = (card == null) ? null :
-                CardPopup.onClick(_ctx, ownerId, card.thingId, card.created, status);
+                CardPopup.onClick(_ctx, new CardIdent(ownerId, card.thingId, card.created), status);
             grid.setWidget(row, col, ThingCardView.create(card, onClick));
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);

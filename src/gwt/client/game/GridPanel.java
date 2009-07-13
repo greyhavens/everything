@@ -120,7 +120,7 @@ public class GridPanel extends FlowPanel
 
                     // display the card big and fancy and allow them to gift it or cash it in
                     Value<String> status = new Value<String>("");
-                    _ctx.displayPopup(new CardPopup(_ctx, result.card, status));
+                    _ctx.displayPopup(new CardPopup(_ctx, result.card, result.haveCount, status));
                     status.addListener(new Value.Listener<String>() {
                         public void valueChanged (String status) {
                             _cards.setText(row, col, status);

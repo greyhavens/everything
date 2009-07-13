@@ -17,6 +17,7 @@ import com.threerings.gwt.util.Value;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.CardIdent;
 
 import client.ui.DataPopup;
 import client.util.Context;
@@ -27,26 +28,28 @@ import client.util.PopupCallback;
  */
 public class CardPopup extends DataPopup<Card>
 {
-    public static ClickHandler onClick (final Context ctx, final int ownerId, final int thingId,
-                                        final long created, final Value<String> status)
+    public static ClickHandler onClick (final Context ctx, final CardIdent ident,
+                                        final Value<String> status)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new CardPopup(ctx, ownerId, thingId, created, status));
+                ctx.displayPopup(new CardPopup(ctx, ident, status));
             }
         };
     }
 
-    public CardPopup (Context ctx, int ownerId, int thingId, long created, Value<String> status)
+    public CardPopup (Context ctx, CardIdent ident, Value<String> status)
     {
         this(ctx, status);
         _doneLabel = "Close"; // we're viewing something from our collection
-        _gamesvc.getCard(ownerId, thingId, created, createCallback());
+        _gamesvc.getCard(ident, createCallback());
     }
 
-    public CardPopup (Context ctx, final Card card, Value<String> status)
+    public CardPopup (Context ctx, final Card card, int haveCount, Value<String> status)
     {
         this(ctx, status);
+        _title = "You got the <b>" + card.thing.name + "</b> card!";
+        _haveCount = haveCount;
         _doneLabel = "Keep"; // we're viewing a just flipped card
         setWidget(createContents(card));
     }
@@ -60,7 +63,16 @@ public class CardPopup extends DataPopup<Card>
     protected Widget createContents (final Card card)
     {
         final FlowPanel contents = new FlowPanel();
+        if (_title != null) {
+            contents.add(Widgets.newHTML(_title, "Title"));
+        }
         contents.add(CardView.create(card));
+
+        String haveMsg = (_haveCount > 1) ? "You already have " + _haveCount + " of these cards." :
+            ((_haveCount > 0) ? "You already have this card." : null);
+        if (haveMsg != null) {
+            contents.add(Widgets.newLabel(haveMsg, null));
+        }
 
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
@@ -87,11 +99,16 @@ public class CardPopup extends DataPopup<Card>
                          "Do you want to sell it?");
 
         Button done = new Button(_doneLabel, onHide());
-        contents.add(Widgets.newRow("Buttons", sell, gift, done));
+        if (card.owner.userId == _ctx.getMe().userId) {
+            contents.add(Widgets.newRow("Buttons", sell, gift, done));
+        } else {
+            contents.add(Widgets.newRow("Buttons", done));
+        }
         return contents;
     }
 
-    protected String _doneLabel;
+    protected String _title, _doneLabel;
+    protected int _haveCount;
     protected Value<String> _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

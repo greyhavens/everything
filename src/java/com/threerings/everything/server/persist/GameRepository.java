@@ -12,10 +12,12 @@ import com.google.inject.Singleton;
 
 import com.samskivert.util.IntIntMap;
 
+import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Where;
 
@@ -95,6 +97,16 @@ public class GameRepository extends DepotRepository
             data.put(orec.ownerId, orec.count);
         }
         return data;
+    }
+
+    /**
+     * Returns the number of cards held by the specified owner with the specified thing on them.
+     */
+    public int countCardHoldings (int ownerId, int thingId)
+    {
+        return load(CountRecord.class, new FromOverride(CardRecord.class),
+                    new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
+                                      CardRecord.THING_ID.eq(thingId)))).count;
     }
 
     /**

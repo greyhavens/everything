@@ -53,18 +53,23 @@ public class EditorServlet extends EveryServiceServlet
         // make sure they have editing privileges on this object (and that it exists)
         Category ocategory = _thingRepo.loadCategory(category.categoryId);
         PlayerRecord editor = checkEditor(ocategory);
+        boolean activeChanged = (ocategory.active != category.active);
 
-        // only editors can activate categories
-        if (!ocategory.active && category.active) {
+        // only editors can activate and deactivate categories
+        if (activeChanged) {
             requireAdmin();
         }
 
+        // the only updatable values are name, active and parentId
+        ocategory.name = category.name;
+        ocategory.active = category.active;
+        ocategory.parentId = category.parentId;
+
         // actually update the category
-        category.creatorId = ocategory.creatorId;
-        _thingRepo.updateCategory(category);
+        _thingRepo.updateCategory(ocategory);
 
         String action;
-        if (ocategory.active != category.active) {
+        if (activeChanged) {
             action = (category.active) ? "activated" : "deactivated";
             // if a category changed active state, queue a reload of the thing index
             log.info("Category active status changed. TODO: reload thing index.");
@@ -134,6 +139,8 @@ public class EditorServlet extends EveryServiceServlet
         // make sure they have editing privileges on this object (and that it exists)
         Thing othing = _thingRepo.loadThing(thing.thingId);
         PlayerRecord editor = checkEditor(othing);
+
+        // TODO: if this thing is moving categories, validate that
 
         // actually update the thing
         thing.creatorId = othing.creatorId;

@@ -149,8 +149,9 @@
 }
 
 /** CardPopup styles */
-.card {
-  background: #FFFFFF;
+.card .Title {
+  font-size: 18px;
+  text-align: center:
 }
 
 .card .Buttons {

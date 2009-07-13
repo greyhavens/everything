@@ -31,6 +31,8 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.EverythingCodes;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.SessionData;
+import com.threerings.everything.server.persist.GameRepository;
+import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
@@ -126,6 +128,8 @@ public class EverythingServlet extends EveryServiceServlet
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
         data.coins = player.coins;
+        GridRecord grid = _gameRepo.loadGrid(player.userId);
+        data.gridsConsumed = (grid == null) ? 0 : grid.gridId;
         return data;
     }
 
@@ -139,6 +143,7 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected UserLogic _userLogic;
     @Inject protected GameLogic _gameLogic;
+    @Inject protected GameRepository _gameRepo;
 
     /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");

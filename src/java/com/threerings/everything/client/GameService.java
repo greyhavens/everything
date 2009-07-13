@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
@@ -67,6 +68,9 @@ public interface GameService extends RemoteService
         /** The card at the position they flipped. */
         public Card card;
 
+        /** Number of this thing already held by this player (not including this one). */
+        public int haveCount;
+
         /** The player's new game status after the flip. */
         public GameStatus status;
     }
@@ -94,7 +98,7 @@ public interface GameService extends RemoteService
     /**
      * Returns detail information for the specified card.
      */
-    Card getCard (int ownerId, int thingId, long created) throws ServiceException;
+    Card getCard (CardIdent cardId) throws ServiceException;
 
     /**
      * Returns the player's current grid.

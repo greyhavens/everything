@@ -22,4 +22,7 @@ public class SessionData
 
     /** Our coin balance at the time we validated our session. */
     public int coins;
+
+    /** The number of grids that this player has consumed. */
+    public int gridsConsumed;
 }

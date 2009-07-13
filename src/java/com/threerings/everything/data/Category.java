@@ -23,11 +23,14 @@ public class Category
     /** The id of this category's parent, if it is a sub-category, or 0. */
     public int parentId;
 
+    /** The id of the creator of this category. */
+    public int creatorId;
+
     /** True if this category is active (and hence items in it are usable in the game). */
     public boolean active;
 
-    /** The id of the creator of this category. */
-    public int creatorId;
+    /** The number of things in this category (only valid for leaf categories). */
+    public int things;
 
     // from interface Created
     public int getCreatorId ()
