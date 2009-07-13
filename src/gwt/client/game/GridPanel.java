@@ -133,7 +133,7 @@ public class GridPanel extends FlowPanel
     protected Context _ctx;
     protected SmartTable _info, _cards, _status;
 
-    protected static final DateTimeFormat _expfmt = DateTimeFormat.getFormat("H:MMa EEEEEEEEE");
+    protected static final DateTimeFormat _expfmt = DateTimeFormat.getFormat("h:MMa EEEEEEEEE");
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 
     protected static final int COLUMNS = 4;
