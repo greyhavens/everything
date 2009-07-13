@@ -48,8 +48,8 @@ public class LandingPanel extends FlowPanel
         "about as programmery as it gets and our giant database of everything in the entire " +
         "universe is still pretty small. But there's some awesome stuff in there. " +
         "These are the new features we'll be adding soon:" +
-        "<ul><li> A feed of what cool stuff your friends have been flipping and giving to each other. </li>" +
-        "<li> A way to browse your friends' collections. </li>" +
+        "<ul><li> Aggregation of the feed that shows what your friends have been up to. </li>" +
+        "<li> An easier way to browse your friends' collections than clicking in your feed. </li>" +
         "<li> A wishlist so that you can let your friends know what you're looking for. </li>" +
         "<li> A prettier user interface! </li>" +
         "<li> Lots more things in the database. </li></ul>";
