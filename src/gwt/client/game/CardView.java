@@ -104,5 +104,5 @@ public abstract class CardView extends FlowPanel
         return buf.append("</ul>").toString();
     }
 
-    protected DateTimeFormat _dfmt = DateTimeFormat.getLongDateFormat();
+    protected static final DateTimeFormat _dfmt = DateTimeFormat.getLongDateFormat();
 }

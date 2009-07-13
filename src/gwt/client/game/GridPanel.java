@@ -4,6 +4,7 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -14,6 +15,7 @@ import com.samskivert.depot.util.ByteEnumUtil;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
@@ -46,7 +48,11 @@ public class GridPanel extends FlowPanel
     protected void init (final GameService.GridResult data)
     {
         clear();
-        add(_remaining = Widgets.newHTML("", "Remaining"));
+
+        String expires = "New grid at " + _expfmt.format(data.grid.expires);
+        add(Widgets.newFlowPanel("Info", _remaining = Widgets.newHTML("", "Remaining", "inline"),
+                                 Widgets.newHTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", "inline"),
+                                 Widgets.newLabel(expires, "inline")));
         updateRemaining(data.grid.unflipped);
 
         add(_cards = new SmartTable(5, 0));
@@ -72,7 +78,7 @@ public class GridPanel extends FlowPanel
             if (unflipped[ii] == 0) {
                 continue;
             }
-            buf.append((buf.length() > 0) ? "&nbsp;&nbsp;&nbsp;&nbsp;" : "");
+            buf.append((buf.length() > 0) ? "&nbsp;&nbsp;" : "");
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(rarity).append("-").append(unflipped[ii]);
         }
@@ -88,7 +94,7 @@ public class GridPanel extends FlowPanel
             _status.setWidget(Widgets.newLabel("Free flips: " + status.freeFlips, null));
         } else {
             String next = "Next flip: " + status.nextFlipCost + " You have: ";
-            _status.setWidget(Widgets.newFlowPanel(null, Widgets.newInlineLabel(next),
+            _status.setWidget(Widgets.newFlowPanel(Widgets.newInlineLabel(next),
                                                    new CoinLabel(_ctx.getCoins())));
         }
     }
@@ -105,17 +111,22 @@ public class GridPanel extends FlowPanel
                     card.name = result.card.thing.name;
                     card.image = result.card.thing.image;
                     card.rarity = result.card.thing.rarity;
-                    _cards.setWidget(position / COLUMNS, position % COLUMNS,
-                                     new ThingCardView(card, null));
+                    final int row = position / COLUMNS, col = position % COLUMNS;
+                    _cards.setWidget(row, col, new ThingCardView(card, null));
 
                     // update our status
                     data.grid.unflipped[card.rarity.ordinal()]--;
                     updateRemaining(data.grid.unflipped);
                     updateStatus(data.status = result.status);
 
-                    // display the card big and fancy and allow them to keep it, gift to a friend
-                    // or cash it in
-                    _ctx.displayPopup(new CardPopup(_ctx, result.card));
+                    // display the card big and fancy and allow them to gift it or cash it in
+                    Value<String> status = new Value<String>("");
+                    _ctx.displayPopup(new CardPopup(_ctx, result.card, status));
+                    status.addListener(new Value.Listener<String>() {
+                        public void valueChanged (String status) {
+                            _cards.setText(row, col, status);
+                        }
+                    });
                 }
             });
     }
@@ -125,6 +136,7 @@ public class GridPanel extends FlowPanel
     protected HTML _remaining;
     protected SimplePanel _status;
 
+    protected static final DateTimeFormat _expfmt = DateTimeFormat.getFormat("H:MMa EEEEEEEEE");
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 
     protected static final int COLUMNS = 4;

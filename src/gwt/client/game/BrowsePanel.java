@@ -12,7 +12,9 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
@@ -48,11 +50,16 @@ public class BrowsePanel extends FlowPanel
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
                 String subcatname = subcat.getKey();
                 FlowPanel cards = new FlowPanel();
-                for (SeriesCard card : subcat.getValue()) {
-                    cards.add(Widgets.newActionLabel(card.name, "Series",
-                                  SeriesPopup.onClick(_ctx, coll.owner.userId, card.categoryId)));
-                    cards.add(Widgets.newLabel(" (" + card.owned + " of " + card.things + ")",
-                                               "Series"));
+                for (final SeriesCard card : subcat.getValue()) {
+                    Value<Integer> owned = new Value<Integer>(card.owned);
+                    cards.add(Widgets.newActionLabel(
+                                  card.name, "Series", SeriesPopup.onClick(
+                                      _ctx, coll.owner.userId, card.categoryId, owned)));
+                    cards.add(new ValueLabel<Integer>("Series", owned) {
+                        protected String getText (Integer owned) {
+                            return " (" + owned + " of " + card.things + ")";
+                        }
+                    });
                 }
                 int row = table.addText(catname, 1, null);
                 table.setText(row, 1, subcatname);

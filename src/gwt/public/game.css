@@ -101,8 +101,11 @@
   width: 600px;
 }
 
-.grid .Remaining, .grid .Status {
+.grid .Info, .grid .Status {
   text-align: center;
+}
+
+.grid .Remaining, .grid .Status {
   font-weight: bold;
 }
 

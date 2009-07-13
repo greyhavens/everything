@@ -23,6 +23,6 @@ public class OwnedRecord extends PersistentRecord
     public int categoryId;
 
     /** The number of cards owned in this series. */
-    @Computed(fieldDefinition="count(*)")
+    @Computed(fieldDefinition="count(distinct 'thingId')")
     public int owned;
 }

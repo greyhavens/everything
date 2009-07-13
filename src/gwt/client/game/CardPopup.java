@@ -10,9 +10,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.ClickCallback;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
@@ -27,31 +27,32 @@ import client.util.PopupCallback;
  */
 public class CardPopup extends DataPopup<Card>
 {
-    public static ClickHandler onClick (
-        final Context ctx, final int ownerId, final int thingId, final long created)
+    public static ClickHandler onClick (final Context ctx, final int ownerId, final int thingId,
+                                        final long created, final Value<String> status)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new CardPopup(ctx, ownerId, thingId, created));
+                ctx.displayPopup(new CardPopup(ctx, ownerId, thingId, created, status));
             }
         };
     }
 
-    public CardPopup (Context ctx, int ownerId, int thingId, long created)
+    public CardPopup (Context ctx, int ownerId, int thingId, long created, Value<String> status)
     {
-        this(ctx);
+        this(ctx, status);
         _gamesvc.getCard(ownerId, thingId, created, createCallback());
     }
 
-    public CardPopup (Context ctx, final Card card)
+    public CardPopup (Context ctx, final Card card, Value<String> status)
     {
-        this(ctx);
+        this(ctx, status);
         setWidget(createContents(card));
     }
 
-    protected CardPopup (Context ctx)
+    protected CardPopup (Context ctx, Value<String> status)
     {
         super("card", ctx);
+        _status = status;
     }
 
     protected Widget createContents (final Card card)
@@ -72,7 +73,7 @@ public class CardPopup extends DataPopup<Card>
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
                 CardPopup.this.hide();
-                // TODO: if we're viewing our own collection, remove this card
+                _status.update("Gifted!");
             }
         }));
         Button sell = new Button("Sell");
@@ -93,7 +94,7 @@ public class CardPopup extends DataPopup<Card>
                 // let the client know we have an updated coins value
                 _ctx.getCoins().update(result);
                 CardPopup.this.hide();
-                Popups.info("Sold!");
+                _status.update("Sold!");
                 return false;
             }
         };
@@ -101,6 +102,8 @@ public class CardPopup extends DataPopup<Card>
         contents.add(Widgets.newRow(flip, sell, gift, done));
         return contents;
     }
+
+    protected Value<String> _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
