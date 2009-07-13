@@ -59,8 +59,7 @@ public class AdminServlet extends EveryServiceServlet
             throw new ServiceException(E_UNKNOWN_USER);
         }
         _playerRepo.updateIsEditor(userId, isEditor);
-        String action = isEditor ? "activated" : "deactivated";
-        _adminLogic.noteAction(user.userId, action + " editor status", player);
+        _adminLogic.noteAction(user.userId, isEditor ? "editored" : "deeditored", player);
     }
 
     // from interface AdminService
