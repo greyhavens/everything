@@ -335,10 +335,7 @@ public class EditThingsPanel extends SmartTable
             while (getWidgetCount() > 1) {
                 remove(1);
             }
-            SmartTable pair = new SmartTable(5, 0);
-            pair.setWidget(0, 0, new CardView.Front(card));
-            pair.setWidget(0, 1, new CardView.Back(card));
-            add(pair);
+            add(CardView.create(card));
         }
     }
 

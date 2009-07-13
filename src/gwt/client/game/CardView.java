@@ -19,57 +19,16 @@ import com.threerings.everything.data.Category;
 import client.util.ImageUtil;
 
 /**
- * Handles the display of the front and back of a card.
+ * Handles the display of a card.
  */
 public abstract class CardView extends FlowPanel
 {
-    public static class Front extends CardView
+    /**
+     * Creates a view for the specified card.
+     */
+    public static Widget create (Card card)
     {
-        public Front (Card card)
-        {
-            addStyleName("Front");
-
-            add(Widgets.newLabel(card.thing.name, "Title"));
-
-            StringBuilder buf = new StringBuilder();
-            for (Category cat : card.categories) {
-                if (buf.length() > 0) {
-                    buf.append(" &#8594; "); // right arrow
-                }
-                buf.append(cat.name);
-            }
-            add(Widgets.newHTML(buf.toString(), "Categories"));
-
-            add(ImageUtil.getImageBox(card.thing.image));
-
-            add(Widgets.newFlowPanel("Rarity", Widgets.newInlineLabel(card.thing.rarity + " - "),
-                                     new CoinLabel(card.thing.rarity.value)));
-        }
-    }
-
-    public static class Back extends CardView
-    {
-        public Back (Card card)
-        {
-            addStyleName("Back");
-
-            add(Widgets.newLabel(card.thing.name, "Title"));
-            add(Widgets.newLabel("N of M", "Position"));
-
-            add(Widgets.newLabel(card.thing.descrip, "Descrip"));
-
-            add(Widgets.newLabel("Facts:", "FactsTitle"));
-
-            add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
-
-            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
-            if (card.giver != null) {
-                add(Widgets.newLabel("A gift from " + card.giver.name, "Giver"));
-            }
-
-            add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
-                                nameSource(card.thing.source) + "</a>", "Source"));
-        }
+        return Widgets.newRow(new CardView.Left(card), new CardView.Right(card));
     }
 
     protected CardView ()
@@ -102,6 +61,55 @@ public abstract class CardView extends FlowPanel
             buf.append("<li>").append(bit).append("</li>");
         }
         return buf.append("</ul>").toString();
+    }
+
+    protected static class Left extends CardView
+    {
+        public Left (Card card)
+        {
+            addStyleName("Left");
+
+            add(Widgets.newLabel(card.thing.name, "Title"));
+
+            StringBuilder buf = new StringBuilder();
+            for (Category cat : card.categories) {
+                if (buf.length() > 0) {
+                    buf.append(" &#8594; "); // right arrow
+                }
+                buf.append(cat.name);
+            }
+            add(Widgets.newHTML(buf.toString(), "Categories"));
+
+            add(ImageUtil.getImageBox(card.thing.image));
+
+            add(Widgets.newFlowPanel("Rarity", Widgets.newInlineLabel(card.thing.rarity + " - "),
+                                     new CoinLabel(card.thing.rarity.value)));
+        }
+    }
+
+    protected static class Right extends CardView
+    {
+        public Right (Card card)
+        {
+            addStyleName("Right");
+
+            // add(Widgets.newLabel(card.thing.name, "Title"));
+            add(Widgets.newLabel("N of M", "Position"));
+
+            add(Widgets.newLabel(card.thing.descrip, "Descrip"));
+
+            add(Widgets.newLabel("Facts:", "FactsTitle"));
+
+            add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
+
+            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
+            if (card.giver != null) {
+                add(Widgets.newLabel("A gift from " + card.giver.name, "Giver"));
+            }
+
+            add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
+                                nameSource(card.thing.source) + "</a>", "Source"));
+        }
     }
 
     protected static final DateTimeFormat _dfmt = DateTimeFormat.getLongDateFormat();

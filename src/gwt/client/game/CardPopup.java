@@ -60,19 +60,7 @@ public class CardPopup extends DataPopup<Card>
     protected Widget createContents (final Card card)
     {
         final FlowPanel contents = new FlowPanel();
-        contents.add(new CardView.Front(card));
-
-        Button flip = new Button("Flip", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                Widget face = contents.getWidget(0);
-                contents.remove(0);
-                if (face instanceof CardView.Front) {
-                    contents.insert(new CardView.Back(card), 0);
-                } else {
-                    contents.insert(new CardView.Front(card), 0);
-                }
-            }
-        });
+        contents.add(CardView.create(card));
 
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
@@ -99,7 +87,7 @@ public class CardPopup extends DataPopup<Card>
                          "Do you want to sell it?");
 
         Button done = new Button(_doneLabel, onHide());
-        contents.add(Widgets.newRow(sell, gift, flip, done));
+        contents.add(Widgets.newRow(sell, gift, done));
         return contents;
     }
 
