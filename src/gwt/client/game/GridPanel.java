@@ -8,8 +8,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
@@ -49,11 +47,9 @@ public class GridPanel extends FlowPanel
     {
         clear();
 
-        String expires = "New grid at " + _expfmt.format(data.grid.expires);
-        add(Widgets.newFlowPanel("Info", _remaining = Widgets.newHTML("", "Remaining", "inline"),
-                                 Widgets.newHTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", "inline"),
-                                 Widgets.newLabel(expires, "inline")));
+        add(_info = new SmartTable(5, 0));
         updateRemaining(data.grid.unflipped);
+        _info.setText(0, 1, "New grid at " + _expfmt.format(data.grid.expires));
 
         add(_cards = new SmartTable(5, 0));
         for (int ii = 0; ii < data.grid.flipped.length; ii++) {
@@ -67,8 +63,9 @@ public class GridPanel extends FlowPanel
             _cards.setWidget(row, col, new ThingCardView(data.grid.flipped[ii], onClick));
         }
 
-        add(_status = Widgets.newSimplePanel(null, "Status"));
+        add(_status = new SmartTable(5, 0));
         updateStatus(data.status);
+        // TODO: _status.setText(0, 2, "Next free flip at " + _expfmt(data.nextFreeFlip));
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -82,7 +79,7 @@ public class GridPanel extends FlowPanel
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(rarity).append("-").append(unflipped[ii]);
         }
-        _remaining.setHTML("Remaining: " + buf);
+        _info.setHTML(0, 0, "Remaining: " + buf, 1, "Bold");
     }
 
     protected void updateStatus (final GameStatus status)
@@ -91,11 +88,12 @@ public class GridPanel extends FlowPanel
         _ctx.getCoins().update(status.coins);
 
         if (status.freeFlips > 0) {
-            _status.setWidget(Widgets.newLabel("Free flips: " + status.freeFlips, null));
+            _status.setText(0, 0, "Free flips: " + status.freeFlips, 1, "Bold");
+            _status.setText(0, 1, "");
         } else {
-            String next = "Next flip: " + status.nextFlipCost + " You have: ";
-            _status.setWidget(Widgets.newFlowPanel(Widgets.newInlineLabel(next),
-                                                   new CoinLabel(_ctx.getCoins())));
+            _status.setText(0, 0, "Next flip: " + status.nextFlipCost, 1, "Bold");
+            _status.setWidget(0, 1, Widgets.newFlowPanel(Widgets.newInlineLabel("You have: "),
+                                                         new CoinLabel(_ctx.getCoins())));
         }
     }
 
@@ -132,9 +130,7 @@ public class GridPanel extends FlowPanel
     }
 
     protected Context _ctx;
-    protected SmartTable _cards;
-    protected HTML _remaining;
-    protected SimplePanel _status;
+    protected SmartTable _info, _cards, _status;
 
     protected static final DateTimeFormat _expfmt = DateTimeFormat.getFormat("H:MMa EEEEEEEEE");
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

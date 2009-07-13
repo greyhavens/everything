@@ -98,14 +98,18 @@
 
 /** GridPanel styles */
 .grid {
-  width: 600px;
+  width: 585px;
 }
 
-.grid .Info, .grid .Status {
+.grid table {
+  width: 100%;
+}
+
+.grid table td {
   text-align: center;
 }
 
-.grid .Remaining, .grid .Status {
+.grid .Bold {
   font-weight: bold;
 }
 
