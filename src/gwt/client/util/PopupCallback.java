@@ -5,12 +5,10 @@ package client.util;
 
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.util.AbstractPopupCallback;
-
 /**
  * A callback that displays errors via a popup.
  */
-public abstract class PopupCallback<T> extends AbstractPopupCallback<T>
+public abstract class PopupCallback<T> extends com.threerings.gwt.util.PopupCallback<T>
 {
     public PopupCallback ()
     {
