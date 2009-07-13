@@ -35,6 +35,10 @@ public class FeedItemRecord extends PersistentRecord
     public static Function<FeedItemRecord, FeedItem> TO_FEED_ITEM =
         RuntimeUtil.makeToRuntime(FeedItemRecord.class, FeedItem.class);
 
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
+
     /** The id of user that took the action. */
     @Id public int actorId;
 
