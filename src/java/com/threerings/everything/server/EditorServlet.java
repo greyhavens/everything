@@ -60,6 +60,7 @@ public class EditorServlet extends EveryServiceServlet
         }
 
         // actually update the category
+        category.creatorId = ocategory.creatorId;
         _thingRepo.updateCategory(category);
 
         String action;
@@ -118,12 +119,11 @@ public class EditorServlet extends EveryServiceServlet
     public void updateThing (Thing thing) throws ServiceException
     {
         // make sure they have editing privileges on this object (and that it exists)
-        PlayerRecord editor = checkEditor(_thingRepo.loadThing(thing.thingId));
-
-        // make sure they're not doing anything funny
-        thing.creatorId = editor.userId;
+        Thing othing = _thingRepo.loadThing(thing.thingId);
+        PlayerRecord editor = checkEditor(othing);
 
         // actually update the thing
+        thing.creatorId = othing.creatorId;
         _thingRepo.updateThing(thing);
 
         // note that this action was taken
