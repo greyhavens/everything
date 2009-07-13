@@ -31,23 +31,6 @@ public abstract class ClickCallback<T> extends com.threerings.gwt.util.ClickCall
     }
 
     @Override // from ClickCallback<T>
-    protected void reportFailure (Throwable cause)
-    {
-        Widget near = _onEnter;
-        if (near == null && _trigger instanceof Widget) {
-            near = (Widget)_trigger;
-        }
-        if (_onEnter != null) {
-            _onEnter.setFocus(true);
-        }
-        if (near == null) {
-            Popups.error(cause.getMessage());
-        } else {
-            Popups.errorNear(cause.getMessage(), near);
-        }
-    }
-
-    @Override // from ClickCallback<T>
     protected void takeAction ()
     {
         takeAction(false);
