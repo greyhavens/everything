@@ -8,5 +8,5 @@ package client;
  */
 public enum Page
 {
-    LANDING, FLIP, BROWSE, EDIT_THINGS;
+    LANDING, FLIP, BROWSE, EDIT_THINGS, DASHBOARD;
 }

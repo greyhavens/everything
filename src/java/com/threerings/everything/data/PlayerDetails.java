@@ -36,7 +36,4 @@ public class PlayerDetails
 
     /** This player's current free flips status. */
     public float freeFlips;
-
-    /** This player's admin status. */
-    public boolean isAdmin;
 }

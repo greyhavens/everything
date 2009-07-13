@@ -125,14 +125,6 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link PlayerDetails#isAdmin}.
-     */
-    public boolean getIsAdmin ()
-    {
-        return false; // caller will fill this in
-    }
-
-    /**
      * Reports a useful string identifying this player for logging.
      */
     public String who ()

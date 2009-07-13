@@ -28,6 +28,9 @@ public class HeaderPanel extends SmartTable
         if (ctx.isEditor()) {
             setWidget(0, col++, new Hyperlink("Add Things", ""+Page.EDIT_THINGS));
         }
+        if (ctx.isAdmin()) {
+            setWidget(0, col++, new Hyperlink("Dashboard", ""+Page.DASHBOARD));
+        }
 
         // finally display the game build on the right
         getFlexCellFormatter().setHorizontalAlignment(0, col, HasAlignment.ALIGN_RIGHT);

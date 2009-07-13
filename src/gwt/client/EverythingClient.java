@@ -23,6 +23,7 @@ import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
+import client.admin.DashboardPanel;
 import client.admin.EditThingsPanel;
 import client.game.BrowsePanel;
 import client.game.GridPanel;
@@ -113,6 +114,7 @@ public class EverythingClient
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, getMe().userId)); break;
         case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
+        case DASHBOARD: setContent(new DashboardPanel(this)); break;
         }
 
         // if we have showing popups, clear them out

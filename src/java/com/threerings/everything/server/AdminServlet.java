@@ -9,11 +9,14 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.threerings.user.OOOUser;
+
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerFullName;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
@@ -40,14 +43,24 @@ public class AdminServlet extends EveryServiceServlet
     public PlayerDetails getPlayerDetails (int userId) throws ServiceException
     {
         requireAdmin();
-        return PlayerRecord.TO_DETAILS.apply(_playerRepo.loadPlayer(userId));
+        PlayerRecord player = _playerRepo.loadPlayer(userId);
+        if (player == null) {
+            throw new ServiceException(E_UNKNOWN_USER);
+        }
+        return PlayerRecord.TO_DETAILS.apply(player);
     }
 
     // from interface AdminService
     public void updateIsEditor (int userId, boolean isEditor) throws ServiceException
     {
-        requireAdmin();
+        OOOUser user = requireAdmin();
+        PlayerName player = _playerRepo.loadPlayerName(userId);
+        if (player == null) {
+            throw new ServiceException(E_UNKNOWN_USER);
+        }
         _playerRepo.updateIsEditor(userId, isEditor);
+        String action = isEditor ? "activated" : "deactivated";
+        _adminLogic.noteAction(user.userId, action + " editor status", player);
     }
 
     // from interface AdminService
@@ -57,6 +70,7 @@ public class AdminServlet extends EveryServiceServlet
         return Lists.newArrayList(); // TODO
     }
 
+    @Inject protected AdminLogic _adminLogic;
     @Inject protected ThingRepository _thingRepo;
 
     protected static final int MAX_RECENTS = 10;

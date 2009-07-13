@@ -25,6 +25,9 @@ public interface AdminService extends RemoteService
     /** The path at which this servlet is mapped. */
     public static final String ENTRY_POINT = "admin";
 
+    /** An error reported by {@link #updateIsEditor} and {@link #getPlayerDetails}. */
+    public static final String E_UNKNOWN_USER = "e.unknown_user";
+
     /** Provides results for {@link #getDashboard}. */
     public static class DashboardResult implements IsSerializable
     {

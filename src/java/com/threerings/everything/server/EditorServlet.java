@@ -43,7 +43,7 @@ public class EditorServlet extends EveryServiceServlet
         PlayerRecord editor = requireEditor();
         category.creatorId = editor.userId;
         category.categoryId = _thingRepo.createCategory(category);
-        _editorLogic.noteAction(editor, "created", category);
+        _adminLogic.noteAction(editor, "created", category);
         return category.categoryId;
     }
 
@@ -72,7 +72,7 @@ public class EditorServlet extends EveryServiceServlet
         }
 
         // note that this action was taken
-        _editorLogic.noteAction(editor, action, category);
+        _adminLogic.noteAction(editor, action, category);
     }
 
     // from interface EditorService
@@ -94,7 +94,7 @@ public class EditorServlet extends EveryServiceServlet
         _thingRepo.deleteCategory(category);
 
         // note that this action was taken
-        _editorLogic.noteAction(editor, "deleted", category);
+        _adminLogic.noteAction(editor, "deleted", category);
     }
 
     // from interface EditorService
@@ -110,7 +110,7 @@ public class EditorServlet extends EveryServiceServlet
         PlayerRecord editor = requireEditor();
         thing.creatorId = editor.userId;
         thing.thingId = _thingRepo.createThing(thing);
-        _editorLogic.noteAction(editor, "created", thing);
+        _adminLogic.noteAction(editor, "created", thing);
         return thing.thingId;
     }
 
@@ -124,7 +124,7 @@ public class EditorServlet extends EveryServiceServlet
         _thingRepo.updateThing(thing);
 
         // note that this action was taken
-        _editorLogic.noteAction(editor, "updated", thing);
+        _adminLogic.noteAction(editor, "updated", thing);
     }
 
     // from interface EditorService
@@ -140,7 +140,7 @@ public class EditorServlet extends EveryServiceServlet
         _thingRepo.deleteThing(thing);
 
         // note that this action was taken
-        _editorLogic.noteAction(editor, "deleted", thing);
+        _adminLogic.noteAction(editor, "deleted", thing);
     }
 
     protected PlayerRecord checkEditor (Created created)
@@ -163,6 +163,6 @@ public class EditorServlet extends EveryServiceServlet
         return list;
     }
 
-    @Inject protected EditorLogic _editorLogic;
+    @Inject protected AdminLogic _adminLogic;
     @Inject protected ThingRepository _thingRepo;
 }

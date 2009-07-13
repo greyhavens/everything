@@ -82,7 +82,10 @@ public class ThingRepository extends DepotRepository
      */
     public Iterable<Category> loadPendingCategories ()
     {
-        return findAll(CategoryRecord.class, new Where(CategoryRecord.ACTIVE.eq(false))).
+        return findAll(CategoryRecord.class,
+                       CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
+                       new Where(CategoryRecord.ACTIVE.eq(false)),
+                       new GroupBy(CategoryRecord.CATEGORY_ID)).
             map(CategoryRecord.TO_CATEGORY);
     }
 
