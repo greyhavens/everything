@@ -42,10 +42,13 @@ import com.samskivert.io.StreamUtil;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.client.ServiceException;
+import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServlet;
 import com.threerings.user.OOOUser;
 
 import com.threerings.everything.data.Thing;
+import com.threerings.everything.server.persist.PlayerRecord;
+import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -60,7 +63,10 @@ public class MediaUploadServlet extends AppServlet
     {
         FileItem file = null;
         try {
-            OOOUser admin = requireAdmin(req, rsp);
+            PlayerRecord player = _playerRepo.loadPlayer(requireUser(req, rsp).userId);
+            if (player == null || !player.isEditor) {
+                throw new ServiceException(AppCodes.E_ACCESS_DENIED);
+            }
 
             // validate the content length is sane
             if (req.getContentLength() <= 0) {
@@ -223,30 +229,9 @@ public class MediaUploadServlet extends AppServlet
         }
     }
 
-//     /**
-//      * Copy the supplied file to S3
-//      */
-//     protected static boolean copyFileToS3 (File file, String mimeType, String name,
-//         String subdirectory, Map<String, String> headers)
-//         throws IOException
-//     {
-
-//         } catch (S3ServerException e) {
-//             // S3 Server-side Exception
-//             log.warning("S3 upload failed [code=" + e.getClass().getName() +
-//                         ", requestId=" + e.getRequestId() + ", hostId=" + e.getHostId() +
-//                         ", message=" + e.getMessage() + "].");
-//             return false;
-
-//         } catch (S3Exception e) {
-//             // S3 Client-side Exception
-//             log.warning("S3 upload failed: " + e);
-//             return false;
-//         }
-//     }
-
     // dependencies
     @Inject protected EverythingApp _app;
+    @Inject protected PlayerRepository _playerRepo;
 
     protected static final int MEGABYTE = 1024 * 1024;
     protected static final int MAX_UPLOAD_SIZE = 2 * MEGABYTE;
