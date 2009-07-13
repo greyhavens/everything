@@ -86,6 +86,17 @@
   font-weight: bold;
 }
 
+.microCard .miniImageBox {
+  width: 83px;
+  height: 100px;
+  margin: 5px auto;
+}
+
+.microCard .miniImageBox .gwt-Image {
+  max-width: 83px;
+  max-height: 100px;
+}
+
 /** BrowsePanel styles */
 .browse .Title {
   font-size: 16px;

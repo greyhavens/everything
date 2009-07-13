@@ -86,7 +86,7 @@ public class SeriesPopup extends PopupPanel
             });
             ClickHandler onClick = (card == null) ? null :
                 CardPopup.onClick(_ctx, ownerId, card.thingId, card.created, status);
-            grid.setWidget(row, col, new ThingCardView(card, onClick));
+            grid.setWidget(row, col, ThingCardView.create(card, onClick));
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);
         }

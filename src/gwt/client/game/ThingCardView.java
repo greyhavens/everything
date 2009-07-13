@@ -17,7 +17,19 @@ import client.util.ImageUtil;
  */
 public class ThingCardView extends FlowPanel
 {
-    public ThingCardView (ThingCard card, ClickHandler onClick)
+    public static ThingCardView create (ThingCard card, ClickHandler onClick)
+    {
+        return new ThingCardView(card, onClick);
+    }
+
+    public static ThingCardView createMicro (ThingCard card, ClickHandler onClick)
+    {
+        ThingCardView view = new ThingCardView(card, onClick);
+        view.addStyleName("microCard");
+        return view;
+    }
+
+    protected ThingCardView (ThingCard card, ClickHandler onClick)
     {
         setStyleName("thingCard");
         String name = (card == null || card.name == null) ? "?" : card.name;

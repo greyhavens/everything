@@ -60,7 +60,7 @@ public class GridPanel extends FlowPanel
                     flipCard(data, position);
                 }
             };
-            _cards.setWidget(row, col, new ThingCardView(data.grid.flipped[ii], onClick));
+            _cards.setWidget(row, col, ThingCardView.createMicro(data.grid.flipped[ii], onClick));
         }
 
         add(_status = new SmartTable(5, 0));
@@ -111,7 +111,7 @@ public class GridPanel extends FlowPanel
                     card.image = result.card.thing.image;
                     card.rarity = result.card.thing.rarity;
                     final int row = position / COLUMNS, col = position % COLUMNS;
-                    _cards.setWidget(row, col, new ThingCardView(card, null));
+                    _cards.setWidget(row, col, ThingCardView.createMicro(card, null));
 
                     // update our status
                     data.grid.unflipped[card.rarity.ordinal()]--;
