@@ -12,13 +12,13 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.ClickCallback;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 
 import client.ui.DataPopup;
-import client.util.ClickCallback;
 import client.util.Context;
 import client.util.PopupCallback;
 
@@ -69,7 +69,12 @@ public class CardPopup extends DataPopup<Card>
                 }
             }
         });
-        Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card));
+        Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+            public void run () {
+                CardPopup.this.hide();
+                // TODO: if we're viewing our own collection, remove this card
+            }
+        }));
         Button sell = new Button("Sell");
         new ClickCallback<Integer>(sell) {
             protected String getConfirmMessage () {

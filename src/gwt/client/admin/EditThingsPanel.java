@@ -34,6 +34,7 @@ import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.ClickCallback;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
@@ -43,7 +44,6 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
 import client.game.CardView;
-import client.util.ClickCallback;
 import client.util.Context;
 import client.util.MediaUploader;
 import client.util.PopupCallback;

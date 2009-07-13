@@ -15,12 +15,6 @@ html, body {
   padding: 25px;
 }
 
-/** ClickCallback styles */
-.confirm {
-  border: 1px solid;
-  background: #FFFFFF;
-}
-
 /** DataPopup styles */
 .popup {
   border: 1px solid;
