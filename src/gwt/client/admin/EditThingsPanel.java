@@ -409,9 +409,11 @@ public class EditThingsPanel extends SmartTable
             // set up the thing with defaults which can be edited once it is created
             thing.rarity = Rarity.I;
             thing.image = "";
-            thing.descrip = "TODO";
-            thing.facts = "TODO";
-            thing.source = "TODO";
+            thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
+                "your description and facts fit on the Thing display.";
+            thing.facts = "Enter facts about your thing here. Press enter to end one " +
+                "bullet point and start the next.";
+            thing.source = "http://wikipedia.org/Todo";
             _editorsvc.createThing(thing, callback);
             return thing;
         }
