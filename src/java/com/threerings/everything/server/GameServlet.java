@@ -27,12 +27,14 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
+import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
@@ -199,6 +201,9 @@ public class GameServlet extends EveryServiceServlet
         result.status = _gameLogic.getGameStatus(
             _playerRepo.loadPlayer(player.userId), grid.unflipped);
 
+        // record that this player flipped this card
+        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, result.card.thing.name);
+
         log.info("Yay! Card flipped", "who", player.who(), "thing", result.card.thing.name,
                  "rarity", result.card.thing.rarity, "paid", expectedCost);
         return result;
@@ -267,7 +272,13 @@ public class GameServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
         CardRecord card = requireCard(player.userId, thingId, created);
+
+        // transfer the card to the target player
         _gameRepo.giftCard(card, friendId);
+
+        // record that this player gifted this card
+        Thing thing = _thingRepo.loadThing(thingId);
+        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.GIFTED, friendId, thing.name);
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)

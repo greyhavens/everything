@@ -16,4 +16,14 @@ public class PlayerName
 
     /** This player's name. */
     public String name;
+
+    /**
+     * Returns a blank name with just the user id.
+     */
+    public static PlayerName create (int userId)
+    {
+        PlayerName name = new PlayerName();
+        name.userId = userId;
+        return name;
+    }
 }

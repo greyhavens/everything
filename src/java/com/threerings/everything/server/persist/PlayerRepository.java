@@ -25,6 +25,7 @@ import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 
 import com.threerings.everything.client.GameCodes;
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
@@ -206,6 +207,20 @@ public class PlayerRepository extends DepotRepository
                                                PlayerRecord.FREE_FLIPS.greaterEq(1))),
                              PlayerRecord.getKey(userId),
                              PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.minus(1)) == 1;
+    }
+
+    /**
+     * Records an item to the specified actor's feed.
+     */
+    public void recordFeedItem (int actorId, FeedItem.Type type, int targetId, String object)
+    {
+        FeedItemRecord record = new FeedItemRecord();
+        record.actorId = actorId;
+        record.when = new Timestamp(System.currentTimeMillis());
+        record.type = type;
+        record.targetId = targetId;
+        record.object = object;
+        insert(record);
     }
 
     @Override // from DepotRepository
