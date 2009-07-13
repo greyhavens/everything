@@ -14,6 +14,7 @@ import com.threerings.gwt.util.DateUtil;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.data.FeedItem;
+import com.threerings.everything.data.PlayerName;
 
 import client.util.Args;
 import client.util.Context;
@@ -52,18 +53,23 @@ public class FeedPanel extends FlowPanel
         }
     }
 
-    protected static class FeedItemLabel extends FlowPanel
+    protected String getName (PlayerName name, boolean capital)
+    {
+        return _ctx.getMe().userId != name.userId ? name.name : (capital ? "You" : "you");
+    }
+
+    protected class FeedItemLabel extends FlowPanel
     {
         public FeedItemLabel (FeedItem item) {
             setStyleName("Item");
-            add(Args.createInlink(item.actor.name, Page.BROWSE, item.actor.userId));
+            add(Args.createInlink(getName(item.actor, true), Page.BROWSE, item.actor.userId));
             switch (item.type) {
             case FLIPPED:
                 add(Widgets.newHTML(" flipped the <b>" + item.object + "</b> card.", "inline"));
                 break;
             case GIFTED:
                 add(Widgets.newHTML(" gave the <b>" + item.object + "</b> card to ", "inline"));
-                add(Args.createInlink(item.target.name, Page.BROWSE, item.actor.userId));
+                add(Args.createInlink(item.target.name, Page.BROWSE, getName(item.actor, false)));
             }
         }
     }
