@@ -267,7 +267,9 @@ public class EditCatsPanel extends SmartTable
         }
 
         @Override protected Widget createCatActionLabel (Category cat) {
-            return Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId);
+            return Widgets.newFlowPanel(
+                Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId),
+                Widgets.newLabel(" (" + cat.things + ")", "inline"));
         }
     };
 
