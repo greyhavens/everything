@@ -28,6 +28,12 @@ public class PlayerName
         return name + " " + surname;
     }
 
+    @Override // from Object
+    public boolean equals (Object other)
+    {
+        return (other instanceof PlayerName) && userId == ((PlayerName)other).userId;
+    }
+
     /**
      * Returns a blank name with just the user id.
      */

@@ -99,7 +99,7 @@ public class CardPopup extends DataPopup<Card>
                          "Do you want to sell it?");
 
         Button done = new Button(_doneLabel, onHide());
-        if (card.owner.userId == _ctx.getMe().userId) {
+        if (_ctx.getMe().equals(card.owner)) {
             contents.add(Widgets.newRow("Buttons", sell, gift, done));
         } else {
             contents.add(Widgets.newRow("Buttons", done));
