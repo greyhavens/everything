@@ -6,7 +6,11 @@ package com.threerings.everything.server;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.samskivert.util.IntMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 import com.threerings.user.OOOUser;
@@ -18,6 +22,7 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Created;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -35,7 +40,22 @@ public class EditorServlet extends EveryServiceServlet
     public List<Category> loadCategories (int parentId) throws ServiceException
     {
         requireEditor();
-        return sort(Lists.newArrayList(_thingRepo.loadCategories(parentId)));
+
+        // load up the categories in question
+        List<Category> cats = sort(Lists.newArrayList(_thingRepo.loadCategories(parentId)));
+
+        // resolve the creator name of these categories
+        IntMap<PlayerName> names = _playerRepo.loadPlayerNames(
+            Sets.newHashSet(Iterables.transform(cats, new Function<Category, Integer>() {
+                public Integer apply (Category cat) {
+                    return cat.getCreatorId();
+                }
+            })));
+        for (Category cat : cats) {
+            cat.creator = names.get(cat.creator.userId);
+        }
+
+        return cats;
     }
 
     // from interface EditorService
