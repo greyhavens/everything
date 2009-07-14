@@ -22,11 +22,14 @@
 
 /** CardView styles */
 .cardView {
-  width: 565px;
   height: 380px;
   border: 1px solid;
   padding: 5px;
   font-size: 15px;
+}
+
+.cardView .Left, .cardView .Right {
+  width: 280px;
 }
 
 .cardView .Title, .cardView .Position, .cardView .Categories, .cardView .Rarity {
@@ -41,7 +44,7 @@
   font-size: 14px;
 }
 
-.cardView .Image .gwt-Image {
+.cardView .imageBox .gwt-Image {
   display: block;
 }
 
