@@ -69,7 +69,8 @@ public class FeedPanel extends FlowPanel
                 break;
             case GIFTED:
                 add(Widgets.newHTML(" gave the " + format(item.objects) + " to ", "inline"));
-                add(Args.createInlink(item.target.name, Page.BROWSE, getName(item.actor, false)));
+                add(Args.createInlink(getName(item.target, false),
+                                      Page.BROWSE, item.target.userId));
             }
         }
 
