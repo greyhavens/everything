@@ -221,13 +221,15 @@ public class GameServlet extends EveryServiceServlet
         CardRecord card = requireCard(player.userId, thingId, created);
 
         // players receive half the value of the thing for cashing in a card
-        int coins = _thingRepo.loadThing(card.thingId).rarity.saleValue();
+        Thing thing = _thingRepo.loadThing(card.thingId);
+        int coins = thing.rarity.saleValue();
 
         // we grant the coins and then delete the card; it's possible that this means that a
         // database failure will result in them getting money and keeping their card but it seems
         // quite unlikely that they'll get to take advantage of such a failure more than once...
         _playerRepo.grantCoins(player.userId, coins);
         _gameRepo.deleteCard(card);
+        log.info("Player sold card", "who", player.who(), "thing", thing.name, "coins", coins);
 
         // return their new coin balance (this doesn't have to be absolutely correct)
         return player.coins + coins;
