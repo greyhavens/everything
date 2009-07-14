@@ -22,6 +22,9 @@ public interface EverythingService extends RemoteService
     /** The path at which this servlet is mapped. */
     public static final String ENTRY_POINT = "everything";
 
+    /** Thrown by {@link #validateSession} if we can't communicate with Facebook. */
+    public static final String E_FACEBOOK_DOWN = "e.facebook_down";
+
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */

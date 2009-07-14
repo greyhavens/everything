@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.ClickCallback;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -20,6 +19,7 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 
 import client.ui.DataPopup;
+import client.util.ClickCallback;
 import client.util.Context;
 import client.util.PopupCallback;
 

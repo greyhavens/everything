@@ -18,6 +18,6 @@ public abstract class PanelCallback<T> extends com.threerings.gwt.util.PanelCall
     @Override // from AbstractPanelCallback<T>
     protected String formatError (Throwable cause)
     {
-        return cause.getMessage(); // TODO
+        return Errors.xlate(cause);
     }
 }

@@ -32,7 +32,6 @@ import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.Card;
-import com.threerings.everything.data.EverythingCodes;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
@@ -76,7 +75,7 @@ public class EverythingServlet extends EveryServiceServlet
             } catch (FacebookException fbe) {
                 log.warning("Failed to load Facebook profile info", "who", user.userId,
                             "fbinfo", fbinfo, fbe);
-                throw new ServiceException(EverythingCodes.E_FACEBOOK_DOWN);
+                throw new ServiceException(E_FACEBOOK_DOWN);
             }
             if (uinfo.getUser().size() == 0) {
                 log.warning("User has no Facebook profile info?", "who", user.userId,

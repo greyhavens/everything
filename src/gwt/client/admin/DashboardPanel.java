@@ -17,7 +17,6 @@ import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.ClickCallback;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
@@ -26,6 +25,7 @@ import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerName;
 
 import client.util.Args;
+import client.util.ClickCallback;
 import client.util.Context;
 import client.util.Page;
 import client.util.PanelCallback;

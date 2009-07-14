@@ -12,7 +12,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
-import com.threerings.gwt.util.ClickCallback;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
@@ -20,6 +19,7 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
 
 import client.ui.DataPopup;
+import client.util.ClickCallback;
 import client.util.Context;
 
 /**

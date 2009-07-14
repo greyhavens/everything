@@ -92,6 +92,7 @@
   <target name="clean" description="Cleans out the compilation results.">
     <delete dir="${deploy.dir}/classes"/>
     <delete file="${src.dir}/com/threerings/everything/data/Build.java"/>
+    <delete><fileset dir="${gsrc.dir}" includes="client/*/*Messages.java"/></delete>
   </target>
 
   <target name="distcleanall" depends="clean" description="Cleans out all build data.">
@@ -107,9 +108,16 @@
     </javac>
   </target>
 
-  <target name="gclient" description="Builds our GWT client.">
+  <target name="gclient" depends="prepare" description="Builds our GWT client.">
     <!-- blow away our old app -->
     <delete dir="${deploy.dir}/gwt/${app.ident}"/>
+
+    <!-- regenerates our i18n messages classes -->
+    <taskdef name="i18nsync" classname="com.threerings.gwt.tools.I18nSyncTask"
+             classpathref="build.classpath"/>
+    <i18nsync srcdir="${gsrc.dir}">
+      <fileset dir="${gsrc.dir}" includes="**/*Messages.properties"/>
+    </i18nsync>
 
     <!-- invoke the GWT compiler and grindy grindy grindy -->
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
@@ -157,8 +165,8 @@
         <pathelement path="${deploy.dir}/lib/depot-gwt-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samsara-app-0.0-SNAPSHOT.jar"/>
-        <pathelement path="src/java"/>
-        <pathelement path="src/gwt"/>
+        <pathelement path="${src.dir}"/>
+        <pathelement path="${gsrc.dir}"/>
       </classpath>
       <arg value="-noserver"/>
       <arg value="-port"/>
@@ -219,7 +227,7 @@
   <target name="styles" depends="prepare" 
           description="Copies updated style sheets into the local installed app.">
     <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/">
-      <fileset dir="src/gwt/public" includes="*.css"/>
+      <fileset dir="${gsrc.dir}/public" includes="*.css"/>
     </copy>
   </target>
 

@@ -93,7 +93,7 @@ public class MediaUploader extends FormPanel
 
     protected void uploadError (String code)
     {
-        Popups.errorNear("Upload error: " + code, _upload); // TODO
+        Popups.errorNear("Upload error: " + Errors.xlate(code), _upload);
     }
 
     /**

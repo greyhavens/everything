@@ -31,6 +31,7 @@ import client.game.GridPanel;
 import client.game.LandingPanel;
 import client.util.Args;
 import client.util.Context;
+import client.util.Errors;
 
 /**
  * The entry point for the Everything client.
@@ -52,7 +53,7 @@ public class EverythingClient
                 }
             }
             public void onFailure (Throwable cause) {
-                setInfoContent("Oh noez: " + cause.getMessage()); // TODO
+                setContent(Widgets.newLabel(Errors.xlate(cause), "errorLabel"));
             }
         });
     }

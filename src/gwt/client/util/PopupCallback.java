@@ -22,6 +22,6 @@ public abstract class PopupCallback<T> extends com.threerings.gwt.util.PopupCall
     @Override // from AbstractPopupCallback<T>
     protected String formatError (Throwable cause)
     {
-        return cause.getMessage(); // TODO
+        return Errors.xlate(cause);
     }
 }
