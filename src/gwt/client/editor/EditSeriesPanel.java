@@ -274,8 +274,8 @@ public class EditSeriesPanel extends FlowPanel
                     return true;
                 }
                 protected boolean gotResult (Void result) {
-                    Popups.infoNear("Thing saved.", save);
                     setEditing(false);
+                    Popups.infoNear("Thing saved.", _edit);
                     return true;
                 }
             };
