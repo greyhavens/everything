@@ -101,7 +101,4 @@ public enum Rarity implements ByteEnum
 
     /** The maximum value of any rarity. */
     protected static final float AVG_COST = computeAvgCost();
-
-    /** Extra weight added to every card to make the rarest card not insanely rare. */
-    protected static final int EXTRA_WEIGHT = 30;
 }
