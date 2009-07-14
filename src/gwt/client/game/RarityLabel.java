@@ -14,12 +14,17 @@ public class RarityLabel extends Label
 {
     public RarityLabel (Rarity rarity)
     {
+        this("", rarity);
+    }
+
+    public RarityLabel (String label, Rarity rarity)
+    {
         setStyleName("Rarity");
         addStyleName("inline");
         if (rarity == null) {
-            setText("?");
+            setText(label + "?");
         } else {
-            setText(rarity.toString());
+            setText(label + rarity.toString());
             setTitle(rarity.description());
         }
     }

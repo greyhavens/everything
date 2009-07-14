@@ -76,10 +76,8 @@ public abstract class CardView extends FlowPanel
             }
             add(Widgets.newHTML(buf.toString(), "Categories"));
             add(ImageUtil.getImageBox(card.thing.image));
-            add(Widgets.newFlowPanel("Metrics",
-                                     new RarityLabel(card.thing.rarity),
-                                     Widgets.newInlineLabel(" - "),
-                                     new CoinLabel("Value: ", card.thing.rarity.value)));
+            add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
+                                     new CoinLabel(" - ", card.thing.rarity.value)));
         }
     }
 
