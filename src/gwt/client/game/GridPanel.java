@@ -79,7 +79,7 @@ public class GridPanel extends FlowPanel
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(unflipped[ii]).append(" of ").append(rarity);
         }
-        _info.setText(1, 0, buf.toString(), 1, "Bold");
+        _info.setHTML(1, 0, buf.toString(), 1, "Bold");
     }
 
     protected void updateStatus (final GameStatus status)
