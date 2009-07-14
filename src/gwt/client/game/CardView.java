@@ -75,7 +75,7 @@ public abstract class CardView extends FlowPanel
     {
         public Right (Card card)
         {
-            add(Widgets.newLabel("N of M", "Position"));
+            add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
             add(Widgets.newLabel(card.thing.descrip, "Descrip"));
             add(Widgets.newLabel("Facts:", "FactsTitle"));
             add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));

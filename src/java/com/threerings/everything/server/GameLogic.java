@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 
 import com.threerings.everything.server.persist.CardRecord;
@@ -127,6 +129,16 @@ public class GameLogic
         card.created = new Date(record.created.getTime());
         if (record.giverId != 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
+        }
+        // we have to load all the things in this category for this bit
+        List<Thing> things = Lists.newArrayList(_thingRepo.loadThings(card.thing.categoryId));
+        Collections.sort(things);
+        card.things = things.size();
+        for (int ii = 0, ll = things.size(); ii < ll; ii++) {
+            if (card.thing.thingId == things.get(ii).thingId) {
+                card.position = ii;
+                break;
+            }
         }
         return card;
     }

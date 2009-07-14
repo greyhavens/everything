@@ -145,9 +145,10 @@ public class EditSeriesPanel extends FlowPanel
         };
 
         // then add all of our things
+        int position = 0;
         for (Thing thing : result.things) {
             // create a fake card and display it
-            add(new ThingEditor(createCard(result.categories, thing)));
+            add(new ThingEditor(createCard(result, thing, position++)));
         }
 
         // finally add a UI for creating new things
@@ -168,7 +169,9 @@ public class EditSeriesPanel extends FlowPanel
             protected boolean gotResult (Integer thingId) {
                 _thing.thingId = thingId;
                 thing.setText("");
-                ThingEditor editor = new ThingEditor(createCard(result.categories, _thing));
+                ThingEditor editor = new ThingEditor(
+                    createCard(result, _thing, result.things.size()));
+                result.things.add(_thing);
                 insert(editor, getWidgetCount()-1);
                 editor.setEditing(true);
                 _thing = null;
@@ -197,12 +200,14 @@ public class EditSeriesPanel extends FlowPanel
         }
     }
 
-    protected Card createCard (Category[] categories, Thing thing)
+    protected Card createCard (EditorService.SeriesResult result, Thing thing, int position)
     {
         Card card = new Card();
         card.owner = _ctx.getMe();
-        card.categories = categories;
+        card.categories = result.categories;
         card.thing = thing;
+        card.position = position;
+        card.things = result.things.size();
         card.created = new Date();
         return card;
     }

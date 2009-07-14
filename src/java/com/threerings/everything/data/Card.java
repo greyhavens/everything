@@ -22,6 +22,12 @@ public class Card
     /** The thing that's on this card. */
     public Thing thing;
 
+    /** This thing's position in its series (counting from zero). */
+    public int position;
+
+    /** The number of things in this thing's series. */
+    public int things;
+
     /** The time at which this card was created. */
     public Date created;
 
