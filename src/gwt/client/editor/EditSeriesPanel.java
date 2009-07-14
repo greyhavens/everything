@@ -4,6 +4,7 @@
 package client.editor;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -17,6 +18,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -26,11 +28,13 @@ import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.DateUtil;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.client.EditorServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
@@ -39,7 +43,6 @@ import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.MediaUploader;
-import client.util.Page;
 import client.util.PanelCallback;
 
 /**
@@ -71,15 +74,13 @@ public class EditSeriesPanel extends FlowPanel
         add(info);
         int row = 0;
         info.setText(row, 0, "Creator:");
-        info.setWidget(row++, 1, Args.createLink(series.creator.toString(), Page.BROWSE,
-                                                 series.creator.userId));
+        info.setWidget(row++, 1, Args.createInlink(series.creator));
 
         if (_ctx.isAdmin() || _ctx.getMe().equals(series.creator)) {
             final TextBox name = Widgets.newTextBox(series.name, Category.MAX_NAME_LENGTH, 15);
             Button update = new Button("Update");
             info.setText(row, 0, "Name:");
-            info.setWidget(row, 1, name);
-            info.setWidget(row++, 2, update);
+            info.setWidget(row++, 1, Widgets.newRow(name, update));
             new ClickCallback<Void>(update, name) {
                 protected boolean callService () {
                     series.name = name.getText().trim();
@@ -113,6 +114,39 @@ public class EditSeriesPanel extends FlowPanel
                 }
             };
         }
+
+        final TextBox message = Widgets.newTextBox("", 255, 35);
+        final Button post = new Button("Add");
+        info.setText(row, 0, "Comments:");
+        info.setWidget(row++, 1, Widgets.newRow(message, post));
+
+        final FlowPanel comments = new FlowPanel();
+        info.setWidget(row++, 0, comments, 2, null);
+        for (CategoryComment comment : result.comments) {
+            comments.add(formatComment(comment));
+        }
+        if (result.comments.size() == 0) {
+            comments.add(Widgets.newLabel("No comments.", null));
+        }
+
+        new ClickCallback<CategoryComment>(post, message) {
+            protected boolean callService () {
+                String text = message.getText().trim();
+                if (text.length() == 0) {
+                    return false;
+                }
+                _editorsvc.postComment(series.categoryId, text, this);
+                return true;
+            }
+            protected boolean gotResult (CategoryComment comment) {
+                if (comments.getWidget(0) instanceof Label) {
+                    comments.clear(); // if we're showing "no comments"
+                }
+                comments.insert(formatComment(comment), 0);
+                message.setText("");
+                return true;
+            }
+        };
 
         // then add all of our things
         for (Thing thing : result.things) {
@@ -190,6 +224,14 @@ public class EditSeriesPanel extends FlowPanel
             "bullet point and start the next.";
         thing.source = "http://wikipedia.org/Todo";
         return thing;
+    }
+
+    protected Widget formatComment (CategoryComment comment)
+    {
+        return Widgets.newRow(
+            Widgets.newLabel(DateUtil.formatDateTime(comment.when), "inline"),
+            Args.createInlink(comment.commentor),
+            Widgets.newLabel(comment.message, "inline"));
     }
 
     protected class ThingEditor extends FlowPanel

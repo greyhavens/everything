@@ -5,6 +5,8 @@ package client.util;
 
 import com.google.gwt.user.client.ui.Hyperlink;
 
+import com.threerings.everything.data.PlayerName;
+
 /**
  * Handles parsing our page arguments.
  */
@@ -45,6 +47,14 @@ public class Args
             link.addStyleName(styleName);
         }
         return link;
+    }
+
+    /**
+     * Creates a link to the specified player's collection.
+     */
+    public static Hyperlink createInlink (PlayerName name)
+    {
+        return createInlink(name.toString(), Page.BROWSE, name.userId);
     }
 
     /**
