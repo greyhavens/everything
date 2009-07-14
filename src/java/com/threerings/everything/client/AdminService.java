@@ -13,7 +13,7 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerDetails;
-import com.threerings.everything.data.PlayerFullName;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.ThingStats;
 
 /**
@@ -38,7 +38,7 @@ public interface AdminService extends RemoteService
         public List<Category> pendingCategories;
 
         /** Players that have recently joined the game. */
-        public List<PlayerFullName> recentPlayers;
+        public List<PlayerName> recentPlayers;
     }
 
     /**
@@ -59,5 +59,5 @@ public interface AdminService extends RemoteService
     /**
      * Looks up players by first or last name.
      */
-    List<PlayerFullName> findPlayers (String query) throws ServiceException;
+    List<PlayerName> findPlayers (String query) throws ServiceException;
 }

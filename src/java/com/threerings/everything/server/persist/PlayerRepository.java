@@ -30,7 +30,6 @@ import com.samskivert.util.IntMaps;
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
-import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -61,14 +60,6 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Load and returns the full name of the specified player, or null if they don't exist.
-     */
-    public PlayerFullName loadPlayerFullName (int userId)
-    {
-        return PlayerRecord.TO_FULL_NAME.apply(loadPlayer(userId));
-    }
-
-    /**
      * Loads and returns the names for the supplied set of players, mapped by user id.
      */
     public IntMap<PlayerName> loadPlayerNames (Set<Integer> userIds)
@@ -84,12 +75,12 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads players that have recently joined.
      */
-    public Iterable<PlayerFullName> loadRecentPlayers (int count)
+    public Iterable<PlayerName> loadRecentPlayers (int count)
     {
         Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24*60*60*1000L);
         return findAll(PlayerRecord.class, new Where(PlayerRecord.JOINED.greaterEq(yesterday)),
                        OrderBy.descending(PlayerRecord.LAST_SESSION),
-                       new Limit(0, count)).map(PlayerRecord.TO_FULL_NAME);
+                       new Limit(0, count)).map(PlayerRecord.TO_NAME);
     }
 
     /**

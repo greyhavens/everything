@@ -23,7 +23,7 @@ import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerDetails;
-import com.threerings.everything.data.PlayerFullName;
+import com.threerings.everything.data.PlayerName;
 
 import client.util.Args;
 import client.util.Context;
@@ -80,9 +80,9 @@ public class DashboardPanel extends FlowPanel
 
         // start out displaying recently joined players
         FlowPanel recent = new FlowPanel();
-        for (PlayerFullName player : data.recentPlayers) {
-            recent.add(Widgets.newActionLabel(player.name + " " + player.surname,
-                                              onPlayerClicked(details, player.userId)));
+        for (PlayerName player : data.recentPlayers) {
+            recent.add(Widgets.newActionLabel(
+                           player.toString(), onPlayerClicked(details, player.userId)));
         }
         details.setWidget(recent);
 
@@ -114,7 +114,7 @@ public class DashboardPanel extends FlowPanel
     {
         public PlayerDetailsPanel (final PlayerDetails details) {
             super("Details", 2, 0);
-            setText(0, 0, details.fullName.name + " " + details.fullName.surname, 2, "Header");
+            setText(0, 0, details.name.toString(), 2, "Header");
             addDatum("Joined", _dfmt.format(details.joined));
             addDatum("Last seen", _dfmt.format(details.lastSession));
             addDatum("Coins", details.coins);
@@ -126,7 +126,7 @@ public class DashboardPanel extends FlowPanel
             isEditor.setValue(details.isEditor);
             new ClickCallback<Void>(isEditor) {
                 protected boolean callService () {
-                    _adminsvc.updateIsEditor(details.fullName.userId, isEditor.getValue(), this);
+                    _adminsvc.updateIsEditor(details.name.userId, isEditor.getValue(), this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {

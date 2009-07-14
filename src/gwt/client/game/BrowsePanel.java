@@ -46,7 +46,7 @@ public class BrowsePanel extends FlowPanel
     protected void init (final PlayerCollection coll)
     {
         final SmartTable table = new SmartTable(5, 0);
-        table.addText(coll.owner.name + "'s Collection", 3, "Title");
+        table.addText(coll.owner.toString() + "'s Collection", 3, "Title");
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {

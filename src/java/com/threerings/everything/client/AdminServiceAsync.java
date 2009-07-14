@@ -8,7 +8,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.PlayerDetails;
-import com.threerings.everything.data.PlayerFullName;
+import com.threerings.everything.data.PlayerName;
 
 /**
  * Provides the asynchronous version of {@link AdminService}.
@@ -33,5 +33,5 @@ public interface AdminServiceAsync
     /**
      * The async version of {@link AdminService#findPlayers}.
      */
-    void findPlayers (String query, AsyncCallback<List<PlayerFullName>> callback);
+    void findPlayers (String query, AsyncCallback<List<PlayerName>> callback);
 }

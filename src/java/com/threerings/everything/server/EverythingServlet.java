@@ -128,7 +128,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         SessionData data = new SessionData();
-        data.name = player.toName();
+        data.name = player.getName();
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
         data.coins = player.coins;

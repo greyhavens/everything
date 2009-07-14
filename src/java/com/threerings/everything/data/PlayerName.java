@@ -17,6 +17,17 @@ public class PlayerName
     /** This player's name. */
     public String name;
 
+    /** This player's surname. */
+    public String surname;
+
+    /**
+     * Formats this name for viewing.
+     */
+    public String toString ()
+    {
+        return name + " " + surname;
+    }
+
     /**
      * Returns a blank name with just the user id.
      */

@@ -184,7 +184,7 @@ public class EditCatsPanel extends SmartTable
             row.clear();
             final Widget label = selected ? Widgets.newLabel(row.cat.name, "Selected") :
                 createCatActionLabel(row.cat);
-            label.setTitle(row.cat.creator.name);
+            label.setTitle(row.cat.creator.toString());
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     onDelete(row.cat, new PopupCallback<Void>(label) {

@@ -15,7 +15,6 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.data.PlayerDetails;
-import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -63,7 +62,7 @@ public class AdminServlet extends EveryServiceServlet
     }
 
     // from interface AdminService
-    public List<PlayerFullName> findPlayers (String query) throws ServiceException
+    public List<PlayerName> findPlayers (String query) throws ServiceException
     {
         requireAdmin();
         return Lists.newArrayList(); // TODO

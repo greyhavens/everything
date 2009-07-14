@@ -71,7 +71,7 @@ public class EditSeriesPanel extends FlowPanel
         add(info);
         int row = 0;
         info.setText(row, 0, "Creator:");
-        info.setWidget(row++, 1, Args.createLink(series.creator.name, Page.BROWSE,
+        info.setWidget(row++, 1, Args.createLink(series.creator.toString(), Page.BROWSE,
                                                  series.creator.userId));
 
         if (_ctx.isAdmin() || _ctx.getMe().userId == series.getCreatorId()) {

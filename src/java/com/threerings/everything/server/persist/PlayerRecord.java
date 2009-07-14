@@ -19,7 +19,6 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerDetails;
-import com.threerings.everything.data.PlayerFullName;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -44,10 +43,6 @@ public class PlayerRecord extends PersistentRecord
     /** A function for converting this record to a {@link PlayerName}. */
     public static Function<PlayerRecord, PlayerName> TO_NAME =
         RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerName.class);
-
-    /** A function for converting this record to a {@link PlayerFullName}. */
-    public static Function<PlayerRecord, PlayerFullName> TO_FULL_NAME =
-        RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerFullName.class);
 
     /** A function for converting this record to a {@link GameStatus}. */
     public static Function<PlayerRecord, GameStatus> TO_STATUS =
@@ -94,14 +89,6 @@ public class PlayerRecord extends PersistentRecord
     public float freeFlips;
 
     /**
-     * Creates a {@link PlayerName} instance from our data.
-     */
-    public PlayerName toName ()
-    {
-        return TO_NAME.apply(this);
-    }
-
-    /**
      * Initializes {@link GameStatus#freeFlips}.
      */
     public int getFreeFlips ()
@@ -132,11 +119,11 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link PlayerDetails#fullName}.
+     * Initializes {@link PlayerDetails#name}.
      */
-    public PlayerFullName getFullName ()
+    public PlayerName getName ()
     {
-        return TO_FULL_NAME.apply(this);
+        return TO_NAME.apply(this);
     }
 
     /**

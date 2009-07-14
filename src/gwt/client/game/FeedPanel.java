@@ -56,7 +56,7 @@ public class FeedPanel extends FlowPanel
 
     protected String getName (PlayerName name, boolean capital)
     {
-        return _ctx.getMe().userId != name.userId ? name.name : (capital ? "You" : "you");
+        return _ctx.getMe().userId != name.userId ? name.toString() : (capital ? "You" : "you");
     }
 
     protected class FeedItemLabel extends FlowPanel

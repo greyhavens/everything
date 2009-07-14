@@ -78,14 +78,13 @@ public abstract class CardView extends FlowPanel
     {
         public Right (Card card)
         {
-            // add(Widgets.newLabel(card.thing.name, "Title"));
             add(Widgets.newLabel("N of M", "Position"));
             add(Widgets.newLabel(card.thing.descrip, "Descrip"));
             add(Widgets.newLabel("Facts:", "FactsTitle"));
             add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
             add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
             if (card.giver != null) {
-                add(Widgets.newLabel("A gift from " + card.giver.name, "Giver"));
+                add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
             }
             add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
                                 nameSource(card.thing.source) + "</a>", "Source"));

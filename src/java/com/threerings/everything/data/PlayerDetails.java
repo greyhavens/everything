@@ -13,8 +13,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class PlayerDetails
     implements IsSerializable
 {
-    /** This player's full name. */
-    public PlayerFullName fullName;
+    /** This player's name. */
+    public PlayerName name;
 
     /** This player's birthday. */
     public Date birthday;

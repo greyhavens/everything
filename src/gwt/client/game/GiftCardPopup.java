@@ -52,7 +52,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     {
         SmartTable grid = new SmartTable(5, 0);
         for (final FriendCardInfo info : result.friends) {
-            int row = grid.addText(info.friend.name, 1, null);
+            int row = grid.addText(info.friend.toString(), 1, null);
             if (info.hasThings > 0) {
                 grid.setText(row, 1, "Has " + info.hasThings + "/" + result.things, 1, null);
             }

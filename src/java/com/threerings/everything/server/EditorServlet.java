@@ -62,7 +62,7 @@ public class EditorServlet extends EveryServiceServlet
     public int createCategory (Category category) throws ServiceException
     {
         PlayerRecord editor = requireEditor();
-        category.creator = editor.toName();
+        category.creator = editor.getName();
         category.categoryId = _thingRepo.createCategory(category);
         _adminLogic.noteAction(editor, "created", category);
         return category.categoryId;
@@ -153,7 +153,7 @@ public class EditorServlet extends EveryServiceServlet
         }
 
         // do the deed
-        thing.creator = editor.toName();
+        thing.creator = editor.getName();
         thing.thingId = _thingRepo.createThing(thing);
         _adminLogic.noteAction(editor, "created", thing);
         return thing.thingId;
