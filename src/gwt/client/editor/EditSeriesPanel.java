@@ -14,11 +14,13 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.EnumListBox;
 import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
@@ -34,8 +36,10 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
 import client.game.CardView;
+import client.util.Args;
 import client.util.Context;
 import client.util.MediaUploader;
+import client.util.Page;
 import client.util.PanelCallback;
 
 /**
@@ -57,47 +61,114 @@ public class EditSeriesPanel extends FlowPanel
         });
     }
 
-    protected void init (EditorService.SeriesResult result)
+    protected void init (final EditorService.SeriesResult result)
     {
-//         @Override protected void initItemRow (final Row<Category> row, boolean selected) {
-//             super.initItemRow(row, selected);
-//             // only admins get a checkbox to activate/deactivate a category
-//             if (!_ctx.isAdmin()) {
-//                 return;
-//             }
-//             row.add(Widgets.newShim(5, 5));
-//             final CheckBox active = new CheckBox();
-//             row.add(active);
-//             active.setTitle("Series Active");
-//             active.setValue(row.item.active);
-//             active.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-//                 public void onValueChange (ValueChangeEvent<Boolean> event) {
-//                     row.item.active = event.getValue();
-//                     active.setEnabled(false);
-//                     _editorsvc.updateCategory(row.item, new PopupCallback<Void>() {
-//                         public void onSuccess (Void result) {
-//                             String msg = row.item.active ?
-//                                 "Category activated." : "Category deactivated.";
-//                             Popups.infoNear(msg, active);
-//                             active.setEnabled(true);
-//                             _child.load(); // reload the thing list which will re-en/disable
-//                         }
-//                     });
-//                 }
-//             });
-//         }
-
+        // add some metadata at the top
+        final Category series = result.categories[result.categories.length-1];
         add(Widgets.newHTML(Category.getHierarchyHTML(result.categories), "Title"));
 
+        SmartTable info = new SmartTable(5, 0);
+        add(info);
+        info.setText(1, 0, "Creator:");
+        info.setWidget(1, 1, Args.createLink(series.creator.name, Page.BROWSE,
+                                             series.creator.userId));
+        final CheckBox active = new CheckBox();
+        active.setValue(series.active);
+        active.setEnabled(_ctx.isAdmin());
+        info.setText(2, 0, "Activated:");
+        info.setWidget(2, 1, active);
+        if (_ctx.isAdmin()) {
+            new ClickCallback<Void>(active) {
+                protected boolean callService () {
+                    series.active = active.getValue();
+                    _editorsvc.updateCategory(series, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    String msg = series.active ? "Category activated." : "Category deactivated.";
+                    Popups.infoNear(msg, active);
+                    updateActive(series);
+                    return true;
+                }
+            };
+        }
+
+        // then add all of our things
         for (Thing thing : result.things) {
             // create a fake card and display it
-            Card card = new Card();
-            card.owner = _ctx.getMe();
-            card.categories = result.categories;
-            card.thing = thing;
-            card.created = new Date();
-            add(new ThingEditor(card));
+            add(new ThingEditor(createCard(result.categories, thing)));
         }
+
+        // finally add a UI for creating new things
+        final TextBox name = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
+        DefaultTextListener.configure(name, "<new thing name>");
+        Button create = new Button("Add Thing");
+        new ClickCallback<Integer>(create, name) {
+            protected boolean callService () {
+                String text = name.getText().trim();
+                if (text.length() == 0) {
+                    return false;
+                }
+                _thing = createBlankThing(text, series.categoryId);
+                _editorsvc.createThing(_thing, this);
+                return true;
+            }
+
+            protected boolean gotResult (Integer thingId) {
+                _thing.thingId = thingId;
+                name.setText("");
+                ThingEditor editor = new ThingEditor(createCard(result.categories, _thing));
+                insert(editor, getWidgetCount()-1);
+                editor.setEditing(true);
+                _thing = null;
+                return true;
+            }
+
+            protected Thing _thing;
+        };
+        add(Widgets.newRow(name, create));
+
+        // only allow adding new items if the series is active
+        updateActive(series);
+    }
+
+    protected void updateActive (Category series)
+    {
+        boolean editable = !series.active &&
+            (series.getCreatorId() == _ctx.getMe().userId || _ctx.isAdmin());
+        for (int ii = 0; ii < getWidgetCount(); ii++) {
+            Widget child = getWidget(ii);
+            if (child instanceof ThingEditor) {
+                ((ThingEditor)child).setEditable(editable);
+            } else if (child instanceof TextBox) {
+                ((TextBox)child).setEnabled(editable);
+            }
+        }
+    }
+
+    protected Card createCard (Category[] categories, Thing thing)
+    {
+        Card card = new Card();
+        card.owner = _ctx.getMe();
+        card.categories = categories;
+        card.thing = thing;
+        card.created = new Date();
+        return card;
+    }
+
+    protected Thing createBlankThing (String name, int categoryId)
+    {
+        Thing thing = new Thing();
+        thing.name = name;
+        thing.categoryId = categoryId;
+        thing.rarity = Rarity.I;
+        thing.image = "";
+        thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
+            "your description and facts fit on the Thing display.";
+        thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
+            "bullet point and start the next.";
+        thing.source = "http://wikipedia.org/Todo";
+        return thing;
     }
 
     protected class ThingEditor extends FlowPanel
@@ -106,15 +177,15 @@ public class EditSeriesPanel extends FlowPanel
             setStyleName("Editor");
 
             int row = 0;
-            _bits = new SmartTable(5, 0);
-            _bits.setText(row, 0, "Name", 1, "right");
+            _ctrl = new SmartTable(5, 0);
+            _ctrl.setText(row, 0, "Name", 1, "right");
             final TextBox name = Widgets.newTextBox(card.thing.name, Thing.MAX_NAME_LENGTH, 15);
-            _bits.setWidget(row, 1, name);
+            _ctrl.setWidget(row, 1, name);
 
-            _bits.setText(row, 2, "Rarity", 1, "right");
+            _ctrl.setText(row, 2, "Rarity", 1, "right");
             final EnumListBox<Rarity> rarity = new EnumListBox<Rarity>(Rarity.class);
             rarity.setSelectedValue(card.thing.rarity);
-            _bits.setWidget(row++, 3, rarity);
+            _ctrl.setWidget(row++, 3, rarity);
             rarity.addChangeHandler(new ChangeHandler() {
                 public void onChange (ChangeEvent event) {
                     card.thing.rarity = rarity.getSelectedValue();
@@ -122,28 +193,40 @@ public class EditSeriesPanel extends FlowPanel
                 }
             });
 
-            _bits.setText(row, 0, "Image", 1, "right");
-            _bits.setWidget(row++, 1, new MediaUploader(new MediaUploader.Listener() {
+            _ctrl.setText(row, 0, "Image", 1, "right");
+            _ctrl.setWidget(row++, 1, new MediaUploader(new MediaUploader.Listener() {
                 public void mediaUploaded (String name) {
                     card.thing.image = name;
                     updateCard(card);
                 }
             }));
 
-            _bits.setText(row, 0, "Descrip", 1, "right");
+            _ctrl.setText(row, 0, "Descrip", 1, "right");
             final LimitedTextArea descrip = Widgets.newTextArea(
                 card.thing.descrip, -1, 2, Thing.MAX_DESCRIP_LENGTH);
-            _bits.setWidget(row++, 1, descrip, 3, "Wide");
+            _ctrl.setWidget(row++, 1, descrip, 3, "Wide");
 
-            _bits.setText(row, 0, "Facts", 1, "right");
+            _ctrl.setText(row, 0, "Facts", 1, "right");
             final LimitedTextArea facts = Widgets.newTextArea(
                 card.thing.facts, -1, 4, Thing.MAX_FACTS_LENGTH);
-            _bits.setWidget(row++, 1, facts, 3, "Wide");
+            _ctrl.setWidget(row++, 1, facts, 3, "Wide");
 
-            _bits.setText(row, 0, "Source", 1, "right");
+            _ctrl.setText(row, 0, "Source", 1, "right");
             final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
-            _bits.setWidget(row++, 1, source, 3, "Wide");
+            _ctrl.setWidget(row++, 1, source, 3, "Wide");
 
+            Button delete = new Button("Delete");
+            new ClickCallback<Void>(delete) {
+                protected boolean callService () {
+                    _editorsvc.deleteThing(card.thing.thingId, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    ((FlowPanel)getParent()).remove(ThingEditor.this);
+                    Popups.info("Thing deleted.");
+                    return false;
+                }
+            }.setConfirmText("Are you sure you want to delete this thing?");
             final Button save = new Button("Save");
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
@@ -158,12 +241,11 @@ public class EditSeriesPanel extends FlowPanel
             Button done = new Button("Done", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     // TODO: check for unsaved modifications
-                    remove(_bits);
-                    add(_edit);
+                    setEditing(false);
                 }
             });
-            _bits.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
-            _bits.setWidget(row++, 1, Widgets.newRow(save, done), 3, null);
+            _ctrl.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
+            _ctrl.setWidget(row++, 1, Widgets.newRow(delete, save, done), 3, null);
                     
             final Timer updater = new Timer() {
                 @Override public void run () {
@@ -190,10 +272,29 @@ public class EditSeriesPanel extends FlowPanel
 
             add(_edit = Widgets.newActionLabel("Edit", "Edit", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    remove(_edit);
-                    add(_bits);
+                    setEditing(true);
                 }
             }));
+        }
+
+        public void setEditable (boolean editable)
+        {
+            remove(_ctrl);
+            remove(_edit);
+            if (editable) {
+                add(_edit);
+            }
+        }
+
+        public void setEditing (boolean editing)
+        {
+            remove(_ctrl);
+            remove(_edit);
+            if (editing) {
+                add(_ctrl);
+            } else {
+                add(_edit);
+            }
         }
 
         protected void updateCard (Card card) {
@@ -203,7 +304,7 @@ public class EditSeriesPanel extends FlowPanel
             insert(CardView.create(card), 0);
         }
 
-        protected SmartTable _bits;
+        protected SmartTable _ctrl;
         protected Widget _edit;
     }
 

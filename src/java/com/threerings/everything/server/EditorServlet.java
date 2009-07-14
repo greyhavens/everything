@@ -110,6 +110,8 @@ public class EditorServlet extends EveryServiceServlet
         requireEditor();
         SeriesResult result = new SeriesResult();
         result.categories = _gameLogic.resolveCategories(categoryId);
+        Category series = result.categories[result.categories.length-1];
+        series.creator = _playerRepo.loadPlayerName(series.creator.userId);
         result.things = sort(Lists.newArrayList(_thingRepo.loadThings(categoryId)));
         return result;
     }

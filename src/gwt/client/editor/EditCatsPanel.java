@@ -286,35 +286,6 @@ public class EditCatsPanel extends SmartTable
         }
     };
 
-//     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
-//         @Override public void clear () {
-//             super.clear();
-//             setText(1, 0, "", getCellCount(0), null);
-//         }
-
-//         @Override public void setSelected (Thing item) {
-//             super.setSelected(item);
-//             // create a fake card and display it
-//             Card card = new Card();
-//             card.owner = _ctx.getMe();
-//             card.categories = new Category[] {
-//                 _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
-//             card.thing = item;
-//             card.created = new Date();
-//             setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
-//         }
-
-//         protected void callLoad (AsyncCallback<List<Thing>> callback) {
-//             Category category = _series.getSelected();
-//             if (category != null) {
-//                 _editorsvc.loadThings(_categoryId = category.categoryId, callback);
-//             }
-//         }
-
-//         protected String getName (Thing thing) {
-//             return thing.name;
-//         }
-
 //         @Override protected boolean isEditable () {
 //             Category series = _series.getSelected();
 //             return !series.active && (series.creatorId == _ctx.getMe().userId || _ctx.isAdmin());

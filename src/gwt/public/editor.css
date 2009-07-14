@@ -21,8 +21,12 @@
   font-weight: bold;
 }
 
+.editSeries .cardView {
+  margin: 5px 0px;
+}
+
 .editSeries .Editor .Edit {
-  margin: -22px 7px 0px 5px;
+  margin: -27px 0px 7px 5px;
 }
 
 .editSeries .Editor .Wide .gwt-TextArea, .editSeries .Editor .Wide .gwt-TextBox {
