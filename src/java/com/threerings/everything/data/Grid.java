@@ -4,7 +4,6 @@
 package com.threerings.everything.data;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

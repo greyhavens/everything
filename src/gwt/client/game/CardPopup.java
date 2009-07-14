@@ -21,7 +21,6 @@ import com.threerings.everything.data.CardIdent;
 import client.ui.DataPopup;
 import client.util.ClickCallback;
 import client.util.Context;
-import client.util.PopupCallback;
 
 /**
  * Displays a full-sized card in a nice looking popup.

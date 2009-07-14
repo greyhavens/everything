@@ -18,11 +18,7 @@ import com.google.inject.Inject;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 
-import com.threerings.user.OOOUser;
-
 import com.threerings.samsara.app.client.ServiceException;
-import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
@@ -41,7 +37,6 @@ import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
-import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;

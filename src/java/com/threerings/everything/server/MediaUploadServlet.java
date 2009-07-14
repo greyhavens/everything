@@ -3,28 +3,14 @@
 
 package com.threerings.everything.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
-import java.util.List;
-import java.util.Map;
-
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import org.apache.commons.fileupload.FileItem;
@@ -33,14 +19,11 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.samskivert.io.StreamUtil;
-import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServlet;
-import com.threerings.user.OOOUser;
 
-import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 

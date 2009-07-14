@@ -5,22 +5,17 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.depot.DepotRepository;
-import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
-import com.samskivert.depot.clause.Join;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -29,7 +24,6 @@ import com.samskivert.util.IntMaps;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
-import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerName;
 
 /**

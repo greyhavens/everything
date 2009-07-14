@@ -12,7 +12,6 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import com.samskivert.depot.PersistenceContext;
 import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
 import com.threerings.util.PostgresUtil;

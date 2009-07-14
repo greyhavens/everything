@@ -25,9 +25,7 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
-import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Rarity;
-import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 
 import com.threerings.everything.server.persist.CardRecord;

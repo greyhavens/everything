@@ -4,7 +4,6 @@
 package client;
 
 import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.Hyperlink;
 
 import com.threerings.gwt.ui.SmartTable;
 

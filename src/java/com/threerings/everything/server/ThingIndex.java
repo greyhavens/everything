@@ -14,7 +14,6 @@ import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
 
-import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
 import static com.threerings.everything.Log.log;

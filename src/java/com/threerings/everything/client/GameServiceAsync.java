@@ -7,7 +7,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
-import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Series;
 

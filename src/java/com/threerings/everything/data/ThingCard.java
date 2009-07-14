@@ -5,8 +5,6 @@ package com.threerings.everything.data;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import java.util.Date;
-
 /**
  * Contains brief summary info for a thing.
  */

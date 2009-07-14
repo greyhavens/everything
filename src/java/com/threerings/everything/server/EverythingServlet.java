@@ -35,7 +35,6 @@ import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
-import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
@@ -43,7 +42,6 @@ import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
-import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;

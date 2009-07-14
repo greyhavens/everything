@@ -8,24 +8,18 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.samskivert.util.IntMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
-import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;

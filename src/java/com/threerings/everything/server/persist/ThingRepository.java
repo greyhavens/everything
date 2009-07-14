@@ -24,7 +24,6 @@ import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
-import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;

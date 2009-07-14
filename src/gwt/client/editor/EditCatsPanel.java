@@ -3,51 +3,31 @@
 
 package client.editor;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
-import com.threerings.gwt.ui.EnumListBox;
-import com.threerings.gwt.ui.LimitedTextArea;
-import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.client.EditorServiceAsync;
-import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
-import com.threerings.everything.data.Rarity;
-import com.threerings.everything.data.Thing;
 
-import client.game.CardView;
 import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
-import client.util.MediaUploader;
 import client.util.Page;
 import client.util.PopupCallback;
 
