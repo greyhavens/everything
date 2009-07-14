@@ -53,9 +53,14 @@ public class Args
     public Args (String token)
     {
         String[] args = token.split(SEPARATOR);
-        this.page = parsePage(args[0]);
-        _args = new String[args.length-1];
-        System.arraycopy(args, 1, _args, 0, _args.length);
+        if (args.length > 0) {
+            this.page = parsePage(args[0]);
+            _args = new String[args.length-1];
+            System.arraycopy(args, 1, _args, 0, _args.length);
+        } else {
+            this.page = Page.LANDING;
+            _args = new String[0];
+        }
     }
 
     /**
