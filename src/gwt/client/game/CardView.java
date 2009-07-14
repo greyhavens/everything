@@ -67,7 +67,6 @@ public abstract class CardView extends FlowPanel
         public Left (Card card)
         {
             add(Widgets.newLabel(card.thing.name, "Title"));
-
             StringBuilder buf = new StringBuilder();
             for (Category cat : card.categories) {
                 if (buf.length() > 0) {
@@ -76,11 +75,10 @@ public abstract class CardView extends FlowPanel
                 buf.append(cat.name);
             }
             add(Widgets.newHTML(buf.toString(), "Categories"));
-
             add(ImageUtil.getImageBox(card.thing.image));
-
-            add(Widgets.newFlowPanel("Rarity",
-                                     Widgets.newInlineLabel("Rarity: " + card.thing.rarity + " - "),
+            add(Widgets.newFlowPanel("Metrics",
+                                     new RarityLabel(card.thing.rarity),
+                                     Widgets.newInlineLabel(" - "),
                                      new CoinLabel("Value: ", card.thing.rarity.value)));
         }
     }
@@ -91,18 +89,13 @@ public abstract class CardView extends FlowPanel
         {
             // add(Widgets.newLabel(card.thing.name, "Title"));
             add(Widgets.newLabel("N of M", "Position"));
-
             add(Widgets.newLabel(card.thing.descrip, "Descrip"));
-
             add(Widgets.newLabel("Facts:", "FactsTitle"));
-
             add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
-
             add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
             if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver.name, "Giver"));
             }
-
             add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
                                 nameSource(card.thing.source) + "</a>", "Source"));
         }

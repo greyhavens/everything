@@ -35,6 +35,6 @@ public class ThingCardView extends FlowPanel
         String name = (card == null || card.name == null) ? "?" : card.name;
         add(Widgets.newLabel(name, "Name"));
         add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
-        add(Widgets.newLabel(card == null ? "?" : card.rarity.toString(), "Rarity"));
+        add(new RarityLabel(card == null ? null : card.rarity));
     }
 }
