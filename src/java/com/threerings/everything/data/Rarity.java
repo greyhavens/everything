@@ -10,7 +10,7 @@ import com.samskivert.depot.ByteEnum;
  */
 public enum Rarity implements ByteEnum
 {
-    I(0, 10, "Ultra common"),
+    I(0, 10, "Grows on trees"),
     II(1, 20, "Very common"),
     III(2, 35, "Common"),
     IV(3, 55, "Fairly common"),
