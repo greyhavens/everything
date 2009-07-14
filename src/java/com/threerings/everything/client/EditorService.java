@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Thing;
 
 /**
@@ -41,6 +42,9 @@ public interface EditorService extends RemoteService
         /** The categories of this series. */
         public Category[] categories;
 
+        /** The comments made on this series. */
+        public List<CategoryComment> comments;
+
         /** The things in this series. */
         public List<Thing> things;
     }
@@ -67,6 +71,11 @@ public interface EditorService extends RemoteService
      * Deletes the specified category, which must have no child categories, nor things.
      */
     void deleteCategory (int categoryId) throws ServiceException;
+
+    /**
+     * Posts a comment about this category which shows up in its creator's feed.
+     */
+    CategoryComment postComment (int categoryId, String message) throws ServiceException;
 
     /**
      * Loads all of the things in the specified series.

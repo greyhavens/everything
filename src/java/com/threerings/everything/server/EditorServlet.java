@@ -23,6 +23,7 @@ import com.threerings.samsara.app.server.AppServiceServlet;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Thing;
@@ -41,23 +42,10 @@ public class EditorServlet extends EveryServiceServlet
     // from interface EditorService
     public List<Category> loadCategories (int parentId) throws ServiceException
     {
-        requireEditor();
-
-        // load up the categories in question
+        PlayerRecord editor = requireEditor();
+        // load up the categories in question and resolve their names
         List<Category> cats = sort(Lists.newArrayList(_thingRepo.loadCategories(parentId)));
-
-        // resolve the creator name of these categories
-        IntMap<PlayerName> names = _playerRepo.loadPlayerNames(
-            Sets.newHashSet(Iterables.transform(cats, new Function<Category, Integer>() {
-                public Integer apply (Category cat) {
-                    return cat.getCreatorId();
-                }
-            })));
-        for (Category cat : cats) {
-            cat.creator = names.get(cat.creator.userId);
-        }
-
-        return cats;
+        return _playerLogic.resolveNames(cats, editor.getName());
     }
 
     // from interface EditorService
@@ -127,13 +115,32 @@ public class EditorServlet extends EveryServiceServlet
     }
 
     // from interface EditorService
+    public CategoryComment postComment (int categoryId, String message) throws ServiceException
+    {
+        PlayerRecord editor = requireEditor();
+        Category category = _thingRepo.loadCategory(categoryId);
+        if (category == null) {
+            log.warning("Requested to comment on non-existent series", "who", editor.who(),
+                        "catId", categoryId);
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+
+        // record this comment to the thing repository
+        CategoryComment comment = _thingRepo.recordComment(categoryId, editor.userId, message);
+        comment.commentor = editor.getName();
+        return comment;
+    }
+
+    // from interface EditorService
     public SeriesResult loadSeries (int categoryId) throws ServiceException
     {
-        requireEditor();
+        PlayerRecord editor = requireEditor();
         SeriesResult result = new SeriesResult();
         result.categories = _gameLogic.resolveCategories(categoryId);
         Category series = result.categories[result.categories.length-1];
         series.creator = _playerRepo.loadPlayerName(series.creator.userId);
+        result.comments = Lists.newArrayList(_thingRepo.loadComments(categoryId));
+        _playerLogic.resolveNames(result.comments, series.creator, editor.getName());
         result.things = sort(Lists.newArrayList(_thingRepo.loadThings(categoryId)));
         return result;
     }
@@ -228,5 +235,6 @@ public class EditorServlet extends EveryServiceServlet
     @Inject protected AdminLogic _adminLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected MediaLogic _mediaLogic;
+    @Inject protected PlayerLogic _playerLogic;
     @Inject protected ThingRepository _thingRepo;
 }

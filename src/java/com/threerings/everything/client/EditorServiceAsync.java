@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Thing;
 
 /**
@@ -34,6 +35,11 @@ public interface EditorServiceAsync
      * The async version of {@link EditorService#deleteCategory}.
      */
     void deleteCategory (int categoryId, AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link EditorService#postComment}.
+     */
+    void postComment (int categoryId, String message, AsyncCallback<CategoryComment> callback);
 
     /**
      * The async version of {@link EditorService#loadSeries}.

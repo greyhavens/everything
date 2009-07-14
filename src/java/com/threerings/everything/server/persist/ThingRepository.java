@@ -3,6 +3,7 @@
 
 package com.threerings.everything.server.persist;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -12,14 +13,17 @@ import com.google.inject.Singleton;
 
 import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
+import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
@@ -117,6 +121,48 @@ public class ThingRepository extends DepotRepository
     public void deleteCategory (Category category)
     {
         delete(CategoryRecord.getKey(category.categoryId));
+        deleteAll(CategoryCommentRecord.class,
+                  new Where(CategoryCommentRecord.CATEGORY_ID.eq(category.categoryId)), null);
+    }
+
+    /**
+     * Loads all comments made on the specified category, ordered from most to least recent.
+     */
+    public Iterable<CategoryComment> loadComments (int categoryId)
+    {
+        return findAll(CategoryCommentRecord.class,
+                       new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
+                       OrderBy.descending(CategoryCommentRecord.WHEN)).
+            map(CategoryCommentRecord.TO_COMMENT);
+    }
+
+    /**
+     * Loads all comments made since the specified cutoff in any category created by the specified
+     * user, ordered from most to least recent.
+     */
+    public Iterable<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
+    {
+        Timestamp since = new Timestamp(sinceStamp);
+        return findAll(CategoryCommentRecord.class,
+                       CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
+                       new Where(Ops.and(CategoryRecord.CREATOR_ID.eq(creatorId),
+                                         CategoryCommentRecord.WHEN.greaterEq(since))),
+                       OrderBy.descending(CategoryCommentRecord.WHEN)).
+            map(CategoryCommentRecord.TO_COMMENT);
+    }
+
+    /**
+     * Records a comment to a category. Returns the newly created comment record.
+     */
+    public CategoryComment recordComment (int categoryId, int commentorId, String message)
+    {
+        CategoryCommentRecord record = new CategoryCommentRecord();
+        record.categoryId = categoryId;
+        record.when = new Timestamp(System.currentTimeMillis());
+        record.commentorId = commentorId;
+        record.message = message;
+        insert(record);
+        return CategoryCommentRecord.TO_COMMENT.apply(record);
     }
 
     /**
@@ -251,6 +297,7 @@ public class ThingRepository extends DepotRepository
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
+        classes.add(CategoryCommentRecord.class);
         classes.add(CategoryRecord.class);
         classes.add(ThingRecord.class);
     }
