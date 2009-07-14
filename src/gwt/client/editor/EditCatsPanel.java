@@ -73,20 +73,20 @@ public class EditCatsPanel extends SmartTable
         _cats.load();
     }
 
-    protected static class Row<T> extends HorizontalPanel
+    protected static class Row extends HorizontalPanel
     {
-        public final T item;
-        public Row (T item) {
-            this.item = item;
+        public final Category cat;
+        public Row (Category cat) {
+            this.cat = cat;
         }
     }
 
-    protected abstract class Column<T> extends FlowPanel
+    protected abstract class Column extends FlowPanel
     {
-        public Column (String header, int maxlen) {
+        public Column (String header) {
             setStyleName("Column");
             add(Widgets.newLabel(header, "Header"));
-            add(_input = Widgets.newTextBox("", maxlen, 15));
+            add(_input = Widgets.newTextBox("", Category.MAX_NAME_LENGTH, 15));
             add(_contents = Widgets.newFlowPanel("List"));
             add(_empty = Widgets.newLabel("<empty>", null));
             DefaultTextListener.configure(_input, "<add new>");
@@ -98,36 +98,36 @@ public class EditCatsPanel extends SmartTable
                     if (text.length() == 0) {
                         return false;
                     }
-                    _item = onCreate(text, this);
+                    _cat = onCreate(text, this);
                     return true;
                 }
                 protected boolean gotResult (Integer result) {
-                    onCreated(result, _item);
-                    _item = null;
+                    onCreated(result, _cat);
+                    _cat = null;
                     _input.setText("");
                     return true;
                 }
-                protected T _item;
+                protected Category _cat;
             };
 
             // start off disabled
             setEnabled(false);
         }
 
-        public void setChild (Column<?> child) {
+        public void setChild (Column child) {
             _child = child;
         }
 
         public void load () {
             clear();
             _contents.add(Widgets.newLabel("Loading...", null));
-            callLoad(new PopupCallback<List<T>>(_input) {
-                public void onSuccess (List<T> items) {
+            callLoad(new PopupCallback<List<Category>>(_input) {
+                public void onSuccess (List<Category> cats) {
                     _contents.clear();
-                    for (T item : items) {
-                        addItem(item);
+                    for (Category cat : cats) {
+                        addCat(cat);
                     }
-                    _empty.setVisible(items.size() == 0);
+                    _empty.setVisible(cats.size() == 0);
                     setEnabled(isEditable());
                 }
             });
@@ -145,21 +145,21 @@ public class EditCatsPanel extends SmartTable
             _input.setEnabled(enabled);
         }
 
-        public T getSelected () {
+        public Category getSelected () {
             return _selected;
         }
 
-        public void setSelected (T item) {
-            // deselect the old item row and select the new
+        public void setSelected (Category cat) {
+            // deselect the old cat row and select the new
             for (int ii = 0; ii < _contents.getWidgetCount(); ii++) {
-                Row<T> row = (Row<T>)_contents.getWidget(ii);
-                if (row.item == _selected) {
-                    initItemRow(row, false);
-                } else if (row.item == item) {
-                    initItemRow(row, true);
+                Row row = (Row)_contents.getWidget(ii);
+                if (row.cat == _selected) {
+                    initCatRow(row, false);
+                } else if (row.cat == cat) {
+                    initCatRow(row, true);
                 }
             }
-            _selected = item;
+            _selected = cat;
             if (_child != null) {
                 if (_selected != null) {
                     _child.load();
@@ -169,9 +169,9 @@ public class EditCatsPanel extends SmartTable
             }
         }
 
-        public void addItem (T item) {
-            Row<T> row = new Row<T>(item);
-            initItemRow(row, false);
+        public void addCat (Category cat) {
+            Row row = new Row(cat);
+            initCatRow(row, false);
             _contents.add(row);
         }
 
@@ -179,17 +179,18 @@ public class EditCatsPanel extends SmartTable
             return true;
         }
 
-        protected void initItemRow (final Row<T> row, boolean selected)
+        protected void initCatRow (final Row row, boolean selected)
         {
             row.clear();
-            final Widget label = selected ? Widgets.newLabel(getName(row.item), "Selected") :
-                createItemActionLabel(row.item);
+            final Widget label = selected ? Widgets.newLabel(row.cat.name, "Selected") :
+                createCatActionLabel(row.cat);
+            label.setTitle(row.cat.creator.name);
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    onDelete(row.item, new PopupCallback<Void>(label) {
+                    onDelete(row.cat, new PopupCallback<Void>(label) {
                         public void onSuccess (Void result) {
                             _contents.remove(row);
-                            if (row.item == _selected) {
+                            if (row.cat == _selected) {
                                 setSelected(null);
                             }
                         }
@@ -200,42 +201,19 @@ public class EditCatsPanel extends SmartTable
             row.add(label);
         }
 
-        protected Widget createItemActionLabel (final T item)
+        protected Widget createCatActionLabel (final Category cat)
         {
-            return Widgets.newActionLabel(getName(item), new ClickHandler() {
+            return Widgets.newActionLabel(cat.name, new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    setSelected(item);
+                    setSelected(cat);
                 }
             });
         }
 
-        protected void itemAdded (T item) {
+        protected void catAdded (Category cat) {
             _empty.setVisible(false);
-            addItem(item);
-            setSelected(item);
-        }
-
-        protected abstract void callLoad (AsyncCallback<List<T>> callback);
-        protected abstract String getName (T object);
-        protected abstract T onCreate (String text, AsyncCallback<Integer> callback);
-        protected abstract void onCreated (int createdId, T object);
-        protected abstract void onDelete (T object, AsyncCallback<Void> callback);
-
-        protected T _selected;
-        protected Column<?> _child;
-        protected FlowPanel _contents;
-        protected TextBox _input;
-        protected Label _empty;
-    }
-
-    protected abstract class CategoryColumn extends Column<Category>
-    {
-        public CategoryColumn (String title) {
-            super(title, Category.MAX_NAME_LENGTH);
-        }
-
-        protected String getName (Category category) {
-            return category.name;
+            addCat(cat);
+            setSelected(cat);
         }
 
         protected Category onCreate (String text, AsyncCallback<Integer> callback) {
@@ -248,23 +226,30 @@ public class EditCatsPanel extends SmartTable
 
         protected void onCreated (int createdId, Category cat) {
             cat.categoryId = createdId;
-            itemAdded(cat);
+            catAdded(cat);
         }
 
         protected void onDelete (Category category, AsyncCallback<Void> callback) {
             _editorsvc.deleteCategory(category.categoryId, callback);
         }
 
+        protected abstract void callLoad (AsyncCallback<List<Category>> callback);
+
+        protected Category _selected;
+        protected Column _child;
+        protected FlowPanel _contents;
+        protected TextBox _input;
+        protected Label _empty;
         protected int _parentId;
     }
 
-    protected CategoryColumn _cats = new CategoryColumn("Categories") {
+    protected Column _cats = new Column("Categories") {
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             _editorsvc.loadCategories(0, callback);
         }
     };
 
-    protected CategoryColumn _subcats = new CategoryColumn("Sub-categories") {
+    protected Column _subcats = new Column("Sub-categories") {
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             Category parent = _cats.getSelected();
             if (parent != null) {
@@ -273,7 +258,7 @@ public class EditCatsPanel extends SmartTable
         }
     };
 
-    protected CategoryColumn _series = new CategoryColumn("Series") {
+    protected Column _series = new Column("Series") {
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             Category parent = _subcats.getSelected();
             if (parent != null) {
@@ -281,49 +266,10 @@ public class EditCatsPanel extends SmartTable
             }
         }
 
-        @Override protected Widget createItemActionLabel (Category item) {
-            return Args.createLink(getName(item), Page.EDIT_SERIES, item.categoryId);
+        @Override protected Widget createCatActionLabel (Category cat) {
+            return Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId);
         }
     };
-
-//         @Override protected boolean isEditable () {
-//             Category series = _series.getSelected();
-//             return !series.active && (series.creatorId == _ctx.getMe().userId || _ctx.isAdmin());
-//         }
-
-//         @Override protected void initItemRow (Row<Thing> row, boolean selected) {
-//             super.initItemRow(row, selected);
-//             row.add(Widgets.newShim(5, 5));
-//             row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
-//         }
-
-//         protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
-//             Thing thing = new Thing();
-//             thing.name = text;
-//             thing.categoryId = _categoryId;
-//             // set up the thing with defaults which can be edited once it is created
-//             thing.rarity = Rarity.I;
-//             thing.image = "";
-//             thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
-//                 "your description and facts fit on the Thing display.";
-//             thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
-//                 "bullet point and start the next.";
-//             thing.source = "http://wikipedia.org/Todo";
-//             _editorsvc.createThing(thing, callback);
-//             return thing;
-//         }
-
-//         protected void onCreated (int createdId, Thing thing) {
-//             thing.thingId = createdId;
-//             itemAdded(thing);
-//         }
-
-//         protected void onDelete (Thing object, AsyncCallback<Void> callback) {
-//             _editorsvc.deleteThing(object.thingId, callback);
-//         }
-
-//         protected int _categoryId;
-//     };
 
     protected Context _ctx;
 

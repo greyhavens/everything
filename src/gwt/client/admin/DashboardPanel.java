@@ -63,28 +63,20 @@ public class DashboardPanel extends FlowPanel
         stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
         stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards, null));
         contents.setWidget(1, 0, stats);
+        contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
 
         // this is where we'll stuff player details
         SimplePanel details = new SimplePanel();
 
-        // display our pending categories
-        contents.setText(2, 0, "Pending Categories", 1, "Header");
-        FlowPanel cats = new FlowPanel();
-        for (Category cat : data.pendingCategories) {
-            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
-        }
-        contents.setWidget(3, 0, cats);
-
         // display our find player interface
-        contents.setText(0, 1, "Find Player", 1, "Header");
+        contents.setText(2, 0, "Find Player", 1, "Header");
         final FlowPanel players = new FlowPanel();
         final TextBox search = Widgets.newTextBox("", 128, 20);
         DefaultTextListener.configure(search, "<find player>");
         players.add(search);
         players.add(details);
-        contents.setWidget(1, 1, players);
-        contents.getFlexCellFormatter().setRowSpan(1, 1, 3);
-        contents.getFlexCellFormatter().setVerticalAlignment(1, 1, HasAlignment.ALIGN_TOP);
+        contents.setWidget(3, 0, players);
+        contents.getFlexCellFormatter().setVerticalAlignment(3, 0, HasAlignment.ALIGN_TOP);
 
         // start out displaying recently joined players
         FlowPanel recent = new FlowPanel();
@@ -93,6 +85,16 @@ public class DashboardPanel extends FlowPanel
                                               onPlayerClicked(details, player.userId)));
         }
         details.setWidget(recent);
+
+        // display our pending categories
+        contents.setText(0, 1, "Pending Categories", 1, "Header");
+        FlowPanel cats = new FlowPanel();
+        for (Category cat : data.pendingCategories) {
+            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
+        }
+        contents.setWidget(1, 1, cats);
+        contents.getFlexCellFormatter().setVerticalAlignment(1, 1, HasAlignment.ALIGN_TOP);
+        contents.getFlexCellFormatter().setRowSpan(1, 1, 3);
     }
 
     protected ClickHandler onPlayerClicked (final SimplePanel details, final int userId)

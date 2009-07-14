@@ -69,14 +69,35 @@ public class EditSeriesPanel extends FlowPanel
 
         SmartTable info = new SmartTable(5, 0);
         add(info);
-        info.setText(1, 0, "Creator:");
-        info.setWidget(1, 1, Args.createLink(series.creator.name, Page.BROWSE,
-                                             series.creator.userId));
+        int row = 0;
+        info.setText(row, 0, "Creator:");
+        info.setWidget(row++, 1, Args.createLink(series.creator.name, Page.BROWSE,
+                                                 series.creator.userId));
+
+        if (_ctx.isAdmin() || _ctx.getMe().userId == series.getCreatorId()) {
+            final TextBox name = Widgets.newTextBox(series.name, Category.MAX_NAME_LENGTH, 15);
+            Button update = new Button("Update");
+            info.setText(row, 0, "Name:");
+            info.setWidget(row, 1, name);
+            info.setWidget(row++, 2, update);
+            new ClickCallback<Void>(update, name) {
+                protected boolean callService () {
+                    series.name = name.getText().trim();
+                    _editorsvc.updateCategory(series, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    Popups.infoNear("Name updated.", name);
+                    return true;
+                }
+            };
+        }
+
         final CheckBox active = new CheckBox();
         active.setValue(series.active);
         active.setEnabled(_ctx.isAdmin());
-        info.setText(2, 0, "Activated:");
-        info.setWidget(2, 1, active);
+        info.setText(row, 0, "Activated:");
+        info.setWidget(row++, 1, active);
         if (_ctx.isAdmin()) {
             new ClickCallback<Void>(active) {
                 protected boolean callService () {
@@ -100,12 +121,12 @@ public class EditSeriesPanel extends FlowPanel
         }
 
         // finally add a UI for creating new things
-        final TextBox name = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
-        DefaultTextListener.configure(name, "<new thing name>");
+        final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
+        DefaultTextListener.configure(thing, "<new thing name>");
         Button create = new Button("Add Thing");
-        new ClickCallback<Integer>(create, name) {
+        new ClickCallback<Integer>(create, thing) {
             protected boolean callService () {
-                String text = name.getText().trim();
+                String text = thing.getText().trim();
                 if (text.length() == 0) {
                     return false;
                 }
@@ -116,7 +137,7 @@ public class EditSeriesPanel extends FlowPanel
 
             protected boolean gotResult (Integer thingId) {
                 _thing.thingId = thingId;
-                name.setText("");
+                thing.setText("");
                 ThingEditor editor = new ThingEditor(createCard(result.categories, _thing));
                 insert(editor, getWidgetCount()-1);
                 editor.setEditing(true);
@@ -126,7 +147,7 @@ public class EditSeriesPanel extends FlowPanel
 
             protected Thing _thing;
         };
-        add(Widgets.newRow(name, create));
+        add(Widgets.newRow(thing, create));
 
         // only allow adding new items if the series is active
         updateActive(series);
