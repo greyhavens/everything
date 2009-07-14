@@ -37,10 +37,7 @@ public class PlayerLogic
             try {
                 for (Field field : getNameFields(object.getClass())) {
                     PlayerName name = (PlayerName)field.get(object);
-                    if (name == null) {
-                        log.warning("Skipping null name during resolution",
-                                    "field", field.getName(), "object", object);
-                    } else {
+                    if (name != null) {
                         ids.add(name.userId);
                     }
                 }
@@ -67,7 +64,7 @@ public class PlayerLogic
             try {
                 for (Field field : getNameFields(object.getClass())) {
                     PlayerName name = (PlayerName)field.get(object);
-                    if (name != null) { // we already warned above on null names, so just skip
+                    if (name != null) {
                         field.set(object, names.get(name.userId));
                     }
                 }

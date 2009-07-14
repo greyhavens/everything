@@ -226,36 +226,15 @@ public class PlayerRepository extends DepotRepository
      * Returns up to the specified maximum number of feed items for the specified player. Also
      * resolves the names of all players in the feed in question.
      */
-    public List<FeedItem> loadRecentFeed (int userId, int maxItems)
+    public Iterable<FeedItem> loadRecentFeed (int userId, int maxItems)
     {
         // load up this player's friends and add them to the list of actors
         Set<Integer> actorIds = Sets.newHashSet(loadFriendIds(userId));
         actorIds.add(userId);
-
-        // load up the feed items in question
-        Set<Integer> nameIds = Sets.newHashSet();
-        List<FeedItem> items = Lists.newArrayList();
-        for (FeedItem item : findAll(FeedItemRecord.class,
-                                     new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
-                                     OrderBy.descending(FeedItemRecord.WHEN),
-                                     new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM)) {
-            items.add(item);
-            nameIds.add(item.actor.userId);
-            if (item.target != null) {
-                nameIds.add(item.target.userId);
-            }
-        }
-
-        // resolve the names for all included feed items
-        IntMap<PlayerName> names = loadPlayerNames(nameIds);
-        for (FeedItem item : items) {
-            item.actor = names.get(item.actor.userId);
-            if (item.target != null) {
-                item.target = names.get(item.target.userId);
-            }
-        }
-
-        return items;
+        return findAll(FeedItemRecord.class,
+                       new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
+                       OrderBy.descending(FeedItemRecord.WHEN),
+                       new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
     }
 
     @Override // from DepotRepository

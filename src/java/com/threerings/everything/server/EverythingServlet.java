@@ -15,6 +15,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import com.google.code.facebookapi.FacebookException;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
@@ -22,6 +23,9 @@ import com.google.code.facebookapi.ProfileField;
 import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
+import com.samskivert.util.CalendarUtil;
+import com.samskivert.util.IntMap;
+import com.samskivert.util.IntMaps;
 import com.samskivert.util.Tuple;
 
 import com.threerings.user.OOOUser;
@@ -32,12 +36,15 @@ import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.Card;
+import com.threerings.everything.data.Category;
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -140,10 +147,48 @@ public class EverythingServlet extends EveryServiceServlet
     public List<FeedItem> getRecentFeed () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS);
+        List<FeedItem> items = Lists.newArrayList(
+            _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS));
+        Calendar cal = Calendar.getInstance();
+
+        // if this player is an editor, load up recent comments on their feed
+        if (player.isEditor) {
+            // load up their recent comments
+            cal.add(Calendar.DATE, -RECENT_COMMENT_DAYS);
+            CalendarUtil.zeroTime(cal);
+            Iterable<CategoryComment> comments = _thingRepo.loadCommentsSince(
+                player.userId, cal.getTimeInMillis());
+
+            // load up the categories to which those comments apply
+            Set<Integer> catIds = Sets.newHashSet();
+            for (Iterator<CategoryComment> iter = comments.iterator(); iter.hasNext(); ) {
+                CategoryComment comment = iter.next();
+                if (comment.commentor.userId == player.userId) {
+                    iter.remove(); // prune comments by us, we know we wrote them
+                } else if (!catIds.add(comment.categoryId)) {
+                    iter.remove(); // prune any comments after the first about the same category
+                }
+            }
+            IntMap<Category> cats = IntMaps.newHashIntMap();
+            for (Category cat : _thingRepo.loadCategories(catIds)) {
+                cats.put(cat.categoryId, cat);
+            }
+
+            // create faux feed entries for each of these comments
+            for (CategoryComment comment : comments) {
+                FeedItem item = new FeedItem();
+                item.actor = comment.commentor;
+                item.when = comment.when;
+                item.type = FeedItem.Type.COMMENT;
+                item.target = player.getName();
+                item.objects = Lists.newArrayList(cats.get(comment.categoryId).name);
+                item.message = String.valueOf(comment.categoryId); // hax0rz!
+                items.add(item);
+            }
+            Collections.sort(items);
+        }
 
         // aggregate these results a bit
-        Calendar cal = Calendar.getInstance();
         Map<ItemKey, FeedItem> imap = Maps.newHashMap();
         for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
             FeedItem item = iter.next();
@@ -166,7 +211,8 @@ public class EverythingServlet extends EveryServiceServlet
             }
         }
 
-        return items;
+        // finally resolve the names in all the records that remain
+        return _playerLogic.resolveNames(items, player.getName());
     }
 
     protected static class ItemKey {
@@ -195,13 +241,18 @@ public class EverythingServlet extends EveryServiceServlet
     }
 
     @Inject protected FacebookLogic _faceLogic;
-    @Inject protected UserLogic _userLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected PlayerLogic _playerLogic;
+    @Inject protected ThingRepository _thingRepo;
+    @Inject protected UserLogic _userLogic;
 
-        /** Used to parse Facebook profile birthdays. */
+    /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");
 
     /** The maximum number of recent feed items returned. */
     protected static final int RECENT_FEED_ITEMS = 50;
+
+    /** The number of days into the past we look for recent category comments. */
+    protected static final int RECENT_COMMENT_DAYS = 3;
 }

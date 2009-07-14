@@ -76,6 +76,13 @@ public class FeedPanel extends FlowPanel
                     ". " + item.actor.name + " said \"" + item.message + "\"";
                 add(Widgets.newLabel(post, "inline"));
                 break;
+            case COMMENT:
+                add(Widgets.newLabel(" commented on your category ", "inline"));
+                add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
+                break;
+            default:
+                add(Widgets.newLabel(" did something mysterious.", "inline"));
+                break;
             }
         }
 

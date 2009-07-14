@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * Contains information on a player action, for display in the "recent happenings" feed.
  */
 public class FeedItem
-    implements IsSerializable
+    implements IsSerializable, Comparable<FeedItem>
 {
     /** Identifies the different types of feed items. */
     public enum Type implements ByteEnum {
@@ -49,4 +49,10 @@ public class FeedItem
 
     /** An optional message that goes along with the action that's only shown to the target. */
     public String message;
+
+    // from interface Comparable<FeedItem>
+    public int compareTo (FeedItem other)
+    {
+        return other.when.compareTo(when); // most recent to least
+    }
 }
