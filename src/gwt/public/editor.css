@@ -29,6 +29,10 @@
   margin: -27px 0px 7px 5px;
 }
 
+.editSeries .Editor .tipLabel {
+  text-align: center;
+}
+
 .editSeries .Editor .Wide .gwt-TextArea, .editSeries .Editor .Wide .gwt-TextBox {
   width: 500px;
 }

@@ -15,6 +15,10 @@ html, body {
   padding: 25px;
 }
 
+.tipLabel {
+  font-size: 12px;
+}
+
 .left {
   text-align: left;
 }

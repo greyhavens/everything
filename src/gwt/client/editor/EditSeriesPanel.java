@@ -215,15 +215,18 @@ public class EditSeriesPanel extends FlowPanel
             });
 
             _ctrl.setText(row, 0, "Image", 1, "right");
-            _ctrl.setWidget(row, 1, new MediaUploader(new MediaUploader.Listener() {
+            MediaUploader uploader = new MediaUploader(new MediaUploader.Listener() {
                 public void mediaUploaded (String image) {
                     card.thing.image = image;
                     updateCard(card);
                 }
-            }));
+            });
+            Widget tip = Widgets.newLabel("Upload an image from your computer", "tipLabel");
+            _ctrl.setWidget(row, 1, Widgets.newFlowPanel(uploader, tip));
             final TextBox imgurl = Widgets.newTextBox("", -1, 25);
             DefaultTextListener.configure(imgurl, "<paste image url, press enter>");
-            _ctrl.setWidget(row++, 2, imgurl, 2, null);
+            tip = Widgets.newLabel("Or slurp one directly from the Internets", "tipLabel");
+            _ctrl.setWidget(row++, 2, Widgets.newFlowPanel(imgurl, tip), 2, null);
             new ClickCallback<String>(new Button("dummy"), imgurl) {
                 protected boolean callService () {
                     _editorsvc.slurpImage(imgurl.getText().trim(), this);
