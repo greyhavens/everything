@@ -18,13 +18,14 @@ public class LandingPanel extends FlowPanel
     {
         setStyleName("landing");
 
-        // TODO: nix help once they've had 3 sessions
-        add(Widgets.newLabel("Welcome to Everything!", "Title"));
-        FlowPanel intro = new FlowPanel();
-        for (String text : INTRO_HTML) {
-            intro.add(Widgets.newHTML(text, "Text"));
+        if (ctx.isNewbie()) {
+            add(Widgets.newLabel("Welcome to Everything!", "Title"));
+            FlowPanel intro = new FlowPanel();
+            for (String text : INTRO_HTML) {
+                intro.add(Widgets.newHTML(text, "Text"));
+            }
+            add(intro);
         }
-        add(intro);
 
         add(Widgets.newLabel("Latest News", "Title"));
         add(Widgets.newHTML(NEWS, "Text")); // TODO: load from DB

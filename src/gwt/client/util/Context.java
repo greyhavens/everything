@@ -21,6 +21,9 @@ public interface Context
     /** Returns this player's name. */
     public PlayerName getMe ();
 
+    /** Returns true if this player is still pretty new. */
+    public boolean isNewbie ();
+
     /** Returns whether this player has editor privileges. */
     public boolean isEditor ();
 

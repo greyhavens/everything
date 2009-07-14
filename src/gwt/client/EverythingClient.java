@@ -78,6 +78,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public boolean isNewbie ()
+    {
+        return _data.gridsConsumed < NEWBIE_GRIDS;
+    }
+
+    // from interface Context
     public boolean isEditor ()
     {
         return _data.isEditor || _data.isAdmin;
@@ -148,4 +154,5 @@ public class EverythingClient
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 
     protected static final String CLIENT_DIV = "client";
+    protected static final int NEWBIE_GRIDS = 3;
 }
