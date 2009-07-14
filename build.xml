@@ -28,6 +28,7 @@
     <file name="${extlibs.dir}/commons-lang.jar"/>
     <file name="${extlibs.dir}/commons-fileupload.jar"/>
     <file name="${extlibs.dir}/commons-io.jar"/>
+    <file name="${extlibs.dir}/commons-logging.jar"/>
     <file name="${extlibs.dir}/json.jar"/>
     <file name="${extlibs.dir}/jvnet-runtime.jar"/>
     <file name="${extlibs.dir}/facebook-java-api.jar"/>
