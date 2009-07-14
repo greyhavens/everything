@@ -10,8 +10,16 @@ import com.samskivert.depot.ByteEnum;
  */
 public enum Rarity implements ByteEnum
 {
-    I(0, 10),   II(1, 20),   III(2, 35),   IV(3, 55),  V(4, 90),
-    VI(5, 145), VII(6, 235), VIII(7, 380), IX(8, 615), X(9, 995);
+    I(0, 10, "Ultra common"),
+    II(1, 20, "Very common"),
+    III(2, 35, "Common"),
+    IV(3, 55, "Fairly common"),
+    V(4, 90, "Uncommon"),
+    VI(5, 145, "Fairly rare"),
+    VII(6, 235, "Rare"),
+    VIII(7, 380, "Very rare"),
+    IX(8, 615, "Ultra rare"),
+    X(9, 995, "Mythical");
 
     /** The coin value of a card of this rarity. */
     public final int value;
@@ -42,7 +50,15 @@ public enum Rarity implements ByteEnum
      */
     public int weight ()
     {
-        return MAX_VALUE - value + EXTRA_WEIGHT;
+        return Math.round(100 * AVG_COST / value);
+    }
+
+    /**
+     * Returns a human readable description of this rarity.
+     */
+    public String description ()
+    {
+        return _descrip + " (1 in " + computeRarity(this) + ")";
     }
 
     // from interface ByteEnum
@@ -51,26 +67,41 @@ public enum Rarity implements ByteEnum
         return _code;
     }
 
-    Rarity (int code, int value) {
+    Rarity (int code, int value, String descrip) {
         this.value = value;
+        _descrip = descrip;
         _code = (byte)code;
     }
 
     /** This rarity's byte code. */
     protected byte _code;
 
-    protected static int computeMaxValue ()
+    /** A human grokkable description of this rarity. */
+    protected String _descrip;
+
+    protected static float computeAvgCost ()
     {
-        int maxValue = 0;
+        float totalCost = 0;
+        int count = 0;
         for (Rarity rarity : Rarity.values()) {
-            maxValue = Math.max(maxValue, rarity.value);
+            totalCost += rarity.value;
+            count++;
         }
-        return maxValue;
+        return totalCost / count;
+    }
+
+    protected static int computeRarity (Rarity rarity)
+    {
+        float sumWeights = 0;
+        for (Rarity r : Rarity.values()) {
+            sumWeights += r.weight();
+        }
+        return Math.round(sumWeights / rarity.weight());
     }
 
     /** The maximum value of any rarity. */
-    protected static final int MAX_VALUE = computeMaxValue();
+    protected static final float AVG_COST = computeAvgCost();
 
     /** Extra weight added to every card to make the rarest card not insanely rare. */
-    protected static final int EXTRA_WEIGHT = 50;
+    protected static final int EXTRA_WEIGHT = 30;
 }
