@@ -122,6 +122,10 @@
 }
 
 /** FeedPanel styles */
+.feed .Date {
+  font-style: italic;
+}
+
 .feed .Item {
   padding: 2px 0px;
 }
