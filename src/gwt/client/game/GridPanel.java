@@ -50,6 +50,7 @@ public class GridPanel extends FlowPanel
         clear();
 
         add(_info = new SmartTable(5, 0));
+        _info.setText(1, 0, "Unflipped cards:");
         _info.setText(1, 1, "New grid " + format(data.grid.expires), 1, "right");
         updateRemaining(data.grid.unflipped);
         updateStatus(data.status);
@@ -76,9 +77,9 @@ public class GridPanel extends FlowPanel
             }
             buf.append((buf.length() > 0) ? "&nbsp;&nbsp;" : "");
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
-            buf.append(rarity).append("-").append(unflipped[ii]);
+            buf.append(unflipped[ii]).append(" of ").append(rarity);
         }
-        _info.setHTML(1, 0, "Rarity in grid: <b>" + buf + "</b>", 2, "left");
+        _info.setText(1, 0, buf.toString(), 1, "Bold");
     }
 
     protected void updateStatus (final GameStatus status)

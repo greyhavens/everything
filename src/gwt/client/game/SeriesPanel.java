@@ -13,7 +13,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
@@ -32,19 +32,9 @@ import client.util.Context;
 /**
  * Displays thumbnails for all cards in a player's series.
  */
-public class SeriesPopup extends PopupPanel
+public class SeriesPanel extends SimplePanel
 {
-    public static ClickHandler onClick (final Context ctx, final int ownerId, final int categoryId,
-                                        final Value<Integer> count)
-    {
-        return new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                ctx.displayPopup(new SeriesPopup(ctx, ownerId, categoryId, count));
-            }
-        };
-    }
-
-    public SeriesPopup (Context ctx, final int ownerId, int categoryId, Value<Integer> count)
+    public SeriesPanel (Context ctx, final int ownerId, int categoryId, Value<Integer> count)
     {
         setStyleName("series");
         setWidget(Widgets.newLabel("Loading...", "infoLabel"));
@@ -91,14 +81,7 @@ public class SeriesPopup extends PopupPanel
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);
         }
-        int row = grid.addWidget(new Button("Close", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                SeriesPopup.this.hide();
-            }
-        }), COLUMNS, null);
-        grid.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
         setWidget(grid);
-        center();
     }
 
     protected Context _ctx;
