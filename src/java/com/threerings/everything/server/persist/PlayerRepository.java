@@ -22,6 +22,7 @@ import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
@@ -223,7 +224,7 @@ public class PlayerRepository extends DepotRepository
         record.type = type;
         record.targetId = targetId;
         record.object = object;
-        if (message.length() > 0) {
+        if (!StringUtil.isBlank(message)) {
             record.message = message;
         }
         insert(record);
