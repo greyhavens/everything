@@ -147,6 +147,15 @@ public class EverythingServlet extends EveryServiceServlet
         Map<ItemKey, FeedItem> imap = Maps.newHashMap();
         for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
             FeedItem item = iter.next();
+            if (item.message != null) {
+                // null out the message if we're not the target
+                if (item.target != null && player.userId != item.target.userId) {
+                    item.message = null;
+                } else {
+                    // if we are the target, don't try to aggregate this message
+                    continue;
+                }
+            }
             ItemKey key = new ItemKey(item, cal);
             FeedItem oitem = imap.get(key);
             if (oitem  != null) {

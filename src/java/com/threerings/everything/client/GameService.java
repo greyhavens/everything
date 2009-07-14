@@ -123,5 +123,5 @@ public interface GameService extends RemoteService
     /**
      * Gifts the specified card to the specified friend.
      */
-    void giftCard (int thingId, long created, int friendId) throws ServiceException;
+    void giftCard (int thingId, long created, int friendId, String message) throws ServiceException;
 }

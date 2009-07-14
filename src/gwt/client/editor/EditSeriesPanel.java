@@ -74,7 +74,7 @@ public class EditSeriesPanel extends FlowPanel
         info.setWidget(row++, 1, Args.createLink(series.creator.toString(), Page.BROWSE,
                                                  series.creator.userId));
 
-        if (_ctx.isAdmin() || _ctx.getMe().equals(series.creator))) {
+        if (_ctx.isAdmin() || _ctx.getMe().equals(series.creator)) {
             final TextBox name = Widgets.newTextBox(series.name, Category.MAX_NAME_LENGTH, 15);
             Button update = new Button("Update");
             info.setText(row, 0, "Name:");

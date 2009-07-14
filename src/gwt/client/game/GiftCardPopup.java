@@ -4,14 +4,17 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
@@ -59,12 +62,22 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             if (info.onWishlist) {
                 grid.setText(row, 2, "Wishlist!", 1, "Wishlist");
             }
+            final TextBox message = Widgets.newTextBox("", 255, 20);
+            DefaultTextListener.configure(message, "<optional gift message>");
+            message.setVisible(false);
+            grid.setWidget(row, 3, message);
             final Button give = new Button("Give");
-            grid.setWidget(row, 3, give);
-            new ClickCallback<Void>(give) {
+            grid.setWidget(row, 4, give);
+            new ClickCallback<Void>(give, message) {
                 protected boolean callService () {
-                    _gamesvc.giftCard(_thingId, _created, info.friend.userId, this);
-                    return false;
+                    if (!message.isVisible()) {
+                        message.setVisible(true);
+                        give.setText("Send Gift");
+                        return false;
+                    }
+                    _gamesvc.giftCard(_thingId, _created, info.friend.userId,
+                                      message.getText().trim(), this);
+                    return true;
                 }
                 protected boolean gotResult (Void result) {
                     GiftCardPopup.this.hide();

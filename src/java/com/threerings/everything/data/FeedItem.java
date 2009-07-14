@@ -46,4 +46,7 @@ public class FeedItem
 
     /** A textual description of the object(s) of the action. */
     public List<String> objects;
+
+    /** An optional message that goes along with the action that's only shown to the target. */
+    public String message;
 }

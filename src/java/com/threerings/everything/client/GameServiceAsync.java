@@ -56,5 +56,6 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#giftCard}.
      */
-    void giftCard (int thingId, long created, int friendId, AsyncCallback<Void> callback);
+    void giftCard (int thingId, long created, int friendId, String message,
+                   AsyncCallback<Void> callback);
 }

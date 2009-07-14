@@ -56,7 +56,7 @@ public class FeedPanel extends FlowPanel
 
     protected String getName (PlayerName name, boolean capital)
     {
-        return _ctx.getMe().userId != name.userId ? name.toString() : (capital ? "You" : "you");
+        return _ctx.getMe().equals(name) ? (capital ? "You" : "you") : name.toString();
     }
 
     protected class FeedItemLabel extends FlowPanel
@@ -72,6 +72,10 @@ public class FeedPanel extends FlowPanel
                 add(Widgets.newHTML(" gave the " + format(item.objects) + " to ", "inline"));
                 add(Args.createInlink(getName(item.target, false),
                                       Page.BROWSE, item.target.userId));
+                String post = (item.message == null) ? "." :
+                    ". " + item.actor.name + " said \"" + item.message + "\"";
+                add(Widgets.newLabel(post, "inline"));
+                break;
             }
         }
 

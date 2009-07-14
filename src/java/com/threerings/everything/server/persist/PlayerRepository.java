@@ -207,7 +207,8 @@ public class PlayerRepository extends DepotRepository
     /**
      * Records an item to the specified actor's feed.
      */
-    public void recordFeedItem (int actorId, FeedItem.Type type, int targetId, String object)
+    public void recordFeedItem (int actorId, FeedItem.Type type, int targetId, String object,
+                                String message)
     {
         FeedItemRecord record = new FeedItemRecord();
         record.actorId = actorId;
@@ -215,6 +216,9 @@ public class PlayerRepository extends DepotRepository
         record.type = type;
         record.targetId = targetId;
         record.object = object;
+        if (message.length() > 0) {
+            record.message = message;
+        }
         insert(record);
     }
 

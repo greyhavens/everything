@@ -47,8 +47,7 @@ public class LandingPanel extends FlowPanel
     protected static final String NEWS = "We're just getting started. The user interface is " +
         "about as programmery as it gets and our giant database of everything in the entire " +
         "universe is still pretty small. But there's some awesome stuff in there. " +
-        "These are the new features we'll be adding soon:" +
-        "<ul><li> Aggregation of the feed that shows what your friends have been up to. </li>" +
+        "These are the new features we'll be adding soon: <ul>" +
         "<li> An easier way to browse your friends' collections than clicking in your feed. </li>" +
         "<li> A wishlist so that you can let your friends know what you're looking for. </li>" +
         "<li> A prettier user interface! </li>" +

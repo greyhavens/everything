@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.util.RuntimeUtil;
+import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
@@ -31,6 +32,7 @@ public class FeedItemRecord extends PersistentRecord
     public static final ColumnExp TYPE = colexp(_R, "type");
     public static final ColumnExp TARGET_ID = colexp(_R, "targetId");
     public static final ColumnExp OBJECT = colexp(_R, "object");
+    public static final ColumnExp MESSAGE = colexp(_R, "message");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */
@@ -39,7 +41,7 @@ public class FeedItemRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     /** The id of user that took the action. */
     @Id public int actorId;
@@ -55,6 +57,10 @@ public class FeedItemRecord extends PersistentRecord
 
     /** A textual description of the object of the action. */
     public String object;
+
+    /** An optional message that goes along with the action that's only shown to the target. */
+    @Column(nullable=true)
+    public String message;
 
     /**
      * Initializes {@link FeedItem#actor}.

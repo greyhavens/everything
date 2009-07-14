@@ -208,7 +208,8 @@ public class GameServlet extends EveryServiceServlet
             _playerRepo.loadPlayer(player.userId), grid.unflipped);
 
         // record that this player flipped this card
-        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, result.card.thing.name);
+        _playerRepo.recordFeedItem(
+            player.userId, FeedItem.Type.FLIPPED, 0, result.card.thing.name, null);
 
         log.info("Yay! Card flipped", "who", player.who(), "thing", result.card.thing.name,
                  "rarity", result.card.thing.rarity, "paid", expectedCost);
@@ -276,7 +277,8 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public void giftCard (int thingId, long created, int friendId) throws ServiceException
+    public void giftCard (int thingId, long created, int friendId, String message)
+        throws ServiceException
     {
         PlayerRecord player = requirePlayer();
         CardRecord card = requireCard(player.userId, thingId, created);
@@ -286,7 +288,8 @@ public class GameServlet extends EveryServiceServlet
 
         // record that this player gifted this card
         Thing thing = _thingRepo.loadThing(thingId);
-        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.GIFTED, friendId, thing.name);
+        _playerRepo.recordFeedItem(
+            player.userId, FeedItem.Type.GIFTED, friendId, thing.name, message);
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)
