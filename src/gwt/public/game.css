@@ -122,6 +122,9 @@
 }
 
 /** FeedPanel styles */
+.feed .Item {
+  padding: 2px 0px;
+}
 
 /** GridPanel styles */
 .grid {
