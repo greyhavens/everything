@@ -25,7 +25,9 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerFullName;
 
+import client.util.Args;
 import client.util.Context;
+import client.util.Page;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
 
@@ -69,7 +71,7 @@ public class DashboardPanel extends FlowPanel
         contents.setText(2, 0, "Pending Categories", 1, "Header");
         FlowPanel cats = new FlowPanel();
         for (Category cat : data.pendingCategories) {
-            cats.add(Widgets.newActionLabel(cat.name, onPlayerClicked(details, cat.creatorId)));
+            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
         }
         contents.setWidget(3, 0, cats);
 

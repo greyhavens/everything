@@ -15,6 +15,7 @@ import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
@@ -90,6 +91,22 @@ public class ThingRecord extends PersistentRecord
     public Thing toThing ()
     {
         return TO_THING.apply(this);
+    }
+
+    /**
+     * Initializes {@link Thing#creator}.
+     */
+    public PlayerName getCreator ()
+    {
+        return PlayerName.create(creatorId);
+    }
+
+    /**
+     * Initializes {@link #creatorId}.
+     */
+    public void setCreator (PlayerName creator)
+    {
+        this.creatorId = (creator == null) ? 0 : creator.userId;
     }
 
     /**

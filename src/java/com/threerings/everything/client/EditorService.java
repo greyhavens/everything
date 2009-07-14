@@ -5,6 +5,7 @@ package com.threerings.everything.client;
 
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -31,6 +32,16 @@ public interface EditorService extends RemoteService
     /** Thrown by {@link #deleteThing} if the thing in question is used in cards. */
     public static final String E_THING_IN_CARDS = "e.thing_in_cards";
 
+    /** Provides results for {@link #loadSeries}. */
+    public static class SeriesResult implements IsSerializable
+    {
+        /** The categories of this series. */
+        public Category[] categories;
+
+        /** The things in this series. */
+        public List<Thing> things;
+    }
+
     /**
      * Loads all of the categories with the specified parent. Specifying a parentId of 0 will load
      * all top-level categories.
@@ -55,9 +66,9 @@ public interface EditorService extends RemoteService
     void deleteCategory (int categoryId) throws ServiceException;
 
     /**
-     * Loads all of the things in the specified category.
+     * Loads all of the things in the specified series.
      */
-    List<Thing> loadThings (int categoryId) throws ServiceException;
+    SeriesResult loadSeries (int categoryId) throws ServiceException;
 
     /**
      * Creates a new thing with the specified configuration.

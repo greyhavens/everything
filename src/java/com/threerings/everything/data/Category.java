@@ -23,8 +23,8 @@ public class Category
     /** The id of this category's parent, if it is a sub-category, or 0. */
     public int parentId;
 
-    /** The id of the creator of this category. */
-    public int creatorId;
+    /** The creator of this category. */
+    public PlayerName creator;
 
     /** True if this category is active (and hence items in it are usable in the game). */
     public boolean active;
@@ -32,10 +32,25 @@ public class Category
     /** The number of things in this category (only valid for leaf categories). */
     public int things;
 
+    /**
+     * Returns an HTML snippet that will display cat -> cat -> cat for the supplied categories.
+     */
+    public static String getHierarchyHTML (Category[] cats)
+    {
+        StringBuilder buf = new StringBuilder();
+        for (Category cat : cats) {
+            if (buf.length() > 0) {
+                buf.append(" &#8594; "); // right arrow
+            }
+            buf.append(cat.name);
+        }
+        return buf.toString();
+    }
+
     // from interface Created
     public int getCreatorId ()
     {
-        return creatorId;
+        return creator.userId;
     }
 
     // from interface Comparable<Category>

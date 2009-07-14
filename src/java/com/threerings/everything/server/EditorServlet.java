@@ -19,6 +19,7 @@ import com.threerings.everything.client.EditorService;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Created;
 import com.threerings.everything.data.Thing;
+import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
@@ -41,7 +42,7 @@ public class EditorServlet extends EveryServiceServlet
     public int createCategory (Category category) throws ServiceException
     {
         PlayerRecord editor = requireEditor();
-        category.creatorId = editor.userId;
+        category.creator = editor.toName();
         category.categoryId = _thingRepo.createCategory(category);
         _adminLogic.noteAction(editor, "created", category);
         return category.categoryId;
@@ -104,10 +105,13 @@ public class EditorServlet extends EveryServiceServlet
     }
 
     // from interface EditorService
-    public List<Thing> loadThings (int parentId) throws ServiceException
+    public SeriesResult loadSeries (int categoryId) throws ServiceException
     {
         requireEditor();
-        return sort(Lists.newArrayList(_thingRepo.loadThings(parentId)));
+        SeriesResult result = new SeriesResult();
+        result.categories = _gameLogic.resolveCategories(categoryId);
+        result.things = sort(Lists.newArrayList(_thingRepo.loadThings(categoryId)));
+        return result;
     }
 
     // from interface EditorService
@@ -122,12 +126,12 @@ public class EditorServlet extends EveryServiceServlet
         if (series == null) {
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
-        if (series.active || (series.creatorId != editor.userId && !user.isAdmin())) {
+        if (series.active || (series.getCreatorId() != editor.userId && !user.isAdmin())) {
             throw new ServiceException(AppCodes.E_ACCESS_DENIED);
         }
 
         // do the deed
-        thing.creatorId = editor.userId;
+        thing.creator = editor.toName();
         thing.thingId = _thingRepo.createThing(thing);
         _adminLogic.noteAction(editor, "created", thing);
         return thing.thingId;
@@ -143,7 +147,7 @@ public class EditorServlet extends EveryServiceServlet
         // TODO: if this thing is moving categories, validate that
 
         // actually update the thing
-        thing.creatorId = othing.creatorId;
+        thing.creator = othing.creator;
         _thingRepo.updateThing(thing);
 
         // note that this action was taken
@@ -187,5 +191,6 @@ public class EditorServlet extends EveryServiceServlet
     }
 
     @Inject protected AdminLogic _adminLogic;
+    @Inject protected GameLogic _gameLogic;
     @Inject protected ThingRepository _thingRepo;
 }

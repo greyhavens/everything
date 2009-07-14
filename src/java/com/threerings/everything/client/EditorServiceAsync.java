@@ -36,9 +36,9 @@ public interface EditorServiceAsync
     void deleteCategory (int categoryId, AsyncCallback<Void> callback);
 
     /**
-     * The async version of {@link EditorService#loadThings}.
+     * The async version of {@link EditorService#loadSeries}.
      */
-    void loadThings (int parentId, AsyncCallback<List<Thing>> callback);
+    void loadSeries (int categoryId, AsyncCallback<EditorService.SeriesResult> callback);
 
     /**
      * The async version of {@link EditorService#createThing}.

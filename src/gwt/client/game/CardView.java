@@ -67,14 +67,7 @@ public abstract class CardView extends FlowPanel
         public Left (Card card)
         {
             add(Widgets.newLabel(card.thing.name, "Title"));
-            StringBuilder buf = new StringBuilder();
-            for (Category cat : card.categories) {
-                if (buf.length() > 0) {
-                    buf.append(" &#8594; "); // right arrow
-                }
-                buf.append(cat.name);
-            }
-            add(Widgets.newHTML(buf.toString(), "Categories"));
+            add(Widgets.newHTML(Category.getHierarchyHTML(card.categories), "Categories"));
             add(ImageUtil.getImageBox(card.thing.image));
             add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
                                      new CoinLabel(" - ", card.thing.rarity.value)));

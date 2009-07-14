@@ -13,5 +13,6 @@
   <public path="public"/>
   <stylesheet src="global.css"/>
   <stylesheet src="game.css"/>
+  <stylesheet src="editor.css"/>
   <stylesheet src="admin.css"/>
 </module>

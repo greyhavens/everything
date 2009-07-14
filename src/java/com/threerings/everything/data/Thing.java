@@ -50,13 +50,13 @@ public class Thing
     /** The URL from which this thing's information was obtained. */
     public String source;
 
-    /** The id of the creator of this thing. */
-    public int creatorId;
+    /** The creator of this thing. */
+    public PlayerName creator;
 
     // from interface Created
     public int getCreatorId ()
     {
-        return creatorId;
+        return creator.userId;
     }
 
     // from interface Comparable<Thing>

@@ -16,6 +16,7 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.util.RuntimeUtil;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SeriesCard;
 
 /**
@@ -74,6 +75,22 @@ public class CategoryRecord extends PersistentRecord
     public Category toCategory ()
     {
         return TO_CATEGORY.apply(this);
+    }
+
+    /**
+     * Initializes {@link Category#creator}.
+     */
+    public PlayerName getCreator ()
+    {
+        return PlayerName.create(creatorId);
+    }
+
+    /**
+     * Initializes {@link #creatorId}.
+     */
+    public void setCreator (PlayerName creator)
+    {
+        this.creatorId = (creator == null) ? 0 : creator.userId;
     }
 
     /**

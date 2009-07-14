@@ -1,7 +1,7 @@
 //
 // $Id$
 
-package client.admin;
+package client.editor;
 
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -44,23 +45,24 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
 import client.game.CardView;
+import client.util.Args;
 import client.util.Context;
 import client.util.MediaUploader;
+import client.util.Page;
 import client.util.PopupCallback;
 
 /**
  * Provides an interface for editing categories and things.
  */
-public class EditThingsPanel extends SmartTable
+public class EditCatsPanel extends SmartTable
 {
-    public EditThingsPanel (Context ctx)
+    public EditCatsPanel (Context ctx)
     {
-        super("editThings", 5, 0);
+        super("editCats", 5, 0);
 
         setWidget(0, 0, _cats);
         setWidget(0, 1, _subcats);
         setWidget(0, 2, _series);
-        setWidget(0, 3, _things);
         for (int col = 0; col < getCellCount(0); col++) {
             getFlexCellFormatter().setVerticalAlignment(0, col, HasAlignment.ALIGN_TOP);
         }
@@ -68,7 +70,6 @@ public class EditThingsPanel extends SmartTable
         _ctx = ctx;
         _cats.setChild(_subcats);
         _subcats.setChild(_series);
-        _series.setChild(_things);
         _cats.load();
     }
 
@@ -181,12 +182,8 @@ public class EditThingsPanel extends SmartTable
         protected void initItemRow (final Row<T> row, boolean selected)
         {
             row.clear();
-            final Label label = selected ? Widgets.newLabel(getName(row.item), "Selected") :
-                Widgets.newActionLabel(getName(row.item), new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    setSelected(row.item);
-                }
-            });
+            final Widget label = selected ? Widgets.newLabel(getName(row.item), "Selected") :
+                createItemActionLabel(row.item);
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     onDelete(row.item, new PopupCallback<Void>(label) {
@@ -201,6 +198,15 @@ public class EditThingsPanel extends SmartTable
             }));
             row.add(Widgets.newShim(5, 5));
             row.add(label);
+        }
+
+        protected Widget createItemActionLabel (final T item)
+        {
+            return Widgets.newActionLabel(getName(item), new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    setSelected(item);
+                }
+            });
         }
 
         protected void itemAdded (T item) {
@@ -252,97 +258,6 @@ public class EditThingsPanel extends SmartTable
         protected int _parentId;
     }
 
-    protected class ThingEditor extends FlowPanel
-    {
-        public ThingEditor (final Card card) {
-            setStyleName("Editor");
-            SmartTable bits = new SmartTable(5, 0);
-            add(bits);
-
-            int row = 0;
-            bits.setText(row, 0, "Name", 1, "Label");
-            final TextBox name = Widgets.newTextBox(card.thing.name, Thing.MAX_NAME_LENGTH, 15);
-            bits.setWidget(row, 1, name);
-
-            bits.setText(row, 2, "Rarity", 1, "Label");
-            final EnumListBox<Rarity> rarity = new EnumListBox<Rarity>(Rarity.class);
-            rarity.setSelectedValue(card.thing.rarity);
-            bits.setWidget(row++, 3, rarity);
-            rarity.addChangeHandler(new ChangeHandler() {
-                public void onChange (ChangeEvent event) {
-                    card.thing.rarity = rarity.getSelectedValue();
-                    updateCard(card);
-                }
-            });
-
-            bits.setText(row, 0, "Image", 1, "Label");
-            bits.setWidget(row++, 1, new MediaUploader(new MediaUploader.Listener() {
-                public void mediaUploaded (String name) {
-                    card.thing.image = name;
-                    updateCard(card);
-                }
-            }));
-
-            bits.setText(row, 0, "Descrip", 1, "Label");
-            final LimitedTextArea descrip = Widgets.newTextArea(
-                card.thing.descrip, -1, 2, Thing.MAX_DESCRIP_LENGTH);
-            bits.setWidget(row++, 1, descrip, 3, "Wide");
-
-            bits.setText(row, 0, "Facts", 1, "Label");
-            final LimitedTextArea facts = Widgets.newTextArea(
-                card.thing.facts, -1, 4, Thing.MAX_FACTS_LENGTH);
-            bits.setWidget(row++, 1, facts, 3, "Wide");
-
-            bits.setText(row, 0, "Source", 1, "Label");
-            final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
-            bits.setWidget(row++, 1, source, 3, "Wide");
-
-            final Button save = new Button("Save");
-            bits.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
-            bits.setWidget(row++, 1, save, 3, null);
-            new ClickCallback<Void>(save) {
-                protected boolean callService () {
-                    _editorsvc.updateThing(card.thing, this);
-                    return true;
-                }
-                protected boolean gotResult (Void result) {
-                    Popups.infoNear("Thing saved.", save);
-                    return true;
-                }
-            };
-
-            final Timer updater = new Timer() {
-                @Override public void run () {
-                    card.thing.name = name.getText().trim();
-                    card.thing.descrip = descrip.getText().trim();
-                    card.thing.facts = facts.getText().trim();
-                    card.thing.source = source.getText().trim();
-                    updateCard(card);
-                }
-            };
-
-            KeyPressHandler trigger = new KeyPressHandler() {
-                public void onKeyPress (KeyPressEvent event) {
-                    updater.cancel();
-                    updater.schedule(250);
-                }
-            };
-            name.addKeyPressHandler(trigger);
-            descrip.getTextArea().addKeyPressHandler(trigger);
-            facts.getTextArea().addKeyPressHandler(trigger);
-            source.addKeyPressHandler(trigger);
-
-            updateCard(card);
-        }
-
-        protected void updateCard (Card card) {
-            while (getWidgetCount() > 1) {
-                remove(1);
-            }
-            add(CardView.create(card));
-        }
-    }
-
     protected CategoryColumn _cats = new CategoryColumn("Categories") {
         protected void callLoad (AsyncCallback<List<Category>> callback) {
             _editorsvc.loadCategories(0, callback);
@@ -366,102 +281,78 @@ public class EditThingsPanel extends SmartTable
             }
         }
 
-        @Override protected void initItemRow (final Row<Category> row, boolean selected) {
-            super.initItemRow(row, selected);
-            // only admins get a checkbox to activate/deactivate a category
-            if (!_ctx.isAdmin()) {
-                return;
-            }
-            row.add(Widgets.newShim(5, 5));
-            final CheckBox active = new CheckBox();
-            row.add(active);
-            active.setTitle("Series Active");
-            active.setValue(row.item.active);
-            active.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-                public void onValueChange (ValueChangeEvent<Boolean> event) {
-                    row.item.active = event.getValue();
-                    active.setEnabled(false);
-                    _editorsvc.updateCategory(row.item, new PopupCallback<Void>() {
-                        public void onSuccess (Void result) {
-                            String msg = row.item.active ?
-                                "Category activated." : "Category deactivated.";
-                            Popups.infoNear(msg, active);
-                            active.setEnabled(true);
-                            _child.load(); // reload the thing list which will re-en/disable
-                        }
-                    });
-                }
-            });
+        @Override protected Widget createItemActionLabel (Category item) {
+            return Args.createLink(getName(item), Page.EDIT_SERIES, item.categoryId);
         }
     };
 
-    protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
-        @Override public void clear () {
-            super.clear();
-            setText(1, 0, "", getCellCount(0), null);
-        }
+//     protected Column<Thing> _things = new Column<Thing>("Things", Thing.MAX_NAME_LENGTH) {
+//         @Override public void clear () {
+//             super.clear();
+//             setText(1, 0, "", getCellCount(0), null);
+//         }
 
-        @Override public void setSelected (Thing item) {
-            super.setSelected(item);
-            // create a fake card and display it
-            Card card = new Card();
-            card.owner = _ctx.getMe();
-            card.categories = new Category[] {
-                _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
-            card.thing = item;
-            card.created = new Date();
-            setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
-        }
+//         @Override public void setSelected (Thing item) {
+//             super.setSelected(item);
+//             // create a fake card and display it
+//             Card card = new Card();
+//             card.owner = _ctx.getMe();
+//             card.categories = new Category[] {
+//                 _cats.getSelected(), _subcats.getSelected(), _series.getSelected() };
+//             card.thing = item;
+//             card.created = new Date();
+//             setWidget(1, 0, new ThingEditor(card), getCellCount(0), null);
+//         }
 
-        protected void callLoad (AsyncCallback<List<Thing>> callback) {
-            Category category = _series.getSelected();
-            if (category != null) {
-                _editorsvc.loadThings(_categoryId = category.categoryId, callback);
-            }
-        }
+//         protected void callLoad (AsyncCallback<List<Thing>> callback) {
+//             Category category = _series.getSelected();
+//             if (category != null) {
+//                 _editorsvc.loadThings(_categoryId = category.categoryId, callback);
+//             }
+//         }
 
-        protected String getName (Thing thing) {
-            return thing.name;
-        }
+//         protected String getName (Thing thing) {
+//             return thing.name;
+//         }
 
-        @Override protected boolean isEditable () {
-            Category series = _series.getSelected();
-            return !series.active && (series.creatorId == _ctx.getMe().userId || _ctx.isAdmin());
-        }
+//         @Override protected boolean isEditable () {
+//             Category series = _series.getSelected();
+//             return !series.active && (series.creatorId == _ctx.getMe().userId || _ctx.isAdmin());
+//         }
 
-        @Override protected void initItemRow (Row<Thing> row, boolean selected) {
-            super.initItemRow(row, selected);
-            row.add(Widgets.newShim(5, 5));
-            row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
-        }
+//         @Override protected void initItemRow (Row<Thing> row, boolean selected) {
+//             super.initItemRow(row, selected);
+//             row.add(Widgets.newShim(5, 5));
+//             row.add(Widgets.newLabel(row.item.rarity.toString(), selected ? "Selected" : null));
+//         }
 
-        protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
-            Thing thing = new Thing();
-            thing.name = text;
-            thing.categoryId = _categoryId;
-            // set up the thing with defaults which can be edited once it is created
-            thing.rarity = Rarity.I;
-            thing.image = "";
-            thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
-                "your description and facts fit on the Thing display.";
-            thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
-                "bullet point and start the next.";
-            thing.source = "http://wikipedia.org/Todo";
-            _editorsvc.createThing(thing, callback);
-            return thing;
-        }
+//         protected Thing onCreate (String text, AsyncCallback<Integer> callback) {
+//             Thing thing = new Thing();
+//             thing.name = text;
+//             thing.categoryId = _categoryId;
+//             // set up the thing with defaults which can be edited once it is created
+//             thing.rarity = Rarity.I;
+//             thing.image = "";
+//             thing.descrip = "Briefly describe your thing here. Scroll down to make sure " +
+//                 "your description and facts fit on the Thing display.";
+//             thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
+//                 "bullet point and start the next.";
+//             thing.source = "http://wikipedia.org/Todo";
+//             _editorsvc.createThing(thing, callback);
+//             return thing;
+//         }
 
-        protected void onCreated (int createdId, Thing thing) {
-            thing.thingId = createdId;
-            itemAdded(thing);
-        }
+//         protected void onCreated (int createdId, Thing thing) {
+//             thing.thingId = createdId;
+//             itemAdded(thing);
+//         }
 
-        protected void onDelete (Thing object, AsyncCallback<Void> callback) {
-            _editorsvc.deleteThing(object.thingId, callback);
-        }
+//         protected void onDelete (Thing object, AsyncCallback<Void> callback) {
+//             _editorsvc.deleteThing(object.thingId, callback);
+//         }
 
-        protected int _categoryId;
-    };
+//         protected int _categoryId;
+//     };
 
     protected Context _ctx;
 

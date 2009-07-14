@@ -1,0 +1,30 @@
+/**
+ * $Id$
+ */
+
+/** EditCatsPanel styles */
+.editCats .Header, .editCats .Selected {
+  font-weight: bold;
+}
+
+.editCats .Column .gwt-TextBox {
+  margin: 5px 0px;
+}
+
+/** EditSeriesPanel styles */
+.editSeries {
+  margin: 5px;
+}
+
+.editSeries .Title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.editSeries .Editor .Edit {
+  margin: -22px 7px 0px 5px;
+}
+
+.editSeries .Editor .Wide .gwt-TextArea, .editSeries .Editor .Wide .gwt-TextBox {
+  width: 500px;
+}

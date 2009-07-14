@@ -2,23 +2,6 @@
  * $Id$
  */
 
-/** EditThingsPanel styles */
-.editThings .Header, .editThings .Selected {
-  font-weight: bold;
-}
-
-.editThings .Column .gwt-TextBox {
-  margin: 5px 0px;
-}
-
-.editThings .Editor .Label {
-  text-align: right;
-}
-
-.editThings .Editor .Wide .gwt-TextArea, .editThings .Editor .Wide .gwt-TextBox {
-  width: 500px;
-}
-
 /** DashboardPanel styles */
 .dashboard .Header {
   font-weight: bold;

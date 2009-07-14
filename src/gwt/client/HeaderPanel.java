@@ -29,7 +29,7 @@ public class HeaderPanel extends SmartTable
         setWidget(0, col++, Args.createLink("Flip Cards", Page.FLIP));
         setWidget(0, col++, Args.createLink("Your Collection", Page.BROWSE));
         if (ctx.isEditor()) {
-            setWidget(0, col++, Args.createLink("Add Things", Page.EDIT_THINGS));
+            setWidget(0, col++, Args.createLink("Add Things", Page.EDIT_CATS));
         }
         if (ctx.isAdmin()) {
             setWidget(0, col++, Args.createLink("Dashboard", Page.DASHBOARD));

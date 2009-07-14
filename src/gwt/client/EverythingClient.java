@@ -24,7 +24,8 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
 import client.admin.DashboardPanel;
-import client.admin.EditThingsPanel;
+import client.editor.EditCatsPanel;
+import client.editor.EditSeriesPanel;
 import client.game.BrowsePanel;
 import client.game.GridPanel;
 import client.game.LandingPanel;
@@ -109,7 +110,8 @@ public class EverythingClient
         case LANDING: setContent(new LandingPanel(this)); break;
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
-        case EDIT_THINGS: setContent(new EditThingsPanel(this)); break;
+        case EDIT_CATS: setContent(new EditCatsPanel(this)); break;
+        case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
         case DASHBOARD: setContent(new DashboardPanel(this)); break;
         }
 

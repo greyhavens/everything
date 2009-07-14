@@ -124,7 +124,7 @@ public class GameLogic
         Card card = new Card();
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
         card.thing = _thingRepo.loadThing(record.thingId);
-        card.categories = resolveCategories(card.thing);
+        card.categories = resolveCategories(card.thing.categoryId);
         card.created = new Date(record.created.getTime());
         if (record.giverId != 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
@@ -176,28 +176,15 @@ public class GameLogic
     }
 
     /**
-     * Selects the things that will be contained in a fresh grid for the specified player. The
-     * things will be selected using our most recently loaded snapshot of the thing database based
-     * on the aggregate rarities of all of the things in that snapshot.
+     * Resolves the categories from the specified leaf category up.
      */
-    protected int[] selectGridThings (PlayerRecord player, int count)
-    {
-        // TODO: see if this player has any active powerups, apply them during selection
-        return getThingIndex().selectThings(count);
-    }
-
-    /**
-     * Resolves the categories for the specified thing.
-     */
-    protected Category[] resolveCategories (Thing thing)
+    public Category[] resolveCategories (int categoryId)
     {
         List<Category> cats = Lists.newArrayList();
-        int categoryId = thing.categoryId;
         while (categoryId != 0) {
             Category cat = _thingRepo.loadCategory(categoryId);
             if (cat == null) {
-                log.warning("Missing category for thing!",  "thing", thing.thingId,
-                            "categoryId", categoryId);
+                log.warning("Missing category in chain",  "cats", cats, "categoryId", categoryId);
                 categoryId = 0;
             } else {
                 cats.add(cat);
@@ -206,6 +193,17 @@ public class GameLogic
         }
         Collections.reverse(cats);
         return cats.toArray(new Category[cats.size()]);
+    }
+
+    /**
+     * Selects the things that will be contained in a fresh grid for the specified player. The
+     * things will be selected using our most recently loaded snapshot of the thing database based
+     * on the aggregate rarities of all of the things in that snapshot.
+     */
+    protected int[] selectGridThings (PlayerRecord player, int count)
+    {
+        // TODO: see if this player has any active powerups, apply them during selection
+        return getThingIndex().selectThings(count);
     }
 
     /**
