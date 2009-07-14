@@ -152,10 +152,11 @@ public class GameServlet extends EveryServiceServlet
                      "expires", grid.expires);
         }
 
-        log.info("Returning grid", "for", player.who(), "things", grid.thingIds);
         GridResult result = new GridResult();
         result.grid = _gameLogic.resolveGrid(grid);
         result.status = _gameLogic.getGameStatus(player, result.grid.unflipped);
+        log.info("Returning grid", "for", player.who(), "things", grid.thingIds,
+                 "unflipped", result.grid.unflipped);
         return result;
     }
 

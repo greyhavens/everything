@@ -101,16 +101,17 @@ public class GameLogic
         // load up the flipped status for the player's current grid
         boolean[] flipped = _gameRepo.loadFlipped(record.userId);
 
-        // place the flipped cards into the runtime grid and remove them from our map
+        // place the flipped cards into the runtime grid and summarize the rarities of the rest
         for (int ii = 0; ii < record.thingIds.length; ii++) {
-            if (flipped[ii]) {
-                grid.flipped[ii] = cards.remove(record.thingIds[ii]);
+            ThingCard card = cards.get(record.thingIds[ii]);
+            if (card == null) {
+                log.warning("Missing card for grid?", "userId", record.userId,
+                            "gridId", record.gridId, "thingId", record.thingIds[ii]);
+            } else if (flipped[ii]) {
+                grid.flipped[ii] = card;
+            } else {
+                grid.unflipped[card.rarity.toByte()]++;
             }
-        }
-
-        // now summarize the rarities of the remaining unflipped cards
-        for (ThingCard card : cards.values()) {
-            grid.unflipped[card.rarity.toByte()]++;
         }
 
         return grid;
