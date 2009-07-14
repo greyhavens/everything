@@ -4,6 +4,7 @@
 package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +66,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns all category records with the specified parent id.
      */
-    public Iterable<Category> loadCategories (int parentId)
+    public Collection<Category> loadCategories (int parentId)
     {
         return findAll(CategoryRecord.class, new Where(CategoryRecord.PARENT_ID.eq(parentId))).
             map(CategoryRecord.TO_CATEGORY);
@@ -74,7 +75,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads all categories with ids in the supplied set.
      */
-    public Iterable<Category> loadCategories (Set<Integer> ids)
+    public Collection<Category> loadCategories (Set<Integer> ids)
     {
         return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))).
             map(CategoryRecord.TO_CATEGORY);
@@ -83,7 +84,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads all categories that are not yet marked active.
      */
-    public Iterable<Category> loadPendingCategories ()
+    public Collection<Category> loadPendingCategories ()
     {
         return findAll(CategoryRecord.class,
                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
@@ -127,7 +128,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads all comments made on the specified category, ordered from most to least recent.
      */
-    public Iterable<CategoryComment> loadComments (int categoryId)
+    public Collection<CategoryComment> loadComments (int categoryId)
     {
         return findAll(CategoryCommentRecord.class,
                        new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
@@ -139,7 +140,7 @@ public class ThingRepository extends DepotRepository
      * Loads all comments made since the specified cutoff in any category created by the specified
      * user, ordered from most to least recent.
      */
-    public Iterable<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
+    public Collection<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
     {
         Timestamp since = new Timestamp(sinceStamp);
         return findAll(CategoryCommentRecord.class,
@@ -175,7 +176,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns all things in the specified category.
      */
-    public Iterable<Thing> loadThings (int categoryId)
+    public Collection<Thing> loadThings (int categoryId)
     {
         return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
             map(ThingRecord.TO_THING);
@@ -184,7 +185,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns cards for all things in the specified category.
      */
-    public Iterable<ThingCard> loadThingCards (int categoryId)
+    public Collection<ThingCard> loadThingCards (int categoryId)
     {
         return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
             map(ThingRecord.TO_CARD);
@@ -193,7 +194,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns cards for the supplied set of things.
      */
-    public Iterable<ThingCard> loadThingCards (Set<Integer> thingIds)
+    public Collection<ThingCard> loadThingCards (Set<Integer> thingIds)
     {
         return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))).
             map(ThingRecord.TO_CARD);
@@ -244,7 +245,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads all categories in the database that are active.
      */
-    public Iterable<CategoryRecord> loadActiveCategories ()
+    public Collection<CategoryRecord> loadActiveCategories ()
     {
         return findAll(CategoryRecord.class, CacheStrategy.NONE,
                        new Where(CategoryRecord.ACTIVE.eq(true)));
@@ -253,7 +254,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads summary information on every active thing in the repository.
      */
-    public Iterable<ThingInfoRecord> loadActiveThings ()
+    public Collection<ThingInfoRecord> loadActiveThings ()
     {
         return findAll(ThingInfoRecord.class,
                        CacheStrategy.NONE,

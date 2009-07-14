@@ -49,7 +49,7 @@ public class GameLogic
      */
     public GameStatus getGameStatus (PlayerRecord player, int[] unflipped)
     {
-        GameStatus status = PlayerRecord.TO_STATUS.apply(player);
+        GameStatus status = PlayerRecord.TO_GAME_STATUS.apply(player);
         if (status.freeFlips == 0) {
             status.nextFlipCost = getNextFlipCost(unflipped);
         }

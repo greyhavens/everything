@@ -17,6 +17,7 @@ import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
 import com.threerings.everything.client.GameCodes;
+import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerName;
@@ -45,8 +46,12 @@ public class PlayerRecord extends PersistentRecord
         RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerName.class);
 
     /** A function for converting this record to a {@link GameStatus}. */
-    public static Function<PlayerRecord, GameStatus> TO_STATUS =
+    public static Function<PlayerRecord, GameStatus> TO_GAME_STATUS =
         RuntimeUtil.makeToRuntime(PlayerRecord.class, GameStatus.class);
+
+    /** A function for converting this record to a {@link FriendStatus}. */
+    public static Function<PlayerRecord, FriendStatus> TO_FRIEND_STATUS =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, FriendStatus.class);
 
     /** A function for converting this record to a {@link GameStatus}. */
     public static Function<PlayerRecord, PlayerDetails> TO_DETAILS =
@@ -117,7 +122,7 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link PlayerDetails#name}.
+     * Initializes {@link PlayerDetails#name} and  {@link FriendStatus#name}.
      */
     public PlayerName getName ()
     {

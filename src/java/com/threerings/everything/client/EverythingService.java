@@ -11,6 +11,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.FeedItem;
+import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -34,4 +35,9 @@ public interface EverythingService extends RemoteService
      * Returns a list of recent activity for the calling user.
      */
     List<FeedItem> getRecentFeed () throws ServiceException;
+
+    /**
+     * Returns the names of the caller's friends.
+     */
+    List<FriendStatus> getFriends () throws ServiceException;
 }

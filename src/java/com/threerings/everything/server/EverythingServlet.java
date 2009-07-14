@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
+import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -154,7 +156,7 @@ public class EverythingServlet extends EveryServiceServlet
             // load up their recent comments
             cal.add(Calendar.DATE, -RECENT_COMMENT_DAYS);
             CalendarUtil.zeroTime(cal);
-            Iterable<CategoryComment> comments = _thingRepo.loadCommentsSince(
+            Collection<CategoryComment> comments = _thingRepo.loadCommentsSince(
                 player.userId, cal.getTimeInMillis());
 
             // load up the categories to which those comments apply
@@ -211,6 +213,13 @@ public class EverythingServlet extends EveryServiceServlet
 
         // finally resolve the names in all the records that remain
         return _playerLogic.resolveNames(items, player.getName());
+    }
+
+    // from interface EverythingService
+    public List<FriendStatus> getFriends () throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        return Lists.newArrayList(_playerRepo.loadFriendStatus(player.userId));
     }
 
     protected static class ItemKey {

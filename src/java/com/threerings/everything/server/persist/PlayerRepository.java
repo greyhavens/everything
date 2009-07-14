@@ -5,6 +5,7 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.base.Function;
@@ -24,6 +25,7 @@ import com.samskivert.util.IntMaps;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
+import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -56,7 +58,7 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads and returns the names for the supplied set of players, mapped by user id.
      */
-    public IntMap<PlayerName> loadPlayerNames (Set<Integer> userIds)
+    public IntMap<PlayerName> loadPlayerNames (Collection<Integer> userIds)
     {
         IntMap<PlayerName> names = IntMaps.newHashIntMap();
         for (PlayerRecord prec : findAll(PlayerRecord.class,
@@ -69,7 +71,7 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads players that have recently joined.
      */
-    public Iterable<PlayerName> loadRecentPlayers (int count)
+    public Collection<PlayerName> loadRecentPlayers (int count)
     {
         Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24*60*60*1000L);
         return findAll(PlayerRecord.class, new Where(PlayerRecord.JOINED.greaterEq(yesterday)),
@@ -126,9 +128,20 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Loads this status of this user's friends.
+     */
+    public Collection<FriendStatus> loadFriendStatus (int userId)
+    {
+        return findAll(PlayerRecord.class,
+                       PlayerRecord.USER_ID.join(FriendRecord.FRIEND_ID),
+                       new Where(FriendRecord.USER_ID.eq(userId))).
+            map(PlayerRecord.TO_FRIEND_STATUS);
+    }
+
+    /**
      * Loads the ids of all friends of the specified user.
      */
-    public Iterable<Integer> loadFriendIds (int userId)
+    public Collection<Integer> loadFriendIds (int userId)
     {
         return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId))).map(
             new Function<FriendRecord, Integer>() {
@@ -220,7 +233,7 @@ public class PlayerRepository extends DepotRepository
      * Returns up to the specified maximum number of feed items for the specified player. Also
      * resolves the names of all players in the feed in question.
      */
-    public Iterable<FeedItem> loadRecentFeed (int userId, int maxItems)
+    public Collection<FeedItem> loadRecentFeed (int userId, int maxItems)
     {
         // load up this player's friends and add them to the list of actors
         Set<Integer> actorIds = Sets.newHashSet(loadFriendIds(userId));
