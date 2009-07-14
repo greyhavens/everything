@@ -122,12 +122,7 @@ public class EditSeriesPanel extends FlowPanel
 
         final FlowPanel comments = new FlowPanel();
         info.setWidget(row++, 0, comments, 2, null);
-        for (CategoryComment comment : result.comments) {
-            comments.add(formatComment(comment));
-        }
-        if (result.comments.size() == 0) {
-            comments.add(Widgets.newLabel("No comments.", null));
-        }
+        showComments(comments, result.comments, false);
 
         new ClickCallback<CategoryComment>(post, message) {
             protected boolean callService () {
@@ -140,8 +135,9 @@ public class EditSeriesPanel extends FlowPanel
             }
             protected boolean gotResult (CategoryComment comment) {
                 if (comments.getWidget(0) instanceof Label) {
-                    comments.clear(); // if we're showing "no comments"
+                    comments.clear(); // we were showing "no comments"
                 }
+                result.comments.add(0, comment);
                 comments.insert(formatComment(comment), 0);
                 message.setText("");
                 return true;
@@ -232,6 +228,29 @@ public class EditSeriesPanel extends FlowPanel
             Widgets.newLabel(DateUtil.formatDateTime(comment.when), "inline"),
             Args.createInlink(comment.commentor),
             Widgets.newLabel(comment.message, "inline"));
+    }
+
+    protected void showComments (
+        final FlowPanel combox, final List<CategoryComment> comments, final boolean all)
+    {
+        combox.clear();
+        int shown = 0;
+        for (CategoryComment comment : comments) {
+            combox.add(formatComment(comment));
+            if (!all && ++shown >= BRIEF_COMMENT_COUNT) {
+                break;
+            }
+        }
+        if (comments.size() > BRIEF_COMMENT_COUNT) {
+            String label = all ? "[show recent]" : "[show all]";
+            combox.add(Widgets.newActionLabel(label, "tipLabel", new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    showComments(combox, comments, !all);
+                }
+            }));
+        } else if (comments.size() == 0) {
+            combox.add(Widgets.newLabel("No comments.", null));
+        }
     }
 
     protected class ThingEditor extends FlowPanel
@@ -394,4 +413,5 @@ public class EditSeriesPanel extends FlowPanel
     protected Context _ctx;
 
     protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);
+    protected static final int BRIEF_COMMENT_COUNT = 3;
 }
