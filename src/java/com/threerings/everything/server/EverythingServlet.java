@@ -4,13 +4,17 @@
 package com.threerings.everything.server;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import com.google.code.facebookapi.FacebookException;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
@@ -137,7 +141,49 @@ public class EverythingServlet extends EveryServiceServlet
     public List<FeedItem> getRecentFeed () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        return _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS);
+        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS);
+
+        // aggregate these results a bit
+        Calendar cal = Calendar.getInstance();
+        Map<ItemKey, FeedItem> imap = Maps.newHashMap();
+        for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
+            FeedItem item = iter.next();
+            ItemKey key = new ItemKey(item, cal);
+            FeedItem oitem = imap.get(key);
+            if (oitem  != null) {
+                oitem.objects.addAll(item.objects);
+                iter.remove();
+            } else {
+                imap.put(key, item);
+            }
+        }
+
+        return items;
+    }
+
+    protected static class ItemKey {
+        public final int actorId;
+        public final FeedItem.Type type;
+        public final int targetId;
+        public final int dayOfYear;
+
+        public ItemKey (FeedItem item, Calendar cal) {
+            this.actorId = item.actor.userId;
+            this.type = item.type;
+            cal.setTime(item.when);
+            this.dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+            this.targetId = (item.target == null) ? 0 : item.target.userId;
+        }
+
+        public int hashCode () {
+            return actorId ^ type.hashCode() ^ targetId ^ dayOfYear;
+        }
+
+        public boolean equals (Object other) {
+            ItemKey okey = (ItemKey)other;
+            return actorId == okey.actorId && type == okey.type && targetId == okey.targetId &&
+                dayOfYear == okey.dayOfYear;
+        }
     }
 
     @Inject protected FacebookLogic _faceLogic;
@@ -145,7 +191,7 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
 
-    /** Used to parse Facebook profile birthdays. */
+        /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");
 
     /** The maximum number of recent feed items returned. */

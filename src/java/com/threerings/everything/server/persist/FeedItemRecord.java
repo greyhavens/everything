@@ -4,8 +4,10 @@
 package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
@@ -68,6 +70,14 @@ public class FeedItemRecord extends PersistentRecord
     public PlayerName getTarget ()
     {
         return (targetId == 0) ? null : PlayerName.create(targetId);
+    }
+
+    /**
+     * Initializes {@link FeedItem#objects}.
+     */
+    public List<String> getObjects ()
+    {
+        return Lists.newArrayList(object);
     }
 
     // AUTO-GENERATED: METHODS START

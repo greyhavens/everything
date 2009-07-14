@@ -3,6 +3,7 @@
 
 package client.game;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -43,7 +44,6 @@ public class FeedPanel extends FlowPanel
     protected void init (List<FeedItem> items)
     {
         String date = "Today";
-
         for (FeedItem item : items) {
             String idate = DateUtil.formatDate(item.when);
             if (!idate.equals(date)) {
@@ -65,12 +65,27 @@ public class FeedPanel extends FlowPanel
             add(Args.createInlink(getName(item.actor, true), Page.BROWSE, item.actor.userId));
             switch (item.type) {
             case FLIPPED:
-                add(Widgets.newHTML(" flipped the <b>" + item.object + "</b> card.", "inline"));
+                add(Widgets.newHTML(" flipped the " + format(item.objects) + ".", "inline"));
                 break;
             case GIFTED:
-                add(Widgets.newHTML(" gave the <b>" + item.object + "</b> card to ", "inline"));
+                add(Widgets.newHTML(" gave the " + format(item.objects) + " to ", "inline"));
                 add(Args.createInlink(item.target.name, Page.BROWSE, getName(item.actor, false)));
             }
+        }
+
+        protected String format (List<String> objects) {
+            StringBuffer buf = new StringBuffer();
+            for (Iterator<String> iter = objects.iterator(); iter.hasNext(); ) {
+                String object = iter.next();
+                if (buf.length() > 0) {
+                    buf.append(", ");
+                }
+                if (!iter.hasNext()) { // yay for English!
+                    buf.append("and ");
+                }
+                buf.append("<b>").append(object).append("</b>");
+            }
+            return buf.append(objects.size() > 1 ? " cards" : " card").toString();
         }
     }
 

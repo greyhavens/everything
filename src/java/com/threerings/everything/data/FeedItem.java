@@ -4,6 +4,7 @@
 package com.threerings.everything.data;
 
 import java.util.Date;
+import java.util.List;
 
 import com.samskivert.depot.ByteEnum;
 
@@ -43,6 +44,6 @@ public class FeedItem
     /** The the player toward whom this action was targeted (or null). */
     public PlayerName target;
 
-    /** A textual description of the object of the action. */
-    public String object;
+    /** A textual description of the object(s) of the action. */
+    public List<String> objects;
 }
