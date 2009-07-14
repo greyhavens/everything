@@ -32,7 +32,7 @@
   width: 280px;
 }
 
-.cardView .Title, .cardView .Position, .cardView .Categories, .cardView .Rarity {
+.cardView .Title, .cardView .Position, .cardView .Categories, .cardView .Metrics {
   text-align: center;
 }
 
