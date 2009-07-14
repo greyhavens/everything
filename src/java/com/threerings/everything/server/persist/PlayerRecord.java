@@ -113,8 +113,6 @@ public class PlayerRecord extends PersistentRecord
             GameCodes.DAILY_FREE_FLIPS : GameCodes.VACATION_FREE_FLIPS;
         long millisPerFlip = ONE_DAY / flipsPerDay;
         long millisToNextFlip = (long)(millisPerFlip * (Math.ceil(freeFlips) - freeFlips));
-        System.out.println(flipsPerDay + " " + millisPerFlip + " " + millisToNextFlip + " " +
-                           lastSession.getTime());
         return lastSession.getTime() + millisToNextFlip;
     }
 
