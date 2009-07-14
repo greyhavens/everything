@@ -50,7 +50,7 @@ public class GridPanel extends FlowPanel
         clear();
 
         add(_info = new SmartTable(5, 0));
-        _info.setText(0, 1, "New grid " + format(data.grid.expires), 1, "right");
+        _info.setText(1, 1, "New grid " + format(data.grid.expires), 1, "right");
         updateRemaining(data.grid.unflipped);
         updateStatus(data.status);
 
@@ -78,7 +78,7 @@ public class GridPanel extends FlowPanel
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(rarity).append("-").append(unflipped[ii]);
         }
-        _info.setHTML(0, 0, "Rarity in grid: <b>" + buf + "</b>", 2, "left");
+        _info.setHTML(1, 0, "Rarity in grid: <b>" + buf + "</b>", 2, "left");
     }
 
     protected void updateStatus (final GameStatus status)
@@ -86,14 +86,14 @@ public class GridPanel extends FlowPanel
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
 
-        _info.setWidget(1, 0, new CoinLabel("You have ", _ctx.getCoins()), 1, "left");
+        _info.setWidget(0, 0, new CoinLabel("You have ", _ctx.getCoins()), 1, "left");
         if (status.freeFlips > 0) {
-            _info.setText(1, 1, "Next flip is free!", 1, "Bold");
-            _info.setText(1, 2, "Free flips left: " + status.freeFlips, 1, "right");
+            _info.setText(0, 1, "Next flip is free!", 1, "Bold");
+            _info.setText(0, 2, "Free flips left: " + status.freeFlips, 1, "right");
         } else {
-            _info.setWidget(
-                1, 1, new CoinLabel("Next flip costs ", status.nextFlipCost), 1, "Bold");
-            _info.setText(1, 2, "Next free flip " + format(new Date(status.nextFreeFlipAt)),
+            _info.setWidget(0, 1, new CoinLabel("Next flip costs ", status.nextFlipCost),
+                            1, "Bold");
+            _info.setText(0, 2, "Next free flip " + format(new Date(status.nextFreeFlipAt)),
                           1, "right");
         }
     }

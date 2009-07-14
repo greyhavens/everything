@@ -16,7 +16,7 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public static String getCoinHTML (int coins)
     {
-        return "&Omega;" + coins;
+        return "&Sigma;" + coins;
     }
 
     /**
