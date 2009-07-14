@@ -48,6 +48,7 @@ public class FeedPanel extends FlowPanel
             String idate = DateUtil.formatDate(item.when);
             if (!idate.equals(date)) {
                 add(Widgets.newLabel(idate, "Date"));
+                date = idate;
             }
             add(new FeedItemLabel(item));
         }
