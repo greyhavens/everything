@@ -16,6 +16,7 @@ import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerFullName;
@@ -117,6 +118,20 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
+     * Initializes {@link GameStatus#nextFreeFlipAt}.
+     */
+    public long getNextFreeFlipAt ()
+    {
+        long flipsPerDay = (freeFlips < GameCodes.DAILY_FREE_FLIPS) ?
+            GameCodes.DAILY_FREE_FLIPS : GameCodes.VACATION_FREE_FLIPS;
+        long millisPerFlip = ONE_DAY / flipsPerDay;
+        long millisToNextFlip = (long)(millisPerFlip * (Math.ceil(freeFlips) - freeFlips));
+        System.out.println(flipsPerDay + " " + millisPerFlip + " " + millisToNextFlip + " " +
+                           lastSession.getTime());
+        return lastSession.getTime() + millisToNextFlip;
+    }
+
+    /**
      * Initializes {@link PlayerDetails#fullName}.
      */
     public PlayerFullName getFullName ()
@@ -145,4 +160,7 @@ public class PlayerRecord extends PersistentRecord
                 new Comparable[] { userId });
     }
     // AUTO-GENERATED: METHODS END
+
+    /** One day in milliseconds. */
+    protected static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 }

@@ -3,8 +3,9 @@
 
 package client.game;
 
+import java.util.Date;
+
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -13,6 +14,7 @@ import com.samskivert.depot.util.ByteEnumUtil;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -48,8 +50,9 @@ public class GridPanel extends FlowPanel
         clear();
 
         add(_info = new SmartTable(5, 0));
+        _info.setText(0, 1, "New grid " + format(data.grid.expires), 1, "right");
         updateRemaining(data.grid.unflipped);
-        _info.setText(0, 1, "New grid at " + _expfmt.format(data.grid.expires));
+        updateStatus(data.status);
 
         add(_cards = new SmartTable(5, 0));
         for (int ii = 0; ii < data.grid.flipped.length; ii++) {
@@ -62,9 +65,6 @@ public class GridPanel extends FlowPanel
             };
             _cards.setWidget(row, col, ThingCardView.createMicro(data.grid.flipped[ii], onClick));
         }
-
-        add(_status = new SmartTable(5, 0));
-        updateStatus(data.status);
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -78,7 +78,7 @@ public class GridPanel extends FlowPanel
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(rarity).append("-").append(unflipped[ii]);
         }
-        _info.setHTML(0, 0, "Remaining: " + buf, 1, "Bold");
+        _info.setHTML(0, 0, "Rarity in grid: <b>" + buf + "</b>", 2, "left");
     }
 
     protected void updateStatus (final GameStatus status)
@@ -86,15 +86,15 @@ public class GridPanel extends FlowPanel
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
 
-        _status.setWidget(0, 0, new CoinLabel("You have ", _ctx.getCoins()));
+        _info.setWidget(1, 0, new CoinLabel("You have ", _ctx.getCoins()), 1, "left");
         if (status.freeFlips > 0) {
-            _status.setText(0, 1, "Next flip is free!", 1, "Bold");
-            _status.setText(0, 2, "Free flips left: " + status.freeFlips);
+            _info.setText(1, 1, "Next flip is free!", 1, "Bold");
+            _info.setText(1, 2, "Free flips left: " + status.freeFlips, 1, "right");
         } else {
-            _status.setWidget(
-                0, 1, new CoinLabel("Next flip costs ", status.nextFlipCost), 1, "Bold");
-            _status.setText(0, 2, "");
-            // TODO: _status.setText(0, 2, "Next free flip at " + _expfmt(data.nextFreeFlip));
+            _info.setWidget(
+                1, 1, new CoinLabel("Next flip costs ", status.nextFlipCost), 1, "Bold");
+            _info.setText(1, 2, "Next free flip " + format(new Date(status.nextFreeFlipAt)),
+                          1, "right");
         }
     }
 
@@ -130,10 +130,14 @@ public class GridPanel extends FlowPanel
             });
     }
 
+    protected static String format (Date date)
+    {
+        return DateUtil.formatDateTime(date).toLowerCase();
+    }
+
     protected Context _ctx;
     protected SmartTable _info, _cards, _status;
 
-    protected static final DateTimeFormat _expfmt = DateTimeFormat.getFormat("h:MMa EEEEEEEEE");
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 
     protected static final int COLUMNS = 4;
