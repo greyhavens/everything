@@ -80,7 +80,7 @@ public class FeedPanel extends FlowPanel
                 if (buf.length() > 0) {
                     buf.append(", ");
                 }
-                if (!iter.hasNext()) { // yay for English!
+                if (!iter.hasNext() && objects.size() > 0) { // yay for English!
                     buf.append("and ");
                 }
                 buf.append("<b>").append(object).append("</b>");
