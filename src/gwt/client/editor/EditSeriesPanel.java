@@ -225,7 +225,7 @@ public class EditSeriesPanel extends FlowPanel
     protected Widget formatComment (CategoryComment comment)
     {
         return Widgets.newRow(
-            Widgets.newLabel(DateUtil.formatDateTime(comment.when), "inline"),
+            Widgets.newLabel(DateUtil.formatDateTime(comment.when), "inline", "nowrap"),
             Args.createInlink(comment.commentor),
             Widgets.newLabel(comment.message, "inline"));
     }

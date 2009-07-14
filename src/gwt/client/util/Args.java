@@ -43,6 +43,7 @@ public class Args
             buf.append(arg);
         }
         Hyperlink link = new Hyperlink(label, buf.toString());
+        link.addStyleName("nowrap");
         if (styleName != null) {
             link.addStyleName(styleName);
         }

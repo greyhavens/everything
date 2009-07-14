@@ -31,6 +31,10 @@ html, body {
   text-align: center;
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 /** DataPopup styles */
 .popup {
   border: 1px solid;
