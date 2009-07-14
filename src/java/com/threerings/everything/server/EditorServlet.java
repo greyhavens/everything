@@ -3,6 +3,8 @@
 
 package com.threerings.everything.server;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -192,6 +194,17 @@ public class EditorServlet extends EveryServiceServlet
         _adminLogic.noteAction(editor, "deleted", thing);
     }
 
+    // from interface EditorService
+    public String slurpImage (String imgurl) throws ServiceException
+    {
+        requireEditor();
+        try {
+            return _mediaLogic.processImage(new URL(imgurl));
+        } catch (MalformedURLException mue) {
+            throw new ServiceException(E_INVALID_URL);
+        }
+    }
+
     protected PlayerRecord checkEditor (Created created)
         throws ServiceException
     {
@@ -214,5 +227,6 @@ public class EditorServlet extends EveryServiceServlet
 
     @Inject protected AdminLogic _adminLogic;
     @Inject protected GameLogic _gameLogic;
+    @Inject protected MediaLogic _mediaLogic;
     @Inject protected ThingRepository _thingRepo;
 }

@@ -32,6 +32,9 @@ public interface EditorService extends RemoteService
     /** Thrown by {@link #deleteThing} if the thing in question is used in cards. */
     public static final String E_THING_IN_CARDS = "e.thing_in_cards";
 
+    /** Thrown by {@link #slurpImage} if the supplied image URL is invalid. */
+    public static final String E_INVALID_URL = "e.invalid_url";
+
     /** Provides results for {@link #loadSeries}. */
     public static class SeriesResult implements IsSerializable
     {
@@ -86,4 +89,10 @@ public interface EditorService extends RemoteService
      * Deletes the specified thing.
      */
     void deleteThing (int thingId) throws ServiceException;
+
+    /**
+     * Requests that the server slurp down the specified image, upload it to our media repository
+     * and return the path to the slurped media.
+     */
+    String slurpImage (String imgurl) throws ServiceException;
 }

@@ -54,4 +54,9 @@ public interface EditorServiceAsync
      * The async version of {@link EditorService#deleteThing}.
      */
     void deleteThing (int thingId, AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link EditorService#slurpImage}.
+     */
+    void slurpImage (String imgurl, AsyncCallback<String> callback);
 }

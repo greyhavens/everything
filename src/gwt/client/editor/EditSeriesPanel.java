@@ -215,12 +215,28 @@ public class EditSeriesPanel extends FlowPanel
             });
 
             _ctrl.setText(row, 0, "Image", 1, "right");
-            _ctrl.setWidget(row++, 1, new MediaUploader(new MediaUploader.Listener() {
-                public void mediaUploaded (String name) {
-                    card.thing.image = name;
+            _ctrl.setWidget(row, 1, new MediaUploader(new MediaUploader.Listener() {
+                public void mediaUploaded (String image) {
+                    card.thing.image = image;
                     updateCard(card);
                 }
             }));
+            final TextBox imgurl = Widgets.newTextBox("", -1, 25);
+            DefaultTextListener.configure(imgurl, "<paste image url, press enter>");
+            _ctrl.setWidget(row++, 2, imgurl, 2, null);
+            new ClickCallback<String>(new Button("dummy"), imgurl) {
+                protected boolean callService () {
+                    _editorsvc.slurpImage(imgurl.getText().trim(), this);
+                    return true;
+                }
+                protected boolean gotResult (String image) {
+                    card.thing.image = image;
+                    updateCard(card);
+                    imgurl.setText("");
+                    imgurl.setFocus(false);
+                    return true;
+                }
+            };
 
             _ctrl.setText(row, 0, "Descrip", 1, "right");
             final LimitedTextArea descrip = Widgets.newTextArea(
