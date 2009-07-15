@@ -135,7 +135,8 @@ public class PlayerRepository extends DepotRepository
     {
         return findAll(PlayerRecord.class,
                        PlayerRecord.USER_ID.join(FriendRecord.FRIEND_ID),
-                       new Where(FriendRecord.USER_ID.eq(userId))).
+                       new Where(FriendRecord.USER_ID.eq(userId)),
+                       OrderBy.descending(PlayerRecord.LAST_SESSION)).
             map(PlayerRecord.TO_FRIEND_STATUS);
     }
 
