@@ -44,6 +44,14 @@ public class EverythingApp extends App
     }
 
     /**
+     * Returns true if RPC version checking is enabled.
+     */
+    public boolean versionCheckingEnabled ()
+    {
+        return !_config.getValue("disable_version_checking", false);
+    }
+
+    /**
      * Returns our Facebook API key.
      */
     public String getFacebookKey ()

@@ -3,6 +3,9 @@
 #
 # Everything app configuration
 
+# Local developer configuration
+disable_version_checking = false
+
 # Our Facebook app configuration
 facebook_appid = APP_ID
 facebook_key = API_KEY
