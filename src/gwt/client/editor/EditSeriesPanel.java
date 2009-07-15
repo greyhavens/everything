@@ -152,6 +152,7 @@ public class EditSeriesPanel extends FlowPanel
         }
 
         // finally add a UI for creating new things
+        add(Widgets.newHTML("Add Things", "Title"));
         final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
         DefaultTextListener.configure(thing, "<new thing name>");
         Button create = new Button("Add Thing");
@@ -172,7 +173,7 @@ public class EditSeriesPanel extends FlowPanel
                 ThingEditor editor = new ThingEditor(
                     createCard(result, _thing, result.things.size()));
                 result.things.add(_thing);
-                insert(editor, getWidgetCount()-1);
+                insert(editor, getWidgetCount()-2);
                 editor.setEditing(true);
                 _thing = null;
                 return true;

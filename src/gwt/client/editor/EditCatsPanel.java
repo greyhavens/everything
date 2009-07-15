@@ -89,7 +89,9 @@ public class EditCatsPanel extends SmartTable
                     _cat.categoryId = categoryId;
                     _empty.setVisible(false);
                     addCat(_cat);
-                    setSelected(_cat);
+                    if (_child != null) {
+                        setSelected(_cat);
+                    }
                     _cat = null;
                     _input.setText("");
                     return true;
