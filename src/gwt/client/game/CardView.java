@@ -63,8 +63,9 @@ public abstract class CardView extends FlowPanel
     {
         public Left (Card card)
         {
-            add(Widgets.newLabel(card.thing.name, "Title"));
-            add(Widgets.newHTML(Category.getHierarchyHTML(card.categories), "Categories"));
+            add(Widgets.newLabel(card.thing.name, "Title", getTitleSize(card.thing.name)));
+            add(Widgets.newHTML(Category.getHierarchyHTML(card.categories), "Categories",
+                                getCategoriesSize(card.categories)));
             add(ImageUtil.getImageBox(card.thing.image));
             add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
                                      new CoinLabel(" - ", card.thing.rarity.value)));
@@ -85,6 +86,30 @@ public abstract class CardView extends FlowPanel
                 add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
             }
             add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
+        }
+    }
+
+    protected String getTitleSize (String name)
+    {
+        if (name.length() < 16) {
+            return "NormalTitle";
+        } else if (name.length() < 24) {
+            return "LongTitle";
+        } else {
+            return "ReallyLongTitle";
+        }
+    }
+
+    protected String getCategoriesSize (Category[] categories)
+    {
+        int length = 0;
+        for (Category cat : categories) {
+            length += cat.name.length();
+        }
+        if (length < 28) {
+            return "NormalCategories";
+        } else {
+            return "LongCategories";
         }
     }
 

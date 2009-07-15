@@ -68,7 +68,7 @@ public class EditSeriesPanel extends FlowPanel
     {
         // add some metadata at the top
         final Category series = result.categories[result.categories.length-1];
-        add(Widgets.newHTML(Category.getHierarchyHTML(result.categories), "Title"));
+        add(Widgets.newHTML(Category.getHierarchyHTML(result.categories), "Header"));
 
         SmartTable info = new SmartTable(5, 0);
         add(info);
@@ -152,7 +152,7 @@ public class EditSeriesPanel extends FlowPanel
         }
 
         // finally add a UI for creating new things
-        add(Widgets.newHTML("Add Things", "Title"));
+        add(Widgets.newHTML("Add Things", "Header"));
         final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
         DefaultTextListener.configure(thing, "<new thing name>");
         Button create = new Button("Add Thing");

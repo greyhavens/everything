@@ -36,8 +36,21 @@
   text-align: center;
 }
 
-.cardView .Title {
+.cardView .NormalTitle {
   font-size: 24px;
+}
+.cardView .LongTitle {
+  font-size: 21px;
+}
+.cardView .ReallyLongTitle {
+  font-size: 18px;
+}
+
+.cardView .NormalCategories {
+  font-size: 15px;
+}
+.cardView .LongCategories {
+  font-size: 13px;
 }
 
 .cardView .Position, .cardView .Metrics {
