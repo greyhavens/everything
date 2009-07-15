@@ -78,11 +78,18 @@ public class EditCatsPanel extends SmartTable
                     if (text.length() == 0) {
                         return false;
                     }
-                    _cat = onCreate(text, this);
+                    _cat = new Category();
+                    _cat.name = text;
+                    _cat.parentId = _parentId;
+                    _cat.creator = _ctx.getMe();
+                    _editorsvc.createCategory(_cat, this);
                     return true;
                 }
-                protected boolean gotResult (Integer result) {
-                    onCreated(result, _cat);
+                protected boolean gotResult (Integer categoryId) {
+                    _cat.categoryId = categoryId;
+                    _empty.setVisible(false);
+                    addCat(_cat);
+                    setSelected(_cat);
                     _cat = null;
                     _input.setText("");
                     return true;
@@ -108,7 +115,7 @@ public class EditCatsPanel extends SmartTable
                         addCat(cat);
                     }
                     _empty.setVisible(cats.size() == 0);
-                    setEnabled(isEditable());
+                    setEnabled(true);
                 }
             });
         }
@@ -155,10 +162,6 @@ public class EditCatsPanel extends SmartTable
             _contents.add(row);
         }
 
-        protected boolean isEditable () {
-            return true;
-        }
-
         protected void initCatRow (final Row row, boolean selected)
         {
             row.clear();
@@ -167,7 +170,7 @@ public class EditCatsPanel extends SmartTable
             label.setTitle(row.cat.creator.toString());
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    onDelete(row.cat, new PopupCallback<Void>(label) {
+                    _editorsvc.deleteCategory(row.cat.categoryId, new PopupCallback<Void>(label) {
                         public void onSuccess (Void result) {
                             _contents.remove(row);
                             if (row.cat == _selected) {
@@ -188,29 +191,6 @@ public class EditCatsPanel extends SmartTable
                     setSelected(cat);
                 }
             });
-        }
-
-        protected void catAdded (Category cat) {
-            _empty.setVisible(false);
-            addCat(cat);
-            setSelected(cat);
-        }
-
-        protected Category onCreate (String text, AsyncCallback<Integer> callback) {
-            Category cat = new Category();
-            cat.name = text;
-            cat.parentId = _parentId;
-            _editorsvc.createCategory(cat, callback);
-            return cat;
-        }
-
-        protected void onCreated (int createdId, Category cat) {
-            cat.categoryId = createdId;
-            catAdded(cat);
-        }
-
-        protected void onDelete (Category category, AsyncCallback<Void> callback) {
-            _editorsvc.deleteCategory(category.categoryId, callback);
         }
 
         protected abstract void callLoad (AsyncCallback<List<Category>> callback);
