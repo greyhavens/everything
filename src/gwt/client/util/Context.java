@@ -36,4 +36,9 @@ public interface Context
     /** Displays a popup, hiding any existing popup (which will be restored when this popup is
      * cleared). */
     public void displayPopup (PopupPanel popup);
+
+    /**
+     * Returns the categories model.
+     */
+    public CategoriesModel getCatsModel ();
 }

@@ -36,13 +36,7 @@ public class Args
      */
     public static Hyperlink createLink (String label, String styleName, Page page, Object... args)
     {
-        StringBuffer buf = new StringBuffer();
-        buf.append(page);
-        for (Object arg : args) {
-            buf.append(SEPARATOR);
-            buf.append(arg);
-        }
-        Hyperlink link = new Hyperlink(label, buf.toString());
+        Hyperlink link = new Hyperlink(label, createLinkToken(page, args));
         link.addStyleName("nowrap");
         if (styleName != null) {
             link.addStyleName(styleName);
@@ -56,6 +50,20 @@ public class Args
     public static Hyperlink createInlink (PlayerName name)
     {
         return createInlink(name.toString(), Page.BROWSE, name.userId);
+    }
+
+    /**
+     * Creates a history token for the specified page and args.
+     */
+    public static String createLinkToken (Page page, Object... args)
+    {
+        StringBuffer buf = new StringBuffer();
+        buf.append(page);
+        for (Object arg : args) {
+            buf.append(SEPARATOR);
+            buf.append(arg);
+        }
+        return buf.toString();
     }
 
     /**

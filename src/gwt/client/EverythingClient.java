@@ -34,6 +34,7 @@ import client.game.FriendsPanel;
 import client.game.GridPanel;
 import client.game.LandingPanel;
 import client.util.Args;
+import client.util.CategoriesModel;
 import client.util.Context;
 import client.util.Errors;
 
@@ -112,6 +113,12 @@ public class EverythingClient
         _pstack.show(popup);
     }
 
+    // from interface Context
+    public CategoriesModel getCatsModel ()
+    {
+        return _catsmodel;
+    }
+
     // from interface ValueChangeHandler<String>
     public void onValueChange (ValueChangeEvent<String> event)
     {
@@ -123,7 +130,12 @@ public class EverythingClient
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
-        case EDIT_CATS: setContent(new EditCatsPanel(this)); break;
+        case EDIT_CATS:
+            if (!(_content instanceof EditCatsPanel)) {
+                setContent(new EditCatsPanel(this));
+            }
+            ((EditCatsPanel)_content).setArgs(args);
+            break;
         case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
         case DASHBOARD: setContent(new DashboardPanel(this, _news)); break;
         }
@@ -158,6 +170,8 @@ public class EverythingClient
     protected HeaderPanel _header;
     protected Widget _content;
     protected PopupStack _pstack = new PopupStack();
+
+    protected CategoriesModel _catsmodel = new CategoriesModel(this);
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 

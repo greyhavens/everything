@@ -5,9 +5,9 @@ package client.editor;
 
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -21,8 +21,6 @@ import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
-import com.threerings.everything.client.EditorService;
-import com.threerings.everything.client.EditorServiceAsync;
 import com.threerings.everything.data.Category;
 
 import client.util.Args;
@@ -50,7 +48,19 @@ public class EditCatsPanel extends SmartTable
         _ctx = ctx;
         _cats.setChild(_subcats);
         _subcats.setChild(_series);
-        _cats.load();
+    }
+
+    public void setArgs (Args args)
+    {
+        _cats.setSelectedId(args.get(0, -1));
+        _subcats.setSelectedId(args.get(1, -1));
+        _cats.setParentId(0);
+    }
+
+    protected String createToken ()
+    {
+        return Args.createLinkToken(
+            Page.EDIT_CATS, _cats.getSelectedId(), _subcats.getSelectedId());
     }
 
     protected static class Row extends HorizontalPanel
@@ -72,54 +82,87 @@ public class EditCatsPanel extends SmartTable
             DefaultTextListener.configure(_input, "<add new>");
 
             // wire up our create callback
-            new ClickCallback<Integer>(new Button("dummy"), _input) {
+            new ClickCallback<Category>(new Button("dummy"), _input) {
                 protected boolean callService () {
                     String text = _input.getText().trim();
                     if (text.length() == 0) {
                         return false;
                     }
-                    _cat = new Category();
-                    _cat.name = text;
-                    _cat.parentId = _parentId;
-                    _cat.creator = _ctx.getMe();
-                    _editorsvc.createCategory(_cat, this);
+                    _ctx.getCatsModel().createCategory(text, _parentId, this);
                     return true;
                 }
-                protected boolean gotResult (Integer categoryId) {
-                    _cat.categoryId = categoryId;
+                protected boolean gotResult (Category cat) {
                     _empty.setVisible(false);
-                    addCat(_cat);
-                    if (_child != null) {
-                        setSelected(_cat);
-                    }
-                    _cat = null;
+                    addCat(cat);
                     _input.setText("");
+                    if (_child != null) {
+                        setSelectedId(cat.categoryId);
+                        History.newItem(createToken());
+                    }
                     return true;
                 }
-                protected Category _cat;
             };
 
             // start off disabled
             setEnabled(false);
         }
 
-        public void setChild (Column child) {
-            _child = child;
+        public int getSelectedId () {
+            return _selectedId;
         }
 
-        public void load () {
+        public void setSelectedId (int categoryId)
+        {
+            if (_contents.getWidgetCount() == 0) {
+                _pendingSelId = categoryId;
+
+            } else if (_selectedId != categoryId) {
+                // deselect the old cat row and select the new
+                for (int ii = 0; ii < _contents.getWidgetCount(); ii++) {
+                    Row row = (Row)_contents.getWidget(ii);
+                    if (row.cat.categoryId == _selectedId) {
+                        initCatRow(row, false);
+                    } else if (row.cat.categoryId == categoryId) {
+                        initCatRow(row, true);
+                    }
+                }
+                _selectedId = categoryId;
+                if (_child != null) {
+                    if (_selectedId > 0) {
+                        _child.setParentId(_selectedId);
+                    } else {
+                        _child.clear();
+                    }
+                }
+            }
+        }
+
+        public void setParentId (int parentId)
+        {
+            if (_parentId == parentId) {
+                checkPendingSelection();
+                return;
+            }
+
             clear();
+            _empty.setVisible(false);
             _contents.add(Widgets.newLabel("Loading...", null));
-            callLoad(new PopupCallback<List<Category>>(_input) {
+            _parentId = parentId;
+            _ctx.getCatsModel().getCategories(_parentId, new PopupCallback<List<Category>>(_input) {
                 public void onSuccess (List<Category> cats) {
                     _contents.clear();
                     for (Category cat : cats) {
                         addCat(cat);
                     }
                     _empty.setVisible(cats.size() == 0);
+                    checkPendingSelection();
                     setEnabled(true);
                 }
             });
+        }
+
+        public void setChild (Column child) {
+            _child = child;
         }
 
         public void clear () {
@@ -130,41 +173,22 @@ public class EditCatsPanel extends SmartTable
             }
         }
 
-        public void setEnabled (boolean enabled) {
+        protected void setEnabled (boolean enabled) {
             _input.setEnabled(enabled);
         }
 
-        public Category getSelected () {
-            return _selected;
+        protected void addCat (Category cat) {
+            _contents.add(initCatRow(new Row(cat), false));
         }
 
-        public void setSelected (Category cat) {
-            // deselect the old cat row and select the new
-            for (int ii = 0; ii < _contents.getWidgetCount(); ii++) {
-                Row row = (Row)_contents.getWidget(ii);
-                if (row.cat == _selected) {
-                    initCatRow(row, false);
-                } else if (row.cat == cat) {
-                    initCatRow(row, true);
-                }
-            }
-            _selected = cat;
-            if (_child != null) {
-                if (_selected != null) {
-                    _child.load();
-                } else {
-                    _child.clear();
-                }
+        protected void checkPendingSelection () {
+            if (_pendingSelId > 0) {
+                setSelectedId(_pendingSelId);
+                _pendingSelId = 0;
             }
         }
 
-        public void addCat (Category cat) {
-            Row row = new Row(cat);
-            initCatRow(row, false);
-            _contents.add(row);
-        }
-
-        protected void initCatRow (final Row row, boolean selected)
+        protected Row initCatRow (final Row row, boolean selected)
         {
             row.clear();
             final Widget label = selected ? Widgets.newLabel(row.cat.name, "Selected") :
@@ -172,11 +196,12 @@ public class EditCatsPanel extends SmartTable
             label.setTitle(row.cat.creator.toString());
             row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    _editorsvc.deleteCategory(row.cat.categoryId, new PopupCallback<Void>(label) {
+                    _ctx.getCatsModel().deleteCategory(
+                        row.cat.categoryId, new PopupCallback<Void>(label) {
                         public void onSuccess (Void result) {
                             _contents.remove(row);
-                            if (row.cat == _selected) {
-                                setSelected(null);
+                            if (row.cat.categoryId == _selectedId) {
+                                setSelectedId(0);
                             }
                         }
                     });
@@ -184,51 +209,31 @@ public class EditCatsPanel extends SmartTable
             }));
             row.add(Widgets.newShim(5, 5));
             row.add(label);
+            return row;
         }
 
-        protected Widget createCatActionLabel (final Category cat)
-        {
-            return Widgets.newActionLabel(cat.name, new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    setSelected(cat);
-                }
-            });
-        }
+        protected abstract Widget createCatActionLabel (final Category cat);
 
-        protected abstract void callLoad (AsyncCallback<List<Category>> callback);
-
-        protected Category _selected;
         protected Column _child;
         protected FlowPanel _contents;
         protected TextBox _input;
         protected Label _empty;
-        protected int _parentId;
+
+        protected int _parentId = -1, _selectedId, _pendingSelId = -1;
     }
 
     protected Column _cats = new Column("Categories") {
-        protected void callLoad (AsyncCallback<List<Category>> callback) {
-            _editorsvc.loadCategories(0, callback);
+        protected Widget createCatActionLabel (Category cat) {
+            return Args.createLink(cat.name, Page.EDIT_CATS, cat.categoryId);
         }
     };
-
     protected Column _subcats = new Column("Sub-categories") {
-        protected void callLoad (AsyncCallback<List<Category>> callback) {
-            Category parent = _cats.getSelected();
-            if (parent != null) {
-                _editorsvc.loadCategories(_parentId = parent.categoryId, callback);
-            }
+        protected Widget createCatActionLabel (Category cat) {
+            return Args.createLink(cat.name, Page.EDIT_CATS, _cats.getSelectedId(), cat.categoryId);
         }
     };
-
     protected Column _series = new Column("Series") {
-        protected void callLoad (AsyncCallback<List<Category>> callback) {
-            Category parent = _subcats.getSelected();
-            if (parent != null) {
-                _editorsvc.loadCategories(_parentId = parent.categoryId, callback);
-            }
-        }
-
-        @Override protected Widget createCatActionLabel (Category cat) {
+        protected Widget createCatActionLabel (Category cat) {
             return Widgets.newFlowPanel(
                 Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId),
                 Widgets.newLabel(" (" + cat.things + ")", "inline"));
@@ -236,6 +241,4 @@ public class EditCatsPanel extends SmartTable
     };
 
     protected Context _ctx;
-
-    protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);
 }
