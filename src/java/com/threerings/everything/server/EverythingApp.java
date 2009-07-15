@@ -12,6 +12,7 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import com.samskivert.io.StreamUtil;
 import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
 import com.threerings.util.PostgresUtil;
@@ -48,7 +49,7 @@ public class EverythingApp extends App
      */
     public boolean versionCheckingEnabled ()
     {
-        return !_config.getValue("disable_version_checking", false);
+        return _config.getValue("rpc_version_checking", true);
     }
 
     /**
@@ -136,7 +137,7 @@ public class EverythingApp extends App
         shutdown();
     }
 
-    protected Config _config = new Config("everything", getClass().getClassLoader());
+    protected Config _config = createConfig("everything");
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
 

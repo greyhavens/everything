@@ -3,8 +3,8 @@
 #
 # Everything app configuration
 
-# Local developer configuration
-disable_version_checking = false
+# Whether or not to version check RPC requests
+rpc_version_checking = true
 
 # Our Facebook app configuration
 facebook_appid = APP_ID
