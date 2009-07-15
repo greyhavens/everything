@@ -14,11 +14,14 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.CookieUtil;
 import com.threerings.gwt.util.PopupStack;
 import com.threerings.gwt.util.Value;
 
+import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
+import com.threerings.everything.data.Build;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
@@ -45,6 +48,7 @@ public class EverythingClient
     {
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
+        CookieUtil.set("/", 0, EverythingCodes.VERS_COOKIE, Build.VERSION);
         _everysvc.validateSession(getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 if (data == null) {

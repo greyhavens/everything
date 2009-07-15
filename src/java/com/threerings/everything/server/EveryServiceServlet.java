@@ -3,7 +3,12 @@
 
 package com.threerings.everything.server;
 
+import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
+import com.google.gwt.user.client.rpc.SerializationException;
+import com.google.gwt.user.server.rpc.RPC;
 import com.google.inject.Inject;
+
+import com.samskivert.servlet.util.CookieUtil;
 
 import com.threerings.user.OOOUser;
 
@@ -11,6 +16,8 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServiceServlet;
 
+import com.threerings.everything.client.EverythingCodes;
+import com.threerings.everything.data.Build;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
@@ -19,6 +26,18 @@ import com.threerings.everything.server.persist.PlayerRepository;
  */
 public abstract class EveryServiceServlet extends AppServiceServlet
 {
+    @Override // from RemoteServiceServlet
+    public String processCall (String payload) throws SerializationException
+    {
+        String reqvers = CookieUtil.getCookieValue(
+            getThreadLocalRequest(), EverythingCodes.VERS_COOKIE);
+        if (!reqvers.equals(Build.VERSION)) {
+            return RPC.encodeResponseForFailure(
+                null, new IncompatibleRemoteServiceException(EverythingCodes.E_STALE_APP, null));
+        }
+        return super.processCall(payload);
+    }
+
     protected PlayerRecord requirePlayer ()
         throws ServiceException
     {
