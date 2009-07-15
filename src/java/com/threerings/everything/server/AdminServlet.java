@@ -3,6 +3,7 @@
 
 package com.threerings.everything.server;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -14,8 +15,10 @@ import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.client.AdminService;
+import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
@@ -35,6 +38,9 @@ public class AdminServlet extends EveryServiceServlet
         result.stats = _thingRepo.loadStats();
         result.recentPlayers = Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
         result.pendingCategories = Lists.newArrayList(_thingRepo.loadPendingCategories());
+        for (News news : _gameRepo.loadLatestNews()) {
+            result.latestNews = news;
+        }
         return result;
     }
 
@@ -68,7 +74,25 @@ public class AdminServlet extends EveryServiceServlet
         return Lists.newArrayList(); // TODO
     }
 
+    // from interface AdminService
+    public long addNews (String text) throws ServiceException
+    {
+        OOOUser user = requireAdmin();
+        long reported = _gameRepo.reportNews(user.userId, text);
+        _adminLogic.noteAction(user.userId, "added news " + new Date(reported));
+        return reported;
+    }
+
+    // from interface AdminService
+    public void updateNews (long reported, String text) throws ServiceException
+    {
+        OOOUser user = requireAdmin();
+        _gameRepo.updateNews(reported, text);
+        _adminLogic.noteAction(user.userId, "updated news " + new Date(reported));
+    }
+
     @Inject protected AdminLogic _adminLogic;
+    @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
 
     protected static final int MAX_RECENTS = 10;

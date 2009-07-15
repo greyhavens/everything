@@ -4,6 +4,7 @@
 package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +20,11 @@ import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
+import com.samskivert.depot.clause.Limit;
+import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+
+import com.threerings.everything.data.News;
 
 /**
  * Maintains game related persistent data.
@@ -30,6 +35,38 @@ public class GameRepository extends DepotRepository
     @Inject public GameRepository (PersistenceContext ctx)
     {
         super(ctx);
+    }
+
+    /**
+     * Loads up the latest news. The supplied array will contain zero or one elements.
+     */
+    public Collection<News> loadLatestNews ()
+    {
+        return findAll(NewsRecord.class,
+                       OrderBy.descending(NewsRecord.REPORTED),
+                       new Limit(0, 1)).map(NewsRecord.TO_NEWS);
+    }
+
+    /**
+     * Stores a new news record into the database. Returns the time assigned to this news report.
+     */
+    public long reportNews (int reporterId, String text)
+    {
+        NewsRecord record = new NewsRecord();
+        record.reported = new Timestamp(System.currentTimeMillis());
+        record.reporterId = reporterId;
+        record.text = text;
+        insert(record);
+        return record.reported.getTime();
+    }
+
+    /**
+     * Updates the text of the specified news report.
+     */
+    public void updateNews (long reported, String text)
+    {
+        updatePartial(NewsRecord.getKey(new Timestamp(reported)),
+                      NewsRecord.TEXT, text);
     }
 
     /**
@@ -175,6 +212,7 @@ public class GameRepository extends DepotRepository
         classes.add(CardRecord.class);
         classes.add(FlippedRecord.class);
         classes.add(GridRecord.class);
+        classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
     }
 }

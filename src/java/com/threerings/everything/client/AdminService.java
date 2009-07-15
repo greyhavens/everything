@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.ThingStats;
@@ -39,6 +40,9 @@ public interface AdminService extends RemoteService
 
         /** Players that have recently joined the game. */
         public List<PlayerName> recentPlayers;
+
+        /** The latest news or null. */
+        public News latestNews;
     }
 
     /**
@@ -60,4 +64,14 @@ public interface AdminService extends RemoteService
      * Looks up players by first or last name.
      */
     List<PlayerName> findPlayers (String query) throws ServiceException;
+
+    /**
+     * Adds a new news report. Returns the time assigned to this news report.
+     */
+    long addNews (String text) throws ServiceException;
+
+    /**
+     * Updates an existing news report.
+     */
+    void updateNews (long reported, String text) throws ServiceException;
 }

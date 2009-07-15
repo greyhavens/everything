@@ -40,6 +40,7 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
+import com.threerings.everything.data.News;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -140,6 +141,9 @@ public class EverythingServlet extends EveryServiceServlet
         data.coins = player.coins;
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         data.gridsConsumed = (grid == null) ? 0 : grid.gridId;
+        for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
+            data.news = news;
+        }
         return data;
     }
 

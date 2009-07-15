@@ -71,6 +71,9 @@ public interface GameService extends RemoteService
         /** Number of this thing already held by this player (not including this one). */
         public int haveCount;
 
+        /** True if this card completes its set for this player. */
+        public boolean completesSet;
+
         /** The player's new game status after the flip. */
         public GameStatus status;
     }

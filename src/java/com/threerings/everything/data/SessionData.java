@@ -25,4 +25,7 @@ public class SessionData
 
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;
+
+    /** The current game news, or null. */
+    public News news;
 }

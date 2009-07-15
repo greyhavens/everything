@@ -19,6 +19,7 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
+import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
@@ -114,13 +115,13 @@ public class EverythingClient
 
         switch (args.page) {
         default:
-        case LANDING: setContent(new LandingPanel(this)); break;
+        case LANDING: setContent(new LandingPanel(this, _news)); break;
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
         case EDIT_CATS: setContent(new EditCatsPanel(this)); break;
         case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
-        case DASHBOARD: setContent(new DashboardPanel(this)); break;
+        case DASHBOARD: setContent(new DashboardPanel(this, _news)); break;
         }
 
         // if we have showing popups, clear them out
@@ -131,6 +132,7 @@ public class EverythingClient
     {
         _data = data;
         _coins = new Value<Integer>(data.coins);
+        _news = new Value<News>(data.news);
         setContent(null);
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
         History.fireCurrentHistoryState();
@@ -147,6 +149,7 @@ public class EverythingClient
 
     protected SessionData _data;
     protected Value<Integer> _coins;
+    protected Value<News> _news;
 
     protected HeaderPanel _header;
     protected Widget _content;

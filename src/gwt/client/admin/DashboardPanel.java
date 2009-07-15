@@ -3,27 +3,35 @@
 
 package client.admin;
 
+import java.util.Date;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
+import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerDetails;
 import com.threerings.everything.data.PlayerName;
 
+import client.ui.DataPanel;
 import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -34,49 +42,56 @@ import client.util.PopupCallback;
 /**
  * Displays an admin dashboard.
  */
-public class DashboardPanel extends FlowPanel
+public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
 {
-    public DashboardPanel (Context ctx)
+    public DashboardPanel (Context ctx, Value<News> news)
     {
-        setStyleName("dashboard");
-        add(Widgets.newLabel("Loading...", "infoLabel"));
-
-        _ctx = ctx;
-        _adminsvc.getDashboard(new PanelCallback<AdminService.DashboardResult>(this) {
-            public void onSuccess (AdminService.DashboardResult data) {
-                init(data);
-            }
-        });
+        super("dashboard", ctx);
+        _news = news;
+        _adminsvc.getDashboard(createCallback());
     }
 
-    protected void init (AdminService.DashboardResult data)
+    protected void init (final AdminService.DashboardResult data)
     {
         clear();
         SmartTable contents = new SmartTable(5, 0);
         add(contents);
 
+        // update the latest news in case it has changed
+        _news.update(data.latestNews);
+
         // set up our thing database stats
-        contents.setText(0, 0, "Thing Stats", 1, "Header");
         FlowPanel stats = new FlowPanel();
+        stats.add(Widgets.newLabel("ThingStats", "Header"));
         stats.add(Widgets.newLabel("Total things: " + data.stats.totalThings, null));
         stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories, null));
         stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
         stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards, null));
-        contents.setWidget(1, 0, stats);
+        contents.setWidget(0, 0, stats);
         contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
+
+        // display our pending categories
+        FlowPanel cats = new FlowPanel();
+        cats.add(Widgets.newLabel("Pending Categories", "Header"));
+        for (Category cat : data.pendingCategories) {
+            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
+        }
+        contents.setWidget(0, 1, cats);
+        contents.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_TOP);
+        contents.getFlexCellFormatter().setRowSpan(0, 1, 2);
 
         // this is where we'll stuff player details
         SimplePanel details = new SimplePanel();
 
         // display our find player interface
-        contents.setText(2, 0, "Find Player", 1, "Header");
-        final FlowPanel players = new FlowPanel();
         final TextBox search = Widgets.newTextBox("", 128, 20);
         DefaultTextListener.configure(search, "<find player>");
+        final FlowPanel players = new FlowPanel();
+        players.add(Widgets.newLabel("Find Player", "Header"));
         players.add(search);
         players.add(details);
-        contents.setWidget(3, 0, players);
-        contents.getFlexCellFormatter().setVerticalAlignment(3, 0, HasAlignment.ALIGN_TOP);
+        contents.setWidget(1, 0, players);
+        contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
 
         // start out displaying recently joined players
         FlowPanel recent = new FlowPanel();
@@ -86,15 +101,61 @@ public class DashboardPanel extends FlowPanel
         }
         details.setWidget(recent);
 
-        // display our pending categories
-        contents.setText(0, 1, "Pending Categories", 1, "Header");
-        FlowPanel cats = new FlowPanel();
-        for (Category cat : data.pendingCategories) {
-            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
+        // display our news editing and posting interface
+        Widget ontitle = Widgets.newLabel("Latest News", "Header");
+        final LimitedTextArea onews = new LimitedTextArea(News.MAX_NEWS_LENGTH, 80, 5);
+        final Button upnews = new Button("Update");
+        new ClickCallback<Void>(upnews) {
+            protected boolean callService () {
+                data.latestNews.text = onews.getText().trim();
+                _adminsvc.updateNews(
+                    data.latestNews.reported.getTime(), data.latestNews.text, this);
+                return true;
+            }
+            protected boolean gotResult (Void result) {
+                Popups.infoNear("News updated.", upnews);
+                _news.update(data.latestNews);
+                return true;
+            }
+        };
+        contents.setWidget(2, 0, Widgets.newFlowPanel(ontitle, onews, upnews), 2, null);
+        setLatestNews(onews, upnews, data.latestNews);
+
+        Widget ntitle = Widgets.newLabel("Add News", "Header");
+        final LimitedTextArea nnews = new LimitedTextArea(News.MAX_NEWS_LENGTH, 80, 5);
+        final Button post = new Button("Post");
+        new ClickCallback<Long>(post) {
+            protected boolean callService () {
+                String text = nnews.getText().trim();
+                if (text.length() == 0) {
+                    return false;
+                }
+                _adminsvc.addNews(text, this);
+                return true;
+            }
+            protected boolean gotResult (Long reported) {
+                News news = new News();
+                news.reported = new Date(reported);
+                news.reporter = _ctx.getMe();
+                news.text = nnews.getText().trim();
+                _news.update(news);
+                data.latestNews = news;
+                setLatestNews(onews, upnews, data.latestNews);
+                nnews.setText("");
+                Popups.infoNear("News posted.", post);
+                return true;
+            }
+        };
+        contents.setWidget(3, 0, Widgets.newFlowPanel(ntitle, nnews, post), 2, null);
+    }
+
+    protected void setLatestNews (LimitedTextArea text, Button action, News news)
+    {
+        if (news != null) {
+            text.setText(news.text);
         }
-        contents.setWidget(1, 1, cats);
-        contents.getFlexCellFormatter().setVerticalAlignment(1, 1, HasAlignment.ALIGN_TOP);
-        contents.getFlexCellFormatter().setRowSpan(1, 1, 3);
+        text.getTextArea().setEnabled(news != null);
+        action.setEnabled(news != null);
     }
 
     protected ClickHandler onPlayerClicked (final SimplePanel details, final int userId)
@@ -146,7 +207,7 @@ public class DashboardPanel extends FlowPanel
         }
     }
 
-    protected Context _ctx;
+    protected Value<News> _news;
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
     protected static final DateTimeFormat _dfmt = DateTimeFormat.getMediumDateTimeFormat();

@@ -37,5 +37,10 @@ public class AdminLogic
                                 action + " player " + player.name);
     }
 
+    public void noteAction (int adminId, String action)
+    {
+        _adminRepo.recordAction(adminId, Action.Target.NONE, 0, action);
+    }
+
     @Inject protected AdminRepository _adminRepo;
 }

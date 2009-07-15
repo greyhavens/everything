@@ -29,7 +29,7 @@ public class PlayerLogic
     /**
      * Resolves all names in the supplied list of objects.
      */
-    public <T> List<T> resolveNames (List<T> objects, PlayerName... resolved)
+    public <T, L extends Iterable<T>> L resolveNames (L objects, PlayerName... resolved)
     {
         // extract the set of ids we need to resolve
         ArrayIntSet ids = new ArrayIntSet();

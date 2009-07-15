@@ -34,4 +34,14 @@ public interface AdminServiceAsync
      * The async version of {@link AdminService#findPlayers}.
      */
     void findPlayers (String query, AsyncCallback<List<PlayerName>> callback);
+
+    /**
+     * The async version of {@link AdminService#addNews}.
+     */
+    void addNews (String text, AsyncCallback<Long> callback);
+
+    /**
+     * The async version of {@link AdminService#updateNews}.
+     */
+    void updateNews (long reported, String text, AsyncCallback<Void> callback);
 }

@@ -6,6 +6,10 @@ package client.game;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.DateUtil;
+import com.threerings.gwt.util.Value;
+
+import com.threerings.everything.data.News;
 
 import client.util.Context;
 
@@ -14,7 +18,7 @@ import client.util.Context;
  */
 public class LandingPanel extends FlowPanel
 {
-    public LandingPanel (Context ctx)
+    public LandingPanel (Context ctx, Value<News> news)
     {
         setStyleName("landing");
 
@@ -27,11 +31,37 @@ public class LandingPanel extends FlowPanel
             add(intro);
         }
 
-        add(Widgets.newLabel("Latest News", "Title"));
-        add(Widgets.newHTML(NEWS, "Text")); // TODO: load from DB
+        if (news.get() == null) {
+            add(Widgets.newLabel("Latest News", "Title"));
+            add(Widgets.newLabel("No gnus is good gnus.", "Text"));
+        } else {
+            add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported), "Title"));
+            add(Widgets.newHTML(formatNews(news.get().text), "Text"));
+        }
 
         add(Widgets.newLabel("Recent Happenings", "Title"));
         add(new FeedPanel(ctx));
+    }
+
+    protected static String formatNews (String text)
+    {
+        StringBuffer buf = new StringBuffer();
+        boolean inList = false;
+        for (String line : text.split("\n")) {
+            if (line.startsWith("* ")) {
+                if (!inList) {
+                    buf.append("<ul>\n");
+                    inList = true;
+                }
+                buf.append("<li>").append(line.substring(2)).append("</li>\n");
+            } else {
+                if (inList) {
+                    buf.append("</ul>\n");
+                }
+                buf.append(line).append("\n");
+            }
+        }
+        return buf.toString();
     }
 
     protected static final String[] INTRO_HTML = {
@@ -44,13 +74,4 @@ public class LandingPanel extends FlowPanel
         "collections.",
         "Enough jabber, click <b>Flip Cards</b> up above to get started!"
     };
-
-    protected static final String NEWS = "We're just getting started. The user interface is " +
-        "about as programmery as it gets and our giant database of everything in the entire " +
-        "universe is still pretty small. But there's some awesome stuff in there. " +
-        "These are the new features we'll be adding soon: <ul>" +
-        "<li> An easier way to browse your friends' collections than clicking in your feed. </li>" +
-        "<li> A wishlist so that you can let your friends know what you're looking for. </li>" +
-        "<li> A prettier user interface! </li>" +
-        "<li> Lots more things in the database. </li></ul>";
 }
