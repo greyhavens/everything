@@ -31,7 +31,7 @@ public abstract class EveryServiceServlet extends AppServiceServlet
     {
         String reqvers = CookieUtil.getCookieValue(
             getThreadLocalRequest(), EverythingCodes.VERS_COOKIE);
-        if (!reqvers.equals(Build.VERSION)) {
+        if (!Build.VERSION.equals(reqvers)) {
             return RPC.encodeResponseForFailure(
                 null, new IncompatibleRemoteServiceException(EverythingCodes.E_STALE_APP, null));
         }
