@@ -44,4 +44,9 @@ public interface AdminServiceAsync
      * The async version of {@link AdminService#updateNews}.
      */
     void updateNews (long reported, String text, AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link AdminService#grantCoins}.
+     */
+    void grantCoins (int userId, int coins, AsyncCallback<Void> callback);
 }

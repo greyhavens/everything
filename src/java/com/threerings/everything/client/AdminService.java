@@ -74,4 +74,9 @@ public interface AdminService extends RemoteService
      * Updates an existing news report.
      */
     void updateNews (long reported, String text) throws ServiceException;
+
+    /**
+     * Grants freebie coins to the specified player.
+     */
+    void grantCoins (int userId, int coins) throws ServiceException;
 }

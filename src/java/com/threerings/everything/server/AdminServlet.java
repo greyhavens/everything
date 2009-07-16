@@ -91,6 +91,18 @@ public class AdminServlet extends EveryServiceServlet
         _adminLogic.noteAction(user.userId, "updated news " + new Date(reported));
     }
 
+    // from interface AdminService
+    public void grantCoins (int userId, int coins) throws ServiceException
+    {
+        OOOUser user = requireAdmin();
+        PlayerRecord target = _playerRepo.loadPlayer(userId);
+        if (target == null) {
+            throw new ServiceException(E_UNKNOWN_USER);
+        }
+        _playerRepo.grantCoins(userId, coins);
+        _adminLogic.noteAction(user.userId, "granted " + coins + " coins to ", target.getName());
+    }
+
     @Inject protected AdminLogic _adminLogic;
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
