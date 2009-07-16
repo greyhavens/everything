@@ -1,21 +1,34 @@
-var api_key = 'eed6c8a8d9be1718c1a2922caa344ead';
-var channel_path = 'xd_receiver.html';
-FB_RequireFeatures(["Api", "CanvasUtil"], function() {
-    // Create an ApiClient object, passing app's API key and
-    // a site relative URL to xd_receiver.htm
-    FB.Facebook.init(api_key, channel_path);
-    var api = FB.Facebook.apiClient;
-    alert("Hello client " + FB.Facebook.get_isInCanvas());
+/* Make our FB root object visible to GWT. */
+window.FB = FB;
+
+/* Wire up some specific functions. */
+window.FB_Init = function (apiKey) {
+    FB_RequireFeatures(["Api", "Connect", "XFBML", "CanvasUtil"], function () {
+        FB.init(apiKey, "xd_receiver.html");
+    });
+}
+window.FB_RequireSession = function () {
+    FB.Bootstrap.ensureInit(function () {
+        FB.Connect.requireSession(function () {
+            if (FB_RequireSessionCallback) {
+                FB_RequireSessionCallback(FB.Facebook.apiClient.get_session().uid);
+                FB_RequireSessionCallback = null;
+            }
+        });
+    });
+};
+window.FB_ParseXFBML = function (id) {
+    FB.Bootstrap.ensureInit(function () {
+        var elem = document.getElementById(id);
+        if (elem != null) {
+            FB.XFBML.Host.parseDomElement(elem);
+        }
+    });
+}
+
+/* Start up our iframe resizer once FB_Init is called by GWT */
+FB.Bootstrap.ensureInit(function () {
     FB.CanvasClient.startTimerToSizeToContent();
-//     // require user to login
-//     api.requireLogin(function(exception) {
-//         alert("Hello login! " + api.get_session().uid);
-//         Debug.dump("Current user id is " + api.get_session().uid);
-//         // Get friends list //5-14-09: this code below is broken, correct code follows
-//         // //api.friends_get(null, function(result){ // Debug.dump(result, 'friendsResult
-//         // from non-batch execution '); // });
-//         api.friends_get(new Array(), function(result, exception){
-//             Debug.dump(result, 'friendsResult from non-batch execution ');
-//         });
-//     });
 });
+
+/* Note: all callbacks seem to get called twice. Thanks Facebook! */

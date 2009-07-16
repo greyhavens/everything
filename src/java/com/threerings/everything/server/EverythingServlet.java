@@ -152,6 +152,7 @@ public class EverythingServlet extends EveryServiceServlet
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
             data.news = news;
         }
+        data.facebookKey = _app.getFacebookKey();
         return data;
     }
 
@@ -259,6 +260,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
     }
 
+    @Inject protected EverythingApp _app;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;

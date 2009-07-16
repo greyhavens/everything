@@ -48,6 +48,8 @@ public class EverythingClient
     {
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
+
+        // validate our session which will trigger the rest of our initialization
         _everysvc.validateSession(
             Build.VERSION, getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
@@ -149,6 +151,9 @@ public class EverythingClient
         _coins = new Value<Integer>(data.coins);
         _news = new Value<News>(data.news);
         setContent(null);
+        if (data.facebookKey != null) {
+            initFacebook(data.facebookKey);
+        }
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
         History.fireCurrentHistoryState();
     }
@@ -160,6 +165,10 @@ public class EverythingClient
 
     protected static native int getTimezoneOffset () /*-{
         return new Date().getTimezoneOffset();
+    }-*/;
+
+    protected static native void initFacebook (String apiKey) /*-{
+        $wnd.FB_Init(apiKey);
     }-*/;
 
     protected SessionData _data;

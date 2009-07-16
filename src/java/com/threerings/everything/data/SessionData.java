@@ -28,4 +28,7 @@ public class SessionData
 
     /** The current game news, or null. */
     public News news;
+
+    /** Our Facebook API key. */
+    public String facebookKey;
 }
