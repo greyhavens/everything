@@ -24,6 +24,7 @@ import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.App;
 import com.threerings.samsara.app.server.Binding;
 
+import com.threerings.everything.data.Build;
 import com.threerings.everything.server.persist.AdminRepository;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
@@ -129,7 +130,7 @@ public class EverythingApp extends App
     @Override // from App
     public void didInit ()
     {
-        log.info("Everything app initialized.", "version", _appvers);
+        log.info("Everything app initialized.", "version", _appvers, "build", Build.VERSION);
     }
 
     @Override // from App
