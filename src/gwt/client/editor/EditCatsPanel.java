@@ -24,6 +24,7 @@ import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Function;
 
 import com.threerings.everything.data.Category;
 
@@ -78,9 +79,10 @@ public class EditCatsPanel extends SmartTable
 
     protected abstract class Column extends FlowPanel
     {
-        public Column (String header) {
+        public Column (String header, int level) {
             setStyleName("Column");
             add(Widgets.newLabel(header, "Header"));
+            _level = level;
             add(_input = Widgets.newTextBox("", Category.MAX_NAME_LENGTH, 15));
             add(_contents = Widgets.newFlowPanel("List"));
             add(_empty = Widgets.newLabel("<empty>", null));
@@ -150,8 +152,8 @@ public class EditCatsPanel extends SmartTable
             }
 
             clear();
-            _empty.setVisible(false);
-            _contents.add(Widgets.newLabel("Loading...", null));
+            _empty.setText("Loading...");
+            _empty.setVisible(true);
             _parentId = parentId;
             _ctx.getCatsModel().getCategories(_parentId, new PopupCallback<List<Category>>(_input) {
                 public void onSuccess (List<Category> cats) {
@@ -159,6 +161,7 @@ public class EditCatsPanel extends SmartTable
                     for (Category cat : cats) {
                         addCat(cat);
                     }
+                    _empty.setText("<empty>");
                     _empty.setVisible(cats.size() == 0);
                     checkPendingSelection();
                     setEnabled(true);
@@ -196,12 +199,14 @@ public class EditCatsPanel extends SmartTable
         protected Row initCatRow (final Row row, boolean selected)
         {
             row.clear();
-            row.add(Widgets.newActionImage("images/folder.png", new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    showOptionMenu(row, (Widget)event.getSource());
-                }
-            }));
-            row.add(Widgets.newLabel(" ", "inline"));
+            if (_ctx.isAdmin() || _ctx.getMe().equals(row.cat.creator)) {
+                row.add(Widgets.newActionImage("images/folder.png", new ClickHandler() {
+                    public void onClick (ClickEvent event) {
+                        showOptionMenu(row, (Widget)event.getSource());
+                    }
+                }));
+                row.add(Widgets.newLabel(" ", "inline"));
+            }
             if (selected) {
                 row.add(Widgets.newInlineLabel(row.cat.name, "Selected"));
             } else {
@@ -209,6 +214,14 @@ public class EditCatsPanel extends SmartTable
             }
             row.setTitle(row.cat.creator.toString());
             return row;
+        }
+
+        protected void removeRow (Row row)
+        {
+            _contents.remove(row);
+            if (row.cat.categoryId == _selectedId) {
+                setSelectedId(0);
+            }
         }
 
         protected void showOptionMenu (final Row row, final Widget trigger)
@@ -221,21 +234,34 @@ public class EditCatsPanel extends SmartTable
                     _ctx.getCatsModel().deleteCategory(
                         row.cat.categoryId, new PopupCallback<Void>(trigger) {
                         public void onSuccess (Void result) {
-                            _contents.remove(row);
-                            if (row.cat.categoryId == _selectedId) {
-                                setSelectedId(0);
-                            }
+                            removeRow(row);
                         }
                     });
                 }
             });
-            options.addItem("Move", new CategoryMenuBar(0));
+            if (_level > 0) {
+                Function<Category, Void> onSelect = new Function<Category, Void>() {
+                    public Void apply (final Category parent) {
+                        popup.hide();
+                        _ctx.getCatsModel().moveCategory(
+                            row.cat, parent.categoryId, new PopupCallback<Void>() {
+                            public void onSuccess (Void result) {
+                                removeRow(row);
+                                Popups.info(row.cat.name + " moved to " + parent.name + ".");
+                            }
+                        });
+                        return null;
+                    }
+                };
+                options.addItem("Move", new CategoryMenuBar(0, _level-1, onSelect));
+            }
             popup.setWidget(options);
             Popups.showNear(popup, trigger);
         }
 
         protected abstract void addCategoryAction (Row row);
 
+        protected int _level;
         protected Column _child;
         protected FlowPanel _contents;
         protected TextBox _input;
@@ -247,9 +273,11 @@ public class EditCatsPanel extends SmartTable
     protected class CategoryMenuBar extends MenuBar
         implements AsyncCallback<List<Category>>
     {
-        public CategoryMenuBar (int parentId) {
+        public CategoryMenuBar (int parentId, int children, Function<Category, Void> onSelect) {
             super(true);
             _parentId = parentId;
+            _children = children;
+            _onSelect = onSelect;
         }
 
         public void onAttach () {
@@ -262,13 +290,20 @@ public class EditCatsPanel extends SmartTable
 
         // from interface AsyncCallback
         public void onSuccess (List<Category> cats) {
-            for (Category cat : cats) {
-                addItem(cat.name, new CategoryMenuBar(cat.categoryId));
+            for (final Category cat : cats) {
+                if (_children > 0) {
+                    addItem(cat.name, new CategoryMenuBar(cat.categoryId, _children-1, _onSelect));
+                } else {
+                    addItem(cat.name, new Command() {
+                        public void execute () {
+                            _onSelect.apply(cat);
+                        }
+                    });
+                }
             }
             if (cats.size() == 0) {
                 addItem("<empty>", new Command() {
-                    public void execute () {
-                    }
+                    public void execute () { /* noop! */ }
                 });
             }
         }
@@ -276,28 +311,27 @@ public class EditCatsPanel extends SmartTable
         // from interface AsyncCallback
         public void onFailure (Throwable cause) {
             addItem("Error: " + Errors.xlate(cause), new Command() {
-                public void execute () {
-                    // noop!
-                }
+                public void execute () { /* noop! */ }
             });
         }
 
-        protected int _parentId;
+        protected int _parentId, _children;
+        protected Function<Category, Void> _onSelect;
         protected boolean _resolved;
     }
 
-    protected Column _cats = new Column("Categories") {
+    protected Column _cats = new Column("Categories", 0) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, row.cat.categoryId));
         }
     };
-    protected Column _subcats = new Column("Sub-categories") {
+    protected Column _subcats = new Column("Sub-categories", 1) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, _cats.getSelectedId(),
                                       row.cat.categoryId));
         }
     };
-    protected Column _series = new Column("Series") {
+    protected Column _series = new Column("Series", 2) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_SERIES, row.cat.categoryId));
             row.add(Widgets.newLabel(" (" + row.cat.things + ")", "inline"));

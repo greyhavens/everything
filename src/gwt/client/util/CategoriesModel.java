@@ -4,6 +4,7 @@
 package client.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.gwt.util.ChainedCallback;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Function;
 
 import com.threerings.everything.client.EditorService;
@@ -74,6 +76,31 @@ public class CategoriesModel
         };
         _editorsvc.createCategory(
             cat, ChainedCallback.map(ChainedCallback.before(callback, addCatOp), toCat));
+    }
+
+    /**
+     * Reparents the supplied category with the specified new parent.
+     */
+    public void moveCategory (final Category cat, final int newParentId,
+                              AsyncCallback<Void> callback)
+    {
+        final int oldParentId = cat.parentId;
+        Function<Void, Void> movedOp = new Function<Void, Void>() {
+            public Void apply (Void result) {
+                List<Category> cats = _catmap.get(oldParentId);
+                if (cats != null) {
+                    cats.remove(cat);
+                }
+                cats = _catmap.get(newParentId);
+                if (cats != null) {
+                    cats.add(cat);
+                    Collections.sort(cats);
+                }
+                return null;
+            }
+        };
+        cat.parentId = newParentId;
+        _editorsvc.updateCategory(cat, ChainedCallback.before(callback, movedOp));
     }
 
     /**
