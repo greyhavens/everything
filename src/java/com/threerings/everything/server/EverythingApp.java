@@ -130,7 +130,7 @@ public class EverythingApp extends App
     @Override // from App
     public void didInit ()
     {
-        log.info("Everything app initialized.", "version", _appvers, "build", Build.VERSION);
+        log.info("Everything app initialized.", "version", _appvers, "build", Build.version());
     }
 
     @Override // from App

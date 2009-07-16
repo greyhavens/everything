@@ -51,7 +51,7 @@ public class EverythingClient
 
         // validate our session which will trigger the rest of our initialization
         _everysvc.validateSession(
-            Build.VERSION, getTimezoneOffset(), new AsyncCallback<SessionData>() {
+            Build.version(), getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 if (data == null) {
                     setInfoContent("TODO: Redirect to splash/fbconnect page.");

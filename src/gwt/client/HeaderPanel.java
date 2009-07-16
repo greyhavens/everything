@@ -38,6 +38,6 @@ public class HeaderPanel extends SmartTable
         // finally display the game build on the right
         getFlexCellFormatter().setHorizontalAlignment(0, col, HasAlignment.ALIGN_RIGHT);
         getFlexCellFormatter().setWidth(0, col, "100%");
-        setText(0, col++, "Build: " + Build.VERSION);
+        setText(0, col++, "Build: " + Build.version());
     }
 }

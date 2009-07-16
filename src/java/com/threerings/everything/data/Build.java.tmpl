@@ -9,8 +9,14 @@ package com.threerings.everything.data;
 public class Build
 {
     /** The version number assigned to this build. */
-    public static String VERSION = "@build_version@";
+    public static String version () 
+    {
+	return "@build_version@";
+    }
 
     /** The time at which this build was made. */
-    public static String TIME = "@build_time@";
+    public static String time () 
+    {
+        return "@build_time@";
+    }
 }
