@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -14,10 +15,13 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
+import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
@@ -26,6 +30,7 @@ import com.threerings.everything.data.Category;
 import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.Errors;
 import client.util.Page;
 import client.util.PopupCallback;
 
@@ -63,7 +68,7 @@ public class EditCatsPanel extends SmartTable
             Page.EDIT_CATS, _cats.getSelectedId(), _subcats.getSelectedId());
     }
 
-    protected static class Row extends HorizontalPanel
+    protected static class Row extends FlowPanel
     {
         public final Category cat;
         public Row (Category cat) {
@@ -191,13 +196,30 @@ public class EditCatsPanel extends SmartTable
         protected Row initCatRow (final Row row, boolean selected)
         {
             row.clear();
-            final Widget label = selected ? Widgets.newLabel(row.cat.name, "Selected") :
-                createCatActionLabel(row.cat);
-            label.setTitle(row.cat.creator.toString());
-            row.add(Widgets.newActionImage("images/delete.png", "Delete", new ClickHandler() {
+            row.add(Widgets.newActionImage("images/folder.png", new ClickHandler() {
                 public void onClick (ClickEvent event) {
+                    showOptionMenu(row, (Widget)event.getSource());
+                }
+            }));
+            row.add(Widgets.newLabel(" ", "inline"));
+            if (selected) {
+                row.add(Widgets.newInlineLabel(row.cat.name, "Selected"));
+            } else {
+                addCategoryAction(row);
+            }
+            row.setTitle(row.cat.creator.toString());
+            return row;
+        }
+
+        protected void showOptionMenu (final Row row, final Widget trigger)
+        {
+            final PopupPanel popup = new PopupPanel(true);
+            MenuBar options = new MenuBar(true);
+            options.addItem("Delete", new Command() {
+                public void execute() {
+                    popup.hide();
                     _ctx.getCatsModel().deleteCategory(
-                        row.cat.categoryId, new PopupCallback<Void>(label) {
+                        row.cat.categoryId, new PopupCallback<Void>(trigger) {
                         public void onSuccess (Void result) {
                             _contents.remove(row);
                             if (row.cat.categoryId == _selectedId) {
@@ -206,13 +228,13 @@ public class EditCatsPanel extends SmartTable
                         }
                     });
                 }
-            }));
-            row.add(Widgets.newShim(5, 5));
-            row.add(label);
-            return row;
+            });
+            options.addItem("Move", new CategoryMenuBar(0));
+            popup.setWidget(options);
+            Popups.showNear(popup, trigger);
         }
 
-        protected abstract Widget createCatActionLabel (final Category cat);
+        protected abstract void addCategoryAction (Row row);
 
         protected Column _child;
         protected FlowPanel _contents;
@@ -222,21 +244,63 @@ public class EditCatsPanel extends SmartTable
         protected int _parentId = -1, _selectedId, _pendingSelId = -1;
     }
 
+    protected class CategoryMenuBar extends MenuBar
+        implements AsyncCallback<List<Category>>
+    {
+        public CategoryMenuBar (int parentId) {
+            super(true);
+            _parentId = parentId;
+        }
+
+        public void onAttach () {
+            super.onAttach();
+            if (!_resolved) {
+                _resolved = true;
+                _ctx.getCatsModel().getCategories(_parentId, this);
+            }
+        }
+
+        // from interface AsyncCallback
+        public void onSuccess (List<Category> cats) {
+            for (Category cat : cats) {
+                addItem(cat.name, new CategoryMenuBar(cat.categoryId));
+            }
+            if (cats.size() == 0) {
+                addItem("<empty>", new Command() {
+                    public void execute () {
+                    }
+                });
+            }
+        }
+
+        // from interface AsyncCallback
+        public void onFailure (Throwable cause) {
+            addItem("Error: " + Errors.xlate(cause), new Command() {
+                public void execute () {
+                    // noop!
+                }
+            });
+        }
+
+        protected int _parentId;
+        protected boolean _resolved;
+    }
+
     protected Column _cats = new Column("Categories") {
-        protected Widget createCatActionLabel (Category cat) {
-            return Args.createLink(cat.name, Page.EDIT_CATS, cat.categoryId);
+        protected void addCategoryAction (Row row) {
+            row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, row.cat.categoryId));
         }
     };
     protected Column _subcats = new Column("Sub-categories") {
-        protected Widget createCatActionLabel (Category cat) {
-            return Args.createLink(cat.name, Page.EDIT_CATS, _cats.getSelectedId(), cat.categoryId);
+        protected void addCategoryAction (Row row) {
+            row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, _cats.getSelectedId(),
+                                      row.cat.categoryId));
         }
     };
     protected Column _series = new Column("Series") {
-        protected Widget createCatActionLabel (Category cat) {
-            return Widgets.newFlowPanel(
-                Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId),
-                Widgets.newLabel(" (" + cat.things + ")", "inline"));
+        protected void addCategoryAction (Row row) {
+            row.add(Args.createInlink(row.cat.name, Page.EDIT_SERIES, row.cat.categoryId));
+            row.add(Widgets.newLabel(" (" + row.cat.things + ")", "inline"));
         }
     };
 

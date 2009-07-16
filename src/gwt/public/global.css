@@ -41,3 +41,13 @@ html, body {
   background: #FFFFFF;
   padding: 5px;
 }
+
+/** GWT styles */
+.gwt-MenuBar-vertical {
+  border: 1px solid;
+  background: #FFFFFF;
+}
+
+.gwt-MenuBar .gwt-MenuItem-selected {
+  background: #99CCFF;
+}
