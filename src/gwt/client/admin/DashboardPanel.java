@@ -198,7 +198,24 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             int row = addText("Is editor:", 1, "Label");
             setWidget(row, 1, isEditor);
 
-            // TODO: add granting coins
+            final TextBox coins = Widgets.newTextBox("", 4, 4);
+            final Button grant = new Button("Grant");
+            row = addText("Grant coins:", 1, "Label");
+            setWidget(row, 1, Widgets.newRow(coins, grant));
+            new ClickCallback<Void>(grant, coins) {
+                protected boolean callService () {
+                    int togrant = Integer.parseInt(coins.getText().trim());
+                    if (togrant <= 0) {
+                        return false;
+                    }
+                    _adminsvc.grantCoins(details.name.userId, togrant, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    Popups.infoNear("Coins granted!", grant);
+                    return true;
+                }
+            };
         }
 
         protected void addDatum (String name, Object value) {
