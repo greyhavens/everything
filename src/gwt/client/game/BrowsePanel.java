@@ -22,6 +22,7 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.SeriesCard;
 
+import client.ui.XFBML;
 import client.util.Context;
 import client.util.PanelCallback;
 
@@ -45,7 +46,9 @@ public class BrowsePanel extends FlowPanel
     protected void init (final PlayerCollection coll)
     {
         final SmartTable table = new SmartTable(5, 0);
-        table.addText(coll.owner.toString() + "'s Collection", 3, "Title");
+        table.setWidget(0, 0, XFBML.newTag("profile-pic", "uid", ""+coll.owner.facebookId));
+        table.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
+        table.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
@@ -73,6 +76,7 @@ public class BrowsePanel extends FlowPanel
         }
         clear();
         add(table);
+        XFBML.parse(getElement());
     }
 
     protected void showSeries (SmartTable table, PlayerCollection coll, int categoryId,

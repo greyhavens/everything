@@ -17,9 +17,8 @@ window.FB_RequireSession = function () {
         });
     });
 };
-window.FB_ParseXFBML = function (id) {
+window.FB_ParseXFBML = function (elem) {
     FB.Bootstrap.ensureInit(function () {
-        var elem = document.getElementById(id);
         if (elem != null) {
             FB.XFBML.Host.parseDomElement(elem);
         }
