@@ -73,11 +73,14 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
 
         // display our pending categories
         FlowPanel cats = new FlowPanel();
-        cats.add(Widgets.newLabel("Pending Categories", "Header"));
         for (Category cat : data.pendingCategories) {
-            cats.add(Args.createLink(cat.name, Page.EDIT_SERIES, cat.categoryId));
+            if (cats.getWidgetCount() > 0) {
+                cats.add(Widgets.newInlineLabel(", "));
+            }
+            cats.add(Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId));
         }
-        contents.setWidget(0, 1, cats);
+        contents.setWidget(0, 1, Widgets.newFlowPanel(
+                               Widgets.newLabel("Pending Categories", "Header"), cats));
         contents.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_TOP);
         contents.getFlexCellFormatter().setRowSpan(0, 1, 2);
 
