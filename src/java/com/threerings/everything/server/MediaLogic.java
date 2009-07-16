@@ -144,6 +144,9 @@ public class MediaLogic
             log.warning("S3 upload failed", "bucket", _app.getMediaStoreBucket(), e);
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
 
+        } catch (ServiceException se) {
+            throw se; // no need to log this one
+
         } catch (Exception e) {
             log.warning("Failed to process uploaded imgae.", e);
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
