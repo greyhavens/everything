@@ -4,6 +4,9 @@
 package com.threerings.everything.server;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
@@ -42,6 +45,14 @@ public class EverythingApp extends App
         @Override protected void configure () {
             bind(App.class).to(EverythingApp.class);
         }
+    }
+
+    /**
+     * Returns an executor that can be used for background processing tasks.
+     */
+    public Executor getExecutor ()
+    {
+        return _executor;
     }
 
     /**
@@ -125,11 +136,14 @@ public class EverythingApp extends App
     public void didDetach ()
     {
         log.info("Everything app detached.", "version", _appvers);
+        // shut down our executors
+        _executor.shutdown();
         // TODO: we want to wait for all of our pending servlets to finish before shutdown
         shutdown();
     }
 
     protected Config _config = createConfig("everything");
+    protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
 
