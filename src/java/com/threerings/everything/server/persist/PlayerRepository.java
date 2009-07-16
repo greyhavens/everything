@@ -83,11 +83,12 @@ public class PlayerRepository extends DepotRepository
     /**
      * Creates, inserts and returns a new player record.
      */
-    public PlayerRecord createPlayer (int userId, String name, String surname, long birthday,
-                                      String timezone)
+    public PlayerRecord createPlayer (int userId, long facebookId, String name, String surname,
+                                      long birthday, String timezone)
     {
         PlayerRecord record = new PlayerRecord();
         record.userId = userId;
+        record.facebookId = facebookId;
         record.name = name;
         record.surname = surname;
         record.birthday = (birthday == 0L) ? null : new Date(birthday);
@@ -99,6 +100,14 @@ public class PlayerRepository extends DepotRepository
         record.isEditor = true; // TEMP
         insert(record);
         return record;
+    }
+
+    /**
+     * Updates the specified user's stored Facebook id.
+     */
+    public void updateFacebookId (int userId, long facebookId)
+    {
+        updatePartial(PlayerRecord.getKey(userId), PlayerRecord.FACEBOOK_ID, facebookId);
     }
 
     /**

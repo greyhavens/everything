@@ -14,6 +14,9 @@ public class PlayerName
     /** This player's unique id. */
     public int userId;
 
+    /** This player's Facebook id. */
+    public long facebookId;
+
     /** This player's name. */
     public String name;
 

@@ -82,7 +82,8 @@ public class EverythingServlet extends EveryServiceServlet
 
             // load up this player's Facebook profile info
             FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbinfo.right);
-            Set<Long> ids = Collections.singleton(Long.parseLong(fbinfo.left));
+            long facebookId = Long.parseLong(fbinfo.left);
+            Set<Long> ids = Collections.singleton(facebookId);
             EnumSet<ProfileField> fields = EnumSet.of(
                 ProfileField.FIRST_NAME, ProfileField.LAST_NAME, ProfileField.BIRTHDAY);
             UsersGetInfoResponse uinfo;
@@ -114,7 +115,7 @@ public class EverythingServlet extends EveryServiceServlet
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
             }
             player = _playerRepo.createPlayer(
-                user.userId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
+                user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
 
             // look up their friends' facebook ids and make friend mappings for them
@@ -132,6 +133,10 @@ public class EverythingServlet extends EveryServiceServlet
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
             if (fbinfo != null) {
                 updateFacebookFriends(player, fbinfo.right);
+                // TEMP: if they have no facebook id stored, update it now
+                if (player.facebookId == 0L) {
+                    _playerRepo.updateFacebookId(player.userId, Long.parseLong(fbinfo.left));
+                }
             }
         }
 

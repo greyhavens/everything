@@ -30,6 +30,7 @@ public class PlayerRecord extends PersistentRecord
     // AUTO-GENERATED: FIELDS START
     public static final Class<PlayerRecord> _R = PlayerRecord.class;
     public static final ColumnExp USER_ID = colexp(_R, "userId");
+    public static final ColumnExp FACEBOOK_ID = colexp(_R, "facebookId");
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp SURNAME = colexp(_R, "surname");
     public static final ColumnExp BIRTHDAY = colexp(_R, "birthday");
@@ -59,16 +60,18 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 6;
+    public static final int SCHEMA_VERSION = 7;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
+
+    /** This player's Facebook id. */
+    public long facebookId;
 
     /** This player's first name (shown in some places in the game). */
     public String name;
 
     /** This player's last name (only shown to admins). */
-    @Column(defaultValue="''") // temp
     public String surname;
 
     /** This player's birthday (we'll send them something nice on their birthday). */
