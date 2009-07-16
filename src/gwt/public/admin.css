@@ -10,3 +10,7 @@
 .dashboard .Label {
   text-align: right;
 }
+
+.dashboard .Details {
+  margin-top: 5px;
+}

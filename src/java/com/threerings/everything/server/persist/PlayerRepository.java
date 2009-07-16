@@ -81,6 +81,17 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Searches for players by first or last name.
+     */
+    public Collection<PlayerName> findPlayers (String query)
+    {
+        // TODO: none of this is indexed nor is it case insensitive, change to full text
+        return findAll(PlayerRecord.class, new Where(Ops.or(PlayerRecord.NAME.eq(query),
+                                                            PlayerRecord.SURNAME.eq(query)))).
+            map(PlayerRecord.TO_NAME);
+    }
+
+    /**
      * Creates, inserts and returns a new player record.
      */
     public PlayerRecord createPlayer (int userId, long facebookId, String name, String surname,

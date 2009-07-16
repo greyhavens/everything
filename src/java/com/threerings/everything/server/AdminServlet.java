@@ -71,7 +71,7 @@ public class AdminServlet extends EveryServiceServlet
     public List<PlayerName> findPlayers (String query) throws ServiceException
     {
         requireAdmin();
-        return Lists.newArrayList(); // TODO
+        return Lists.newArrayList(_playerRepo.findPlayers(query));
     }
 
     // from interface AdminService

@@ -4,6 +4,7 @@
 package client.admin;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -81,7 +82,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         contents.getFlexCellFormatter().setRowSpan(0, 1, 2);
 
         // this is where we'll stuff player details
-        SimplePanel details = new SimplePanel();
+        final SimplePanel details = Widgets.newSimplePanel(null, "Details");
 
         // display our find player interface
         final TextBox search = Widgets.newTextBox("", 128, 20);
@@ -92,14 +93,27 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         players.add(details);
         contents.setWidget(1, 0, players);
         contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
+        new ClickCallback<List<PlayerName>>(new Button("fake"), search) {
+            protected boolean callService () {
+                String query = search.getText().trim();
+                if (query.length() == 0) {
+                    return false;
+                }
+                _adminsvc.findPlayers(query, this);
+                return true;
+            }
+            protected boolean gotResult (List<PlayerName> players) {
+                if (players.size() == 0) {
+                    details.setWidget(Widgets.newLabel("No match.", null));
+                } else {
+                    details.setWidget(makePlayerList(details, players));
+                }
+                return true;
+            }
+        };
 
         // start out displaying recently joined players
-        FlowPanel recent = new FlowPanel();
-        for (PlayerName player : data.recentPlayers) {
-            recent.add(Widgets.newActionLabel(
-                           player.toString(), onPlayerClicked(details, player.userId)));
-        }
-        details.setWidget(recent);
+        details.setWidget(makePlayerList(details, data.recentPlayers));
 
         // display our news editing and posting interface
         Widget ontitle = Widgets.newLabel("Latest News", "Header");
@@ -156,6 +170,15 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         }
         text.getTextArea().setEnabled(news != null);
         action.setEnabled(news != null);
+    }
+
+    protected FlowPanel makePlayerList (SimplePanel details, List<PlayerName> players)
+    {
+        FlowPanel list = new FlowPanel();
+        for (PlayerName player : players) {
+            list.add(Widgets.newActionLabel(""+player, onPlayerClicked(details, player.userId)));
+        }
+        return list;
     }
 
     protected ClickHandler onPlayerClicked (final SimplePanel details, final int userId)
