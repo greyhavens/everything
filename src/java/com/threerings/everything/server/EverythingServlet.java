@@ -118,20 +118,7 @@ public class EverythingServlet extends EveryServiceServlet
             log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
 
             // look up their friends' facebook ids and make friend mappings for them
-            try {
-                List<String> friendIds = Lists.newArrayList();
-                for (Long uid : fbclient.friends_get().getUid()) {
-                    friendIds.add(uid.toString());
-                }
-                if (friendIds.size() > 0) {
-                    log.info("Wiring up friends", "who", user.username, "friends", friendIds);
-                    _playerRepo.addFriends(
-                        user.userId, _userLogic.mapFacebookIds(friendIds).values());
-                }
-            } catch (Exception e) {
-                log.info("Failed to look up Facebook friends", "who", user.username,
-                         "error", e.getMessage());
-            }
+            updateFacebookFriends(player, fbinfo.right);
 
         } else {
             // if this is not their first session, update their last session and grant free flips
@@ -140,6 +127,12 @@ public class EverythingServlet extends EveryServiceServlet
             float extraFlips = _gameLogic.computeFreeFlipsEarned(player.freeFlips, elapsed);
             _playerRepo.recordSession(player.userId, now, extraFlips);
             log.info("Welcome back", "who", player.who(), "gone", elapsed, "flips", extraFlips);
+
+            // check to see if they made FB friends with any existing Everything players
+            Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
+            if (fbinfo != null) {
+                updateFacebookFriends(player, fbinfo.right);
+            }
         }
 
         SessionData data = new SessionData();
@@ -233,6 +226,35 @@ public class EverythingServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
         return Lists.newArrayList(_playerRepo.loadFriendStatus(player.userId));
+    }
+
+    protected void updateFacebookFriends (final PlayerRecord prec, String fbSessionKey)
+    {
+        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbSessionKey);
+        _app.getExecutor().execute(new Runnable() {
+            public void run () {
+                try {
+                    // ask Facebook for their list of friends
+                    List<String> fbFriendIds = Lists.newArrayList();
+                    for (Long uid : fbclient.friends_get().getUid()) {
+                        fbFriendIds.add(uid.toString());
+                    }
+                    // map those friends to Samsara user ids
+                    Set<Integer> newFriendIds =
+                        Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    // remove all friends for whom we already have a mapping
+                    newFriendIds.removeAll(_playerRepo.loadFriendIds(prec.userId));
+                    // finally add mappings for any new friends we've discovered
+                    if (newFriendIds.size() > 0) {
+                        log.info("Wiring up friends", "who", prec.who(), "friends", newFriendIds);
+                        _playerRepo.addFriends(prec.userId, newFriendIds);
+                    }
+                } catch (Exception e) {
+                    log.info("Failed to wire up Facebook friends", "who", prec.who(),
+                             "error", e.getMessage());
+                }
+            }
+        });
     }
 
     protected static class ItemKey {
