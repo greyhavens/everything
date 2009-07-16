@@ -90,6 +90,7 @@
         <filter token="build_version" value="${build.version}"/>
       </filterset>
     </copy>
+    <echo>Assigned build version ${build.version}.</echo>
   </target>
 
   <target name="clean" description="Cleans out the compilation results.">
