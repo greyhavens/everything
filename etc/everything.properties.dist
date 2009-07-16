@@ -3,9 +3,6 @@
 #
 # Everything app configuration
 
-# Whether or not to version check RPC requests
-rpc_version_checking = true
-
 # Our Facebook app configuration
 facebook_appid = APP_ID
 facebook_key = API_KEY

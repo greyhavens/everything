@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.CookieUtil;
 import com.threerings.gwt.util.PopupStack;
 import com.threerings.gwt.util.Value;
 
@@ -49,8 +48,8 @@ public class EverythingClient
     {
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
-        CookieUtil.set("/", 0, EverythingCodes.VERS_COOKIE, Build.VERSION);
-        _everysvc.validateSession(getTimezoneOffset(), new AsyncCallback<SessionData>() {
+        _everysvc.validateSession(
+            Build.VERSION, getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 if (data == null) {
                     setInfoContent("TODO: Redirect to splash/fbconnect page.");

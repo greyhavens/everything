@@ -24,6 +24,8 @@ import com.google.code.facebookapi.ProfileField;
 import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
+import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
+
 import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
@@ -35,7 +37,9 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.UserLogic;
 
+import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
+import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
@@ -56,8 +60,12 @@ public class EverythingServlet extends EveryServiceServlet
     implements EverythingService
 {
     // from interface EverythingService
-    public SessionData validateSession (int tzOffset) throws ServiceException
+    public SessionData validateSession (String version, int tzOffset) throws ServiceException
     {
+        if (!Build.VERSION.equals(version)) {
+            throw new ServiceException(EverythingCodes.E_STALE_APP);
+        }
+
         OOOUser user = getUser();
         if (user == null) {
             throw new ServiceException(AppCodes.E_SESSION_EXPIRED);

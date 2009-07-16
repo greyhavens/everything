@@ -29,14 +29,6 @@ public abstract class EveryServiceServlet extends AppServiceServlet
     @Override // from RemoteServiceServlet
     public String processCall (String payload) throws SerializationException
     {
-        if (_app.versionCheckingEnabled()) {
-            String reqvers = CookieUtil.getCookieValue(
-                getThreadLocalRequest(), EverythingCodes.VERS_COOKIE);
-            if (!Build.VERSION.equals(reqvers)) {
-                return RPC.encodeResponseForFailure(null, new IncompatibleRemoteServiceException(
-                                                        EverythingCodes.E_STALE_APP, null));
-            }
-        }
         return super.processCall(payload);
     }
 

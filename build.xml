@@ -62,17 +62,6 @@
       <filelist refid="build.libs"/>
       <filelist refid="runtime.libs"/>
     </copyfilelist>
-
-    <!-- generate a build version and create our Build.java file -->
-    <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
-    <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
-    <copy file="${src.dir}/com/threerings/everything/data/Build.java.tmpl"
-          tofile="${src.dir}/com/threerings/everything/data/Build.java" overwrite="true">
-      <filterset>
-        <filter token="build_time" value="${build.time}"/>
-        <filter token="build_version" value="${build.version}"/>
-      </filterset>
-    </copy>
   </target>
 
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
@@ -87,6 +76,19 @@
     <copy todir="${deploy.dir}/lib">
       <fileset refid="dependency.fileset"/>
       <mapper type="flatten"/>
+    </copy>
+  </target>
+
+  <target name="version" depends="prepare">
+    <!-- generate a build version and create our Build.java file -->
+    <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
+    <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
+    <copy file="${src.dir}/com/threerings/everything/data/Build.java.tmpl"
+          tofile="${src.dir}/com/threerings/everything/data/Build.java" overwrite="true">
+      <filterset>
+        <filter token="build_time" value="${build.time}"/>
+        <filter token="build_version" value="${build.version}"/>
+      </filterset>
     </copy>
   </target>
 
@@ -187,7 +189,7 @@
     </jar>
   </target>
 
-  <target name="distall" depends="mavendeps,dist,gclient"
+  <target name="distall" depends="mavendeps,version,dist,gclient"
           description="Fetches dependencies and builds everything.">
   </target>
 
