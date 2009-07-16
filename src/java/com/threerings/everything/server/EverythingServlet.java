@@ -63,6 +63,7 @@ public class EverythingServlet extends EveryServiceServlet
     public SessionData validateSession (String version, int tzOffset) throws ServiceException
     {
         if (!Build.VERSION.equals(version)) {
+            log.info("Rejecting stale client", "cversion", version, "sversion", Build.VERSION);
             throw new ServiceException(EverythingCodes.E_STALE_APP);
         }
 
