@@ -3,6 +3,7 @@
 
 package com.threerings.everything.server;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class AdminServlet extends EveryServiceServlet
         result.stats = _thingRepo.loadStats();
         result.recentPlayers = Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
         result.pendingCategories = Lists.newArrayList(_thingRepo.loadPendingCategories());
+        Collections.sort(result.pendingCategories);
         for (News news : _gameRepo.loadLatestNews()) {
             result.latestNews = news;
         }
