@@ -31,6 +31,20 @@ public enum Powerup implements ByteEnum
     /** Grants an extra free card flip each day. */
     EXTRA_FLIP(64, 5000, 1);
 
+    /** The cost of this powerup in coins. */
+    public final int cost;
+
+    /** The number of charges obtained each time the powerup is purchased. */
+    public final int charges;
+
+    /**
+     * Returns true if this powerup is permanent, false if it is consumed per use.
+     */
+    public boolean isPermanent ()
+    {
+        return _code >= PERMA_CODE;
+    }
+
     // from interface ByteEnum
     public byte toByte ()
     {
@@ -40,16 +54,13 @@ public enum Powerup implements ByteEnum
     Powerup (int code, int cost, int charges)
     {
         _code = (byte)code;
-        _cost = cost;
-        _charges = charges;
+        this.cost = cost;
+        this.charges = charges;
     }
 
     /** This powerup's byte code. */
     protected byte _code;
 
-    /** The cost of this powerup in coins. */
-    protected int _cost;
-
-    /** The number of charges obtained each time the powerup is purchased. */
-    protected int _charges;
+    /** Powerups with a code equal to this value or higher are permanent. */
+    protected static final int PERMA_CODE = 64;
 }

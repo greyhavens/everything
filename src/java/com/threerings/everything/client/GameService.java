@@ -4,6 +4,7 @@
 package com.threerings.everything.client;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -17,6 +18,7 @@ import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
 
 /**
@@ -52,6 +54,12 @@ public interface GameService extends RemoteService
     /** Thrown by various card-related methods if the card in question does not exist. */
     public static final String E_UNKNOWN_CARD = "e.unknown_card";
 
+    /** Thrown by {@link #buyPowerup} if the powerup is permanent and the player already owns it. */
+    public static final String E_ALREADY_OWN_POWERUP = "e.already_own_powerup";
+
+    /** Thrown by {@link #buyPowerup} if the user can't afford the powerup they requested. */
+    public static final String E_NSF_FOR_PURCHASE = "e.nsf_for_purchase";
+
     /** Provides results for {@link #getGrid}. */
     public static class GridResult implements IsSerializable
     {
@@ -86,6 +94,16 @@ public interface GameService extends RemoteService
 
         /** The status of each of this player's friends that do not already have the card. */
         public List<FriendCardInfo> friends;
+    }
+
+    /** Provides results for {@link #getShopInfo}. */
+    public class ShopResult implements IsSerializable
+    {
+        /** This player's current coin balance. */
+        public int coins;
+
+        /** This player's current powerups count. */
+        public Map<Powerup, Integer> powerups;
     }
 
     /**
@@ -127,4 +145,14 @@ public interface GameService extends RemoteService
      * Gifts the specified card to the specified friend.
      */
     void giftCard (int thingId, long created, int friendId, String message) throws ServiceException;
+
+    /**
+     * Returns data needed to display the shop.
+     */
+    ShopResult getShopInfo () throws ServiceException;
+
+    /**
+     * Purchases the specified powerup.
+     */
+    void buyPowerup (Powerup type) throws ServiceException;
 }

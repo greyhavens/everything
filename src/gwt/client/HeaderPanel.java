@@ -27,6 +27,7 @@ public class HeaderPanel extends SmartTable
         setWidget(0, col++, Args.createLink("News", Page.LANDING));
         setWidget(0, col++, Args.createLink("Flip Cards", Page.FLIP));
         setWidget(0, col++, Args.createLink("Your Collection", Page.BROWSE));
+        setWidget(0, col++, Args.createLink("Shop", Page.SHOP));
         setWidget(0, col++, Args.createLink("Friends", Page.FRIENDS));
         if (ctx.isEditor()) {
             setWidget(0, col++, Args.createLink("Add Things", Page.EDIT_CATS));
@@ -38,6 +39,6 @@ public class HeaderPanel extends SmartTable
         // finally display the game build on the right
         getFlexCellFormatter().setHorizontalAlignment(0, col, HasAlignment.ALIGN_RIGHT);
         getFlexCellFormatter().setWidth(0, col, "100%");
-        setText(0, col++, "Build: " + Build.version());
+        setText(0, col++, "Build: " + Build.time());
     }
 }

@@ -19,12 +19,12 @@ public class PowerupRecord extends PersistentRecord
     public static final Class<PowerupRecord> _R = PowerupRecord.class;
     public static final ColumnExp OWNER_ID = colexp(_R, "ownerId");
     public static final ColumnExp TYPE = colexp(_R, "type");
-    public static final ColumnExp COUNT = colexp(_R, "count");
+    public static final ColumnExp CHARGES = colexp(_R, "charges");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     /** The player that owns this powerup. */
     @Id public int ownerId;
@@ -32,8 +32,8 @@ public class PowerupRecord extends PersistentRecord
     /** The type of this powerup. */
     @Id public Powerup type;
 
-    /** The number of charges remaining on this powerup (if applicable). */
-    public int count;
+    /** The number of charges remaining on this powerup. */
+    public int charges;
 
     // AUTO-GENERATED: METHODS START
     /**

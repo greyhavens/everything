@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
 
 /**
@@ -57,4 +58,14 @@ public interface GameServiceAsync
      */
     void giftCard (int thingId, long created, int friendId, String message,
                    AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link GameService#getShopInfo}.
+     */
+    void getShopInfo (AsyncCallback<GameService.ShopResult> callback);
+
+    /**
+     * The async version of {@link GameService#getPowerups}.
+     */
+    void buyPowerup (Powerup type, AsyncCallback<Void> callback);
 }

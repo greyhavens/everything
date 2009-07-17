@@ -32,6 +32,7 @@ import client.game.BrowsePanel;
 import client.game.FriendsPanel;
 import client.game.GridPanel;
 import client.game.LandingPanel;
+import client.game.ShopPanel;
 import client.util.Args;
 import client.util.CategoriesModel;
 import client.util.Context;
@@ -130,6 +131,7 @@ public class EverythingClient
         case LANDING: setContent(new LandingPanel(this, _news)); break;
         case FLIP: setContent(new GridPanel(this)); break;
         case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
+        case SHOP: setContent(new ShopPanel(this)); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
         case EDIT_CATS:
             if (!(_content instanceof EditCatsPanel)) {

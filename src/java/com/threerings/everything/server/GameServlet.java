@@ -29,6 +29,7 @@ import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
@@ -294,6 +295,37 @@ public class GameServlet extends EveryServiceServlet
         Thing thing = _thingRepo.loadThing(thingId);
         _playerRepo.recordFeedItem(
             player.userId, FeedItem.Type.GIFTED, friendId, thing.name, message);
+    }
+
+    // from interface GameService
+    public ShopResult getShopInfo () throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        ShopResult result = new ShopResult();
+        result.coins = player.coins;
+        result.powerups = _gameRepo.loadPowerups(player.userId);
+        return result;
+    }
+
+    // from interface GameService
+    public void buyPowerup (Powerup type) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+
+        // if this is a permanent powerup, make sure they don't already own it
+        if (type.isPermanent()) {
+            if (_gameRepo.loadPowerupCount(player.userId, type) > 0) {
+                throw new ServiceException(E_ALREADY_OWN_POWERUP);
+            }
+        }
+
+        // deduct the coins from the player's account
+        if (!_playerRepo.consumeCoins(player.userId, type.cost)) {
+            throw new ServiceException(E_NSF_FOR_PURCHASE);
+        }
+
+        // grant them the powerup charges
+        _gameRepo.grantPowerupCharges(player.userId, type, type.charges);
     }
 
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)

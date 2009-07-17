@@ -6,8 +6,10 @@ package com.threerings.everything.server.persist;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -18,6 +20,7 @@ import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
@@ -25,6 +28,7 @@ import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 
 import com.threerings.everything.data.News;
+import com.threerings.everything.data.Powerup;
 
 /**
  * Maintains game related persistent data.
@@ -35,6 +39,10 @@ public class GameRepository extends DepotRepository
     @Inject public GameRepository (PersistenceContext ctx)
     {
         super(ctx);
+
+        // TODO: remove a week or two after 07-17-2009
+        _ctx.registerMigration(PowerupRecord.class,
+                               new SchemaMigration.Rename(2, "count", PowerupRecord.CHARGES));
     }
 
     /**
@@ -204,6 +212,51 @@ public class GameRepository extends DepotRepository
     public void resetPosition (int userId, int position)
     {
         updatePartial(FlippedRecord.getKey(userId), FlippedRecord.SLOTS[position], false);
+    }
+
+    /**
+     * Loads and returns the specified player's powerup inventory.
+     */
+    public Map<Powerup, Integer> loadPowerups (int ownerId)
+    {
+        Map<Powerup, Integer> inventory = Maps.newHashMap();
+        for (PowerupRecord record : findAll(PowerupRecord.class,
+                                            new Where(PowerupRecord.OWNER_ID.eq(ownerId)))) {
+            inventory.put(record.type, record.charges);
+        }
+        return inventory;
+    }
+
+    /**
+     * Returns the number of powerup charges possessed by the specified player for the specified
+     * powerup type.
+     */
+    public int loadPowerupCount (int ownerId, Powerup type)
+    {
+        PowerupRecord record = load(PowerupRecord.getKey(ownerId, type));
+        return (record == null) ? 0 : record.charges;
+    }
+
+    /**
+     * Grants powerup charges for the specified type to the specified player.
+     */
+    public void grantPowerupCharges (int ownerId, Powerup type, int charges)
+    {
+        // first try updating an existing record
+        if (updatePartial(PowerupRecord.getKey(ownerId, type),
+                          PowerupRecord.CHARGES, PowerupRecord.CHARGES.plus(charges)) > 0) {
+            return;
+        }
+
+        // if that fails, insert a new record
+        PowerupRecord record = new PowerupRecord();
+        record.ownerId = ownerId;
+        record.type = type;
+        record.charges = charges;
+        insert(record);
+
+        // note: the above insertion could fail if the player was somehow making a purchase from
+        // two computers at the exact same time, but why would they be doing that?
     }
 
     @Override // from DepotRepository
