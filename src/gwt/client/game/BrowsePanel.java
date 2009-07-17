@@ -46,7 +46,9 @@ public class BrowsePanel extends FlowPanel
     protected void init (final PlayerCollection coll)
     {
         final SmartTable table = new SmartTable(5, 0);
-        table.setWidget(0, 0, XFBML.newTag("profile-pic", "uid", ""+coll.owner.facebookId));
+        // TODO: wrap this in a link to their profile: http://www.facebook.com/people/fbid
+        table.setWidget(0, 0, XFBML.newTag("profile-pic", "uid", ""+coll.owner.facebookId,
+                                           "linked", "false"));
         table.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
         table.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
