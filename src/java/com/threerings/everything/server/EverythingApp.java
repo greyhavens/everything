@@ -61,7 +61,7 @@ public class EverythingApp extends App
      */
     public String getFacebookKey ()
     {
-        return _config.getValue("facebook_key", (String)null);
+        return _config.getValue(getFacebookKey("facebook_key"), (String)null);
     }
 
     /**
@@ -69,7 +69,7 @@ public class EverythingApp extends App
      */
     public String getFacebookSecret ()
     {
-        return _config.getValue("facebook_secret", (String)null);
+        return _config.getValue(getFacebookKey("facebook_secret"), (String)null);
     }
 
     /**
@@ -141,6 +141,11 @@ public class EverythingApp extends App
         _executor.shutdown();
         // TODO: we want to wait for all of our pending servlets to finish before shutdown
         shutdown();
+    }
+
+    protected String getFacebookKey (String key)
+    {
+        return (_appvers.equals(AppCodes.RELEASE_CANDIDATE) ? "candidate_" : "") + key;
     }
 
     protected Config _config = createConfig("everything");
