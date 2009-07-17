@@ -24,6 +24,8 @@ window.FB_ParseXFBML = function (elem) {
 }
 
 /* Start up our iframe resizer once FB_Init is called by GWT */
-FB.Bootstrap.ensureInit(function () {
-    FB.CanvasClient.startTimerToSizeToContent();
-});
+if (window != window.top) {
+    FB.Bootstrap.ensureInit(function () {
+        FB.CanvasClient.startTimerToSizeToContent();
+    });
+}
