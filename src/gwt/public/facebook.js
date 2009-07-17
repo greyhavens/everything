@@ -1,10 +1,7 @@
-/* Make our FB root object visible to GWT. */
-window.FB = FB;
-
 /* Wire up some specific functions. */
 window.FB_Init = function (apiKey) {
-    FB_RequireFeatures(["Connect", "XFBML", "CanvasUtil"], function () {
-        FB.XFBML.Host.autoParseDomTree = false;
+    FB_RequireFeatures(["XFBML"], function () {
+        // FB.XFBML.Host.autoParseDomTree = false;
         FB.init(apiKey, "xd_receiver.html");
     });
 }
@@ -30,5 +27,3 @@ window.FB_ParseXFBML = function (elem) {
 FB.Bootstrap.ensureInit(function () {
     FB.CanvasClient.startTimerToSizeToContent();
 });
-
-/* Note: all callbacks seem to get called twice. Thanks Facebook! */
