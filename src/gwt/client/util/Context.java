@@ -41,4 +41,9 @@ public interface Context
      * Returns the categories model.
      */
     public CategoriesModel getCatsModel ();
+
+    /**
+     * Returns the powerups model.
+     */
+    public PowerupsModel getPupsModel ();
 }

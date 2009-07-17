@@ -22,9 +22,6 @@ public enum Powerup implements ByteEnum
     /** Reveals the series of all cards in the grid. */
     SHOW_SERIES(3, 1000, 3),
 
-    /** Regenerates the grid with cards from a single category. */
-    SWIZZLE_CATEGORY(4, 1000, 3),
-
     //
     // permanent powerups (id starts at 64)
 

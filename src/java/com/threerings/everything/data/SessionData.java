@@ -3,6 +3,8 @@
 
 package com.threerings.everything.data;
 
+import java.util.Map;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -22,6 +24,9 @@ public class SessionData
 
     /** Our coin balance at the time we validated our session. */
     public int coins;
+
+    /** This player's current powerups count. */
+    public Map<Powerup, Integer> powerups;
 
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;

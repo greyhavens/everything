@@ -37,6 +37,7 @@ import client.util.Args;
 import client.util.CategoriesModel;
 import client.util.Context;
 import client.util.Errors;
+import client.util.PowerupsModel;
 
 /**
  * The entry point for the Everything client.
@@ -121,6 +122,12 @@ public class EverythingClient
         return _catsmodel;
     }
 
+    // from interface Context
+    public PowerupsModel getPupsModel ()
+    {
+        return _pupsmodel;
+    }
+
     // from interface ValueChangeHandler<String>
     public void onValueChange (ValueChangeEvent<String> event)
     {
@@ -152,6 +159,7 @@ public class EverythingClient
         _data = data;
         _coins = new Value<Integer>(data.coins);
         _news = new Value<News>(data.news);
+        _pupsmodel = new PowerupsModel(data.powerups);
         setContent(null);
         if (data.facebookKey != null) {
             initFacebook(data.facebookKey);
@@ -182,6 +190,7 @@ public class EverythingClient
     protected PopupStack _pstack = new PopupStack();
 
     protected CategoriesModel _catsmodel = new CategoriesModel(this);
+    protected PowerupsModel _pupsmodel;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 

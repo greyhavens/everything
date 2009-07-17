@@ -144,6 +144,7 @@ public class EverythingServlet extends EveryServiceServlet
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
         data.coins = player.coins;
+        data.powerups = _gameRepo.loadPowerups(player.userId);
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         data.gridsConsumed = (grid == null) ? 0 : grid.gridId;
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
