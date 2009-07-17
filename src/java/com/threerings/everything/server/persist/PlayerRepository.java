@@ -223,7 +223,7 @@ public class PlayerRepository extends DepotRepository
      */
     public void grantFreeFlipsToEveryone (int flips)
     {
-        updatePartial(PlayerRecord.class, new Where(new ValueExp("true")), null,
+        updatePartial(PlayerRecord.class, new Where(PlayerRecord.USER_ID.greaterThan(0)), null,
                       PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(flips));
     }
 

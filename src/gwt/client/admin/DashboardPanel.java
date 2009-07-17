@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.LimitedTextArea;
+import com.threerings.gwt.ui.NumberTextBox;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
@@ -68,6 +69,25 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories, null));
         stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
         stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards, null));
+
+        final NumberTextBox flips = NumberTextBox.newIntBox(2, 2);
+        final Button grant = new Button("Grant");
+        stats.add(Widgets.newRow(Widgets.newLabel("Grant free flips:", null), flips, grant));
+        new ClickCallback<Void>(grant, flips) {
+            protected boolean callService () {
+                int togrant = flips.getNumber().intValue();
+                if (togrant <= 0) {
+                    return false;
+                }
+                _adminsvc.grantFreeFlips(0, togrant, this);
+                return true;
+            }
+            protected boolean gotResult (Void result) {
+                Popups.infoNear("Free flips granted to everyone!", grant);
+                return true;
+            }
+        }.setConfirmText("Are you sure you want to grant free flips to every player in the " +
+                         "entire game?");
 
         contents.setWidget(0, 0, stats);
         contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
@@ -245,13 +265,13 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         protected void addGrant (final PlayerDetails details, String label, final String onGranted,
                                  final Granter granter)
         {
-            final TextBox amount = Widgets.newTextBox("", 4, 4);
+            final NumberTextBox amount = NumberTextBox.newIntBox(4, 4);
             final Button grant = new Button("Grant");
             int row = addText(label, 1, "Label");
             setWidget(row, 1, Widgets.newRow(amount, grant));
             new ClickCallback<Void>(grant, amount) {
                 protected boolean callService () {
-                    int togrant = Integer.parseInt(amount.getText().trim());
+                    int togrant = amount.getNumber().intValue();
                     if (togrant <= 0) {
                         return false;
                     }
