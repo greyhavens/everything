@@ -231,8 +231,7 @@
   <target name="web" depends="prepare" 
           description="Copies updated style sheets into the local installed app.">
     <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/">
-      <fileset dir="${gsrc.dir}/public" includes="*.css"/>
-      <fileset dir="${gsrc.dir}/public" includes="*.js"/>
+      <fileset dir="${gsrc.dir}/public" includes="**"/>
     </copy>
   </target>
 

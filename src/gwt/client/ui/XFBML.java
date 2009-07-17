@@ -6,6 +6,7 @@ package client.ui;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -46,15 +47,14 @@ public class XFBML
     /**
      * Parses the XFBML widgets in the supplied DOM tree rooted at the specified element.
      */
-    public static void parse (Element root)
+    public static void parse (Widget root)
     {
-        nativeParse(root);
+        nativeParse(root.getElement());
     }
 
     protected static class XFBMLWidget extends Widget
     {
-        public XFBMLWidget (String tag, String... attrsValues)
-        {
+        public XFBMLWidget (String tag, String... attrsValues) {
             setElement(DOM.createElement(NAMESPACE + tag));
             // we need to have <fb:x></fb:x>, not <fb:x/>, so add an empty text node
             getElement().appendChild(Document.get().createTextNode(""));
@@ -64,9 +64,9 @@ public class XFBML
         }
     }
 
-    protected static native void nativeParse (Element root) /*-{
+    protected static native void nativeParse (Element elem) /*-{
         try {
-            $wnd.FB_ParseXFBML(root);
+            $wnd.FB_ParseXFBML(elem);
         } catch (e) {
             if ($wnd.console) {
                 $wnd.console.log("Failed to reparse XFBML [error=" + e + "]");

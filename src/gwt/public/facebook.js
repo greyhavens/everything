@@ -3,7 +3,8 @@ window.FB = FB;
 
 /* Wire up some specific functions. */
 window.FB_Init = function (apiKey) {
-    FB_RequireFeatures(["Api", "Connect", "XFBML", "CanvasUtil"], function () {
+    FB_RequireFeatures(["Connect", "XFBML", "CanvasUtil"], function () {
+        FB.XFBML.Host.autoParseDomTree = false;
         FB.init(apiKey, "xd_receiver.html");
     });
 }

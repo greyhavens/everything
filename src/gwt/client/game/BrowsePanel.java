@@ -76,7 +76,7 @@ public class BrowsePanel extends FlowPanel
         }
         clear();
         add(table);
-        XFBML.parse(getElement());
+        XFBML.parse(this);
     }
 
     protected void showSeries (SmartTable table, PlayerCollection coll, int categoryId,
