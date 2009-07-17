@@ -48,10 +48,7 @@ public class AdminServlet extends EveryServiceServlet
     public PlayerDetails getPlayerDetails (int userId) throws ServiceException
     {
         requireAdmin();
-        PlayerRecord player = _playerRepo.loadPlayer(userId);
-        if (player == null) {
-            throw new ServiceException(E_UNKNOWN_USER);
-        }
+        PlayerRecord player = requirePlayer(userId);
         return PlayerRecord.TO_DETAILS.apply(player);
     }
 
@@ -59,10 +56,7 @@ public class AdminServlet extends EveryServiceServlet
     public void updateIsEditor (int userId, boolean isEditor) throws ServiceException
     {
         OOOUser user = requireAdmin();
-        PlayerName player = _playerRepo.loadPlayerName(userId);
-        if (player == null) {
-            throw new ServiceException(E_UNKNOWN_USER);
-        }
+        PlayerName player = requirePlayer(userId).getName();
         _playerRepo.updateIsEditor(userId, isEditor);
         _adminLogic.noteAction(user.userId, isEditor ? "editored" : "deeditored", player);
     }
@@ -95,12 +89,34 @@ public class AdminServlet extends EveryServiceServlet
     public void grantCoins (int userId, int coins) throws ServiceException
     {
         OOOUser user = requireAdmin();
+        PlayerRecord target = requirePlayer(userId);
+        _playerRepo.grantCoins(userId, coins);
+        _adminLogic.noteAction(user.userId, "granted " + coins + " coins to ", target.getName());
+    }
+
+    // from interface AdminService
+    public void grantFreeFlips (int userId, int flips) throws ServiceException
+    {
+        OOOUser user = requireAdmin();
+        if (userId == 0) {
+            _playerRepo.grantFreeFlipsToEveryone(flips);
+            _adminLogic.noteAction(user.userId, "grantd " + flips + " to everyone");
+        } else {
+            PlayerRecord target = requirePlayer(userId);
+            _playerRepo.grantFreeFlips(target.userId, flips);
+            _adminLogic.noteAction(
+                user.userId, "granted " + flips + " free flips to ", target.getName());
+        }
+    }
+
+    protected PlayerRecord requirePlayer (int userId)
+        throws ServiceException
+    {
         PlayerRecord target = _playerRepo.loadPlayer(userId);
         if (target == null) {
             throw new ServiceException(E_UNKNOWN_USER);
         }
-        _playerRepo.grantCoins(userId, coins);
-        _adminLogic.noteAction(user.userId, "granted " + coins + " coins to ", target.getName());
+        return target;
     }
 
     @Inject protected AdminLogic _adminLogic;

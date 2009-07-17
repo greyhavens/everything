@@ -18,6 +18,7 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
+import com.samskivert.depot.expression.ValueExp;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -79,9 +80,7 @@ public class PlayerRepository extends DepotRepository
      */
     public Collection<PlayerName> loadRecentPlayers (int count)
     {
-        Timestamp yesterday = new Timestamp(System.currentTimeMillis() - 24*60*60*1000L);
-        return findAll(PlayerRecord.class, new Where(PlayerRecord.JOINED.greaterEq(yesterday)),
-                       OrderBy.descending(PlayerRecord.LAST_SESSION),
+        return findAll(PlayerRecord.class, OrderBy.descending(PlayerRecord.USER_ID),
                        new Limit(0, count)).map(PlayerRecord.TO_NAME);
     }
 
@@ -216,6 +215,15 @@ public class PlayerRepository extends DepotRepository
     public void grantFreeFlips (int userId, int flips)
     {
         updatePartial(PlayerRecord.getKey(userId),
+                      PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(flips));
+    }
+
+    /**
+     * Grants the specified number of free flips to every single player in the database.
+     */
+    public void grantFreeFlipsToEveryone (int flips)
+    {
+        updatePartial(PlayerRecord.class, new Where(new ValueExp("true")), null,
                       PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(flips));
     }
 

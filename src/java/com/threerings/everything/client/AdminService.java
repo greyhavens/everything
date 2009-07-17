@@ -79,4 +79,9 @@ public interface AdminService extends RemoteService
      * Grants freebie coins to the specified player.
      */
     void grantCoins (int userId, int coins) throws ServiceException;
+
+    /**
+     * Grants free flips to the specified player, or to all players if userId is zero.
+     */
+    void grantFreeFlips (int userId, int flips) throws ServiceException;
 }

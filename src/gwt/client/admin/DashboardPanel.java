@@ -68,6 +68,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories, null));
         stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
         stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards, null));
+
         contents.setWidget(0, 0, stats);
         contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
 
@@ -224,30 +225,49 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             int row = addText("Is editor:", 1, "Label");
             setWidget(row, 1, isEditor);
 
-            final TextBox coins = Widgets.newTextBox("", 4, 4);
-            final Button grant = new Button("Grant");
-            row = addText("Grant coins:", 1, "Label");
-            setWidget(row, 1, Widgets.newRow(coins, grant));
-            new ClickCallback<Void>(grant, coins) {
-                protected boolean callService () {
-                    int togrant = Integer.parseInt(coins.getText().trim());
-                    if (togrant <= 0) {
-                        return false;
-                    }
-                    _adminsvc.grantCoins(details.name.userId, togrant, this);
-                    return true;
+            addGrant(details, "Grant coins:", "Coins granted!", new Granter() {
+                public void callService (int userId, int amount, ClickCallback<Void> callback) {
+                    _adminsvc.grantCoins(userId, amount, callback);
                 }
-                protected boolean gotResult (Void result) {
-                    Popups.infoNear("Coins granted!", grant);
-                    return true;
+            });
+            addGrant(details, "Grant free flips:", "Free flips granted!", new Granter() {
+                public void callService (int userId, int amount, ClickCallback<Void> callback) {
+                    _adminsvc.grantFreeFlips(userId, amount, callback);
                 }
-            };
+            });
         }
 
         protected void addDatum (String name, Object value) {
             int row = addText(name + ":", 1, "Label");
             setText(row, 1, String.valueOf(value));
         }
+
+        protected void addGrant (final PlayerDetails details, String label, final String onGranted,
+                                 final Granter granter)
+        {
+            final TextBox amount = Widgets.newTextBox("", 4, 4);
+            final Button grant = new Button("Grant");
+            int row = addText(label, 1, "Label");
+            setWidget(row, 1, Widgets.newRow(amount, grant));
+            new ClickCallback<Void>(grant, amount) {
+                protected boolean callService () {
+                    int togrant = Integer.parseInt(amount.getText().trim());
+                    if (togrant <= 0) {
+                        return false;
+                    }
+                    granter.callService(details.name.userId, togrant, this);
+                    return true;
+                }
+                protected boolean gotResult (Void result) {
+                    Popups.infoNear(onGranted, grant);
+                    return true;
+                }
+            };
+        }
+    }
+
+    protected static interface Granter {
+        public void callService (int userId, int amount, ClickCallback<Void> callback);
     }
 
     protected Value<News> _news;
