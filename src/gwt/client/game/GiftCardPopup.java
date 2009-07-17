@@ -63,7 +63,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 grid.setText(row, 2, "Wishlist!", 1, "Wishlist");
             }
             final TextBox message = Widgets.newTextBox("", 255, 20);
-            DefaultTextListener.configure(message, "<optional gift message>");
+            final String defmsg = "<optional gift message>";
+            DefaultTextListener.configure(message, defmsg);
             message.setVisible(false);
             grid.setWidget(row, 3, message);
             final Button give = new Button("Give");
@@ -75,8 +76,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                         give.setText("Send Gift");
                         return false;
                     }
-                    _gamesvc.giftCard(_thingId, _created, info.friend.userId,
-                                      message.getText().trim(), this);
+                    String msg = DefaultTextListener.getText(message, defmsg);
+                    _gamesvc.giftCard(_thingId, _created, info.friend.userId, msg, this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {
