@@ -224,7 +224,7 @@ public class EditSeriesPanel extends FlowPanel
             "your description and facts fit on the Thing display.";
         thing.facts = "Enter facts about your thing here.\nPress enter to end one " +
             "bullet point and start the next.";
-        thing.source = "http://wikipedia.org/Todo";
+        thing.source = "";
         return thing;
     }
 
@@ -320,6 +320,8 @@ public class EditSeriesPanel extends FlowPanel
 
             _ctrl.setText(row, 0, "Source", 1, "right");
             final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
+            DefaultTextListener.configure(
+                source, "<source URL, e.g. http://en.wikipedia.org/wiki/Everything>");
             _ctrl.setWidget(row++, 1, source, 3, "Wide");
 
             Button delete = new Button("Delete");
