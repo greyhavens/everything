@@ -159,34 +159,6 @@ public class GameLogic
     }
 
     /**
-     * Computes the fractional number of free flips earned by a player who just started a session
-     * after the specified number of milliseconds since their last session and who currently has
-     * the specified number of free flips.
-     */
-    public float computeFreeFlipsEarned (float haveFlips, long elapsed)
-    {
-        // if they have fewer than the daily free flips grant, compute how many millis would be
-        // needed to top them up at that rate
-        float earnedFlips = 0;
-        if (haveFlips < GameCodes.DAILY_FREE_FLIPS) {
-            long millisPerFlip = ONE_DAY / GameCodes.DAILY_FREE_FLIPS;
-            float allowedDaily = GameCodes.DAILY_FREE_FLIPS - haveFlips;
-            long allowedMillis = Math.round(allowedDaily * millisPerFlip);
-            if (elapsed > allowedMillis) {
-                // they've been gone more than a day: accumulate up to the daily limit at the daily
-                // rate and then fall through and accumulate further flips at the vacation rate
-                earnedFlips += allowedDaily;
-                elapsed -= allowedMillis;
-            } else {
-                // they've been gone less than a day, so accumulate at the daily rate
-                return elapsed / (float)millisPerFlip;
-            }
-        }
-        // now we're accumulating at the vacation rate
-        return earnedFlips + GameCodes.VACATION_FREE_FLIPS * elapsed / (float)ONE_DAY;
-    }
-
-    /**
      * Resolves the categories from the specified leaf category up.
      */
     public Category[] resolveCategories (int categoryId)
@@ -268,7 +240,4 @@ public class GameLogic
 
     /** Recompute our thing index every five minutes. */
     protected static final long THING_INDEX_UPDATE_INTERVAL = 5 * 60 * 1000L;
-
-    /** One day in milliseconds. */
-    protected static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 }

@@ -33,6 +33,7 @@ import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.util.GameUtil;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -136,6 +137,9 @@ public class GameServlet extends EveryServiceServlet
 
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid == null || grid.expires.getTime() < System.currentTimeMillis()) {
+            // note the time that their old grid expired
+            long oexpires = grid.expires.getTime();
+
             // generate a new grid
             grid = _gameLogic.generateGrid(player, grid);
 
@@ -143,8 +147,13 @@ public class GameServlet extends EveryServiceServlet
             _gameRepo.storeGrid(grid);
             _gameRepo.resetFlipped(player.userId);
 
+            // based on the time that has elapsed between grid expirations, grant them free flips
+            long elapsed = grid.expires.getTime() - oexpires;
+            int grantFlips = GameUtil.computeFreeFlips(player, elapsed);
+            _playerRepo.grantFreeFlips(player.userId, grantFlips);
+
             log.info("Generated grid", "for", player.who(), "things", grid.thingIds,
-                     "expires", grid.expires);
+                     "expires", grid.expires, "elapsed", elapsed, "flips", grantFlips);
         }
 
         GridResult result = new GridResult();

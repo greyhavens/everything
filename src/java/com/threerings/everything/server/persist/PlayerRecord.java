@@ -60,7 +60,7 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 7;
+    public static final int SCHEMA_VERSION = 8;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -94,15 +94,7 @@ public class PlayerRecord extends PersistentRecord
     public int coins;
 
     /** This player's accumulated free flips. */
-    public float freeFlips;
-
-    /**
-     * Initializes {@link GameStatus#freeFlips}.
-     */
-    public int getFreeFlips ()
-    {
-        return (int)Math.floor(freeFlips);
-    }
+    public int freeFlips;
 
     /**
      * Initializes {@link GameStatus#nextFlipCost}.
@@ -110,18 +102,6 @@ public class PlayerRecord extends PersistentRecord
     public int getNextFlipCost ()
     {
         return 0; // will be filled in by caller
-    }
-
-    /**
-     * Initializes {@link GameStatus#nextFreeFlipAt}.
-     */
-    public long getNextFreeFlipAt ()
-    {
-        long flipsPerDay = (freeFlips < GameCodes.DAILY_FREE_FLIPS) ?
-            GameCodes.DAILY_FREE_FLIPS : GameCodes.VACATION_FREE_FLIPS;
-        long millisPerFlip = ONE_DAY / flipsPerDay;
-        long millisToNextFlip = (long)(millisPerFlip * (Math.ceil(freeFlips) - freeFlips));
-        return lastSession.getTime() + millisToNextFlip;
     }
 
     /**
@@ -153,7 +133,4 @@ public class PlayerRecord extends PersistentRecord
                 new Comparable[] { userId });
     }
     // AUTO-GENERATED: METHODS END
-
-    /** One day in milliseconds. */
-    protected static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 }

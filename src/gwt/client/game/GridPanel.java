@@ -94,8 +94,7 @@ public class GridPanel extends FlowPanel
         } else {
             _info.setWidget(0, 1, new CoinLabel("Next flip costs ", status.nextFlipCost),
                             1, "Bold");
-            _info.setText(0, 2, "Next free flip " + format(new Date(status.nextFreeFlipAt)),
-                          1, "right");
+            _info.setText(0, 2, "");
         }
     }
 

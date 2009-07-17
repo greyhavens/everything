@@ -35,5 +35,5 @@ public class PlayerDetails
     public int coins;
 
     /** This player's current free flips status. */
-    public float freeFlips;
+    public int freeFlips;
 }

@@ -123,12 +123,10 @@ public class EverythingServlet extends EveryServiceServlet
             updateFacebookFriends(player, fbinfo.right);
 
         } else {
-            // if this is not their first session, update their last session and grant free flips
-            // they've accumulated since their previous session
+            // if this is not their first session, update their last session timestamp
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
-            float extraFlips = _gameLogic.computeFreeFlipsEarned(player.freeFlips, elapsed);
-            _playerRepo.recordSession(player.userId, now, extraFlips);
-            log.info("Welcome back", "who", player.who(), "gone", elapsed, "flips", extraFlips);
+            _playerRepo.recordSession(player.userId, now);
+            log.info("Welcome back", "who", player.who(), "gone", elapsed);
 
             // check to see if they made FB friends with any existing Everything players
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);

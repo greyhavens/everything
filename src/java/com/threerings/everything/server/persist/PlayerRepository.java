@@ -17,6 +17,7 @@ import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -38,6 +39,10 @@ public class PlayerRepository extends DepotRepository
     @Inject public PlayerRepository (PersistenceContext ctx)
     {
         super(ctx);
+
+        // TODO: remove a week or two after 07-17-2009
+        _ctx.registerMigration(PlayerRecord.class,
+                               new SchemaMigration.Retype(8, PlayerRecord.FREE_FLIPS));
     }
 
     /**
@@ -107,8 +112,6 @@ public class PlayerRepository extends DepotRepository
         record.joined = new Timestamp(System.currentTimeMillis());
         record.lastSession = record.joined;
         record.coins = GameCodes.NEW_USER_FREE_COINS;
-        record.freeFlips = GameCodes.NEW_USER_FREE_FLIPS;
-        record.isEditor = true; // TEMP
         insert(record);
         return record;
     }
@@ -177,11 +180,10 @@ public class PlayerRepository extends DepotRepository
      * Updates the specified user's last session stamp and grants them free flips earned since
      * their previous session.
      */
-    public void recordSession (int userId, long sessionStamp, float freeFlipsEarned)
+    public void recordSession (int userId, long sessionStamp)
     {
         updatePartial(PlayerRecord.getKey(userId),
-                      PlayerRecord.LAST_SESSION, new Timestamp(sessionStamp),
-                      PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(freeFlipsEarned));
+                      PlayerRecord.LAST_SESSION, new Timestamp(sessionStamp));
     }
 
     /**
@@ -211,7 +213,7 @@ public class PlayerRepository extends DepotRepository
     /**
      * Adds to the specified player's free flip count.
      */
-    public void grantFreeFlips (int userId, float flips)
+    public void grantFreeFlips (int userId, int flips)
     {
         updatePartial(PlayerRecord.getKey(userId),
                       PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(flips));

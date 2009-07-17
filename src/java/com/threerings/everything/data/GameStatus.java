@@ -19,7 +19,4 @@ public class GameStatus
 
     /** The cost of the next flip (0 if there are free flips remaining). */
     public int nextFlipCost;
-
-    /** The time at which this player's next free flip will be awarded. */
-    public long nextFreeFlipAt;
 }
