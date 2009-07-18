@@ -210,12 +210,13 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Adds to the specified player's free flip count.
+     * Adds to the specified player's free flip count. Updates the supplied record in memory also.
      */
-    public void grantFreeFlips (int userId, int flips)
+    public void grantFreeFlips (PlayerRecord record, int flips)
     {
-        updatePartial(PlayerRecord.getKey(userId),
+        updatePartial(PlayerRecord.getKey(record.userId),
                       PlayerRecord.FREE_FLIPS, PlayerRecord.FREE_FLIPS.plus(flips));
+        record.freeFlips += flips;
     }
 
     /**

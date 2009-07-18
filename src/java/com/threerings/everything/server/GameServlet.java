@@ -151,7 +151,7 @@ public class GameServlet extends EveryServiceServlet
             // based on the time that has elapsed between grid expirations, grant them free flips
             long elapsed = grid.expires.getTime() - oexpires;
             int grantFlips = GameUtil.computeFreeFlips(player, elapsed);
-            _playerRepo.grantFreeFlips(player.userId, grantFlips);
+            _playerRepo.grantFreeFlips(player, grantFlips);
 
             log.info("Generated grid", "for", player.who(), "things", grid.thingIds,
                      "expires", grid.expires, "elapsed", elapsed, "flips", grantFlips);

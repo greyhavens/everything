@@ -28,7 +28,10 @@ public class GameUtil
                         "who", record.who(),  "elapsed", elapsed);
         }
 
-        int freeFlips = GameCodes.DAILY_FREE_FLIPS;
+        // if you have free flips left over, we only top you up (but we'll always give you at least
+        // vacation_free_flips for your elapsed day)
+        int freeFlips = Math.max(GameCodes.DAILY_FREE_FLIPS - record.freeFlips,
+                                 GameCodes.VACATION_FREE_FLIPS);
         elapsed -= ONE_DAY;
         while (elapsed > shortDay) { // accomodate the occasional lost hour due to DST
             freeFlips += GameCodes.VACATION_FREE_FLIPS;
