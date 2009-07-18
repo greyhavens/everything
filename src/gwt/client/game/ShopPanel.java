@@ -36,8 +36,6 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
     {
         _ctx.getPupsModel().refresh(data.powerups);
 
-        add(Widgets.newLabel("Welcome to the Everything shop!", "Title"));
-
         SmartTable table = new SmartTable(5, 0);
         table.setWidget(0, 0, Widgets.newRow(Widgets.newLabel("You have:", null),
                                              new CoinLabel(_ctx.getCoins())));
