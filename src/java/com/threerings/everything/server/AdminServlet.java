@@ -105,7 +105,7 @@ public class AdminServlet extends EveryServiceServlet
             _adminLogic.noteAction(user.userId, "grantd " + flips + " to everyone");
         } else {
             PlayerRecord target = requirePlayer(userId);
-            _playerRepo.grantFreeFlips(target.userId, flips);
+            _playerRepo.grantFreeFlips(target, flips);
             _adminLogic.noteAction(
                 user.userId, "granted " + flips + " free flips to ", target.getName());
         }
