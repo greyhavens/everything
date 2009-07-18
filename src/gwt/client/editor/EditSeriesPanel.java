@@ -314,8 +314,8 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
 
             _ctrl.setText(row, 0, "Source", 1, "right");
             final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
-            DefaultTextListener.configure(
-                source, "<source URL, e.g. http://en.wikipedia.org/wiki/Everything>");
+            final String defsource = "<source URL, e.g. http://en.wikipedia.org/wiki/Everything>";
+            DefaultTextListener.configure(source, defsource);
             _ctrl.setWidget(row++, 1, source, 3, "Wide");
 
             Button delete = new Button("Delete");
@@ -356,7 +356,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
                     card.thing.name = name.getText().trim();
                     card.thing.descrip = descrip.getText().trim();
                     card.thing.facts = facts.getText().trim();
-                    card.thing.source = source.getText().trim();
+                    card.thing.source = DefaultTextListener.getText(source, defsource);
                     updateCard(card);
                 }
             };
