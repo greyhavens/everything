@@ -7,7 +7,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -54,6 +53,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     protected Widget createContents (GameService.GiftInfoResult result)
     {
         SmartTable grid = new SmartTable(5, 0);
+        grid.setWidth("100%");
         for (final FriendCardInfo info : result.friends) {
             int row = grid.addText(info.friend.toString(), 1, null);
             if (info.hasThings > 0) {
@@ -88,14 +88,12 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 }
             };
         }
-        if (result.friends.size() == 0) {
-            grid.addText("All of your friends already have this card.", 4, null);
-        } else {
-            grid.addText("Friends that already have this card are not shown.", 4, null);
-        }
-        int row = grid.addWidget(new Button("Never Mind", onHide()), 4, null);
-        grid.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
-        return grid;
+        String msg = (result.friends.size() == 0) ? "All of your friends already have this card." :
+            "Friends that already have this card are not shown.";
+        grid.addText(msg, 5, null);
+        return Widgets.newFlowPanel(
+            Widgets.newScrollPanel(grid, -1, 80),
+            Widgets.newFlowPanel("Buttons", new Button("Never Mind", onHide())));
     }
 
     protected int _thingId;

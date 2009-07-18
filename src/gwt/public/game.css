@@ -187,6 +187,10 @@
   font-weight: bold;
 }
 
+.giftCard .Buttons {
+  text-align: center;
+}
+
 /** ShopPanel styles */
 .shop .Header {
   font-size: 18px;
