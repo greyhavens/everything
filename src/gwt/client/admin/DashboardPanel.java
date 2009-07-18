@@ -48,7 +48,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
 {
     public DashboardPanel (Context ctx, Value<News> news)
     {
-        super("dashboard", ctx);
+        super(ctx, "page", "dashboard");
         _news = news;
         _adminsvc.getDashboard(createCallback());
     }

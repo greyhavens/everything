@@ -43,6 +43,7 @@ public class EditCatsPanel extends SmartTable
     public EditCatsPanel (Context ctx)
     {
         super("editCats", 5, 0);
+        addStyleName("page");
 
         setWidget(0, 0, _cats);
         setWidget(0, 1, _subcats);

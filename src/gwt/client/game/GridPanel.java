@@ -8,7 +8,6 @@ import java.util.Date;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
@@ -23,6 +22,7 @@ import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
 
+import client.ui.DataPanel;
 import client.util.Context;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
@@ -30,21 +30,15 @@ import client.util.PopupCallback;
 /**
  * Displays a player's grid, allows flipping of cards.
  */
-public class GridPanel extends FlowPanel
+public class GridPanel extends DataPanel<GameService.GridResult>
 {
     public GridPanel (Context ctx)
     {
-        setStyleName("grid");
-        _ctx = ctx;
-
-        add(Widgets.newLabel("Loading...", "infoLabel"));
-        _gamesvc.getGrid(new PanelCallback<GameService.GridResult>(this) {
-            public void onSuccess (GameService.GridResult data) {
-                init(data);
-            }
-        });
+        super(ctx, "page", "grid");
+        _gamesvc.getGrid(createCallback());
     }
 
+    @Override // from DataPanel
     protected void init (final GameService.GridResult data)
     {
         clear();
@@ -135,7 +129,6 @@ public class GridPanel extends FlowPanel
         return DateUtil.formatDateTime(date).toLowerCase();
     }
 
-    protected Context _ctx;
     protected SmartTable _info, _cards, _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

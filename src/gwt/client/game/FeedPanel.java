@@ -17,6 +17,7 @@ import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PlayerName;
 
+import client.ui.DataPanel;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -25,22 +26,15 @@ import client.util.PanelCallback;
 /**
  * Displays the player's recent feed.
  */
-public class FeedPanel extends FlowPanel
+public class FeedPanel extends DataPanel<List<FeedItem>>
 {
     public FeedPanel (Context ctx)
     {
-        setStyleName("feed");
-        add(Widgets.newLabel("Loading...", null));
-
-        _ctx = ctx;
-        _everysvc.getRecentFeed(new PanelCallback<List<FeedItem>>(this) {
-            public void onSuccess (List<FeedItem> items) {
-                clear();
-                init(items);
-            }
-        });
+        super(ctx, "feed");
+        _everysvc.getRecentFeed(createCallback());
     }
 
+    @Override // from DataPanel
     protected void init (List<FeedItem> items)
     {
         String date = "Today";
@@ -101,8 +95,6 @@ public class FeedPanel extends FlowPanel
             return buf.append(objects.size() > 1 ? " cards" : " card").toString();
         }
     }
-
-    protected Context _ctx;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 }

@@ -22,6 +22,7 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.SeriesCard;
 
+import client.ui.DataPanel;
 import client.ui.XFBML;
 import client.util.Context;
 import client.util.PanelCallback;
@@ -29,20 +30,15 @@ import client.util.PanelCallback;
 /**
  * Displays a player's collection.
  */
-public class BrowsePanel extends FlowPanel
+public class BrowsePanel extends DataPanel<PlayerCollection>
 {
     public BrowsePanel (Context ctx, int ownerId)
     {
-        setStyleName("browse");
-        add(Widgets.newLabel("Loading...", "infoLabel"));
-        _ctx = ctx;
-        _gamesvc.getCollection(ownerId, new PanelCallback<PlayerCollection>(this) {
-            public void onSuccess (PlayerCollection coll) {
-                init(coll);
-            }
-        });
+        super(ctx, "page", "browse");
+        _gamesvc.getCollection(ownerId, createCallback());
     }
 
+    @Override // from DataPanel
     protected void init (final PlayerCollection coll)
     {
         final SmartTable table = new SmartTable(5, 0);
@@ -93,7 +89,6 @@ public class BrowsePanel extends FlowPanel
         _showingRow = row;
     }
 
-    protected Context _ctx;
     protected int _showingRow;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

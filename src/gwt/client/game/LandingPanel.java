@@ -21,6 +21,7 @@ public class LandingPanel extends FlowPanel
     public LandingPanel (Context ctx, Value<News> news)
     {
         setStyleName("landing");
+        addStyleName("page"); // we're a top-level page
 
         if (ctx.isNewbie()) {
             add(Widgets.newLabel("Welcome to Everything!", "Title"));

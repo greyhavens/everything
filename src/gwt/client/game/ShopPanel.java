@@ -27,7 +27,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
 {
     public ShopPanel (Context ctx)
     {
-        super("shop", ctx);
+        super(ctx, "page", "shop");
         _gamesvc.getShopInfo(createCallback());
     }
 

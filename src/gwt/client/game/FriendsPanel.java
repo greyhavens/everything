@@ -26,7 +26,7 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
 {
     public FriendsPanel (Context ctx)
     {
-        super("friends", ctx);
+        super(ctx, "page", "friends");
         _everysvc.getFriends(createCallback());
     }
 

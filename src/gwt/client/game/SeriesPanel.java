@@ -24,30 +24,24 @@ import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.ThingCard;
 
+import client.ui.DataPanel;
 import client.util.Context;
 
 /**
  * Displays thumbnails for all cards in a player's series.
  */
-public class SeriesPanel extends SimplePanel
+public class SeriesPanel extends DataPanel<Series>
 {
-    public SeriesPanel (Context ctx, final int ownerId, int categoryId, Value<Integer> count)
+    public SeriesPanel (Context ctx, int ownerId, int categoryId, Value<Integer> count)
     {
-        setStyleName("series");
-        setWidget(Widgets.newLabel("Loading...", "infoLabel"));
-        _ctx = ctx;
+        super(ctx, "series");
+        _ownerId = ownerId;
         _count = count;
-        _gamesvc.getSeries(ownerId, categoryId, new AsyncCallback<Series>() {
-            public void onSuccess (Series series) {
-                init(ownerId, series);
-            }
-            public void onFailure (Throwable t) {
-                setWidget(Widgets.newLabel(t.getMessage(), "errorLabel"));
-            }
-        });
+        _gamesvc.getSeries(ownerId, categoryId, createCallback());
     }
 
-    protected void init (int ownerId, final Series series)
+    @Override // from DataPanel
+    protected void init (final Series series)
     {
         final SmartTable grid = new SmartTable(5, 0);
         grid.addText(series.name, COLUMNS, "Title");
@@ -72,16 +66,16 @@ public class SeriesPanel extends SimplePanel
                     _count.update(ids.size());
                 }
             });
-            ClickHandler onClick = (card == null) ? null :
-                CardPopup.onClick(_ctx, new CardIdent(ownerId, card.thingId, card.created), status);
+            ClickHandler onClick = (card == null) ? null : CardPopup.onClick(
+                _ctx, new CardIdent(_ownerId, card.thingId, card.created), status);
             grid.setWidget(row, col, ThingCardView.create(card, onClick));
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);
         }
-        setWidget(grid);
+        add(grid);
     }
 
-    protected Context _ctx;
+    protected int _ownerId;
     protected Value<Integer> _count;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

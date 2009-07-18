@@ -39,6 +39,7 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
 import client.game.CardView;
+import client.ui.DataPanel;
 import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -48,22 +49,15 @@ import client.util.PanelCallback;
 /**
  * Displays an interface for editing a particular series.
  */
-public class EditSeriesPanel extends FlowPanel
+public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
 {
     public EditSeriesPanel (Context ctx, int categoryId)
     {
-        setStyleName("editSeries");
-        add(Widgets.newLabel("Loading...", "infoLabel"));
-
-        _ctx = ctx;
-        _editorsvc.loadSeries(categoryId, new PanelCallback<EditorService.SeriesResult>(this) {
-            public void onSuccess (EditorService.SeriesResult result) {
-                clear();
-                init(result);
-            }
-        });
+        super(ctx, "page", "editSeries");
+        _editorsvc.loadSeries(categoryId, createCallback());
     }
 
+    @Override // from DataPanel
     protected void init (final EditorService.SeriesResult result)
     {
         // add some metadata at the top
@@ -417,8 +411,6 @@ public class EditSeriesPanel extends FlowPanel
         protected SmartTable _ctrl;
         protected Widget _edit;
     }
-
-    protected Context _ctx;
 
     protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);
     protected static final int BRIEF_COMMENT_COUNT = 3;

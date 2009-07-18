@@ -15,9 +15,11 @@ import client.util.PanelCallback;
  */
 public abstract class DataPanel<T> extends FlowPanel
 {
-    protected DataPanel (String styleName, Context ctx)
+    protected DataPanel (Context ctx, String... styleNames)
     {
-        setStyleName(styleName);
+        for (String styleName : styleNames) {
+            addStyleName(styleName);
+        }
         add(Widgets.newLabel("Loading...", "infoLabel"));
         _ctx = ctx;
     }
