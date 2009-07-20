@@ -74,6 +74,7 @@ public class GameLogic
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
         grid.thingIds = selectGridThings(player, Grid.GRID_SIZE);
+        grid.status = GridStatus.NORMAL;
 
         // grids generally expire at midnight in the player's timezone
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(player.timezone));
