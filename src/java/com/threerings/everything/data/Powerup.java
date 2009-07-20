@@ -3,6 +3,8 @@
 
 package com.threerings.everything.data;
 
+import java.util.EnumSet;
+
 import com.samskivert.depot.ByteEnum;
 
 /**
@@ -27,6 +29,13 @@ public enum Powerup implements ByteEnum
 
     /** Grants an extra free card flip each day. */
     EXTRA_FLIP(64, 5000, 1);
+
+    /** Those powerups that can be used during the grid creation process. */
+    // public static EnumSet<Powerup> PRE_GRID = EnumSet.of(TODO);
+
+    /** Those powerups that can be used on a realized grid. */
+    public static EnumSet<Powerup> POST_GRID =
+        EnumSet.of(SHOW_CATEGORY, SHOW_SUBCATEGORY, SHOW_SERIES);
 
     /** The cost of this powerup in coins. */
     public final int cost;

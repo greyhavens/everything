@@ -6,12 +6,18 @@ package client.game;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
+import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
@@ -19,6 +25,7 @@ import com.threerings.gwt.util.Value;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.GameStatus;
+import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
 
@@ -26,6 +33,7 @@ import client.ui.DataPanel;
 import client.util.Context;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
+import client.util.PowerupLookup;
 
 /**
  * Displays a player's grid, allows flipping of cards.
@@ -45,7 +53,11 @@ public class GridPanel extends DataPanel<GameService.GridResult>
 
         add(_info = new SmartTable(5, 0));
         _info.setText(1, 0, "Unflipped cards:");
-        _info.setText(1, 2, "New grid " + format(data.grid.expires), 1, "right");
+        _info.setWidget(1, 2, new Button("Powerups", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                showPowerupsMenu((Widget)event.getSource());
+            }
+        }), 1, "right");
         updateRemaining(data.grid.unflipped);
         updateStatus(data.status);
 
@@ -60,6 +72,8 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             };
             _cards.setWidget(row, col, ThingCardView.createMicro(data.grid.flipped[ii], onClick));
         }
+
+        add(Widgets.newLabel("New grid " + format(data.grid.expires), "center"));
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -124,6 +138,24 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             });
     }
 
+    protected void showPowerupsMenu (Widget trigger)
+    {
+        FlowPanel contents = new FlowPanel();
+        for (Powerup pup : Powerup.POST_GRID) {
+            Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
+            Label plabel = Widgets.newInlineLabel(" " + _pmsgs.xlate(pup.toString()));
+            if (charges.get() > 0) {
+                Widgets.makeActionLabel(plabel, new ClickHandler() {
+                    public void onClick (ClickEvent event) {
+                        // TODO
+                    }
+                });
+            }
+            contents.add(Widgets.newFlowPanel(ValueLabel.create("inline", charges), plabel));
+        }
+        Popups.newPopupNear("popup", contents, trigger).setAutoHideEnabled(true);
+    }
+
     protected static String format (Date date)
     {
         return DateUtil.formatDateTime(date).toLowerCase();
@@ -132,6 +164,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     protected SmartTable _info, _cards, _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
+    protected static final PowerupLookup _pmsgs = GWT.create(PowerupLookup.class);
 
     protected static final int COLUMNS = 4;
 }

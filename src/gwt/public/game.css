@@ -156,6 +156,11 @@
   font-weight: bold;
 }
 
+.grid .Powerups {
+  border: 1px solid;
+  text-align: center;
+}
+
 /** SeriesPopup styles */
 .series {
   border: 1px solid;
