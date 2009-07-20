@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -344,7 +343,7 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // determine the grid's new status
-        GridStatus status = POWERUP_FX.get(type);
+        GridStatus status = type.getTargetStatus();
         if (status == null) {
             log.warning("Requested to apply invalid powerup to grid", "who", player.who(),
                         "powerup", type);
@@ -414,10 +413,4 @@ public class GameServlet extends EveryServiceServlet
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
-
-    /** A mapping from Powerup to GridStatus for post-grid powerups. */
-    protected static final Map<Powerup, GridStatus> POWERUP_FX = ImmutableMap.of(
-        Powerup.SHOW_CATEGORY, GridStatus.CAT_REVEALED,
-        Powerup.SHOW_SUBCATEGORY, GridStatus.SUBCAT_REVEALED,
-        Powerup.SHOW_SERIES, GridStatus.SERIES_REVEALED);
 }

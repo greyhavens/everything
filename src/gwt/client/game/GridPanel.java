@@ -9,6 +9,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -146,15 +147,22 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             });
     }
 
-    protected void showPowerupsMenu (Widget trigger)
+    protected void showPowerupsMenu (final Widget trigger)
     {
         FlowPanel contents = new FlowPanel();
+        final PopupPanel popup = Popups.newPopup("popup", contents);
+        popup.setAutoHideEnabled(true);
         for (final Powerup pup : Powerup.POST_GRID) {
             final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
             Label plabel = Widgets.newInlineLabel(" " + _pmsgs.xlate(pup.toString()));
             if (charges.get() > 0) {
                 new ClickCallback<Grid>(plabel) {
                     protected boolean callService () {
+                        popup.hide();
+                        if (pup.getTargetStatus() == _data.grid.status) {
+                            Popups.errorNear("This powerup will have no effect.", trigger);
+                            return false;
+                        }
                         _gamesvc.usePowerup(_data.grid.gridId, pup, this);
                         return true;
                     }
@@ -168,7 +176,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             }
             contents.add(Widgets.newFlowPanel(ValueLabel.create("inline", charges), plabel));
         }
-        Popups.newPopupNear("popup", contents, trigger).setAutoHideEnabled(true);
+        Popups.showNear(popup, trigger);
     }
 
     protected static String format (Date date)

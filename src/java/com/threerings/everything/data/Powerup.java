@@ -16,13 +16,25 @@ public enum Powerup implements ByteEnum
     // consumable powerups (id starts at 1)
 
     /** Reveals the category of all cards in the grid. */
-    SHOW_CATEGORY(1, 150, 3),
+    SHOW_CATEGORY(1, 150, 3) {
+        public GridStatus getTargetStatus () {
+            return GridStatus.CAT_REVEALED;
+        }
+    },
 
     /** Reveals the subcategory of all cards in the grid. */
-    SHOW_SUBCATEGORY(2, 300, 3),
+    SHOW_SUBCATEGORY(2, 300, 3) {
+        public GridStatus getTargetStatus () {
+            return GridStatus.SUBCAT_REVEALED;
+        }
+    },
 
     /** Reveals the series of all cards in the grid. */
-    SHOW_SERIES(3, 500, 3),
+    SHOW_SERIES(3, 500, 3) {
+        public GridStatus getTargetStatus () {
+            return GridStatus.SERIES_REVEALED;
+        }
+    },
 
     //
     // permanent powerups (id starts at 64)
@@ -49,6 +61,15 @@ public enum Powerup implements ByteEnum
     public boolean isPermanent ()
     {
         return _code >= PERMA_CODE;
+    }
+
+    /**
+     * Returns the status to which this powerup changes the grid, or null if it is not a status
+     * changing powerup.
+     */
+    public GridStatus getTargetStatus ()
+    {
+        return null;
     }
 
     // from interface ByteEnum
