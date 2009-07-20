@@ -53,6 +53,17 @@ public class Thing
     /** The creator of this thing. */
     public PlayerName creator;
 
+    /** Converts this Thing to a ThingCard. */
+    public ThingCard toCard ()
+    {
+        ThingCard card = new ThingCard();
+        card.thingId = thingId;
+        card.name = name;
+        card.image = image;
+        card.rarity = rarity;
+        return card;
+    }
+
     // from interface Created
     public int getCreatorId ()
     {

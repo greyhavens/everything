@@ -9,9 +9,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -20,12 +25,14 @@ import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.IntSet;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
+import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
@@ -93,24 +100,35 @@ public class GameLogic
         Grid grid = GridRecord.TO_GRID.apply(record);
 
         // load up all the cards in the grid
-        IntMap<ThingCard> cards = IntMaps.newHashIntMap();
-        for (ThingCard card : _thingRepo.loadThingCards(new ArrayIntSet(record.thingIds))) {
-            cards.put(card.thingId, card);
+        IntMap<Thing> things = IntMaps.newHashIntMap();
+        for (Thing thing : _thingRepo.loadThings(new ArrayIntSet(record.thingIds))) {
+            things.put(thing.thingId, thing);
         }
 
         // load up the flipped status for the player's current grid
         boolean[] flipped = _gameRepo.loadFlipped(record.userId);
 
+        // if our grid status is non-normal, we need to resolve category data
+        IntMap<String> reveal = null;
+        switch (grid.status) {
+        case CAT_REVEALED: reveal = resolveReveal(things.values(), 2); break;
+        case SUBCAT_REVEALED: reveal = resolveReveal(things.values(), 1); break;
+        case SERIES_REVEALED: reveal = resolveReveal(things.values(), 0); break;
+        }
+
         // place the flipped cards into the runtime grid and summarize the rarities of the rest
         for (int ii = 0; ii < record.thingIds.length; ii++) {
-            ThingCard card = cards.get(record.thingIds[ii]);
-            if (card == null) {
-                log.warning("Missing card for grid?", "userId", record.userId,
+            Thing thing = things.get(record.thingIds[ii]);
+            if (thing == null) {
+                log.warning("Missing thing for grid?", "userId", record.userId,
                             "gridId", record.gridId, "thingId", record.thingIds[ii]);
             } else if (flipped[ii]) {
-                grid.flipped[ii] = card;
+                grid.flipped[ii] = thing.toCard();
             } else {
-                grid.unflipped[card.rarity.toByte()]++;
+                grid.unflipped[thing.rarity.toByte()]++;
+                if (reveal != null) {
+                    grid.flipped[ii] = ThingCard.newPartial(reveal.get(thing.thingId));
+                }
             }
         }
 
@@ -131,14 +149,13 @@ public class GameLogic
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         }
         // we have to load all the things in this category for this bit
-        List<Thing> things = Lists.newArrayList(_thingRepo.loadThings(card.thing.categoryId));
-        Collections.sort(things);
+        Set<ThingCard> things = Sets.newTreeSet(_thingRepo.loadThingCards(card.thing.categoryId));
         card.things = things.size();
-        for (int ii = 0, ll = things.size(); ii < ll; ii++) {
-            if (card.thing.thingId == things.get(ii).thingId) {
-                card.position = ii;
+        for (ThingCard tcard : things) {
+            if (card.thing.thingId == tcard.thingId) {
                 break;
             }
+            card.position++;
         }
         return card;
     }
@@ -226,6 +243,47 @@ public class GameLogic
             }
         }
         return new ThingIndex(catmap, _thingRepo.loadActiveThings());
+    }
+
+    /**
+     * Resolves either nothing, the series, the sub-category or the category for the specified
+     * collection of things. Returns a map from thing id to the resolved name.
+     */
+    protected IntMap<String> resolveReveal (Collection<Thing> things, int reductions)
+    {
+        // first create a mapping from thing to category
+        IntMap<Category> cats = loadCategoryMap(
+            Sets.newHashSet(Iterables.transform(things, Functions.GET_CATEGORY)));
+        Map<Integer, Category> thingcat = Maps.newHashMap();
+        for (Thing thing : things) {
+            thingcat.put(thing.thingId, cats.get(thing.categoryId));
+        }
+
+        // now reduce the specified number of times
+        while (reductions > 0) {
+            cats = loadCategoryMap(
+                Sets.newHashSet(Iterables.transform(thingcat.values(), Functions.GET_PARENT)));
+            for (Map.Entry<Integer, Category> entry : thingcat.entrySet()) {
+                entry.setValue(cats.get(entry.getValue().parentId));
+            }
+            reductions--;
+        }
+
+        // finally extract the names of these categories
+        IntMap<String> reveals = IntMaps.newHashIntMap();
+        for (Map.Entry<Integer, Category> entry : thingcat.entrySet()) {
+            reveals.put(entry.getKey(), entry.getValue().name);
+        }
+        return reveals;
+    }
+
+    protected IntMap<Category> loadCategoryMap (Set<Integer> catIds)
+    {
+        IntMap<Category> cats = IntMaps.newHashIntMap();
+        for (Category cat : _thingRepo.loadCategories(catIds)) {
+            cats.put(cat.categoryId, cat);
+        }
+        return cats;
     }
 
     protected ThingIndex _index;

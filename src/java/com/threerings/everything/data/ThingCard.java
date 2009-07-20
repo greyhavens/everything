@@ -41,6 +41,16 @@ public class ThingCard
         return card;
     }
 
+    /**
+     * Creates a partially revealed card (which has only a name).
+     */
+    public static ThingCard newPartial (String name)
+    {
+        ThingCard card = new ThingCard();
+        card.name = name;
+        return card;
+    }
+
     // from interface Comparable<ThingCard>
     public int compareTo (ThingCard other)
     {

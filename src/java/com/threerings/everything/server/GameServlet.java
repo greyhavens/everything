@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -19,6 +20,7 @@ import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 
 import com.threerings.samsara.app.client.ServiceException;
+import com.threerings.samsara.app.data.AppCodes;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
@@ -27,6 +29,7 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Grid;
+import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
@@ -328,6 +331,38 @@ public class GameServlet extends EveryServiceServlet
         _gameRepo.grantPowerupCharges(player.userId, type, type.charges);
     }
 
+    // from interface GameService
+    public Grid usePowerup (int gridId, Powerup type) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+
+        // make sure we're all talking about the same grid
+        GridRecord grid = _gameRepo.loadGrid(player.userId);
+        if (grid == null || grid.expires.getTime() < System.currentTimeMillis() ||
+            grid.gridId != gridId) {
+            throw new ServiceException(E_GRID_EXPIRED);
+        }
+
+        // determine the grid's new status
+        GridStatus status = POWERUP_FX.get(type);
+        if (status == null) {
+            log.warning("Requested to apply invalid powerup to grid", "who", player.who(),
+                        "powerup", type);
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+
+        // consume the powerup
+        if (!_gameRepo.consumePowerupCharge(player.userId, type)) {
+            throw new ServiceException(E_LACK_CHARGE);
+        }
+
+        // update the grid's status in the database (and in memory)
+        _gameRepo.updateGridStatus(grid, status);
+
+        // re-resolve and return the grid
+        return _gameLogic.resolveGrid(grid);
+    }
+
     protected void checkCanPayForFlip (PlayerRecord player, int flipCost, int expectedCost)
         throws ServiceException
     {
@@ -379,4 +414,10 @@ public class GameServlet extends EveryServiceServlet
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
+
+    /** A mapping from Powerup to GridStatus for post-grid powerups. */
+    protected static final Map<Powerup, GridStatus> POWERUP_FX = ImmutableMap.of(
+        Powerup.SHOW_CATEGORY, GridStatus.CAT_REVEALED,
+        Powerup.SHOW_SUBCATEGORY, GridStatus.SUBCAT_REVEALED,
+        Powerup.SHOW_SERIES, GridStatus.SERIES_REVEALED);
 }

@@ -174,6 +174,15 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Loads and returns the specified things.
+     */
+    public Collection<Thing> loadThings (Set<Integer> thingIds)
+    {
+        return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))).
+            map(ThingRecord.TO_THING);
+    }
+
+    /**
      * Loads and returns all things in the specified category.
      */
     public Collection<Thing> loadThings (int categoryId)
@@ -188,15 +197,6 @@ public class ThingRepository extends DepotRepository
     public Collection<ThingCard> loadThingCards (int categoryId)
     {
         return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
-            map(ThingRecord.TO_CARD);
-    }
-
-    /**
-     * Loads and returns cards for the supplied set of things.
-     */
-    public Collection<ThingCard> loadThingCards (Set<Integer> thingIds)
-    {
-        return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))).
             map(ThingRecord.TO_CARD);
     }
 

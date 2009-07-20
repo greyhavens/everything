@@ -25,11 +25,13 @@ import com.threerings.gwt.util.Value;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.GameStatus;
+import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
 
 import client.ui.DataPanel;
+import client.util.ClickCallback;
 import client.util.Context;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
@@ -47,9 +49,10 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     }
 
     @Override // from DataPanel
-    protected void init (final GameService.GridResult data)
+    protected void init (GameService.GridResult data)
     {
         clear();
+        _data = data;
 
         add(_info = new SmartTable(5, 0));
         _info.setText(1, 0, "Unflipped cards:");
@@ -58,22 +61,27 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                 showPowerupsMenu((Widget)event.getSource());
             }
         }), 1, "right");
-        updateRemaining(data.grid.unflipped);
-        updateStatus(data.status);
+        updateRemaining(_data.grid.unflipped);
+        updateStatus(_data.status);
 
         add(_cards = new SmartTable(5, 0));
-        for (int ii = 0; ii < data.grid.flipped.length; ii++) {
+        initGrid();
+
+        add(Widgets.newLabel("New grid " + format(_data.grid.expires), "center"));
+    }
+
+    protected void initGrid ()
+    {
+        for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
             int row = ii / COLUMNS, col = ii % COLUMNS;
             final int position = ii;
-            ClickHandler onClick = (data.grid.flipped[ii] != null) ? null : new ClickHandler() {
+            ClickHandler onClick = (_data.grid.flipped[ii] != null) ? null : new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    flipCard(data, position);
+                    flipCard(position);
                 }
             };
-            _cards.setWidget(row, col, ThingCardView.createMicro(data.grid.flipped[ii], onClick));
+            _cards.setWidget(row, col, ThingCardView.createMicro(_data.grid.flipped[ii], onClick));
         }
-
-        add(Widgets.newLabel("New grid " + format(data.grid.expires), "center"));
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -90,7 +98,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         _info.setHTML(1, 1, buf.toString(), 1, "Bold");
     }
 
-    protected void updateStatus (final GameStatus status)
+    protected void updateStatus (GameStatus status)
     {
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
@@ -106,10 +114,10 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         }
     }
 
-    protected void flipCard (final GameService.GridResult data, final int position)
+    protected void flipCard (final int position)
     {
         // TODO: disable all click handlers
-        _gamesvc.flipCard(data.grid.gridId, position, data.status.nextFlipCost,
+        _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
                 public void onSuccess (GameService.FlipResult result) {
                     // convert the card to a thing card and display it in the grid
@@ -122,9 +130,9 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                     _cards.setWidget(row, col, ThingCardView.createMicro(card, null));
 
                     // update our status
-                    data.grid.unflipped[card.rarity.ordinal()]--;
-                    updateRemaining(data.grid.unflipped);
-                    updateStatus(data.status = result.status);
+                    _data.grid.unflipped[card.rarity.ordinal()]--;
+                    updateRemaining(_data.grid.unflipped);
+                    updateStatus(_data.status = result.status);
 
                     // display the card big and fancy and allow them to gift it or cash it in
                     Value<String> status = new Value<String>("");
@@ -141,15 +149,22 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     protected void showPowerupsMenu (Widget trigger)
     {
         FlowPanel contents = new FlowPanel();
-        for (Powerup pup : Powerup.POST_GRID) {
-            Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
+        for (final Powerup pup : Powerup.POST_GRID) {
+            final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
             Label plabel = Widgets.newInlineLabel(" " + _pmsgs.xlate(pup.toString()));
             if (charges.get() > 0) {
-                Widgets.makeActionLabel(plabel, new ClickHandler() {
-                    public void onClick (ClickEvent event) {
-                        // TODO
+                new ClickCallback<Grid>(plabel) {
+                    protected boolean callService () {
+                        _gamesvc.usePowerup(_data.grid.gridId, pup, this);
+                        return true;
                     }
-                });
+                    protected boolean gotResult (Grid grid) {
+                        _data.grid = grid;
+                        charges.update(charges.get()-1);
+                        initGrid();
+                        return charges.get() > 0;
+                    }
+                };
             }
             contents.add(Widgets.newFlowPanel(ValueLabel.create("inline", charges), plabel));
         }
@@ -161,6 +176,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         return DateUtil.formatDateTime(date).toLowerCase();
     }
 
+    protected GameService.GridResult _data;
     protected SmartTable _info, _cards, _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

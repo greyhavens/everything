@@ -36,7 +36,7 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #getSeries} if the series in question does not exist. */
     public static final String E_UNKNOWN_SERIES = "e.unknown_series";
 
-    /** Thrown by {@link #flipCard} if the grid in question has expired. */
+    /** Thrown by {@link #flipCard} or {@link #usePowerup} if the grid in question has expired. */
     public static final String E_GRID_EXPIRED = "e.grid_expired";
 
     /** Thrown by {@link #flipCard} if the position requested has already been flipped. */
@@ -59,6 +59,9 @@ public interface GameService extends RemoteService
 
     /** Thrown by {@link #buyPowerup} if the user can't afford the powerup they requested. */
     public static final String E_NSF_FOR_PURCHASE = "e.nsf_for_purchase";
+
+    /** Thrown by {@link #usePower} if the user doesn't have a charge of the specified powerup. */
+    public static final String E_LACK_CHARGE = "e.lack_charge";
 
     /** Provides results for {@link #getGrid}. */
     public static class GridResult implements IsSerializable
@@ -155,4 +158,9 @@ public interface GameService extends RemoteService
      * Purchases the specified powerup.
      */
     void buyPowerup (Powerup type) throws ServiceException;
+
+    /**
+     * Uses a powerup on the specified grid. Returns the grid with the new status.
+     */
+    Grid usePowerup (int gridId, Powerup type) throws ServiceException;
 }

@@ -27,6 +27,7 @@ import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 
+import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.Powerup;
 
@@ -172,6 +173,15 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Updates the status of the supplied grid.
+     */
+    public void updateGridStatus (GridRecord record, GridStatus status)
+    {
+        updatePartial(GridRecord.getKey(record.userId), GridRecord.STATUS, status);
+        record.status = status; // update the in-memory copy
+    }
+
+    /**
      * Loads up the flipped status for the specified user's current grid.
      */
     public boolean[] loadFlipped (int userId)
@@ -257,6 +267,22 @@ public class GameRepository extends DepotRepository
 
         // note: the above insertion could fail if the player was somehow making a purchase from
         // two computers at the exact same time, but why would they be doing that?
+    }
+
+    /**
+     * Consumes one charge of the specified player's powerup.
+     *
+     * @return true if the charge was consumed, false if the player did not have sufficient charges
+     * (or did not exist).
+     */
+    public boolean consumePowerupCharge (int userId, Powerup type)
+    {
+        return updatePartial(PowerupRecord.class,
+                             new Where(Ops.and(PowerupRecord.OWNER_ID.eq(userId),
+                                               PowerupRecord.TYPE.eq(type),
+                                               PowerupRecord.CHARGES.greaterEq(1))),
+                             PowerupRecord.getKey(userId, type),
+                             PowerupRecord.CHARGES, PowerupRecord.CHARGES.minus(1)) == 1;
     }
 
     @Override // from DepotRepository

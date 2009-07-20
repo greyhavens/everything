@@ -19,6 +19,9 @@ public class Grid
     /** The id assigned to this grid. */
     public int gridId;
 
+    /** The current status of this grid. */
+    public GridStatus status;
+
     /** Info on the flipped cards in each position (null at unflipped positions). */
     public ThingCard[] flipped;
 

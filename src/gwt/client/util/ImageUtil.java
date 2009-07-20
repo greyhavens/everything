@@ -21,8 +21,7 @@ public class ImageUtil
      */
     public static String getImageURL (String image)
     {
-        return (image == null || image.length() == 0) ? "images/unknown.png" :
-            "http://s3.amazonaws.com/everything.threerings.net/" + image;
+        return (image == null || image.length() == 0) ? "images/unknown.png" : S3_BUCKET + image;
     }
 
     /**
@@ -59,4 +58,7 @@ public class ImageUtil
         table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
         return table;
     }
+
+    /** The URL via which we load images from our Amazon S3 bucket. */
+    protected static final String S3_BUCKET = "http://s3.amazonaws.com/everything.threerings.net/";
 }
