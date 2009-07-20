@@ -67,6 +67,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
                     return true;
                 }
                 protected boolean gotResult (Void result) {
+                    _ctx.getCoins().update(_ctx.getCoins().get() - type.cost);
                     _ctx.getPupsModel().notePurchase(type);
                     Popups.infoNear("Powerup purchased!", buy);
                     return true;
