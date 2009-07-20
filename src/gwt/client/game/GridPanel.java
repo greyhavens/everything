@@ -27,6 +27,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
+import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
@@ -63,15 +64,16 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             }
         }), 1, "right");
         updateRemaining(_data.grid.unflipped);
-        updateStatus(_data.status);
+        updateGameStatus(_data.status);
 
         add(_cards = new SmartTable(5, 0));
-        initGrid();
 
-        add(Widgets.newLabel("New grid " + format(_data.grid.expires), "center"));
+        add(_status = new SmartTable(5, 0));
+        _status.setText(0, 0, "New grid " + format(_data.grid.expires));
+        updateGrid();
     }
 
-    protected void initGrid ()
+    protected void updateGrid ()
     {
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
             int row = ii / COLUMNS, col = ii % COLUMNS;
@@ -83,6 +85,14 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             };
             _cards.setWidget(row, col, ThingCardView.createMicro(_data.grid.flipped[ii], onClick));
         }
+
+        String status = "normal";
+        switch (_data.grid.status) {
+        case CAT_REVEALED: status = "category revealed"; break;
+        case SUBCAT_REVEALED: status = "sub-category revealed"; break;
+        case SERIES_REVEALED: status = "series revealed"; break;
+        }
+        _status.setText(0, 1, "Grid status: " + status, 1, "right");
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -99,7 +109,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         _info.setHTML(1, 1, buf.toString(), 1, "Bold");
     }
 
-    protected void updateStatus (GameStatus status)
+    protected void updateGameStatus (GameStatus status)
     {
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
@@ -113,6 +123,10 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                             1, "Bold");
             _info.setText(0, 2, "");
         }
+    }
+
+    protected void updateGridStatus (GridStatus status)
+    {
     }
 
     protected void flipCard (final int position)
@@ -133,7 +147,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                     // update our status
                     _data.grid.unflipped[card.rarity.ordinal()]--;
                     updateRemaining(_data.grid.unflipped);
-                    updateStatus(_data.status = result.status);
+                    updateGameStatus(_data.status = result.status);
 
                     // display the card big and fancy and allow them to gift it or cash it in
                     Value<String> status = new Value<String>("");
@@ -169,8 +183,8 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                     protected boolean gotResult (Grid grid) {
                         _data.grid = grid;
                         charges.update(charges.get()-1);
-                        initGrid();
-                        return charges.get() > 0;
+                        updateGrid();
+                        return false;
                     }
                 };
             }
