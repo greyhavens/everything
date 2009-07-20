@@ -138,11 +138,11 @@ public class GameServlet extends EveryServiceServlet
     public GridResult getGrid () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-
+        long now = System.currentTimeMillis();
         GridRecord grid = _gameRepo.loadGrid(player.userId);
-        if (grid == null || grid.expires.getTime() < System.currentTimeMillis()) {
+        if (grid == null || grid.expires.getTime() < now) {
             // note the time that their old grid expired
-            long oexpires = grid.expires.getTime();
+            long oexpires = (grid == null) ? (now - GameUtil.ONE_DAY) : grid.expires.getTime();
 
             // generate a new grid
             grid = _gameLogic.generateGrid(player, grid);
