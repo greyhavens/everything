@@ -350,6 +350,12 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
 
+        // save the player from wasting a charge (the client prevents this as well)
+        if (grid.status == status) {
+            log.warning("Preventing NOOP powerup usage", "who", player.who(), "powerup", type);
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+
         // consume the powerup
         if (!_gameRepo.consumePowerupCharge(player.userId, type)) {
             throw new ServiceException(E_LACK_CHARGE);
