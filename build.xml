@@ -143,7 +143,7 @@
       <jvmarg value="-XX:CompileCommand=exclude,org/eclipse/jdt/internal/compiler/lookup/ParameterizedMethodBinding,&lt;init&gt;"/>
       <!-- end temp -->
       <jvmarg value="-Djava.awt.headless=true"/>
-      <arg value="-style"/><arg value="pretty"/>
+      <!--<arg value="-style"/><arg value="pretty"/>-->
       <arg value="-war"/>
       <arg value="${deploy.dir}/gwt"/>
       <arg value="${app.ident}"/>
