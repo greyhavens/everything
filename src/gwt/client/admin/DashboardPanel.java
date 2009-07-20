@@ -227,7 +227,9 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             addDatum("Last seen", _dfmt.format(details.lastSession));
             addDatum("Coins", details.coins);
             addDatum("Free flips", details.freeFlips);
-            addDatum("Birthday", _bfmt.format(details.birthday));
+            if (details.birthday != null) {
+                addDatum("Birthday", _bfmt.format(details.birthday));
+            }
             addDatum("Timezone", details.timezone);
 
             final CheckBox isEditor = new CheckBox();
