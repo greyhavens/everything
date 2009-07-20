@@ -32,6 +32,9 @@ public class Category
     /** The number of things in this category (only valid for leaf categories). */
     public int things;
 
+    /** The number of things in this series for which the creator has been paid. */
+    public int paid;
+
     /**
      * Returns an HTML snippet that will display cat -> cat -> cat for the supplied categories.
      */

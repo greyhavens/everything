@@ -17,6 +17,7 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 
 import com.threerings.everything.client.EditorService;
+import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
@@ -65,7 +66,19 @@ public class EditorServlet extends EveryServiceServlet
             requireAdmin();
         }
 
-        // the only updatable values are name, active and parentId
+        // if we're activating, check to see if the creator has been paid for all of its things
+        if (!ocategory.active && category.active) {
+            int things = _thingRepo.getThingCount(ocategory.categoryId);
+            if (ocategory.paid < things) {
+                int payout = (things - ocategory.paid) * GameCodes.COINS_PER_CREATED_CARD;
+                _playerRepo.grantCoins(category.getCreatorId(), payout);
+                log.info("Paid " + category.creator + " " + payout + " coins for '" +
+                         category.name + "' series.");
+                ocategory.paid = things; // update the paid things count
+            }
+        }
+
+        // fill in user updatable values: name, active and parentId
         ocategory.name = category.name;
         ocategory.active = category.active;
         ocategory.parentId = category.parentId;

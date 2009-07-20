@@ -32,11 +32,12 @@ public class CategoryRecord extends PersistentRecord
     public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     public static final ColumnExp ACTIVE = colexp(_R, "active");
     public static final ColumnExp THINGS = colexp(_R, "things");
+    public static final ColumnExp PAID = colexp(_R, "paid");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 4;
+    public static final int SCHEMA_VERSION = 5;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<CategoryRecord, Category> TO_CATEGORY =
@@ -68,6 +69,9 @@ public class CategoryRecord extends PersistentRecord
 
     /** The number of things in this category (only valid for leaf categories). */
     public int things;
+
+    /** The number of things in this series for which the creator has been paid. */
+    public int paid;
 
     /**
      * Converts this persistent record to a runtime record.

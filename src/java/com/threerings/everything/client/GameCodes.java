@@ -19,4 +19,7 @@ public final class GameCodes
 
     /** The maximum number of free flips you can get, regardless of how long you've been away. */
     public static final int MAX_FREE_FLIPS = 32;
+
+    /** Payment to a creator (per card) when their series is accepted into the database. */
+    public static final int COINS_PER_CREATED_CARD = 25;
 }
