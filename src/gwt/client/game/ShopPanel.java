@@ -18,7 +18,7 @@ import com.threerings.everything.data.Powerup;
 import client.ui.DataPanel;
 import client.util.ClickCallback;
 import client.util.Context;
-import client.util.PowerupLookup;
+import client.util.Messages;
 
 /**
  * Displays the shop where a player can buy powerups.
@@ -47,8 +47,8 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
         for (final Powerup type : Powerup.values()) {
             int row = table.addWidget(
                 Widgets.newFlowPanel(
-                    Widgets.newLabel(_pmsgs.xlate(type.toString()), "Name"),
-                    Widgets.newLabel(_pmsgs.xlate(type + "_descrip"), "tipLabel")), 1, null);
+                    Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
+                    Widgets.newLabel(Messages.xlate(type + "_descrip"), "tipLabel")), 1, null);
             table.setWidget(row, 1, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
                             1, "right");
             table.setWidget(row, 2, new CoinLabel(type.cost), 1, "right");
@@ -77,5 +77,4 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
     }
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-    protected static final PowerupLookup _pmsgs = GWT.create(PowerupLookup.class);
 }

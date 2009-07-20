@@ -27,7 +27,7 @@ public class Errors
     {
         if (errcode.startsWith("e.")) {
             try {
-                return _smsgs.xlate(errcode.substring(2));
+                return _dmsgs.xlate(errcode.substring(2));
             } catch (MissingResourceException mre) {
                 // fall through and return the raw string
             }
@@ -35,5 +35,5 @@ public class Errors
         return errcode;
     }
 
-    protected static final ServerLookup _smsgs = GWT.create(ServerLookup.class);
+    protected static final DynamicLookup _dmsgs = GWT.create(DynamicLookup.class);
 }

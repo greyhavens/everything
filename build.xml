@@ -100,7 +100,8 @@
   <target name="distcleanall" depends="clean" description="Cleans out all build data.">
     <delete dir="${deploy.dir}"/>
     <delete file="${src.dir}/com/threerings/everything/data/Build.java"/>
-    <delete><fileset dir="${gsrc.dir}" includes="client/*/*Messages.java"/></delete>
+    <delete><fileset dir="${gsrc.dir}" includes="client/*/*Messages.java"
+                     excludes="client/util/Messages.java"/></delete>
   </target>
 
   <target name="compile" depends="prepare" description="Compiles the source code.">

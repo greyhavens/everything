@@ -35,9 +35,9 @@ import com.threerings.everything.data.ThingCard;
 import client.ui.DataPanel;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.Messages;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
-import client.util.PowerupLookup;
 
 /**
  * Displays a player's grid, allows flipping of cards.
@@ -85,14 +85,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             };
             _cards.setWidget(row, col, ThingCardView.createMicro(_data.grid.flipped[ii], onClick));
         }
-
-        String status = "normal";
-        switch (_data.grid.status) {
-        case CAT_REVEALED: status = "category revealed"; break;
-        case SUBCAT_REVEALED: status = "sub-category revealed"; break;
-        case SERIES_REVEALED: status = "series revealed"; break;
-        }
-        _status.setText(0, 1, "Grid status: " + status, 1, "right");
+        _status.setText(0, 1, "Grid status: " + Messages.xlate(""+_data.grid.status), 1, "right");
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -123,10 +116,6 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                             1, "Bold");
             _info.setText(0, 2, "");
         }
-    }
-
-    protected void updateGridStatus (GridStatus status)
-    {
     }
 
     protected void flipCard (final int position)
@@ -168,7 +157,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         popup.setAutoHideEnabled(true);
         for (final Powerup pup : Powerup.POST_GRID) {
             final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
-            Label plabel = Widgets.newInlineLabel(" " + _pmsgs.xlate(pup.toString()));
+            Label plabel = Widgets.newInlineLabel(" " + Messages.xlate(pup.toString()));
             if (charges.get() > 0) {
                 new ClickCallback<Grid>(plabel) {
                     protected boolean callService () {
@@ -202,7 +191,5 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     protected SmartTable _info, _cards, _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-    protected static final PowerupLookup _pmsgs = GWT.create(PowerupLookup.class);
-
     protected static final int COLUMNS = 4;
 }
