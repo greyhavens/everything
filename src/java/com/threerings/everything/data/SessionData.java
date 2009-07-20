@@ -31,6 +31,9 @@ public class SessionData
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;
 
+    /** When this player's grid expires. */
+    public long gridExpires;
+
     /** The current game news, or null. */
     public News news;
 
