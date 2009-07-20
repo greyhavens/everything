@@ -20,6 +20,10 @@
   max-height: 150px;
 }
 
+.imageBox .gwt-Image, .miniImageBox .gwt-Image {
+  display: block;
+}
+
 /** CardView styles */
 .cardView {
   height: 380px;
@@ -55,10 +59,6 @@
 
 .cardView .Position, .cardView .Metrics {
   font-size: 14px;
-}
-
-.cardView .imageBox .gwt-Image {
-  display: block;
 }
 
 .cardView .Descrip {
