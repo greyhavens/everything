@@ -68,14 +68,14 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
                                       Page.BROWSE, item.target.userId));
                 String post = (item.message == null) ? "." :
                     ". " + item.actor.name + " said \"" + item.message + "\"";
-                add(Widgets.newLabel(post, "inline"));
+                add(Widgets.newInlineLabel(post));
                 break;
             case COMMENT:
-                add(Widgets.newLabel(" commented on your category ", "inline"));
+                add(Widgets.newInlineLabel(" commented on your category "));
                 add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
                 break;
             default:
-                add(Widgets.newLabel(" did something mysterious.", "inline"));
+                add(Widgets.newInlineLabel(" did something mysterious."));
                 break;
             }
         }

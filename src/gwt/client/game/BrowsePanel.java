@@ -55,6 +55,9 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
                 table.setText(row, 1, subcatname);
                 FlowPanel cards = new FlowPanel();
                 for (final SeriesCard card : subcat.getValue()) {
+                    if (cards.getWidgetCount() > 0) {
+                        cards.add(Widgets.newInlineLabel(" "));
+                    }
                     final Value<Integer> owned = new Value<Integer>(card.owned);
                     cards.add(Widgets.newActionLabel(card.name, "Series", new ClickHandler() {
                         public void onClick (ClickEvent event) {

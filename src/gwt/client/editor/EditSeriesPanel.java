@@ -225,9 +225,9 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
     protected Widget formatComment (CategoryComment comment)
     {
         return Widgets.newRow(
-            Widgets.newLabel(DateUtil.formatDateTime(comment.when), "inline", "nowrap"),
+            Widgets.newInlineLabel(DateUtil.formatDateTime(comment.when), "nowrap"),
             Args.createInlink(comment.commentor),
-            Widgets.newLabel(comment.message, "inline"));
+            Widgets.newInlineLabel(comment.message));
     }
 
     protected void showComments (

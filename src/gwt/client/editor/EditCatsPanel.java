@@ -206,7 +206,7 @@ public class EditCatsPanel extends SmartTable
                         showOptionMenu(row, (Widget)event.getSource());
                     }
                 }));
-                row.add(Widgets.newLabel(" ", "inline"));
+                row.add(Widgets.newInlineLabel(" "));
             }
             if (selected) {
                 row.add(Widgets.newInlineLabel(row.cat.name, "Selected"));
@@ -335,7 +335,7 @@ public class EditCatsPanel extends SmartTable
     protected Column _series = new Column("Series", 2) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_SERIES, row.cat.categoryId));
-            row.add(Widgets.newLabel(" (" + row.cat.things + ")", "inline"));
+            row.add(Widgets.newInlineLabel(" (" + row.cat.things + ")"));
         }
     };
 

@@ -57,7 +57,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         for (final FriendCardInfo info : result.friends) {
             int row = grid.addText(info.friend.toString(), 1, null);
             if (info.hasThings > 0) {
-                grid.setText(row, 1, "Has " + info.hasThings + "/" + result.things, 1, null);
+                grid.setText(row, 1, "Has " + info.hasThings + "/" + result.things, 1, "nowrap");
             }
             if (info.onWishlist) {
                 grid.setText(row, 2, "Wishlist!", 1, "Wishlist");
