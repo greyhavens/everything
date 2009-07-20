@@ -98,6 +98,15 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Loads all cards owned by the specified player of the specified things.
+     */
+    public List<CardRecord> loadCards (int ownerId, Set<Integer> thingIds)
+    {
+        return findAll(CardRecord.class, new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
+                                                           CardRecord.THING_ID.in(thingIds))));
+    }
+
+    /**
      * Creates a new card for the specified player for the specified thing. Returns the newly
      * created card record.
      */

@@ -16,34 +16,37 @@ import com.threerings.gwt.util.Value;
 public interface Context
 {
     /** Configures the main client display. */
-    public void setContent (Widget widget);
+    void setContent (Widget widget);
 
     /** Returns this player's name. */
-    public PlayerName getMe ();
+    PlayerName getMe ();
 
     /** Returns true if this player is still pretty new. */
-    public boolean isNewbie ();
+    boolean isNewbie ();
 
     /** Returns whether this player has editor privileges. */
-    public boolean isEditor ();
+    boolean isEditor ();
 
     /** Returns whether this player has admin privileges. */
-    public boolean isAdmin ();
+    boolean isAdmin ();
 
     /** Returns the dynamic value that contains our current coin balance. */
-    public Value<Integer> getCoins ();
+    Value<Integer> getCoins ();
+
+    /** Returns the time at which our current grid expires. */
+    long getGridExpiry ();
 
     /** Displays a popup, hiding any existing popup (which will be restored when this popup is
      * cleared). */
-    public void displayPopup (PopupPanel popup);
+    void displayPopup (PopupPanel popup);
 
     /**
      * Returns the categories model.
      */
-    public CategoriesModel getCatsModel ();
+    CategoriesModel getCatsModel ();
 
     /**
      * Returns the powerups model.
      */
-    public PowerupsModel getPupsModel ();
+    PowerupsModel getPupsModel ();
 }

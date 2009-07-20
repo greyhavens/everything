@@ -141,7 +141,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
 
                     // display the card big and fancy and allow them to gift it or cash it in
                     Value<String> status = new Value<String>("");
-                    _ctx.displayPopup(new CardPopup(_ctx, result.card, result.haveCount, status));
+                    _ctx.displayPopup(new CardPopup(_ctx, result, status));
                     status.addListener(new Value.Listener<String>() {
                         public void valueChanged (String status) {
                             _cards.setText(row, col, status);

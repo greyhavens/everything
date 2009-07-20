@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -131,7 +133,10 @@ public class GameServlet extends EveryServiceServlet
     public Card getCard (CardIdent ident) throws ServiceException
     {
         // TODO: show less info if the caller is not the owner?
-        return _gameLogic.resolveCard(requireCard(ident.ownerId, ident.thingId, ident.created));
+        CardRecord card = requireCard(ident.ownerId, ident.thingId, ident.created);
+        Thing thing = _thingRepo.loadThing(card.thingId);
+        return _gameLogic.resolveCard(
+            card, thing, Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId)));
     }
 
     // from interface GameService
@@ -199,16 +204,29 @@ public class GameServlet extends EveryServiceServlet
             throw se;
         }
 
-        // count up the number of the selected thing already owned by this player before we create
-        // this new card
+        // load up the thing going on the card they just flipped and its whole series
+        Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
+        SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
+
+        // load up the count of each card in this series held by the player
+        IntIntMap holdings = new IntIntMap();
+        for (CardRecord card : _gameRepo.loadCards(
+                 player.userId, Sets.newHashSet(Iterables.transform(things, Functions.THING_ID)))) {
+            holdings.increment(card.thingId, 1);
+        }
+
+        // include the number of cards we already have with this thing
         FlipResult result = new FlipResult();
-        result.haveCount = _gameRepo.countCardHoldings(player.userId, grec.thingIds[position]);
+        result.haveCount = holdings.getOrElse(thing.thingId, 0);
 
-        // create the card and add it to the player's collection
-        CardRecord card = _gameRepo.createCard(player.userId, grec.thingIds[position]);
+        // now note this holding in our mapping and determine how many things remain
+        holdings.increment(thing.thingId, 1);
+        result.thingsRemaining = things.size() - holdings.size();
 
-        // resolve the runtime data for the card and report our result
-        result.card = _gameLogic.resolveCard(card);
+        // create the card and add it to the player's collection, then resolve it
+        CardRecord card = _gameRepo.createCard(player.userId, thing.thingId);
+        result.card = _gameLogic.resolveCard(card, thing, things);
+
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost
         grid.unflipped[result.card.thing.rarity.ordinal()]--;

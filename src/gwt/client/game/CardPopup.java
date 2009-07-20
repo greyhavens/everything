@@ -17,6 +17,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.Category;
 
 import client.ui.DataPopup;
 import client.util.ClickCallback;
@@ -44,13 +45,14 @@ public class CardPopup extends DataPopup<Card>
         _gamesvc.getCard(ident, createCallback());
     }
 
-    public CardPopup (Context ctx, final Card card, int haveCount, Value<String> status)
+    public CardPopup (Context ctx, GameService.FlipResult result, Value<String> status)
     {
         this(ctx, status);
-        _title = "You got the <b>" + card.thing.name + "</b> card!";
-        _haveCount = haveCount;
+        _title = "You got the <b>" + result.card.thing.name + "</b> card!";
+        _haveCount = result.haveCount;
+        _thingsRemaining = result.thingsRemaining;
         _doneLabel = "Keep"; // we're viewing a just flipped card
-        setWidget(createContents(card));
+        setWidget(createContents(result.card));
     }
 
     protected CardPopup (Context ctx, Value<String> status)
@@ -67,10 +69,19 @@ public class CardPopup extends DataPopup<Card>
         }
         contents.add(CardView.create(card));
 
-        String haveMsg = (_haveCount > 1) ? "You already have " + _haveCount + " of these cards." :
-            ((_haveCount > 0) ? "You already have this card." : null);
-        if (haveMsg != null) {
-            contents.add(Widgets.newLabel(haveMsg, null));
+        String msg = null;
+        if (_haveCount > 1) {
+            msg = "You already have " + _haveCount + " of these cards.";
+        } else if (_haveCount > 0) {
+            msg = "You already have this card.";
+        } else if (_thingsRemaining == 1) {
+            msg = "You only need <b>one more card</b> to complete this series!";
+        } else if (_thingsRemaining == 0) {
+            Category series = card.categories[card.categories.length-1];
+            msg = "You have completed the <b>" + series + "</b> series!";
+        }
+        if (msg != null) {
+            contents.add(Widgets.newHTML(msg, "Info"));
         }
 
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
@@ -107,7 +118,7 @@ public class CardPopup extends DataPopup<Card>
     }
 
     protected String _title, _doneLabel;
-    protected int _haveCount;
+    protected int _haveCount, _thingsRemaining = -1;
     protected Value<String> _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

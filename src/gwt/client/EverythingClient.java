@@ -111,6 +111,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public long getGridExpiry ()
+    {
+        return _data.gridExpires;
+    }
+
+    // from interface Context
     public void displayPopup (PopupPanel popup)
     {
         _pstack.show(popup);

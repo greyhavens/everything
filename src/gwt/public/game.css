@@ -179,6 +179,10 @@
   padding-bottom: 5px;
 }
 
+.card .Info {
+  text-align: center;
+}
+
 .card .Buttons {
   margin: 0px auto;
 }

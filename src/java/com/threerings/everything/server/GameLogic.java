@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 
 import com.google.common.collect.Iterables;
@@ -139,20 +140,19 @@ public class GameLogic
     /**
      * Resolves runtime card data for the supplied card.
      */
-    public Card resolveCard (CardRecord record)
+    public Card resolveCard (CardRecord record, Thing thing, SortedSet<Thing> things)
     {
         Card card = new Card();
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
-        card.thing = _thingRepo.loadThing(record.thingId);
+        card.thing = thing;
         card.categories = resolveCategories(card.thing.categoryId);
         card.created = new Date(record.created.getTime());
         if (record.giverId != 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         }
         // we have to load all the things in this category for this bit
-        Set<ThingCard> things = Sets.newTreeSet(_thingRepo.loadThingCards(card.thing.categoryId));
         card.things = things.size();
-        for (ThingCard tcard : things) {
+        for (Thing tcard : things) {
             if (card.thing.thingId == tcard.thingId) {
                 break;
             }
@@ -254,7 +254,7 @@ public class GameLogic
     {
         // first create a mapping from thing to category
         IntMap<Category> cats = loadCategoryMap(
-            Sets.newHashSet(Iterables.transform(things, Functions.GET_CATEGORY)));
+            Sets.newHashSet(Iterables.transform(things, Functions.CATEGORY_ID)));
         Map<Integer, Category> thingcat = Maps.newHashMap();
         for (Thing thing : things) {
             thingcat.put(thing.thingId, cats.get(thing.categoryId));
@@ -263,7 +263,7 @@ public class GameLogic
         // now reduce the specified number of times
         while (reductions > 0) {
             cats = loadCategoryMap(
-                Sets.newHashSet(Iterables.transform(thingcat.values(), Functions.GET_PARENT)));
+                Sets.newHashSet(Iterables.transform(thingcat.values(), Functions.PARENT_ID)));
             for (Map.Entry<Integer, Category> entry : thingcat.entrySet()) {
                 entry.setValue(cats.get(entry.getValue().parentId));
             }
