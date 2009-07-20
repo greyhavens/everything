@@ -58,9 +58,13 @@ public class LandingPanel extends FlowPanel
             } else {
                 if (inList) {
                     buf.append("</ul>\n");
+                    inList = false;
                 }
                 buf.append(line).append("\n");
             }
+        }
+        if (inList) {
+            buf.append("</ul>");
         }
         return buf.toString();
     }
