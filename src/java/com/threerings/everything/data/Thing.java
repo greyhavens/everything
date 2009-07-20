@@ -18,7 +18,7 @@ public class Thing
     public static final int MAX_DESCRIP_LENGTH = 255;
 
     /** The maximum length of thing facts. */
-    public static final int MAX_FACTS_LENGTH = 2048;
+    public static final int MAX_FACTS_LENGTH = 512;
 
     /** The largest allowed width for a thing image. */
     public static final int MAX_IMAGE_WIDTH = 250;
