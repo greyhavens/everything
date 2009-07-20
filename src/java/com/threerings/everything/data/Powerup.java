@@ -42,7 +42,7 @@ public enum Powerup implements ByteEnum
     /** Grants an extra free card flip each day. */
     EXTRA_FLIP(64, 3000, 1) {
         public Player.Flag getTargetFlag () {
-            return Player.Flag.FREE_FLIP;
+            return Player.Flag.EXTRA_FLIP;
         }
     };
 

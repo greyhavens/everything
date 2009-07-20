@@ -4,6 +4,7 @@
 package com.threerings.everything.util;
 
 import com.threerings.everything.client.GameCodes;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.server.persist.PlayerRecord;
 
 import static com.threerings.everything.Log.log;
@@ -36,6 +37,11 @@ public class GameUtil
         while (elapsed > shortDay) { // accomodate the occasional lost hour due to DST
             freeFlips += GameCodes.VACATION_FREE_FLIPS;
             elapsed -= ONE_DAY;
+        }
+
+        // if the player has the EXTRA_FLIP powerup, give them one more flip
+        if (record.isSet(Player.Flag.EXTRA_FLIP)) {
+            freeFlips += 1;
         }
 
         return Math.min(GameCodes.MAX_FREE_FLIPS, freeFlips);
