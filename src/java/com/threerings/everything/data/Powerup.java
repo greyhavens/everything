@@ -40,7 +40,11 @@ public enum Powerup implements ByteEnum
     // permanent powerups (id starts at 64)
 
     /** Grants an extra free card flip each day. */
-    EXTRA_FLIP(64, 3000, 1);
+    EXTRA_FLIP(64, 3000, 1) {
+        public Player.Flag getTargetFlag () {
+            return Player.Flag.FREE_FLIP;
+        }
+    };
 
     /** Those powerups that can be used during the grid creation process. */
     // public static EnumSet<Powerup> PRE_GRID = EnumSet.of(TODO);
@@ -68,6 +72,15 @@ public enum Powerup implements ByteEnum
      * changing powerup.
      */
     public GridStatus getTargetStatus ()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the flag that is activated on the player when this powerup is purchased, or null if
+     * this is not a flag activating powerup.
+     */
+    public Player.Flag getTargetFlag ()
     {
         return null;
     }

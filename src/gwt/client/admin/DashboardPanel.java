@@ -30,7 +30,7 @@ import com.threerings.everything.client.AdminService;
 import com.threerings.everything.client.AdminServiceAsync;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.News;
-import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 
 import client.ui.DataPanel;
@@ -209,8 +209,8 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                _adminsvc.getPlayerDetails(userId, new PopupCallback<PlayerDetails>() {
-                    public void onSuccess (PlayerDetails deets) {
+                _adminsvc.getPlayerDetails(userId, new PopupCallback<Player>() {
+                    public void onSuccess (Player deets) {
                         details.setWidget(new PlayerDetailsPanel(deets));
                     }
                 });
@@ -220,7 +220,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
 
     protected static class PlayerDetailsPanel extends SmartTable
     {
-        public PlayerDetailsPanel (final PlayerDetails details) {
+        public PlayerDetailsPanel (final Player details) {
             super("Details", 2, 0);
             setText(0, 0, details.name.toString(), 2, "Header");
             addDatum("Joined", _dfmt.format(details.joined));
@@ -264,7 +264,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             setText(row, 1, String.valueOf(value));
         }
 
-        protected void addGrant (final PlayerDetails details, String label, final String onGranted,
+        protected void addGrant (final Player details, String label, final String onGranted,
                                  final Granter granter)
         {
             final NumberTextBox amount = NumberTextBox.newIntBox(4, 4);

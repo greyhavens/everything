@@ -5,8 +5,10 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Sets;
 
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
@@ -19,7 +21,7 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.GameStatus;
-import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -40,6 +42,7 @@ public class PlayerRecord extends PersistentRecord
     public static final ColumnExp LAST_SESSION = colexp(_R, "lastSession");
     public static final ColumnExp COINS = colexp(_R, "coins");
     public static final ColumnExp FREE_FLIPS = colexp(_R, "freeFlips");
+    public static final ColumnExp FLAGS = colexp(_R, "flags");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting this record to a {@link PlayerName}. */
@@ -54,13 +57,13 @@ public class PlayerRecord extends PersistentRecord
     public static Function<PlayerRecord, FriendStatus> TO_FRIEND_STATUS =
         RuntimeUtil.makeToRuntime(PlayerRecord.class, FriendStatus.class);
 
-    /** A function for converting this record to a {@link GameStatus}. */
-    public static Function<PlayerRecord, PlayerDetails> TO_DETAILS =
-        RuntimeUtil.makeToRuntime(PlayerRecord.class, PlayerDetails.class);
+    /** A function for converting this record to a {@link Player}. */
+    public static Function<PlayerRecord, Player> TO_PLAYER =
+        RuntimeUtil.makeToRuntime(PlayerRecord.class, Player.class);
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 8;
+    public static final int SCHEMA_VERSION = 9;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -96,6 +99,33 @@ public class PlayerRecord extends PersistentRecord
     /** This player's accumulated free flips. */
     public int freeFlips;
 
+    /** Flags tracked for this player. */
+    public int flags;
+
+    /**
+     * Sets the specified flag on this player.
+     */
+    public void setFlag (Player.Flag flag)
+    {
+        flags |= flag.getMask();
+    }
+
+    /**
+     * Clears the specified flag from this player.
+     */
+    public void clearFlag (Player.Flag flag)
+    {
+        flags &= ~flag.getMask();
+    }
+
+    /**
+     * Returns true if the specified flag is set for this player, false if not.
+     */
+    public boolean isSet (Player.Flag flag)
+    {
+        return (flags & flag.getMask()) != 0;
+    }
+
     /**
      * Initializes {@link GameStatus#nextFlipCost}.
      */
@@ -105,11 +135,25 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link PlayerDetails#name} and  {@link FriendStatus#name}.
+     * Initializes {@link Player#name} and  {@link FriendStatus#name}.
      */
     public PlayerName getName ()
     {
         return TO_NAME.apply(this);
+    }
+
+    /**
+     * Initializes {@link Player#flags}.
+     */
+    public Set<Player.Flag> getFlags ()
+    {
+        Set<Player.Flag> flags = Sets.newHashSet();
+        for (Player.Flag flag : Player.Flag.values()) {
+            if (isSet(flag)) {
+                flags.add(flag);
+            }
+        }
+        return flags;
     }
 
     /**

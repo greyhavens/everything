@@ -29,6 +29,7 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
@@ -36,12 +37,12 @@ import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
-import com.threerings.everything.util.GameUtil;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;
+import com.threerings.everything.util.GameUtil;
 
 import static com.threerings.everything.Log.log;
 
@@ -321,6 +322,13 @@ public class GameServlet extends EveryServiceServlet
             }
         }
 
+        // if this is a flag granting powerup, make sure they don't already have the flag set (this
+        // should be caught by the previous check but we'll be extra sure)
+        Player.Flag flag = type.getTargetFlag();
+        if (flag != null && player.isSet(flag)) {
+            throw new ServiceException(E_ALREADY_OWN_POWERUP);
+        }
+
         // deduct the coins from the player's account
         if (!_playerRepo.consumeCoins(player.userId, type.cost)) {
             throw new ServiceException(E_NSF_FOR_PURCHASE);
@@ -328,6 +336,11 @@ public class GameServlet extends EveryServiceServlet
 
         // grant them the powerup charges
         _gameRepo.grantPowerupCharges(player.userId, type, type.charges);
+
+        // if this was a flag granting powerup, activate the flag
+        if (flag != null) {
+            _playerRepo.updateFlag(player, flag, true);
+        }
     }
 
     // from interface GameService

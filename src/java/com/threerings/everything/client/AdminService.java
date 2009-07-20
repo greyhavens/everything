@@ -13,7 +13,7 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.News;
-import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.ThingStats;
 
@@ -53,7 +53,7 @@ public interface AdminService extends RemoteService
     /**
      * Returns details for the specified player.
      */
-    PlayerDetails getPlayerDetails (int userId) throws ServiceException;
+    Player getPlayerDetails (int userId) throws ServiceException;
 
     /**
      * Updates this player's editor status.

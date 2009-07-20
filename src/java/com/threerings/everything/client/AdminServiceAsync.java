@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -23,7 +23,7 @@ public interface AdminServiceAsync
     /**
      * The async version of {@link AdminService#getPlayerDetails}.
      */
-    void getPlayerDetails (int userId, AsyncCallback<PlayerDetails> callback);
+    void getPlayerDetails (int userId, AsyncCallback<Player> callback);
 
     /**
      * The async version of {@link AdminService#updateIsEditor}.

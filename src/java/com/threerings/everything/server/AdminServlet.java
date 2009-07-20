@@ -17,7 +17,7 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.client.AdminService;
 import com.threerings.everything.data.News;
-import com.threerings.everything.data.PlayerDetails;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -47,11 +47,11 @@ public class AdminServlet extends EveryServiceServlet
     }
 
     // from interface AdminService
-    public PlayerDetails getPlayerDetails (int userId) throws ServiceException
+    public Player getPlayerDetails (int userId) throws ServiceException
     {
         requireAdmin();
         PlayerRecord player = requirePlayer(userId);
-        return PlayerRecord.TO_DETAILS.apply(player);
+        return PlayerRecord.TO_PLAYER.apply(player);
     }
 
     // from interface AdminService

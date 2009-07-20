@@ -29,6 +29,7 @@ import com.samskivert.util.StringUtil;
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -129,6 +130,22 @@ public class PlayerRepository extends DepotRepository
     public void updateIsEditor (int userId, boolean isEditor)
     {
         updatePartial(PlayerRecord.getKey(userId), PlayerRecord.IS_EDITOR, isEditor);
+    }
+
+    /**
+     * Activates or deactivates the specified flag for the specified player.
+     */
+    public void updateFlag (PlayerRecord player, Player.Flag flag, boolean activate)
+    {
+        if (activate) {
+            updatePartial(PlayerRecord.getKey(player.userId),
+                          PlayerRecord.FLAGS, PlayerRecord.FLAGS.bitOr(flag.getMask()));
+            player.setFlag(flag);
+        } else {
+            updatePartial(PlayerRecord.getKey(player.userId),
+                          PlayerRecord.FLAGS, PlayerRecord.FLAGS.bitAnd(~flag.getMask()));
+            player.clearFlag(flag);
+        }
     }
 
     /**
