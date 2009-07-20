@@ -16,19 +16,19 @@ public enum Powerup implements ByteEnum
     // consumable powerups (id starts at 1)
 
     /** Reveals the category of all cards in the grid. */
-    SHOW_CATEGORY(1, 250, 3),
+    SHOW_CATEGORY(1, 150, 3),
 
     /** Reveals the subcategory of all cards in the grid. */
-    SHOW_SUBCATEGORY(2, 500, 3),
+    SHOW_SUBCATEGORY(2, 300, 3),
 
     /** Reveals the series of all cards in the grid. */
-    SHOW_SERIES(3, 1000, 3),
+    SHOW_SERIES(3, 500, 3),
 
     //
     // permanent powerups (id starts at 64)
 
     /** Grants an extra free card flip each day. */
-    EXTRA_FLIP(64, 5000, 1);
+    EXTRA_FLIP(64, 3000, 1);
 
     /** Those powerups that can be used during the grid creation process. */
     // public static EnumSet<Powerup> PRE_GRID = EnumSet.of(TODO);
