@@ -33,4 +33,10 @@ public class Card
 
     /** The player that gave this card to the owner or null. */
     public PlayerName giver;
+
+    /** Returns the series of the thing on this card. */
+    public Category getSeries ()
+    {
+        return categories[categories.length-1];
+    }
 }

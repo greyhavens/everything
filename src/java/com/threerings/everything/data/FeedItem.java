@@ -18,7 +18,7 @@ public class FeedItem
 {
     /** Identifies the different types of feed items. */
     public enum Type implements ByteEnum {
-        FLIPPED(0), GIFTED(1), COMMENT(2);
+        FLIPPED(0), GIFTED(1), COMMENT(2), COMPLETED(3);
 
         // from ByteEnum
         public byte toByte () {

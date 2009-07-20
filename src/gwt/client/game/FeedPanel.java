@@ -58,12 +58,15 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         public FeedItemLabel (FeedItem item) {
             setStyleName("Item");
             add(Args.createInlink(getName(item.actor, true), Page.BROWSE, item.actor.userId));
+            String objmsg;
             switch (item.type) {
             case FLIPPED:
-                add(Widgets.newHTML(" flipped the " + format(item.objects) + ".", "inline"));
+                objmsg = format(item.objects, "card", "cards");
+                add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
                 break;
             case GIFTED:
-                add(Widgets.newHTML(" gave the " + format(item.objects) + " to ", "inline"));
+                objmsg = format(item.objects, "card", "cards");
+                add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
                 add(Args.createInlink(getName(item.target, false),
                                       Page.BROWSE, item.target.userId));
                 String post = (item.message == null) ? "." :
@@ -74,13 +77,17 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
                 add(Widgets.newInlineLabel(" commented on your category "));
                 add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
                 break;
+            case COMPLETED:
+                objmsg = format(item.objects, "series", "series");
+                add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
+                break;
             default:
                 add(Widgets.newInlineLabel(" did something mysterious."));
                 break;
             }
         }
 
-        protected String format (List<String> objects) {
+        protected String format (List<String> objects, String what, String pwhat) {
             StringBuffer buf = new StringBuffer();
             for (Iterator<String> iter = objects.iterator(); iter.hasNext(); ) {
                 String object = iter.next();
@@ -92,7 +99,7 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
                 }
                 buf.append("<b>").append(object).append("</b>");
             }
-            return buf.append(objects.size() > 1 ? " cards" : " card").toString();
+            return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
         }
     }
 

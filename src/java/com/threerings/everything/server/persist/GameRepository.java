@@ -17,6 +17,7 @@ import com.samskivert.util.IntIntMap;
 
 import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.DuplicateKeyException;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
@@ -165,6 +166,26 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Notes that the player in question has completed the specified series.
+     *
+     * @return true if this should be reported to the feed, false if they had already completed the
+     * series and must have just sold off a card and obtained it again.
+     */
+    public boolean noteCompletedSeries (int userId, int categoryId)
+    {
+        try {
+            SeriesRecord record = new SeriesRecord();
+            record.userId = userId;
+            record.categoryId = categoryId;
+            record.when = new Timestamp(System.currentTimeMillis());
+            insert(record);
+            return true;
+        } catch (DuplicateKeyException dke) {
+            return false;
+        }
+    }
+
+    /**
      * Loads the specified player's current grid.
      */
     public GridRecord loadGrid (int userId)
@@ -302,5 +323,6 @@ public class GameRepository extends DepotRepository
         classes.add(GridRecord.class);
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
+        classes.add(SeriesRecord.class);
     }
 }

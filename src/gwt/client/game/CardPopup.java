@@ -17,7 +17,6 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
-import com.threerings.everything.data.Category;
 
 import client.ui.DataPopup;
 import client.util.ClickCallback;
@@ -77,8 +76,7 @@ public class CardPopup extends DataPopup<Card>
         } else if (_thingsRemaining == 1) {
             msg = "You only need <b>one more card</b> to complete this series!";
         } else if (_thingsRemaining == 0) {
-            Category series = card.categories[card.categories.length-1];
-            msg = "You have completed the <b>" + series + "</b> series!";
+            msg = "You have completed the <b>" + card.getSeries().name + "</b> series!";
         }
         if (msg != null) {
             contents.add(Widgets.newHTML(msg, "Info"));

@@ -229,16 +229,24 @@ public class GameServlet extends EveryServiceServlet
 
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost
-        grid.unflipped[result.card.thing.rarity.ordinal()]--;
+        grid.unflipped[thing.rarity.ordinal()]--;
         result.status = _gameLogic.getGameStatus(
             _playerRepo.loadPlayer(player.userId), grid.unflipped);
 
         // record that this player flipped this card
-        _playerRepo.recordFeedItem(
-            player.userId, FeedItem.Type.FLIPPED, 0, result.card.thing.name, null);
+        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name, null);
 
-        log.info("Yay! Card flipped", "who", player.who(), "thing", result.card.thing.name,
-                 "rarity", result.card.thing.rarity, "paid", expectedCost);
+        log.info("Yay! Card flipped", "who", player.who(), "thing", thing.name,
+                 "rarity", thing.rarity, "paid", expectedCost);
+
+        // note that this player completed this series and if appropriate report to their feed
+        if (result.thingsRemaining == 0 &&
+            _gameRepo.noteCompletedSeries(player.userId, thing.categoryId)) {
+            String series = result.card.getSeries().name;
+            log.info("Player completed series!", "who", player.who(), "series", series);
+            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.COMPLETED, 0, series, null);
+        }
+
         return result;
     }
 
