@@ -78,12 +78,13 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
             int row = ii / COLUMNS, col = ii % COLUMNS;
             final int position = ii;
-            ClickHandler onClick = (_data.grid.flipped[ii] != null) ? null : new ClickHandler() {
+            ThingCard card = _data.grid.flipped[ii];
+            ClickHandler onClick = (card != null && card.thingId > 0) ? null : new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     flipCard(position);
                 }
             };
-            _cards.setWidget(row, col, ThingCardView.createMicro(_data.grid.flipped[ii], onClick));
+            _cards.setWidget(row, col, ThingCardView.createMicro(card, onClick));
         }
         _status.setText(0, 1, "Grid status: " + Messages.xlate(""+_data.grid.status), 1, "right");
     }
