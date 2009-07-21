@@ -188,7 +188,7 @@
     </java>
   </target>
 
-  <target name="flexui" depends="prepare" description="Compiles our Flex UI swf.">
+  <target name="flashui" depends="prepare" description="Compiles our Flash UI swf.">
     <copy file="etc/flex-config.xml.in" tofile="${deploy.dir}/flex-config.xml">
       <filterset>
         <filter token="flex_url" value="${flex_url}"/>
@@ -210,7 +210,7 @@
       <arg value="-output"/>
       <arg value="${deploy.dir}/${app.ident}-ui.swf"/>
       <arg value="-file-specs"/>
-      <arg value="${asrc.dir}/com/threerings/everything.mxml"/>
+      <arg value="${asrc.dir}/com/threerings/everything/EverythingUI.as"/>
     </java>
   </target>
 
