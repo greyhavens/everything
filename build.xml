@@ -222,7 +222,7 @@
     </jar>
   </target>
 
-  <target name="distall" depends="mavendeps,version,dist,gclient"
+  <target name="distall" depends="mavendeps,version,dist,flashui,gclient"
           description="Fetches dependencies and builds everything.">
   </target>
 
