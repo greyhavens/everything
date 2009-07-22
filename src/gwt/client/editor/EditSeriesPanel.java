@@ -162,11 +162,12 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             }
 
             protected boolean gotResult (Integer thingId) {
-                _thing.thingId = thingId;
+                _ctx.getCatsModel().thingAdded(series);
                 thing.setText("");
-                ThingEditor editor = new ThingEditor(
-                    createCard(result, _thing, result.things.size()));
+                _thing.thingId = thingId;
                 result.things.add(_thing);
+                int position = result.things.size()-1;
+                ThingEditor editor = new ThingEditor(createCard(result, _thing, position));
                 insert(editor, getWidgetCount()-2);
                 editor.setEditing(true);
                 _thing = null;

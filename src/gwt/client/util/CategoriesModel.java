@@ -117,6 +117,23 @@ public class CategoriesModel
         _editorsvc.deleteCategory(categoryId, ChainedCallback.before(callback, deletedOp));
     }
 
+    /**
+     * Notes that a thing was added to the specified series.
+     */
+    public void thingAdded (Category series)
+    {
+        // locate the series in its parent's list
+        List<Category> cats = _catmap.get(series.parentId);
+        if (cats != null) {
+            for (Category cat : cats) {
+                if (cat.categoryId == series.categoryId) {
+                    cat.things++;
+                    break;
+                }
+            }
+        }
+    }
+
     protected Context _ctx;
     protected Map<Integer, List<Category>> _catmap = new HashMap<Integer, List<Category>>();
 
