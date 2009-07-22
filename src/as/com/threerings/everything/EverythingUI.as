@@ -84,10 +84,12 @@ public class EverythingUI extends Sprite
             }
 
         } else if (name == "descrip") {
-            _descrip = value; // we'll format this with facts shortly
+            _descrip = value;
+            maybeFormatInfo();
 
         } else if (name == "facts") {
-            _clip["information"].htmlText = _descrip + "<br/><b>Facts:</b>" + formatFacts(value);
+            _facts = value;
+            maybeFormatInfo();
 
         } else if (name == "source") {
 //             _clip[name].htmlText = "Source: <a target=\"_blank\" href=\"" + value + "\">" +
@@ -95,6 +97,13 @@ public class EverythingUI extends Sprite
 
         } else {
             _clip[name].text = value;
+        }
+    }
+
+    protected function maybeFormatInfo () :void
+    {
+        if (_descrip != null && _facts != null) {
+            _clip["information"].htmlText = _descrip + "<br/><b>Facts:</b>" + formatFacts(_facts);
         }
     }
 
@@ -145,6 +154,7 @@ public class EverythingUI extends Sprite
     protected var _id :String;
     protected var _type :String;
     protected var _descrip :String;
+    protected var _facts :String;
 
     [Embed(source="ui.swf", mimeType="application/octet-stream")]
     protected var UI :Class;
