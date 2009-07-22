@@ -318,6 +318,11 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             DefaultTextListener.configure(source, defsource);
             _ctrl.setWidget(row++, 1, source, 3, "Wide");
 
+            Button cancel = new Button("Cancel", new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    setEditing(false);
+                }
+            });
             Button delete = new Button("Delete");
             new ClickCallback<Void>(delete) {
                 protected boolean callService () {
@@ -342,14 +347,8 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
                     return true;
                 }
             };
-            Button done = new Button("Done", new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    // TODO: check for unsaved modifications
-                    setEditing(false);
-                }
-            });
             _ctrl.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
-            _ctrl.setWidget(row++, 1, Widgets.newRow(delete, save, done), 3, null);
+            _ctrl.setWidget(row++, 1, Widgets.newRow(cancel, delete, save), 3, null);
                     
             final Timer updater = new Timer() {
                 @Override public void run () {
