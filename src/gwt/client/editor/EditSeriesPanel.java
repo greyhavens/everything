@@ -62,7 +62,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
     {
         // add some metadata at the top
         final Category series = result.categories[result.categories.length-1];
-        add(Widgets.newHTML(Category.getHierarchyHTML(result.categories), "Header"));
+        add(Widgets.newLabel(Category.getHierarchy(result.categories), "Header"));
 
         SmartTable info = new SmartTable(5, 0);
         add(info);

@@ -38,12 +38,12 @@ public class Category
     /**
      * Returns an HTML snippet that will display cat -> cat -> cat for the supplied categories.
      */
-    public static String getHierarchyHTML (Category[] cats)
+    public static String getHierarchy (Category[] cats)
     {
         StringBuilder buf = new StringBuilder();
         for (Category cat : cats) {
             if (buf.length() > 0) {
-                buf.append(" &#8594; "); // right arrow
+                buf.append(" ‣ ");
             }
             buf.append(cat.name);
         }

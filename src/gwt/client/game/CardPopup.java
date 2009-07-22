@@ -4,8 +4,7 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,11 +26,11 @@ import client.util.Context;
  */
 public class CardPopup extends DataPopup<Card>
 {
-    public static ClickHandler onClick (final Context ctx, final CardIdent ident,
-                                        final Value<String> status)
+    public static Command onClick (final Context ctx, final CardIdent ident,
+                                   final Value<String> status)
     {
-        return new ClickHandler() {
-            public void onClick (ClickEvent event) {
+        return new Command() {
+            public void execute () {
                 ctx.displayPopup(new CardPopup(ctx, ident, status));
             }
         };

@@ -6,6 +6,7 @@ package client.game;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -79,12 +80,12 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             int row = ii / COLUMNS, col = ii % COLUMNS;
             final int position = ii;
             ThingCard card = _data.grid.flipped[ii];
-            ClickHandler onClick = (card != null && card.thingId > 0) ? null : new ClickHandler() {
-                public void onClick (ClickEvent event) {
+            Command onClick = (card != null && card.thingId > 0) ? null : new Command() {
+                public void execute () {
                     flipCard(position);
                 }
             };
-            _cards.setWidget(row, col, ThingCardView.createMicro(card, onClick));
+            _cards.setWidget(row, col, ThingCardView.create(ii, card, onClick));
         }
         _status.setText(0, 1, "Grid status: " + Messages.xlate(""+_data.grid.status), 1, "right");
     }
@@ -132,7 +133,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                     card.image = result.card.thing.image;
                     card.rarity = result.card.thing.rarity;
                     final int row = position / COLUMNS, col = position % COLUMNS;
-                    _cards.setWidget(row, col, ThingCardView.createMicro(card, null));
+                    _cards.setWidget(row, col, ThingCardView.create(position, card, null));
 
                     // update our status
                     _data.grid.unflipped[card.rarity.ordinal()]--;

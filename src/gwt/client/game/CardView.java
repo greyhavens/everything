@@ -13,6 +13,7 @@ import com.threerings.gwt.ui.Widgets;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 
+import client.ui.FlashBuilder;
 import client.util.ImageUtil;
 
 /**
@@ -25,11 +26,18 @@ public abstract class CardView extends FlowPanel
      */
     public static Widget create (Card card)
     {
-        SmartTable box = new SmartTable("cardView", 0, 0);
-        box.setWidget(0, 0, new CardView.Left(card), 1, "Left");
-        box.setWidget(0, 1, Widgets.newShim(5, 5));
-        box.setWidget(0, 2, new CardView.Right(card), 1, "Right");
-        return box;
+        FlashBuilder fb = new FlashBuilder("card", "info_card");
+        fb.addOr("title", card.thing.name, "?");
+        fb.add("category", Category.getHierarchy(card.categories));
+        fb.addIf("image", card.thing.image);
+        fb.add("rarity", "Rarity: " + card.thing.rarity + " - Σ" + card.thing.rarity.value);
+        fb.add("series", (card.position+1) + " of " + card.things);
+        fb.add("descrip", card.thing.descrip);
+        fb.add("facts", card.thing.facts);
+        fb.add("from", (card.giver == null) ? "" : "A gift from " + card.giver);
+        fb.add("date", "Received on: " + _dfmt.format(card.created));
+        fb.add("source", card.thing.source);
+        return fb.build(560, 380, false);
     }
 
     protected static String nameSource (String source)
@@ -64,8 +72,8 @@ public abstract class CardView extends FlowPanel
         public Left (Card card)
         {
             add(Widgets.newLabel(card.thing.name, "Title", getTitleSize(card.thing.name)));
-            add(Widgets.newHTML(Category.getHierarchyHTML(card.categories), "Categories",
-                                getCategoriesSize(card.categories)));
+            add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
+                                 getCategoriesSize(card.categories)));
             add(ImageUtil.getImageBox(card.thing.image));
             add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
                                      new CoinLabel(" - ", card.thing.rarity.value)));

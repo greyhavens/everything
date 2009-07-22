@@ -27,7 +27,6 @@ public class Image extends Loader
         contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
         contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, handleProgress);
 
-        trace("Loading " + url);
         load(new URLRequest(S3_BUCKET + url));
         maybeUpdateDimensions(contentLoaderInfo);
     }
