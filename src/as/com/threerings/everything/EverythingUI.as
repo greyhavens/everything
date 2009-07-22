@@ -42,7 +42,7 @@ public class EverythingUI extends Sprite
         _clip.x = 50;
         _clip.y = 50;
         addChild(_clip);
-        trace("Loaded clip " + _clip.width + "x" + _clip.height);
+        // trace("Loaded clip " + _clip.width + "x" + _clip.height);
 
         // TODO: have GWT tell us if we should listen for clicks
         if (_type == "card_front" || _type == "card_back") {
@@ -62,7 +62,6 @@ public class EverythingUI extends Sprite
 
     protected function setValue (name :String, value :String) :void
     {
-        // trace("Setting " + name + " -> " + value);
         if (name == "image") {
             var have :DisplayObject = _clip[name] as DisplayObject;
             if (have == null) {
@@ -75,7 +74,6 @@ public class EverythingUI extends Sprite
             hparent.removeChild(have);
 
             if (value != "") {
-                trace("Am I an info card " + _type);
                 var image :Image = (_type == "info_card") ?
                     new Image(value, 250, 300) : new Image(value, 83, 100);
                 image.x = cx;
@@ -92,8 +90,8 @@ public class EverythingUI extends Sprite
             maybeFormatInfo();
 
         } else if (name == "source") {
-            setHTML(name, "Source: <a target=\"_blank\" href=\"" + value + "\">" +
-                    nameSource(value) + "</a>");
+            setHTML(name, "Source: <u><a target=\"_blank\" href=\"" + value + "\">" +
+                    nameSource(value) + "</a></u>");
 
         } else {
             setText(name, value);
@@ -112,7 +110,9 @@ public class EverythingUI extends Sprite
         if (_clip[name] == null) {
             trace("Missing '" + name + "' component. Can't set text.");
         } else {
+            _clip[name].embedFonts = true;
             _clip[name].text = text;
+            // trace("Set " + name + " to " + text + " (" + _clip[name].defaultTextFormat + ")");
         }
     }
 
@@ -121,7 +121,9 @@ public class EverythingUI extends Sprite
         if (_clip[name] == null) {
             trace("Missing '" + name + "' component. Can't set HTML.");
         } else {
+            _clip[name].embedFonts = true;
             _clip[name].htmlText = html;
+            // trace("Set " + name + " to HTML: " + html);
         }
     }
 
