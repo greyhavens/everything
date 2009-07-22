@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -312,6 +313,13 @@ public class GameServlet extends EveryServiceServlet
         throws ServiceException
     {
         PlayerRecord player = requirePlayer();
+        PlayerRecord friend = _playerRepo.loadPlayer(friendId);
+        if (friend == null) {
+            log.warning("Requested to gift to unknown friend?", "gifter", player.who(),
+                        "friendId", friendId);
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+
         CardRecord card = requireCard(player.userId, thingId, created);
 
         // transfer the card to the target player
@@ -321,6 +329,16 @@ public class GameServlet extends EveryServiceServlet
         Thing thing = _thingRepo.loadThing(thingId);
         _playerRepo.recordFeedItem(
             player.userId, FeedItem.Type.GIFTED, friendId, thing.name, message);
+
+        // send a Facebook notification to the recipient (TODO: localization?)
+        String feedmsg = String.format(
+            "gave you the <b>%s</b> card in <a href=\"%s\">Everything</a>.",
+            thing.name, _app.getFacebookAppURL());
+        if (!StringUtil.isBlank(message)) {
+            // TODO: escape HTML
+            feedmsg += " They said '" + message + "'.";
+        }
+        _playerLogic.sendFacebookNotification(player, friend, feedmsg);
 
         // check whether the recipient just completed a set
         Set<Integer> things = Sets.newHashSet(
@@ -462,7 +480,9 @@ public class GameServlet extends EveryServiceServlet
         return card;
     }
 
+    @Inject protected EverythingApp _app;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected PlayerLogic _playerLogic;
     @Inject protected ThingRepository _thingRepo;
 }

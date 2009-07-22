@@ -73,6 +73,14 @@ public class EverythingApp extends App
     }
 
     /**
+     * Returns the URL we can send people to do access our Facebook app.
+     */
+    public String getFacebookAppURL ()
+    {
+        return "http://www.facebook.com/login.php?api_key=" + getFacebookKey() + "&canvas=1&v=1.0";
+    }
+
+    /**
      * Returns the id of our S3 media store.
      */
     public String getMediaStoreId ()

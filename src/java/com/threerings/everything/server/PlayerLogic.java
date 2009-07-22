@@ -4,6 +4,7 @@
 package com.threerings.everything.server;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,10 +13,15 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.google.code.facebookapi.FacebookJaxbRestClient;
+
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.Tuple;
 
 import com.threerings.everything.data.PlayerName;
+import com.threerings.samsara.app.server.UserLogic;
+import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;
@@ -77,6 +83,47 @@ public class PlayerLogic
         return objects;
     }
 
+    /**
+     * Posts a story to the specified player's Facebook feed.
+     */
+    public void postFacebookStory (PlayerRecord user, String todo)
+    {
+        Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
+        if (fbinfo == null || fbinfo.right == null) {
+            log.warning("Can't post Facebook story, have no Facebook authinfo?", "who", user.who(),
+                        "fbinfo", fbinfo);
+            return;
+        }
+        // TODO
+    }
+
+    /**
+     * Delivers a notification to the specified Facebook user from the specified sender.
+     */
+    public void sendFacebookNotification (PlayerRecord from, PlayerRecord to, final String fbml)
+    {
+        final Tuple<String, String> finfo = _userLogic.getFacebookAuthInfo(from.userId);
+        final Tuple<String, String> tinfo = _userLogic.getFacebookAuthInfo(to.userId);
+        if (finfo == null || finfo.right == null || tinfo == null) {
+            log.warning("Missing needed Facebook data for notification", "from", from.who(),
+                        "to", to.who(), "finfo", finfo, "tinfo", tinfo);
+            return;
+        }
+
+        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(finfo.right);
+        _app.getExecutor().execute(new Runnable() {
+            public void run () {
+                try {
+                    fbclient.notifications_send(
+                        Collections.singleton(Long.parseLong(tinfo.left)), fbml);
+                } catch (Exception e) {
+                    log.info("Failed to send Facebook notification", "to", tinfo.left,
+                             "fbml", fbml, "error", e.getMessage());
+                }
+            }
+        });
+    }
+
     protected List<Field> getNameFields (Class<?> clazz)
     {
         List<Field> fields = _nameFields.get(clazz);
@@ -97,5 +144,8 @@ public class PlayerLogic
     protected Map<Class<?>, List<Field>> _nameFields =
         new ConcurrentHashMap<Class<?>, List<Field>>();
 
+    @Inject protected EverythingApp _app;
+    @Inject protected FacebookLogic _faceLogic;
     @Inject protected PlayerRepository _playerRepo;
+    @Inject protected UserLogic _userLogic;
 }
