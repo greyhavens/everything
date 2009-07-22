@@ -41,7 +41,7 @@ public class ThingCardView extends FlowPanel
                 _onClicks.remove(id);
             }
         };
-        cont.setWidget(fb.build(125, 150, true));
+        cont.setWidget(fb.build(140, 165, true));
 
         // wire up our static callback and map our click handler
         if (onClick != null) {
