@@ -92,18 +92,36 @@ public class EverythingUI extends Sprite
             maybeFormatInfo();
 
         } else if (name == "source") {
-//             _clip[name].htmlText = "Source: <a target=\"_blank\" href=\"" + value + "\">" +
-//                 nameSource(value) + "</a>";
+            setHTML(name, "Source: <a target=\"_blank\" href=\"" + value + "\">" +
+                    nameSource(value) + "</a>");
 
         } else {
-            _clip[name].text = value;
+            setText(name, value);
         }
     }
 
     protected function maybeFormatInfo () :void
     {
         if (_descrip != null && _facts != null) {
-            _clip["information"].htmlText = _descrip + "<br/><b>Facts:</b>" + formatFacts(_facts);
+            setHTML("information", _descrip + "<br/><b>Facts:</b>" + formatFacts(_facts));
+        }
+    }
+
+    protected function setText (name :String, text :String) :void
+    {
+        if (_clip[name] == null) {
+            trace("Missing '" + name + "' component. Can't set text.");
+        } else {
+            _clip[name].text = text;
+        }
+    }
+
+    protected function setHTML (name :String, html :String) :void
+    {
+        if (_clip[name] == null) {
+            trace("Missing '" + name + "' component. Can't set HTML.");
+        } else {
+            _clip[name].htmlText = html;
         }
     }
 
