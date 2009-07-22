@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -49,9 +48,6 @@ public class SeriesPanel extends DataPanel<Series>
             final int row = ii/COLUMNS+1, col = ii%COLUMNS;
             final ThingCard card = series.things[ii];
             Value<String> status = new Value<String>("");
-            if (card != null) {
-                Console.log("Wiring up status for " + card.thingId);
-            }
             status.addListener(new Value.Listener<String>() {
                 public void valueChanged (String status) {
                     grid.setText(row, col, status);
@@ -62,7 +58,6 @@ public class SeriesPanel extends DataPanel<Series>
                             ids.add(tcard.thingId);
                         }
                     }
-                    Console.log("Updating count " + ids.size());
                     _count.update(ids.size());
                 }
             });
