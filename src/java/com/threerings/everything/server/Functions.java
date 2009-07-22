@@ -7,6 +7,7 @@ import com.google.common.base.Function;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Thing;
+import com.threerings.everything.server.persist.CardRecord;
 
 /**
  * Useful functions.
@@ -31,6 +32,14 @@ public class Functions
     public static final Function<Category, Integer> PARENT_ID = new Function<Category, Integer>() {
         public Integer apply (Category category) {
             return category.parentId;
+        }
+    };
+
+    /** Extracts the thing id from a card. */
+    public static final Function<CardRecord, Integer> CARD_THING_ID =
+        new Function<CardRecord, Integer>() {
+        public Integer apply (CardRecord card) {
+            return card.thingId;
         }
     };
 }

@@ -31,6 +31,7 @@ import com.samskivert.util.IntSet;
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
@@ -194,6 +195,18 @@ public class GameLogic
         }
         Collections.reverse(cats);
         return cats.toArray(new Category[cats.size()]);
+    }
+
+    /**
+     * Records and reports that the specified player completed the specified series if they haven't
+     * already completed the series.
+     */
+    public void maybeReportCompleted (int userId, Category series)
+    {
+        if (_gameRepo.noteCompletedSeries(userId, series.categoryId)) {
+            log.info("Player completed series!", "who", userId, "series", series.name);
+            _playerRepo.recordFeedItem(userId, FeedItem.Type.COMPLETED, 0, series.name, null);
+        }
     }
 
     /**

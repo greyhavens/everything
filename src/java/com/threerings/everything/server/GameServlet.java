@@ -240,11 +240,8 @@ public class GameServlet extends EveryServiceServlet
                  "rarity", thing.rarity, "paid", expectedCost);
 
         // note that this player completed this series and if appropriate report to their feed
-        if (result.thingsRemaining == 0 &&
-            _gameRepo.noteCompletedSeries(player.userId, thing.categoryId)) {
-            String series = result.card.getSeries().name;
-            log.info("Player completed series!", "who", player.who(), "series", series);
-            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.COMPLETED, 0, series, null);
+        if (result.thingsRemaining == 0) {
+            _gameLogic.maybeReportCompleted(player.userId, result.card.getSeries());
         }
 
         return result;
@@ -324,6 +321,16 @@ public class GameServlet extends EveryServiceServlet
         Thing thing = _thingRepo.loadThing(thingId);
         _playerRepo.recordFeedItem(
             player.userId, FeedItem.Type.GIFTED, friendId, thing.name, message);
+
+        // check whether the recipient just completed a set
+        Set<Integer> things = Sets.newHashSet(
+            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
+        Set<Integer> holdings = Sets.newHashSet(
+            Iterables.transform(_gameRepo.loadCards(friendId, things), Functions.CARD_THING_ID));
+        holdings.add(card.thingId);
+        if (things.size() - holdings.size() == 0) {
+            _gameLogic.maybeReportCompleted(friendId, _thingRepo.loadCategory(thing.categoryId));
+        }
     }
 
     // from interface GameService
