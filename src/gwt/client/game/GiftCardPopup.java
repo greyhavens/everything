@@ -54,21 +54,22 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     {
         SmartTable grid = new SmartTable(5, 0);
         grid.setWidth("100%");
+        int row = 0, col = 0;
         for (final FriendCardInfo info : result.friends) {
-            int row = grid.addText(info.friend.toString(), 1, null);
-            if (info.hasThings > 0) {
-                grid.setText(row, 1, "Has " + info.hasThings + "/" + result.things, 1, "nowrap");
-            }
+            String text = info.friend.toString();
             if (info.onWishlist) {
-                grid.setText(row, 2, "Wishlist!", 1, "Wishlist");
+                text += " (on wishlist)";
+            } else if (info.hasThings > 0) {
+                text += " (has " + info.hasThings + "/" + result.things + ")";
             }
+            grid.setText(row, col, text, 1, "nowrap");
             final TextBox message = Widgets.newTextBox("", 255, 20);
             final String defmsg = "<optional gift message>";
             DefaultTextListener.configure(message, defmsg);
             message.setVisible(false);
-            grid.setWidget(row, 3, message);
+            grid.setWidget(row, col+1, message);
             final Button give = new Button("Give");
-            grid.setWidget(row, 4, give);
+            grid.setWidget(row, col+2, give);
             new ClickCallback<Void>(give, message) {
                 protected boolean callService () {
                     if (!message.isVisible()) {
@@ -87,10 +88,15 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                     return false;
                 }
             };
+            col += 3;
+            if (col > 5) {
+                row++;
+                col = 0;
+            }
         }
         String msg = (result.friends.size() == 0) ? "All of your friends already have this card." :
             "Friends that already have this card are not shown.";
-        grid.addText(msg, 5, null);
+        grid.addText(msg, 6, null);
         return Widgets.newFlowPanel(
             Widgets.newScrollPanel(grid, -1, 80),
             Widgets.newFlowPanel("Buttons", new Button("Never Mind", onHide())));
