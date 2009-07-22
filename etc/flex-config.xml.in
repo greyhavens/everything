@@ -105,6 +105,7 @@
          <path-element>../dist/lib/corelib.swc</path-element>
          <path-element>../dist/lib/flexlib.swc</path-element>
          <path-element>../dist/lib/tweener.swc</path-element>
+         <path-element>../dist/lib/ooolib-0.0-SNAPSHOT.swc</path-element>
          <path-element>../lib/flex_sdk/frameworks/libs</path-element>
          <path-element>../lib/flex_sdk/frameworks/libs/player</path-element>
          <path-element>../lib/flex_sdk/frameworks/libs/player/{targetPlayerMajorVersion}</path-element>

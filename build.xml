@@ -75,6 +75,7 @@
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
       <fileset refid="dependency.fileset"/>
@@ -247,6 +248,7 @@
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web">
       <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="**"/>
+      <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
     </copy>
     <manifest file="${instroot.dir}/MANIFEST.MF">
       <attribute name="Main-Class" value="com.threerings.everything.server.EverythingApp$Module"/>
@@ -263,6 +265,7 @@
           description="Copies updated style sheets into the local installed app.">
     <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/">
       <fileset dir="${gsrc.dir}/public" includes="**"/>
+      <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
     </copy>
   </target>
 
