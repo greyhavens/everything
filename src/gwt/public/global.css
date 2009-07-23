@@ -29,10 +29,6 @@
   font-family: Handwriting, Trebuchet MS, serif;
 }
 
-.machine, .handwriting, .machine a, .handwriting a { 
-  color: #442D17;
-}
-
 /** Global page definitions. */
 html, body {
   margin: 0px;
@@ -40,6 +36,10 @@ html, body {
   padding: 0px;
   font-family: Helvetia, Arial, sans-serif;
   font-size: 14px;
+}
+
+body, body a { 
+  color: #442D17;
 }
 
 .infoLabel {
@@ -74,8 +74,8 @@ fb\:profile-pic img {
 
 /** DataPopup styles */
 .popup {
-  border: 1px solid;
-  background: #FFFFFF;
+  border: 1px solid #442D17;
+  background: url(images/page_repeat.png) center;
   padding: 5px;
   z-index: 5;
 }
@@ -91,6 +91,8 @@ fb\:profile-pic img {
 }
 
 .gwt-ConfirmPopup {
+  border: 1px solid #442D17;
+  background: url(images/page_repeat.png) center;
   z-index: 10;
 }
 
