@@ -167,6 +167,7 @@
 
 /** LandingPanel styles */
 .landing {
+  font-family: Times, Times New Roman, serif;
 }
 
 .landing .Title {
