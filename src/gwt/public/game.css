@@ -80,6 +80,7 @@
 .cardView .Info {
   margin: 10px 0px;
   height: 270px;
+  overflow: auto;
 }
 
 .cardView .FactsTitle {
