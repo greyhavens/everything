@@ -30,7 +30,7 @@ public class HeaderPanel extends FlowPanel
         add(bits);
 
         int col = 0;
-        SmartTable links = new SmartTable("Links", 0, 0);
+        SmartTable links = new SmartTable("Links", 5, 0);
         links.setWidget(1, col++, Args.createLink("News", Page.LANDING), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Flip Cards", Page.FLIP), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Your Collection", Page.BROWSE), 1, "machine");

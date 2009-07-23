@@ -105,9 +105,8 @@ html, body {
 }
 
 .header .Links {
-  width: 100%;
   font-size: 17px;
-  padding: 10px 20px 0px;
+  padding: 5px 15px 0px;
 }
 
 /** Shared page styles */
