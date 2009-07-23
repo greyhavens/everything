@@ -85,6 +85,7 @@
 
 .cardView .FactsTitle {
   font-weight: bold;
+  padding-top: 5px;
 }
 
 .cardView .Info ul {
