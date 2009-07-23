@@ -3,6 +3,7 @@
 
 package client;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 
 import com.threerings.gwt.ui.SmartTable;
@@ -16,29 +17,31 @@ import client.util.Page;
 /**
  * Displays a simple header and navigation.
  */
-public class HeaderPanel extends SmartTable
+public class HeaderPanel extends FlowPanel
 {
     public HeaderPanel (Context ctx)
     {
-        super("header", 5, 0);
+        setStyleName("header");
+
+        SmartTable bits = new SmartTable("Bits", 0, 0);
+        bits.setText(0, 0, "Hello: " + ctx.getMe().name.toString(), 1, "machine");
+        bits.setText(0, 1, "Build: " + Build.time(), 1, "machine");
+        bits.getFlexCellFormatter().setHorizontalAlignment(0, 1, HasAlignment.ALIGN_RIGHT);
+        add(bits);
 
         int col = 0;
-        setText(0, col++, "Hello: " + ctx.getMe().name.toString());
-        setWidget(0, col++, Args.createLink("News", Page.LANDING));
-        setWidget(0, col++, Args.createLink("Flip Cards", Page.FLIP));
-        setWidget(0, col++, Args.createLink("Your Collection", Page.BROWSE));
-        setWidget(0, col++, Args.createLink("Shop", Page.SHOP));
-        setWidget(0, col++, Args.createLink("Friends", Page.FRIENDS));
+        SmartTable links = new SmartTable("Links", 0, 0);
+        links.setWidget(1, col++, Args.createLink("News", Page.LANDING), 1, "machine");
+        links.setWidget(1, col++, Args.createLink("Flip Cards", Page.FLIP), 1, "machine");
+        links.setWidget(1, col++, Args.createLink("Your Collection", Page.BROWSE), 1, "machine");
+        links.setWidget(1, col++, Args.createLink("Shop", Page.SHOP), 1, "machine");
+        links.setWidget(1, col++, Args.createLink("Friends", Page.FRIENDS), 1, "machine");
         if (ctx.isEditor()) {
-            setWidget(0, col++, Args.createLink("Add Things", Page.EDIT_CATS));
+            links.setWidget(1, col++, Args.createLink("Add Things", Page.EDIT_CATS), 1, "machine");
         }
         if (ctx.isAdmin()) {
-            setWidget(0, col++, Args.createLink("Dashboard", Page.DASHBOARD));
+            links.setWidget(1, col++, Args.createLink("Dashboard", Page.DASHBOARD), 1, "machine");
         }
-
-        // finally display the game build on the right
-        getFlexCellFormatter().setHorizontalAlignment(0, col, HasAlignment.ALIGN_RIGHT);
-        getFlexCellFormatter().setWidth(0, col, "100%");
-        setText(0, col++, "Build: " + Build.time());
+        add(links);
     }
 }

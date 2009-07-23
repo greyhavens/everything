@@ -108,15 +108,6 @@
   padding-top: 4px;
 }
 
-/** HeaderPanel styles */
-.header {
-  width: 100%;
-}
-
-.header td {
-  white-space: nowrap;
-}
-
 /** LandingPanel styles */
 .landing {
   margin: 10px;

@@ -83,3 +83,29 @@ html, body {
 .gwt-MenuBar .gwt-MenuItem-selected {
   background: #99CCFF;
 }
+
+/** HeaderPanel styles */
+.header {
+  width: 760px;
+  height: 106px;
+  background: url(images/header.png);
+}
+
+.header td {
+  white-space: nowrap;
+}
+.header td, .header td a {
+  color: #E8D669;
+}
+
+.header .Bits {
+  width: 100%;
+  font-size: 14px;
+  padding: 15px 20px 0px;
+}
+
+.header .Links {
+  width: 100%;
+  font-size: 17px;
+  padding: 10px 20px 0px;
+}
