@@ -44,7 +44,7 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
             return;
         }
 
-        table.setText(0, 0, "Your Everything friends and when they last played.", 6);
+        table.setText(0, 0, "Browse your friends' collections and see whent hey last played.", 6);
         int row = 1, col = 0;
         for (FriendStatus friend : friends) {
             table.setWidget(row, 2*col, XFBML.newProfilePic(friend.name.facebookId));
