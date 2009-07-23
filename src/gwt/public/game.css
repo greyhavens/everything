@@ -210,7 +210,7 @@
 /** GridPanel styles */
 .grid {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
-  background: url(images/page_flip.png);
+  background: url(images/page_flip.png) no-repeat;
 }
 
 .grid > table {
