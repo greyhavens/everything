@@ -118,6 +118,9 @@ html, body {
 
 .page {
   padding: 5px 15px;
-  color: #442D17;
   min-height: 500px;
+}
+
+.page, .page a {
+  color: #442D17;
 }
