@@ -34,16 +34,36 @@
 /** CardView styles */
 .cardView {
   background: url(images/info_card.png);
-  width: 560px;
-  height: 380px;
+  width: 611px;
+  height: 451px;
   font-size: 15px;
+  padding: 2px 5px 6px 3px;
+  padding: 0px 20px;
+}
+
+.cardViewTall {
+  background: url(images/info_card_tall.png);
+  height: 501px;
 }
 
 .cardView .Left, .cardView .Right {
   width: 280px;
 }
 
-.cardView .Title, .cardView .Position, .cardView .Metrics {
+.cardView .Header {
+  font-size: 20px;
+  height: 50px;
+}
+
+.cardView .Status {
+  height: 30px;
+}
+.cardView .Buttons {
+  height: 39px;
+  vertical-align: top;
+}
+
+.cardView .Header, .cardView .Title, .cardView .Position, .cardView .Metrics, .cardView .Status {
   text-align: center;
 }
 
@@ -61,6 +81,11 @@
   font-size: 16px;
 }
 
+.cardView .Categories {
+  padding-top: 10px;
+  white-space: nowrap;
+  width: 280px;
+}
 .cardView .NormalCategories {
   font-size: 15px;
 }
@@ -78,8 +103,8 @@
 }
 
 .cardView .Info {
-  margin: 10px 0px;
-  height: 270px;
+  margin: 20px 0px 10px 0px;
+  height: 280px;
   overflow: auto;
 }
 
@@ -205,26 +230,9 @@
 
 /** CardPopup styles */
 .card {
+  background: none;
   border: none;
   padding: 0px;
-}
-
-.card .Header {
-  font-size: 18px;
-  text-align: center;
-  padding-bottom: 5px;
-}
-
-.card .Status {
-  text-align: center;
-}
-
-.card .Buttons {
-  margin: 0px auto;
-}
-
-.card .cardView {
-  margin-bottom: 5px;
 }
 
 /** GiftCardPopup styles */

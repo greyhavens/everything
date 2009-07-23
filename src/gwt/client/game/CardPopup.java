@@ -61,24 +61,15 @@ public class CardPopup extends DataPopup<Card>
 
     protected Widget createContents (final Card card)
     {
-        final FlowPanel contents = new FlowPanel();
-        if (_title != null) {
-            contents.add(Widgets.newHTML(_title, "Header", "machine"));
-        }
-        contents.add(CardView.create(card));
-
-        String msg = null;
+        String status = null;
         if (_haveCount > 1) {
-            msg = "You already have " + _haveCount + " of these cards.";
+            status = "You already have " + _haveCount + " of these cards.";
         } else if (_haveCount > 0) {
-            msg = "You already have this card.";
+            status = "You already have this card.";
         } else if (_thingsRemaining == 1) {
-            msg = "You only need <b>one more card</b> to complete this series!";
+            status = "You only need <b>one more card</b> to complete this series!";
         } else if (_thingsRemaining == 0) {
-            msg = "You have completed the <b>" + card.getSeries().name + "</b> series!";
-        }
-        if (msg != null) {
-            contents.add(Widgets.newHTML(msg, "Status"));
+            status = "You have completed the <b>" + card.getSeries().name + "</b> series!";
         }
 
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
@@ -106,12 +97,12 @@ public class CardPopup extends DataPopup<Card>
                          "Do you want to sell it?");
 
         Button done = new Button(_doneLabel, onHide());
+
         if (_ctx.getMe().equals(card.owner)) {
-            contents.add(Widgets.newRow("Buttons", sell, gift, done));
+            return CardView.create(card, _title, status, sell, gift, done);
         } else {
-            contents.add(Widgets.newRow("Buttons", done));
+            return CardView.create(card, _title, status, done);
         }
-        return contents;
     }
 
     protected String _title, _doneLabel;

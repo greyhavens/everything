@@ -373,43 +373,35 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             source.addKeyPressHandler(trigger);
 
             updateCard(card);
-
-            add(_edit = Widgets.newActionLabel("Edit", "Edit", new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    setEditing(true);
-                }
-            }));
         }
 
         public void setEditable (boolean editable)
         {
-            remove(_ctrl);
-            remove(_edit);
-            if (editable) {
-                add(_edit);
-            }
+            _edit.setEnabled(editable);
         }
 
         public void setEditing (boolean editing)
         {
             remove(_ctrl);
-            remove(_edit);
             if (editing) {
                 add(_ctrl);
-            } else {
-                add(_edit);
             }
+            _edit.setEnabled(!editing);
         }
 
         protected void updateCard (Card card) {
             if (getWidgetCount() > 0) {
                 remove(0);
             }
-            insert(CardView.create(card), 0);
+            insert(CardView.create(card, null, null, _edit), 0);
         }
 
         protected SmartTable _ctrl;
-        protected Widget _edit;
+        protected Button _edit = new Button("Edit", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                setEditing(true);
+            }
+        });
     }
 
     protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);

@@ -4,17 +4,18 @@
 package client.game;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.StringUtil;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 
-import client.ui.FlashBuilder;
 import client.util.ImageUtil;
 
 /**
@@ -25,25 +26,23 @@ public abstract class CardView extends FlowPanel
     /**
      * Creates a view for the specified card.
      */
-    public static Widget create (Card card)
+    public static Widget create (Card card, String header, String status, Button... buttons)
     {
         SmartTable box = new SmartTable("cardView", 0, 0);
-        box.setWidget(0, 0, new CardView.Left(card), 1, "Left");
-        box.setWidget(0, 1, Widgets.newShim(5, 5));
-        box.setWidget(0, 2, new CardView.Right(card), 1, "Right");
+        int row = 0;
+        if (header != null) {
+            box.setHTML(row++, 0, header, 3, "Header", "machine");
+            box.addStyleName("cardViewTall");
+        }
+        box.setWidget(row, 0, new CardView.Left(card), 1, "Left");
+        box.setWidget(row, 1, Widgets.newShim(5, 5));
+        box.setWidget(row++, 2, new CardView.Right(card), 1, "Right");
+        if (header != null) { // if we have a header, we always need a status
+            box.setHTML(row++, 0, StringUtil.getOr(status, ""), 3, "Status", "machine");
+        }
+        box.setWidget(row, 0, Widgets.newRow(buttons), 3, "Buttons");
+        box.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
         return box;
-//         FlashBuilder fb = new FlashBuilder("card", "info_card");
-//         fb.addOr("title", card.thing.name, "?");
-//         fb.add("category", Category.getHierarchy(card.categories));
-//         fb.addIf("image", card.thing.image);
-//         fb.add("rarity", "Rarity: " + card.thing.rarity + " - Σ" + card.thing.rarity.value);
-//         fb.add("series", (card.position+1) + " of " + card.things);
-//         fb.add("descrip", card.thing.descrip);
-//         fb.add("facts", card.thing.facts);
-//         fb.add("from", (card.giver == null) ? "" : "A gift from " + card.giver);
-//         fb.add("date", "Received on: " + _dfmt.format(card.created));
-//         fb.add("source", card.thing.source);
-//         return fb.build(560, 380, false);
     }
 
     protected static String nameSource (String source)
@@ -125,7 +124,7 @@ public abstract class CardView extends FlowPanel
         for (Category cat : categories) {
             length += cat.name.length();
         }
-        if (length < 28) {
+        if (length < 26) {
             return "NormalCategories";
         } else {
             return "LongCategories";
