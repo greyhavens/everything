@@ -97,9 +97,9 @@ public abstract class CardView extends FlowPanel
                     Widgets.newHTML(formatFacts(card.thing.facts), "handwriting")));
             add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
                                 nameSource(card.thing.source) + "</a>", "Source", "machine"));
-//             if (card.giver != null) {
+            if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver, "Giver", "machine"));
-//             }
+            }
             add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When", "machine"));
         }
     }

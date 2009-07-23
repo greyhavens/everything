@@ -45,12 +45,15 @@ public class ImageUtil
     protected static Widget getImageBox (String image, String styleName, Command onClick)
     {
         SmartTable table = new SmartTable(styleName, 0, 0);
+        Widget clicky;
         if (image != null && image.length() > 0) {
-            table.setWidget(
-                0, 0, Widgets.newActionImage(S3_BUCKET + image, Commands.onClick(onClick)));
-            table.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
-            table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
+            clicky = Widgets.newActionImage(S3_BUCKET + image, Commands.onClick(onClick));
+        } else {
+            clicky = Widgets.newActionLabel("", "Shim", Commands.onClick(onClick));
         }
+        table.setWidget(0, 0, clicky);
+        table.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
+        table.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
         return table;
     }
 

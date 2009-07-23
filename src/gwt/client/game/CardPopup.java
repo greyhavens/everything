@@ -63,7 +63,7 @@ public class CardPopup extends DataPopup<Card>
     {
         final FlowPanel contents = new FlowPanel();
         if (_title != null) {
-            contents.add(Widgets.newHTML(_title, "Title"));
+            contents.add(Widgets.newHTML(_title, "Header", "machine"));
         }
         contents.add(CardView.create(card));
 
