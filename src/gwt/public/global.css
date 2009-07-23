@@ -117,7 +117,7 @@ html, body {
 /** Shared page styles */
 .content {
   width: 760px;
-  background: url(images/page_flip.png);
+  background: url(images/page_repeat.png) repeat-y;
 }
 
 .page {

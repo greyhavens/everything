@@ -133,6 +133,8 @@
 .thingCard .Rarity {
   position: absolute;
   top: 128px;
+  left: 0px;
+  width: 100%;
 }
 
 /** LandingPanel styles */
@@ -175,6 +177,7 @@
 /** GridPanel styles */
 .grid {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
+  background: url(images/page_flip.png);
 }
 
 .grid > table {
