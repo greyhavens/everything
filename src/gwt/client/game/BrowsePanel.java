@@ -50,6 +50,7 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
                 String subcatname = subcat.getKey();
                 final int row = table.addText(catname, 1, null);
+                catname = ""; // subsequent rows don't repeat the same category
                 table.setText(row, 1, subcatname);
                 FlowPanel cards = new FlowPanel();
                 for (final SeriesCard card : subcat.getValue()) {
