@@ -74,8 +74,6 @@ fb\:profile-pic img {
 
 /** DataPopup styles */
 .popup {
-  border: 1px solid #442D17;
-  background: url(images/page_repeat.png) center;
   padding: 5px;
   z-index: 5;
 }
@@ -90,10 +88,13 @@ fb\:profile-pic img {
   background: #99CCFF;
 }
 
-.gwt-ConfirmPopup {
+.gwt-ConfirmPopup, .infoPopup, .errorPopup {
+  z-index: 10;
+}
+
+.popup, .gwt-ConfirmPopup, .infoPopup, .errorPopup {
   border: 1px solid #442D17;
   background: url(images/page_repeat.png) center;
-  z-index: 10;
 }
 
 /** HeaderPanel styles */
