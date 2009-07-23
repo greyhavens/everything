@@ -5,6 +5,7 @@ package client.game;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
@@ -76,8 +77,10 @@ public abstract class CardView extends FlowPanel
     {
         public Left (Card card)
         {
-            add(Widgets.newLabel(card.thing.name, "Title",
-                                 getTitleSize(card.thing.name), "machine"));
+            SmartTable wrap = new SmartTable("Title", 0, 0);
+            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name), "machine");
+            wrap.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
+            add(wrap);
             add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
             add(ImageUtil.getImageBox(card.thing.image));
             add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
@@ -96,11 +99,12 @@ public abstract class CardView extends FlowPanel
                     Widgets.newLabel("Facts:", "FactsTitle", "machine"),
                     Widgets.newHTML(formatFacts(card.thing.facts), "handwriting")));
             add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
-                                nameSource(card.thing.source) + "</a>", "Source", "machine"));
+                                nameSource(card.thing.source) + "</a>", "Source", "handwriting"));
             if (card.giver != null) {
-                add(Widgets.newLabel("A gift from " + card.giver, "Giver", "machine"));
+                add(Widgets.newLabel("A gift from " + card.giver, "Giver", "handwriting"));
             }
-            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When", "machine"));
+            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created),
+                                 "When", "handwriting"));
         }
     }
 

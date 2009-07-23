@@ -9,6 +9,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -125,31 +126,33 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         // TODO: disable all click handlers
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
-                public void onSuccess (GameService.FlipResult result) {
-                    // convert the card to a thing card and display it in the grid
-                    ThingCard card = new ThingCard();
-                    card.thingId = result.card.thing.thingId;
-                    card.name = result.card.thing.name;
-                    card.image = result.card.thing.image;
-                    card.rarity = result.card.thing.rarity;
-                    final int row = position / COLUMNS, col = position % COLUMNS;
-                    _cards.setWidget(row, col, ThingCardView.create(position, card, null));
+            public void onSuccess (GameService.FlipResult result) {
+                // convert the card to a thing card and display it in the grid
+                ThingCard card = new ThingCard();
+                card.thingId = result.card.thing.thingId;
+                card.name = result.card.thing.name;
+                card.image = result.card.thing.image;
+                card.rarity = result.card.thing.rarity;
+                final int row = position / COLUMNS, col = position % COLUMNS;
+                _cards.setWidget(row, col, ThingCardView.create(position, card, null));
 
-                    // update our status
-                    _data.grid.unflipped[card.rarity.ordinal()]--;
-                    updateRemaining(_data.grid.unflipped);
-                    updateGameStatus(_data.status = result.status);
+                // update our status
+                _data.grid.unflipped[card.rarity.ordinal()]--;
+                updateRemaining(_data.grid.unflipped);
+                updateGameStatus(_data.status = result.status);
 
-                    // display the card big and fancy and allow them to gift it or cash it in
-                    Value<String> status = new Value<String>("");
-                    _ctx.displayPopup(new CardPopup(_ctx, result, status));
-                    status.addListener(new Value.Listener<String>() {
-                        public void valueChanged (String status) {
-                            _cards.setText(row, col, status);
-                        }
-                    });
-                }
-            });
+                // display the card big and fancy and allow them to gift it or cash it in
+                Value<String> status = new Value<String>("");
+                _ctx.displayPopup(new CardPopup(_ctx, result, status));
+                status.addListener(new Value.Listener<String>() {
+                    public void valueChanged (String status) {
+                        _cards.setText(row, col, status);
+                        _cards.getFlexCellFormatter().setHorizontalAlignment(
+                            row, col, HasAlignment.ALIGN_CENTER);
+                    }
+                });
+            }
+        });
     }
 
     protected void showPowerupsMenu (final Widget trigger)

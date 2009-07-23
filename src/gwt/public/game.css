@@ -28,6 +28,7 @@
 .imageBox .gwt-Image, .miniImageBox .gwt-Image {
   display: block;
   border: 1px solid #442D17;
+  margin: 0px auto;
 }
 
 /** CardView styles */
@@ -48,15 +49,16 @@
 
 .cardView .Title {
   height: 28px;
+  width: 100%;
 }
 .cardView .NormalTitle {
   font-size: 24px;
 }
 .cardView .LongTitle {
-  font-size: 21px;
+  font-size: 19px;
 }
 .cardView .ReallyLongTitle {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .cardView .NormalCategories {
@@ -78,7 +80,6 @@
 .cardView .Info {
   margin: 10px 0px;
   height: 270px;
-  font-size: 18px;
 }
 
 .cardView .FactsTitle {
@@ -90,6 +91,10 @@
   padding-left: 25px;
 }
 
+.cardView .When, .cardView .Giver, .cardView .Source, .cardView .Info {
+  font-size: 18px;
+}
+
 .cardView .When, .cardView .Giver, .cardView .Source {
   font-style: italic;
 }
@@ -99,6 +104,7 @@
   text-align: center;
   width: 125px;
   height: 150px;
+  position: relative;
 }
 
 .thingCardFront {
@@ -110,7 +116,23 @@
 }
 
 .thingCard .Name {
+  position: absolute;
+  top: 0px;
+  height: 17px;
   padding-top: 4px;
+  margin: 0px 10px;
+  width: 105px;
+  z-index: 2;
+}
+
+.thingCard .miniImageBox {
+  position: absolute;
+  top: 21px;
+}
+
+.thingCard .Rarity {
+  position: absolute;
+  top: 128px;
 }
 
 /** LandingPanel styles */
@@ -152,12 +174,12 @@
 
 /** GridPanel styles */
 .grid {
-  width: 585px;
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
 }
 
 .grid > table {
-  width: 100%;
+  width: 555px;
+  margin: 0px auto;
 }
 
 .grid .Bold {
