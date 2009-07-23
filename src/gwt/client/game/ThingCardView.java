@@ -29,27 +29,29 @@ public class ThingCardView extends FlowPanel
 {
     public static Widget create (int pos, ThingCard card, Command onClick)
     {
-        boolean back = (card == null || card.image == null);
-        FlashBuilder fb = new FlashBuilder("tc" + pos, back ?  "card_back" : "card_front");
-        fb.addOr("title", (card == null) ? null : card.name, "?");
-        fb.addIf("image", (card == null) ? null : card.image);
-        fb.addOr("rarity", (card == null) ? null : card.rarity, "?");
-        final String id = fb.id;
-        SimplePanel cont = new SimplePanel() {
-            protected void onUnload () {
-                super.onUnload();
-                _onClicks.remove(id);
-            }
-        };
-        cont.setWidget(fb.build(140, 165, true));
+        return new ThingCardView(card, onClick);
 
-        // wire up our static callback and map our click handler
-        if (onClick != null) {
-            configureCallback();
-            _onClicks.put(fb.id, onClick);
-        }
+//         boolean back = (card == null || card.image == null);
+//         FlashBuilder fb = new FlashBuilder("tc" + pos, back ?  "card_back" : "card_front");
+//         fb.addOr("title", (card == null) ? null : card.name, "?");
+//         fb.addIf("image", (card == null) ? null : card.image);
+//         fb.addOr("rarity", (card == null) ? null : card.rarity, "?");
+//         final String id = fb.id;
+//         SimplePanel cont = new SimplePanel() {
+//             protected void onUnload () {
+//                 super.onUnload();
+//                 _onClicks.remove(id);
+//             }
+//         };
+//         cont.setWidget(fb.build(140, 165, true));
 
-        return cont;
+//         // wire up our static callback and map our click handler
+//         if (onClick != null) {
+//             configureCallback();
+//             _onClicks.put(fb.id, onClick);
+//         }
+
+//         return cont;
     }
 
     protected static void cardClicked (String id) {
@@ -69,12 +71,14 @@ public class ThingCardView extends FlowPanel
 
     protected static Map<String, Command> _onClicks = new HashMap<String, Command>();
 
-//     protected ThingCardView (ThingCard card, ClickHandler onClick)
-//     {
-//         setStyleName("thingCard");
-//         String name = (card == null || card.name == null) ? "?" : card.name;
-//         add(Widgets.newLabel(name, "Name"));
-//         add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
-//         add(new RarityLabel(card == null ? null : card.rarity));
-//     }
+    protected ThingCardView (ThingCard card, Command onClick)
+    {
+        setStyleName("thingCard");
+        addStyleName((card == null || card.image == null) ? "thingCardBack" : "thingCardFront");
+
+        String name = (card == null || card.name == null) ? "?" : card.name;
+        add(Widgets.newLabel(name, "Name", "machine"));
+        add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
+        add(new RarityLabel(card == null ? null : card.rarity));
+    }
 }

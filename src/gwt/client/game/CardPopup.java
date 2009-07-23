@@ -78,7 +78,7 @@ public class CardPopup extends DataPopup<Card>
             msg = "You have completed the <b>" + card.getSeries().name + "</b> series!";
         }
         if (msg != null) {
-            contents.add(Widgets.newHTML(msg, "Info"));
+            contents.add(Widgets.newHTML(msg, "Status"));
         }
 
         Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {

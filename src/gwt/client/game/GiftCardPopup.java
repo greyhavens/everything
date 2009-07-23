@@ -98,7 +98,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6, null);
         return Widgets.newFlowPanel(
-            Widgets.newScrollPanel(grid, -1, 80),
+            Widgets.newScrollPanelY(grid, 400),
             Widgets.newFlowPanel("Buttons", new Button("Never Mind", onHide())));
     }
 

@@ -21,6 +21,7 @@ public class RarityLabel extends Label
     {
         setStyleName("Rarity");
         addStyleName("inline");
+        addStyleName("machine");
         if (rarity == null) {
             setText(label + "?");
         } else {

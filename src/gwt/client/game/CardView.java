@@ -26,18 +26,23 @@ public abstract class CardView extends FlowPanel
      */
     public static Widget create (Card card)
     {
-        FlashBuilder fb = new FlashBuilder("card", "info_card");
-        fb.addOr("title", card.thing.name, "?");
-        fb.add("category", Category.getHierarchy(card.categories));
-        fb.addIf("image", card.thing.image);
-        fb.add("rarity", "Rarity: " + card.thing.rarity + " - Σ" + card.thing.rarity.value);
-        fb.add("series", (card.position+1) + " of " + card.things);
-        fb.add("descrip", card.thing.descrip);
-        fb.add("facts", card.thing.facts);
-        fb.add("from", (card.giver == null) ? "" : "A gift from " + card.giver);
-        fb.add("date", "Received on: " + _dfmt.format(card.created));
-        fb.add("source", card.thing.source);
-        return fb.build(560, 380, false);
+        SmartTable box = new SmartTable("cardView", 0, 0);
+        box.setWidget(0, 0, new CardView.Left(card), 1, "Left");
+        box.setWidget(0, 1, Widgets.newShim(5, 5));
+        box.setWidget(0, 2, new CardView.Right(card), 1, "Right");
+        return box;
+//         FlashBuilder fb = new FlashBuilder("card", "info_card");
+//         fb.addOr("title", card.thing.name, "?");
+//         fb.add("category", Category.getHierarchy(card.categories));
+//         fb.addIf("image", card.thing.image);
+//         fb.add("rarity", "Rarity: " + card.thing.rarity + " - Σ" + card.thing.rarity.value);
+//         fb.add("series", (card.position+1) + " of " + card.things);
+//         fb.add("descrip", card.thing.descrip);
+//         fb.add("facts", card.thing.facts);
+//         fb.add("from", (card.giver == null) ? "" : "A gift from " + card.giver);
+//         fb.add("date", "Received on: " + _dfmt.format(card.created));
+//         fb.add("source", card.thing.source);
+//         return fb.build(560, 380, false);
     }
 
     protected static String nameSource (String source)
@@ -71,9 +76,9 @@ public abstract class CardView extends FlowPanel
     {
         public Left (Card card)
         {
-            add(Widgets.newLabel(card.thing.name, "Title", getTitleSize(card.thing.name)));
-            add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                 getCategoriesSize(card.categories)));
+            add(Widgets.newLabel(card.thing.name, "Title",
+                                 getTitleSize(card.thing.name), "machine"));
+            add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
             add(ImageUtil.getImageBox(card.thing.image));
             add(Widgets.newFlowPanel("Metrics", new RarityLabel("Rarity: ", card.thing.rarity),
                                      new CoinLabel(" - ", card.thing.rarity.value)));
@@ -84,16 +89,18 @@ public abstract class CardView extends FlowPanel
     {
         public Right (Card card)
         {
-            add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
-            add(Widgets.newLabel(card.thing.descrip, "Descrip"));
-            add(Widgets.newLabel("Facts:", "FactsTitle"));
-            add(Widgets.newHTML(formatFacts(card.thing.facts), "Facts"));
+            add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
+                                 getCategoriesSize(card.categories), "machine"));
+            add(Widgets.newFlowPanel(
+                    "Info", Widgets.newLabel(card.thing.descrip, "handwriting"),
+                    Widgets.newLabel("Facts:", "FactsTitle", "machine"),
+                    Widgets.newHTML(formatFacts(card.thing.facts), "handwriting")));
             add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
-                                nameSource(card.thing.source) + "</a>", "Source"));
-            if (card.giver != null) {
-                add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
-            }
-            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
+                                nameSource(card.thing.source) + "</a>", "Source", "machine"));
+//             if (card.giver != null) {
+                add(Widgets.newLabel("A gift from " + card.giver, "Giver", "machine"));
+//             }
+            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When", "machine"));
         }
     }
 

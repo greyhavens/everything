@@ -6,29 +6,30 @@
 .imageBox {
   width: 250px;
   height: 300px;
-  margin: 10px 15px;
+  margin: 5px 15px;
 }
 
 .miniImageBox {
-  width: 125px;
-  height: 150px;
+  width: 115px;
+  height: 100px;
   margin: 5px 5px;
 }
 
 .miniImageBox .gwt-Image {
-  max-width: 125px;
-  max-height: 150px;
+  max-width: 83px;
+  max-height: 100px;
 }
 
 .imageBox .gwt-Image, .miniImageBox .gwt-Image {
   display: block;
+  border: 1px solid #442D17;
 }
 
 /** CardView styles */
 .cardView {
+  background: url(images/info_card.png);
+  width: 560px;
   height: 380px;
-  border: 1px solid;
-  padding: 5px;
   font-size: 15px;
 }
 
@@ -36,10 +37,13 @@
   width: 280px;
 }
 
-.cardView .Title, .cardView .Position, .cardView .Categories, .cardView .Metrics {
+.cardView .Title, .cardView .Position, .cardView .Metrics {
   text-align: center;
 }
 
+.cardView .Title {
+  height: 28px;
+}
 .cardView .NormalTitle {
   font-size: 24px;
 }
@@ -57,48 +61,51 @@
   font-size: 13px;
 }
 
-.cardView .Position, .cardView .Metrics {
+.cardView .Position {
+  font-size: 12px;
+  height: 16px;
+}
+.cardView .Metrics {
   font-size: 14px;
+  height: 18px;
 }
 
-.cardView .Descrip {
+.cardView .Info {
   margin: 10px 0px;
+  height: 270px;
+  font-size: 18px;
 }
 
 .cardView .FactsTitle {
   font-weight: bold;
 }
 
-.cardView .Facts ul {
+.cardView .Info ul {
   margin: 10px 0px;
   padding-left: 25px;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Source {
   font-style: italic;
-  margin: 10px 0px;
 }
 
 /** ThingCardView styles */
 .thingCard {
-  border: 1px solid;
   text-align: center;
+  width: 125px;
+  height: 150px;
 }
 
-.thingCard .Name, .thingCard .Rarity {
-  font-weight: bold;
-  margin-top: 4px;
+.thingCardFront {
+  background: url(images/card_front.png);
 }
 
-.microCard .miniImageBox {
-  width: 83px;
-  height: 100px;
-  margin: 5px auto;
+.thingCardBack {
+  background: url(images/card_back.png);
 }
 
-.microCard .miniImageBox .gwt-Image {
-  max-width: 83px;
-  max-height: 100px;
+.thingCard .Name {
+  padding-top: 4px;
 }
 
 /** HeaderPanel styles */
@@ -173,13 +180,18 @@
 }
 
 /** CardPopup styles */
-.card .Title {
+.card {
+  border: none;
+  padding: 0px;
+}
+
+.card .Header {
   font-size: 18px;
   text-align: center;
   padding-bottom: 5px;
 }
 
-.card .Info {
+.card .Status {
   text-align: center;
 }
 

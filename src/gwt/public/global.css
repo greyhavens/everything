@@ -2,6 +2,42 @@
  * $Id$
  */
 
+/** Font definitions */
+@font-face {  
+  font-family: "Handwriting";  
+  src: local("Freestyle Script"), url(freescript.ttf);  
+}  
+
+@font-face {  
+  font-family: "Handwriting Bold";
+  src: local("Freestyle Script"), url(freescript.ttf);  
+  font-weight: bold;  
+}  
+
+@font-face {  
+  font-family: "Machine Bold";
+  src: local("Copperplate Gothic Bold"), url(copper.ttf);  
+  font-weight: bold;  
+}  
+
+.machine {
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
+  font-weight: bold;
+  color: #442D17;
+}
+
+.handwriting {
+  font-family: Handwriting, Trebuchet MS, serif;
+  color: #442D17;
+}
+
+.handwritingb {
+  font-family: Handwriting Vold, Trebuchet MS, serif;
+  font-weight: bold;
+  color: #442D17;
+}
+
+/** Global page definitions. */
 html, body {
   margin: 0px;
   border: none;

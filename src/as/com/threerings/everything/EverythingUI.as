@@ -12,6 +12,7 @@ import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.system.ApplicationDomain;
 import flash.text.TextField;
+import flash.text.TextFormat;
 
 import com.threerings.util.MultiLoader;
 
@@ -110,8 +111,9 @@ public class EverythingUI extends Sprite
         if (_clip[name] == null) {
             trace("Missing '" + name + "' component. Can't set text.");
         } else {
-            _clip[name].embedFonts = true;
-            _clip[name].text = text;
+            // _clip[name].embedFonts = true;
+            // _clip[name].text = text;
+            _clip[name].htmlText = "<font face='handwriting'>" + text + "</font>";
             // trace("Set " + name + " to " + text + " (" + _clip[name].defaultTextFormat + ")");
         }
     }
