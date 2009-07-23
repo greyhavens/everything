@@ -8,9 +8,9 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 
@@ -41,9 +41,46 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
     protected void init (List<FeedItem> items)
     {
         for (FeedItem item : items) {
-            add(new FeedItemLabel(item));
+            add(formatItem(item));
         }
         XFBML.parse(this);
+    }
+
+    protected Widget formatItem (FeedItem item)
+    {
+        FlowPanel action = Widgets.newFlowPanel("Action");
+        action.add(Args.createInlink(getName(item.actor, true),
+                                     Page.BROWSE, item.actor.userId));
+        String objmsg;
+        switch (item.type) {
+        case FLIPPED:
+            objmsg = format(item.objects, "card", "cards");
+            action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
+            break;
+        case GIFTED:
+            objmsg = format(item.objects, "card", "cards");
+            action.add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
+            action.add(Args.createInlink(getName(item.target, false),
+                                         Page.BROWSE, item.target.userId));
+            String post = (item.message == null) ? "." :
+                ". " + item.actor.name + " said \"" + item.message + "\"";
+            action.add(Widgets.newInlineLabel(post));
+            break;
+        case COMMENT:
+            action.add(Widgets.newInlineLabel(" commented on your category "));
+            action.add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
+            break;
+        case COMPLETED:
+            objmsg = format(item.objects, "series", "series");
+            action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
+            break;
+        default:
+            action.add(Widgets.newInlineLabel(" did something mysterious."));
+            break;
+        }
+        action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
+        return Widgets.newRow(HasAlignment.ALIGN_TOP, "Item",
+                              XFBML.newProfilePic(item.actor.facebookId), action);
     }
 
     protected String getName (PlayerName name, boolean capital)
@@ -51,60 +88,20 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         return _ctx.getMe().equals(name) ? (capital ? "You" : "you") : name.toString();
     }
 
-    protected class FeedItemLabel extends SmartTable
+    protected String format (List<String> objects, String what, String pwhat)
     {
-        public FeedItemLabel (FeedItem item) {
-            super("Item", 5, 0);
-            setWidget(0, 0, XFBML.newProfilePic(item.actor.facebookId));
-            getFlexCellFormatter().setRowSpan(0, 0, 2);
-            FlowPanel action = new FlowPanel();
-            action.add(Args.createInlink(getName(item.actor, true),
-                                         Page.BROWSE, item.actor.userId));
-            String objmsg;
-            switch (item.type) {
-            case FLIPPED:
-                objmsg = format(item.objects, "card", "cards");
-                action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
-                break;
-            case GIFTED:
-                objmsg = format(item.objects, "card", "cards");
-                action.add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
-                action.add(Args.createInlink(getName(item.target, false),
-                                      Page.BROWSE, item.target.userId));
-                String post = (item.message == null) ? "." :
-                    ". " + item.actor.name + " said \"" + item.message + "\"";
-                action.add(Widgets.newInlineLabel(post));
-                break;
-            case COMMENT:
-                action.add(Widgets.newInlineLabel(" commented on your category "));
-                action.add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
-                break;
-            case COMPLETED:
-                objmsg = format(item.objects, "series", "series");
-                action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
-                break;
-            default:
-                action.add(Widgets.newInlineLabel(" did something mysterious."));
-                break;
+        StringBuffer buf = new StringBuffer();
+        for (Iterator<String> iter = objects.iterator(); iter.hasNext(); ) {
+            String object = iter.next();
+            if (buf.length() > 0) {
+                buf.append(", ");
             }
-            setWidget(0, 1, action, 1, "Action");
-            setText(1, 0, DateUtil.formatDateTime(item.when), 1, "When");
-        }
-
-        protected String format (List<String> objects, String what, String pwhat) {
-            StringBuffer buf = new StringBuffer();
-            for (Iterator<String> iter = objects.iterator(); iter.hasNext(); ) {
-                String object = iter.next();
-                if (buf.length() > 0) {
-                    buf.append(", ");
-                }
-                if (!iter.hasNext() && objects.size() > 1) { // yay for English!
-                    buf.append("and ");
-                }
-                buf.append("<b>").append(object).append("</b>");
+            if (!iter.hasNext() && objects.size() > 1) { // yay for English!
+                buf.append("and ");
             }
-            return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
+            buf.append("<b>").append(object).append("</b>");
         }
+        return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
     }
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);

@@ -200,11 +200,11 @@
 
 /** FeedPanel styles */
 .feed .Item .Action {
-  vertical-align: bottom;                      
+  padding-top: 3px;
 }
+
 .feed .Item .When {
   font-style: italic;
-  vertical-align: top;
 }
 
 /** GridPanel styles */
