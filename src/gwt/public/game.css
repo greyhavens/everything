@@ -156,7 +156,7 @@
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
 }
 
-.grid table {
+.grid > table {
   width: 100%;
 }
 
