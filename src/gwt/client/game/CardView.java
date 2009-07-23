@@ -68,7 +68,7 @@ public abstract class CardView extends FlowPanel
 
     protected static String formatFacts (String facts)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("<ul>");
         for (String bit : facts.split("\n")) {
             buf.append("<li>").append(bit).append("</li>");

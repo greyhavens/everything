@@ -90,7 +90,7 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
 
     protected String format (List<String> objects, String what, String pwhat)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (Iterator<String> iter = objects.iterator(); iter.hasNext(); ) {
             String object = iter.next();
             if (buf.length() > 0) {

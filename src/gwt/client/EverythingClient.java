@@ -9,9 +9,10 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
@@ -76,7 +77,8 @@ public class EverythingClient
             _content = null;
         }
         if (content != null) {
-            _content = Widgets.newSimplePanel("content", content);
+            _content = Widgets.newFlowPanel(Widgets.newSimplePanel("content", content),
+                                            Widgets.newImage("images/page_cap.png", "endcap"));
             RootPanel.get(CLIENT_DIV).add(_content);
         }
     }
@@ -182,7 +184,7 @@ public class EverythingClient
 
     protected Widget getContent ()
     {
-        return _content == null ? null : _content.getWidget();
+        return _content == null ? null : _content.getWidget(0);
     }
 
     protected static native int getTimezoneOffset () /*-{
@@ -198,7 +200,7 @@ public class EverythingClient
     protected Value<News> _news;
 
     protected HeaderPanel _header;
-    protected SimplePanel _content;
+    protected FlowPanel _content;
     protected PopupStack _pstack = new PopupStack();
 
     protected CategoriesModel _catsmodel = new CategoriesModel(this);

@@ -125,6 +125,8 @@ fb\:profile-pic img {
   background: url(images/page_repeat.png) repeat-y;
 }
 
+.endcap {
+}
 .page {
   padding: 5px 15px;
   min-height: 500px;

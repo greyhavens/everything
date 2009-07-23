@@ -46,7 +46,7 @@ public class LandingPanel extends FlowPanel
 
     protected static String formatNews (String text)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         boolean inList = false;
         for (String line : text.split("\n")) {
             if (line.startsWith("* ")) {

@@ -57,7 +57,7 @@ public class Args
      */
     public static String createLinkToken (Page page, Object... args)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(page);
         for (Object arg : args) {
             buf.append(SEPARATOR);
