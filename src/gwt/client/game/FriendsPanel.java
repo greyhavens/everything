@@ -6,6 +6,7 @@ package client.game;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.HasAlignment;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
@@ -16,6 +17,7 @@ import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.FriendStatus;
 
 import client.ui.DataPanel;
+import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
 
@@ -34,16 +36,26 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
     protected void init (List<FriendStatus> friends)
     {
         SmartTable table = new SmartTable(5, 0);
+        table.setWidth("100%");
         if (friends.size() == 0) {
             table.setText(0, 0, "You have no friends. This makes us sad.");
             table.setText(1, 0, "Soon we'll provide a way to invite your Facebook friends " +
                           "to come and play!");
-        } else {
-            table.setText(0, 0, "Friend", 1, "machine");
-            table.setText(0, 1, "Last played", 1, "machine");
-            for (FriendStatus friend : friends) {
-                int row = table.addWidget(Args.createInlink(friend.name), 1, null);
-                table.setText(row, 1, DateUtil.formatDateTime(friend.lastSession));
+            return;
+        }
+
+        table.setText(0, 0, "Your Everything friends and when they last played.", 6);
+        int row = 1, col = 0;
+        for (FriendStatus friend : friends) {
+            table.setWidget(row, 2*col, XFBML.newProfilePic(friend.name.facebookId));
+            table.getFlexCellFormatter().setRowSpan(row, 2*col, 2);
+            table.getFlexCellFormatter().setHorizontalAlignment(
+                row, 2*col, HasAlignment.ALIGN_RIGHT);
+            table.setWidget(row, 2*col+1, Args.createInlink(friend.name));
+            table.setText(row+1, col, DateUtil.formatDateTime(friend.lastSession));
+            if (++col == 3) {
+                row += 2;
+                col = 0;
             }
         }
         add(table);
