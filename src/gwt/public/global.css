@@ -23,17 +23,13 @@
 .machine {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-weight: bold;
-  color: #442D17;
 }
 
 .handwriting {
   font-family: Handwriting, Trebuchet MS, serif;
-  color: #442D17;
 }
 
-.handwritingb {
-  font-family: Handwriting Vold, Trebuchet MS, serif;
-  font-weight: bold;
+.machine, .handwriting, .machine a, .handwriting a { 
   color: #442D17;
 }
 
