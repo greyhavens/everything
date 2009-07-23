@@ -106,7 +106,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         contents.getFlexCellFormatter().setRowSpan(0, 1, 2);
 
         // this is where we'll stuff player details
-        final SimplePanel details = Widgets.newSimplePanel(null, "Details");
+        final SimplePanel details = Widgets.newSimplePanel("Details", null);
 
         // display our find player interface
         final TextBox search = Widgets.newTextBox("", 128, 20);

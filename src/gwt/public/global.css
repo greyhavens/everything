@@ -109,3 +109,13 @@ html, body {
   font-size: 17px;
   padding: 10px 20px 0px;
 }
+
+/** Shared page styles */
+.content {
+  width: 760px;
+  background: url(images/page_flip.png);
+}
+
+.page {
+  padding: 5px 15px;
+}

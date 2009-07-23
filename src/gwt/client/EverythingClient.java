@@ -75,7 +75,7 @@ public class EverythingClient
             _content = null;
         }
         if (content != null) {
-            _content = content;
+            _content = Widgets.newSimplePanel("content", content);
             RootPanel.get(CLIENT_DIV).add(_content);
         }
     }
