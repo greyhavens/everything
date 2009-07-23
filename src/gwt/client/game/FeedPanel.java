@@ -8,7 +8,9 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 
@@ -17,6 +19,7 @@ import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PlayerName;
 
+import client.ui.XFBML;
 import client.ui.DataPanel;
 import client.util.Args;
 import client.util.Context;
@@ -37,15 +40,10 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
     @Override // from DataPanel
     protected void init (List<FeedItem> items)
     {
-        String date = "Today";
         for (FeedItem item : items) {
-            String idate = DateUtil.formatDate(item.when);
-            if (!idate.equals(date)) {
-                add(Widgets.newLabel(idate, "Date"));
-                date = idate;
-            }
             add(new FeedItemLabel(item));
         }
+        XFBML.parse(this);
     }
 
     protected String getName (PlayerName name, boolean capital)
@@ -53,38 +51,44 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         return _ctx.getMe().equals(name) ? (capital ? "You" : "you") : name.toString();
     }
 
-    protected class FeedItemLabel extends FlowPanel
+    protected class FeedItemLabel extends SmartTable
     {
         public FeedItemLabel (FeedItem item) {
-            setStyleName("Item");
-            add(Args.createInlink(getName(item.actor, true), Page.BROWSE, item.actor.userId));
+            super("Item", 5, 0);
+            setWidget(0, 0, XFBML.newProfilePic(item.actor.facebookId));
+            getFlexCellFormatter().setRowSpan(0, 0, 2);
+            FlowPanel action = new FlowPanel();
+            action.add(Args.createInlink(getName(item.actor, true),
+                                         Page.BROWSE, item.actor.userId));
             String objmsg;
             switch (item.type) {
             case FLIPPED:
                 objmsg = format(item.objects, "card", "cards");
-                add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
+                action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
                 break;
             case GIFTED:
                 objmsg = format(item.objects, "card", "cards");
-                add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
-                add(Args.createInlink(getName(item.target, false),
+                action.add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
+                action.add(Args.createInlink(getName(item.target, false),
                                       Page.BROWSE, item.target.userId));
                 String post = (item.message == null) ? "." :
                     ". " + item.actor.name + " said \"" + item.message + "\"";
-                add(Widgets.newInlineLabel(post));
+                action.add(Widgets.newInlineLabel(post));
                 break;
             case COMMENT:
-                add(Widgets.newInlineLabel(" commented on your category "));
-                add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
+                action.add(Widgets.newInlineLabel(" commented on your category "));
+                action.add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
                 break;
             case COMPLETED:
                 objmsg = format(item.objects, "series", "series");
-                add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
+                action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
                 break;
             default:
-                add(Widgets.newInlineLabel(" did something mysterious."));
+                action.add(Widgets.newInlineLabel(" did something mysterious."));
                 break;
             }
+            setWidget(0, 1, action, 1, "Action");
+            setText(1, 0, DateUtil.formatDateTime(item.when), 1, "When");
         }
 
         protected String format (List<String> objects, String what, String pwhat) {

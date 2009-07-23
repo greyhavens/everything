@@ -45,6 +45,15 @@ public class XFBML
     }
 
     /**
+     * Returns a profile picture for the specified user, which links to their profile.
+     */
+    public static Widget newProfilePic (long facebookId)
+    {
+        // TODO: wrap this in a link to their profile: http://www.facebook.com/people/fbid
+        return newTag("profile-pic", "uid", ""+facebookId, "linked", "false");
+    }
+
+    /**
      * Parses the XFBML widgets in the supplied DOM tree rooted at the specified element.
      */
     public static void parse (Widget root)

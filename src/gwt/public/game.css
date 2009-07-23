@@ -38,7 +38,6 @@
   height: 451px;
   font-size: 15px;
   padding: 2px 5px 6px 3px;
-  padding: 0px 20px;
 }
 
 .cardViewTall {
@@ -46,8 +45,13 @@
   height: 501px;
 }
 
-.cardView .Left, .cardView .Right {
-  width: 280px;
+.cardView .Left {
+  width: 282px;
+  padding: 0px 8px 0px 13px;
+}
+.cardView .Right {
+  width: 295px;
+  padding-right: 5px;
 }
 
 .cardView .Header {
@@ -83,7 +87,6 @@
 
 .cardView .Categories {
   padding-top: 10px;
-  white-space: nowrap;
   width: 280px;
 }
 .cardView .NormalCategories {
@@ -104,6 +107,7 @@
 
 .cardView .Info {
   margin: 20px 0px 10px 0px;
+  width: 290px;
   height: 280px;
   overflow: auto;
 }
@@ -118,7 +122,7 @@
   padding-left: 25px;
 }
 
-.cardView .When, .cardView .Giver, .cardView .Source, .cardView .Info {
+.cardView .When, .cardView .Giver, .cardView .Info {
   font-size: 18px;
 }
 
@@ -195,12 +199,12 @@
 }
 
 /** FeedPanel styles */
-.feed .Date {
-  font-style: italic;
+.feed .Item .Action {
+  vertical-align: bottom;                      
 }
-
-.feed .Item {
-  padding: 2px 0px;
+.feed .Item .When {
+  font-style: italic;
+  vertical-align: top;
 }
 
 /** GridPanel styles */

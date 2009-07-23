@@ -35,7 +35,6 @@ public abstract class CardView extends FlowPanel
             box.addStyleName("cardViewTall");
         }
         box.setWidget(row, 0, new CardView.Left(card), 1, "Left");
-        box.setWidget(row, 1, Widgets.newShim(5, 5));
         box.setWidget(row++, 2, new CardView.Right(card), 1, "Right");
         if (header != null) { // if we have a header, we always need a status
             box.setHTML(row++, 0, StringUtil.getOr(status, ""), 3, "Status", "machine");
@@ -60,6 +59,11 @@ public abstract class CardView extends FlowPanel
         } else {
             return source.substring(ssidx+2, eidx);
         }
+    }
+
+    protected static String sourceLink (String source)
+    {
+        return "<a target=\"_blank\" href=\"" + source + "\">" + nameSource(source) + "</a>";
     }
 
     protected static String formatFacts (String facts)
@@ -96,9 +100,9 @@ public abstract class CardView extends FlowPanel
             add(Widgets.newFlowPanel(
                     "Info", Widgets.newLabel(card.thing.descrip, "handwriting"),
                     Widgets.newLabel("Facts:", "FactsTitle", "machine"),
-                    Widgets.newHTML(formatFacts(card.thing.facts), "handwriting")));
-            add(Widgets.newHTML("Source: <a target=\"_blank\" href=\"" + card.thing.source + "\">" +
-                                nameSource(card.thing.source) + "</a>", "Source", "handwriting"));
+                    Widgets.newHTML(formatFacts(card.thing.facts), "handwriting"),
+                    Widgets.newHTML("Source: " + sourceLink(card.thing.source),
+                                    "Source", "handwriting")));
             if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver, "Giver", "handwriting"));
             }

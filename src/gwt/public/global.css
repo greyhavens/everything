@@ -67,6 +67,11 @@ html, body {
   white-space: nowrap;
 }
 
+/** FBML styles */
+fb\:profile-pic img {
+  border: 1px solid #442D17;
+}
+
 /** DataPopup styles */
 .popup {
   border: 1px solid;
