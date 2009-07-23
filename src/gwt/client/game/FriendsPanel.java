@@ -39,8 +39,8 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
             table.setText(1, 0, "Soon we'll provide a way to invite your Facebook friends " +
                           "to come and play!");
         } else {
-            table.setText(0, 0, "Friend");
-            table.setText(0, 1, "Last played");
+            table.setText(0, 0, "Friend", 1, "machine");
+            table.setText(0, 1, "Last played", 1, "machine");
             for (FriendStatus friend : friends) {
                 int row = table.addWidget(Args.createInlink(friend.name), 1, null);
                 table.setText(row, 1, DateUtil.formatDateTime(friend.lastSession));

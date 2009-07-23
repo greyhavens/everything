@@ -114,6 +114,7 @@
 
 .landing .Title {
   font-size: 18px;
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-weight: bold;
 }
 
@@ -143,6 +144,7 @@
 /** GridPanel styles */
 .grid {
   width: 585px;
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
 }
 
 .grid table {
@@ -203,10 +205,14 @@
 }
 
 /** ShopPanel styles */
+.shop {
+}
+
 .shop .Header {
   font-size: 18px;
 }
 
 .shop .Header, .shop .Name {
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-weight: bold;
 }

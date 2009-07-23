@@ -38,7 +38,7 @@ html, body {
   margin: 0px;
   border: none;
   padding: 0px;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Times, Times New Roman, serif;
   font-size: 14px;
 }
 
@@ -118,4 +118,6 @@ html, body {
 
 .page {
   padding: 5px 15px;
+  color: #442D17;
+  min-height: 500px;
 }

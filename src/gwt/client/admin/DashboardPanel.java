@@ -64,7 +64,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
 
         // set up our thing database stats
         FlowPanel stats = new FlowPanel();
-        stats.add(Widgets.newLabel("ThingStats", "Header"));
+        stats.add(Widgets.newLabel("Thing Stats", "Header"));
         stats.add(Widgets.newLabel("Total things: " + data.stats.totalThings, null));
         stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories, null));
         stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
