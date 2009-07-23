@@ -11,6 +11,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
@@ -147,10 +148,10 @@ public class EverythingClient
         case SHOP: setContent(new ShopPanel(this)); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
         case EDIT_CATS:
-            if (!(_content instanceof EditCatsPanel)) {
+            if (!(getContent() instanceof EditCatsPanel)) {
                 setContent(new EditCatsPanel(this));
             }
-            ((EditCatsPanel)_content).setArgs(args);
+            ((EditCatsPanel)getContent()).setArgs(args);
             break;
         case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
         case DASHBOARD: setContent(new DashboardPanel(this, _news)); break;
@@ -179,6 +180,11 @@ public class EverythingClient
         setContent(Widgets.newLabel(message, "infoLabel"));
     }
 
+    protected Widget getContent ()
+    {
+        return _content == null ? null : _content.getWidget();
+    }
+
     protected static native int getTimezoneOffset () /*-{
         return new Date().getTimezoneOffset();
     }-*/;
@@ -192,7 +198,7 @@ public class EverythingClient
     protected Value<News> _news;
 
     protected HeaderPanel _header;
-    protected Widget _content;
+    protected SimplePanel _content;
     protected PopupStack _pstack = new PopupStack();
 
     protected CategoriesModel _catsmodel = new CategoriesModel(this);
