@@ -157,6 +157,12 @@
   width: 105px;
   z-index: 2;
 }
+.thingCard .NormalName {
+  font-size: 14px;
+}
+.thingCard .LongName {
+  font-size: 12px;
+}
 
 .thingCard .miniImageBox {
   position: absolute;

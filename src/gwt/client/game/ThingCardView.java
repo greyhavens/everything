@@ -30,7 +30,8 @@ public class ThingCardView extends FlowPanel
         addStyleName(back ? "thingCardBack" : "thingCardFront");
 
         String name = (card == null || card.name == null) ? "?" : card.name;
-        add(Widgets.newLabel(name, "Name", back ? "machine" : "handwriting"));
+        String nameStyle = (name.length() > (back ? 12 : 15)) ? "LongName" : "NormalName";
+        add(Widgets.newLabel(name, "Name", nameStyle, back ? "machine" : "handwriting"));
         add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
         add(new RarityLabel(card == null ? null : card.rarity));
     }
