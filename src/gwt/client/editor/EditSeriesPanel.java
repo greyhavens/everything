@@ -62,9 +62,9 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
     {
         // add some metadata at the top
         final Category series = result.categories[result.categories.length-1];
-        add(Widgets.newLabel(Category.getHierarchy(result.categories), "Header"));
+        add(Widgets.newLabel(Category.getHierarchy(result.categories), "Header", "handwriting"));
 
-        SmartTable info = new SmartTable(5, 0);
+        SmartTable info = new SmartTable("handwriting", 5, 0);
         add(info);
         int row = 0;
         info.setText(row, 0, "Creator:");
@@ -146,7 +146,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
         }
 
         // finally add a UI for creating new things
-        add(Widgets.newHTML("Add Things", "Header"));
+        add(Widgets.newHTML("Add Things", "Header", "machine"));
         final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
         DefaultTextListener.configure(thing, "<new thing name>");
         Button create = new Button("Add Thing");

@@ -52,6 +52,9 @@ public class EditCatsPanel extends SmartTable
             getFlexCellFormatter().setVerticalAlignment(0, col, HasAlignment.ALIGN_TOP);
         }
 
+        setHTML(1, 0, "Click the <img src='images/folder.png'> icon to move or delete an entry.",
+                3, "handwriting");
+
         _ctx = ctx;
         _cats.setChild(_subcats);
         _subcats.setChild(_series);
@@ -82,7 +85,8 @@ public class EditCatsPanel extends SmartTable
     {
         public Column (String header, int level) {
             setStyleName("Column");
-            add(Widgets.newLabel(header, "Header"));
+            addStyleName("handwriting");
+            add(Widgets.newLabel(header, "Header", "machine"));
             _level = level;
             add(_input = Widgets.newTextBox("", Category.MAX_NAME_LENGTH, 15));
             add(_contents = Widgets.newFlowPanel("List"));
@@ -321,12 +325,12 @@ public class EditCatsPanel extends SmartTable
         protected boolean _resolved;
     }
 
-    protected Column _cats = new Column("Categories", 0) {
+    protected Column _cats = new Column("Category", 0) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, row.cat.categoryId));
         }
     };
-    protected Column _subcats = new Column("Sub-categories", 1) {
+    protected Column _subcats = new Column("Sub-category", 1) {
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_CATS, _cats.getSelectedId(),
                                       row.cat.categoryId));
