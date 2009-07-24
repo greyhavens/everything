@@ -5,8 +5,8 @@ package client.game;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
@@ -39,7 +39,6 @@ public class CardPopup extends DataPopup<Card>
     public CardPopup (Context ctx, CardIdent ident, Value<String> status)
     {
         this(ctx, status);
-        _doneLabel = "Close"; // we're viewing something from our collection
         _gamesvc.getCard(ident, createCallback());
     }
 
@@ -49,7 +48,6 @@ public class CardPopup extends DataPopup<Card>
         _title = "You got the <b>" + result.card.thing.name + "</b> card!";
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
-        _doneLabel = "Keep"; // we're viewing a just flipped card
         setWidget(createContents(result.card));
     }
 
@@ -72,14 +70,14 @@ public class CardPopup extends DataPopup<Card>
             status = "You have completed the <b>" + card.getSeries().name + "</b> series!";
         }
 
-        Button gift = new Button("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+        PushButton gift = new PushButton("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
                 CardPopup.this.hide();
                 _status.update("Gifted!");
             }
         }));
 
-        Button sell = new Button("Sell");
+        PushButton sell = new PushButton("Sell");
         new ClickCallback<Integer>(sell) {
             protected boolean callService () {
                 _gamesvc.sellCard(card.thing.thingId, card.created.getTime(), this);
@@ -96,7 +94,7 @@ public class CardPopup extends DataPopup<Card>
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
-        Button done = new Button(_doneLabel, onHide());
+        PushButton done = new PushButton("Keep", onHide());
 
         if (_ctx.getMe().equals(card.owner)) {
             return CardView.create(card, _title, status, sell, gift, done);
@@ -105,7 +103,7 @@ public class CardPopup extends DataPopup<Card>
         }
     }
 
-    protected String _title, _doneLabel;
+    protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
     protected Value<String> _status;
 

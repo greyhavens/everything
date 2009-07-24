@@ -8,7 +8,7 @@ import java.util.Collections;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -72,14 +72,14 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             DefaultTextListener.configure(message, defmsg);
             message.setVisible(false);
             grid.setWidget(row, col+1, message);
-            final Button give = new Button("Give");
+            final PushButton give = new PushButton("Give");
             grid.setWidget(row, col+2, give);
             new ClickCallback<Void>(give, message) {
                 protected boolean callService () {
                     if (!message.isVisible()) {
                         message.setVisible(true);
                         center(); // recenter the popup
-                        give.setText("Send Gift");
+                        give.setText("Send");
                         return false;
                     }
                     String msg = DefaultTextListener.getText(message, defmsg);
@@ -104,7 +104,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         grid.addText(msg, 6);
         return Widgets.newFlowPanel(
             Widgets.newScrollPanelY(grid, 400),
-            Widgets.newFlowPanel("Buttons", new Button("Never Mind", onHide())));
+            Widgets.newFlowPanel("Buttons", new PushButton("Done", onHide())));
     }
 
     protected int _thingId;

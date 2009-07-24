@@ -5,7 +5,6 @@ package client.game;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,7 +26,7 @@ public abstract class CardView extends FlowPanel
     /**
      * Creates a view for the specified card.
      */
-    public static Widget create (Card card, String header, String status, Button... buttons)
+    public static Widget create (Card card, String header, String status, Widget... buttons)
     {
         SmartTable box = new SmartTable("cardView", 0, 0);
         box.addStyleName("handwriting");

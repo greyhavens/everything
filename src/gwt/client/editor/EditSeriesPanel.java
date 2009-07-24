@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -397,7 +398,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
         }
 
         protected SmartTable _ctrl;
-        protected Button _edit = new Button("Edit", new ClickHandler() {
+        protected PushButton _edit = new PushButton("Edit", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 setEditing(true);
             }

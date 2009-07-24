@@ -5,6 +5,7 @@ package client.game;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.PushButton;
 
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
@@ -42,7 +43,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
 
         table.setText(1, 0, "Powerup", 1, "Header");
         table.setText(1, 1, "Have", 1, "Header");
-        table.setText(1, 2, "Cost", 1, "Header");
+        table.setText(1, 2, "Cost", 2, "Header", "center");
 
         for (final Powerup type : Powerup.values()) {
             int row = table.addWidget(
@@ -55,7 +56,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
             if (type.charges > 1) {
                 table.setHTML(row, 3, "for " + type.charges);
             }
-            final Button buy = new Button("Buy");
+            final PushButton buy = new PushButton("Buy");
             table.setWidget(row, 4, buy);
             new ClickCallback<Void>(buy) {
                 protected boolean callService () {

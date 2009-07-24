@@ -56,14 +56,14 @@
 
 .cardView .Header {
   font-size: 20px;
-  height: 50px;
+  height: 40px;
 }
 
 .cardView .Status {
   height: 30px;
 }
 .cardView .Buttons {
-  height: 39px;
+  height: 46px;
   vertical-align: top;
 }
 
@@ -272,8 +272,8 @@
   font-weight: bold;
 }
 
-.giftCard .Buttons {
-  text-align: center;
+.giftCard .Buttons .gwt-PushButton {
+  margin: 0px auto;
 }
 
 /** ShopPanel styles */
