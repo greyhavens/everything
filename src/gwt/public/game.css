@@ -242,6 +242,10 @@
 }
 
 /** GiftCardPopup styles */
+.giftCard {
+  min-width: 600px;
+}
+
 .giftCard .Wishlist {
   font-weight: bold;
 }
