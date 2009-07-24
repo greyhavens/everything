@@ -88,6 +88,7 @@
 .cardView .Categories {
   padding-top: 10px;
   width: 280px;
+  font-weight: bold;
 }
 .cardView .NormalCategories {
   font-size: 15px;
@@ -106,9 +107,9 @@
 }
 
 .cardView .Info {
-  margin: 20px 0px 10px 0px;
+  margin: 10px 0px 10px 0px;
   width: 290px;
-  height: 280px;
+  height: 290px;
   overflow: auto;
 }
 
@@ -118,12 +119,12 @@
 }
 
 .cardView .Info ul {
-  margin: 10px 0px;
+  margin: 5px 0px;
   padding-left: 25px;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Info {
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .cardView .When, .cardView .Giver, .cardView .Source {

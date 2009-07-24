@@ -81,7 +81,7 @@ public abstract class CardView extends FlowPanel
         public Left (Card card)
         {
             SmartTable wrap = new SmartTable("Title", 0, 0);
-            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name), "machine");
+            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name), "handwriting");
             wrap.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
             add(wrap);
             add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
@@ -96,10 +96,10 @@ public abstract class CardView extends FlowPanel
         public Right (Card card)
         {
             add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                 getCategoriesSize(card.categories), "machine"));
+                                 getCategoriesSize(card.categories), "handwriting"));
             add(Widgets.newFlowPanel(
                     "Info", Widgets.newLabel(card.thing.descrip, "handwriting"),
-                    Widgets.newLabel("Facts:", "FactsTitle", "machine"),
+                    Widgets.newLabel("Facts:", "FactsTitle", "handwriting"),
                     Widgets.newHTML(formatFacts(card.thing.facts), "handwriting"),
                     Widgets.newHTML("Source: " + sourceLink(card.thing.source),
                                     "Source", "handwriting")));
