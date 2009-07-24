@@ -4,6 +4,7 @@
 package client.game;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -98,11 +99,13 @@ public abstract class CardView extends FlowPanel
         {
             add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
                                  getCategoriesSize(card.categories)));
-            add(Widgets.newFlowPanel(
-                    "Info", Widgets.newLabel(card.thing.descrip),
-                    Widgets.newLabel("Facts:", "FactsTitle"),
-                    Widgets.newHTML(formatFacts(card.thing.facts)),
-                    Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source")));
+            Widget info = Widgets.newFlowPanel(
+                "Info", Widgets.newLabel(card.thing.descrip),
+                Widgets.newLabel("Facts:", "FactsTitle"),
+                Widgets.newHTML(formatFacts(card.thing.facts)),
+                Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source"));
+            info.addStyleName(card.categories[0].name);
+            add(info);
             if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
             }

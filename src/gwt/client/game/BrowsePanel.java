@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.ValueLabel;
@@ -60,12 +61,16 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
                         cards.add(Widgets.newInlineLabel(" "));
                     }
                     final Value<Integer> owned = new Value<Integer>(card.owned);
-                    cards.add(Widgets.newActionLabel(card.name, "Series", new ClickHandler() {
+                    Widget name = Widgets.newActionLabel(card.name, "inline", new ClickHandler() {
                         public void onClick (ClickEvent event) {
                             showSeries(table, coll, card.categoryId, owned, row+1);
                         }
-                    }));
-                    cards.add(new ValueLabel<Integer>("Series", owned) {
+                    });
+                    if (card.owned == card.things) {
+                        name.addStyleName("Complete");
+                    }
+                    cards.add(name);
+                    cards.add(new ValueLabel<Integer>("Held", owned) {
                         protected String getText (Integer owned) {
                             return " (" + owned + " of " + card.things + ")";
                         }

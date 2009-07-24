@@ -111,6 +111,11 @@
   width: 290px;
   height: 290px;
   overflow: auto;
+  background: url(images/category/default.png) top center no-repeat;
+}
+
+.cardView .Animals {
+  background: url(images/category/animals.png) top center no-repeat;
 }
 
 .cardView .FactsTitle {
@@ -180,6 +185,7 @@
 /** LandingPanel styles */
 .landing {
   font-family: Times, Times New Roman, serif;
+  background: url(images/page_news.png) no-repeat;
 }
 
 .landing .Title {
@@ -194,12 +200,20 @@
 }
 
 /** BrowsePanel styles */
-.browse .Title {
+.browse {
   font-size: 16px;
+}
+
+.browse .Title {
   font-weight: bold;
 }
 
-.browse .Series {
+.browse .Complete {
+  font-weight: bold;
+}
+
+.browse .Held {
+  font-size: 14px;
   display: inline;
 }
 

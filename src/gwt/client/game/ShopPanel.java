@@ -48,7 +48,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
             int row = table.addWidget(
                 Widgets.newFlowPanel(Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
                                      Widgets.newLabel(Messages.xlate(type + "_descrip"),
-                                                      "tipLabel", "handwriting")), 1);
+                                                      "handwriting")), 1);
             table.setWidget(row, 1, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
                             1, "right");
             table.setWidget(row, 2, new CoinLabel(type.cost), 1, "right");

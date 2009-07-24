@@ -59,6 +59,7 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
             }
         }
         add(table);
+        XFBML.parse(this);
     }
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
