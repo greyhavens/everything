@@ -162,6 +162,7 @@
 }
 .thingCard .LongName {
   font-size: 12px;
+  line-height: 12px;
 }
 
 .thingCard .miniImageBox {
@@ -192,10 +193,6 @@
 }
 
 /** BrowsePanel styles */
-.browse {
-  font-family: Machine Bold, Helvetia, Arial, sans-serif;
-}
-
 .browse .Title {
   font-size: 16px;
   font-weight: bold;

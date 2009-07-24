@@ -41,10 +41,12 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
     @Override // from DataPanel
     protected void init (final PlayerCollection coll)
     {
-        final SmartTable table = new SmartTable(5, 0);
-        table.setWidget(0, 0, XFBML.newProfilePic(coll.owner.facebookId));
-        table.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
-        table.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
+        SmartTable header = new SmartTable("machine", 5, 0);
+        header.setWidget(0, 0, XFBML.newProfilePic(coll.owner.facebookId));
+        header.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
+        // header.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
+
+        final SmartTable table = new SmartTable("handwriting", 5, 0);
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
@@ -74,7 +76,9 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
                 table.getFlexCellFormatter().setVerticalAlignment(row, 1, HasAlignment.ALIGN_TOP);
             }
         }
+
         clear();
+        add(header);
         add(table);
         XFBML.parse(this);
     }

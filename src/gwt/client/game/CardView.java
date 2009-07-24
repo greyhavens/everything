@@ -29,6 +29,7 @@ public abstract class CardView extends FlowPanel
     public static Widget create (Card card, String header, String status, Button... buttons)
     {
         SmartTable box = new SmartTable("cardView", 0, 0);
+        box.addStyleName("handwriting");
         int row = 0;
         if (header != null) {
             box.setHTML(row++, 0, header, 3, "Header", "machine");
@@ -81,7 +82,7 @@ public abstract class CardView extends FlowPanel
         public Left (Card card)
         {
             SmartTable wrap = new SmartTable("Title", 0, 0);
-            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name), "handwriting");
+            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name));
             wrap.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
             add(wrap);
             add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
@@ -96,18 +97,16 @@ public abstract class CardView extends FlowPanel
         public Right (Card card)
         {
             add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                 getCategoriesSize(card.categories), "handwriting"));
+                                 getCategoriesSize(card.categories)));
             add(Widgets.newFlowPanel(
-                    "Info", Widgets.newLabel(card.thing.descrip, "handwriting"),
-                    Widgets.newLabel("Facts:", "FactsTitle", "handwriting"),
-                    Widgets.newHTML(formatFacts(card.thing.facts), "handwriting"),
-                    Widgets.newHTML("Source: " + sourceLink(card.thing.source),
-                                    "Source", "handwriting")));
+                    "Info", Widgets.newLabel(card.thing.descrip),
+                    Widgets.newLabel("Facts:", "FactsTitle"),
+                    Widgets.newHTML(formatFacts(card.thing.facts)),
+                    Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source")));
             if (card.giver != null) {
-                add(Widgets.newLabel("A gift from " + card.giver, "Giver", "handwriting"));
+                add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
             }
-            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created),
-                                 "When", "handwriting"));
+            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
         }
     }
 
