@@ -72,14 +72,15 @@ public class EverythingClient
     // from interface Context
     public void setContent (Widget content)
     {
-        if (_content != null) {
-            RootPanel.get(CLIENT_DIV).remove(_content);
+        if (_wrapper != null) {
+            RootPanel.get(CLIENT_DIV).remove(_wrapper);
+            _wrapper = null;
             _content = null;
         }
         if (content != null) {
-            _content = Widgets.newFlowPanel(Widgets.newSimplePanel("content", content),
+            _wrapper = Widgets.newFlowPanel(Widgets.newSimplePanel("content", _content = content),
                                             Widgets.newImage("images/page_cap.png", "endcap"));
-            RootPanel.get(CLIENT_DIV).add(_content);
+            RootPanel.get(CLIENT_DIV).add(_wrapper);
         }
     }
 
@@ -150,10 +151,10 @@ public class EverythingClient
         case SHOP: setContent(new ShopPanel(this)); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
         case EDIT_CATS:
-            if (!(getContent() instanceof EditCatsPanel)) {
+            if (!(_content instanceof EditCatsPanel)) {
                 setContent(new EditCatsPanel(this));
             }
-            ((EditCatsPanel)getContent()).setArgs(args);
+            ((EditCatsPanel)_content).setArgs(args);
             break;
         case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
         case DASHBOARD: setContent(new DashboardPanel(this, _news)); break;
@@ -182,11 +183,6 @@ public class EverythingClient
         setContent(Widgets.newLabel(message, "infoLabel"));
     }
 
-    protected Widget getContent ()
-    {
-        return _content == null ? null : _content.getWidget(0);
-    }
-
     protected static native int getTimezoneOffset () /*-{
         return new Date().getTimezoneOffset();
     }-*/;
@@ -200,7 +196,7 @@ public class EverythingClient
     protected Value<News> _news;
 
     protected HeaderPanel _header;
-    protected FlowPanel _content;
+    protected Widget _content, _wrapper;
     protected PopupStack _pstack = new PopupStack();
 
     protected CategoriesModel _catsmodel = new CategoriesModel(this);
