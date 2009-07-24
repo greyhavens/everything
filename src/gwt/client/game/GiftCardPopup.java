@@ -3,6 +3,8 @@
 
 package client.game;
 
+import java.util.Collections;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,6 +54,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     @Override // from DataPopup<GameService.GiftInfoResult>
     protected Widget createContents (GameService.GiftInfoResult result)
     {
+        Collections.sort(result.friends);
+
         SmartTable grid = new SmartTable(5, 0);
         grid.setWidth("100%");
         int row = 0, col = 0;
@@ -74,6 +78,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 protected boolean callService () {
                     if (!message.isVisible()) {
                         message.setVisible(true);
+                        center(); // recenter the popup
                         give.setText("Send Gift");
                         return false;
                     }

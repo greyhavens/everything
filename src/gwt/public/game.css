@@ -33,7 +33,7 @@
 
 /** CardView styles */
 .cardView {
-  background: url(images/info_card.png);
+  background: url(images/info_card.png) no-repeat;
   width: 611px;
   height: 451px;
   font-size: 15px;
@@ -41,7 +41,7 @@
 }
 
 .cardViewTall {
-  background: url(images/info_card_tall.png);
+  background: url(images/info_card_tall.png) no-repeat;
   height: 501px;
 }
 
