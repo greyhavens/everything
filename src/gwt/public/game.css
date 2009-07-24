@@ -190,6 +190,7 @@
 
 .landing .Text {
   margin: 5px 0px;
+  font-family: Handwriting, Trebuchet MS, serif;
 }
 
 /** BrowsePanel styles */
@@ -203,6 +204,10 @@
 }
 
 /** FeedPanel styles */
+.feed {
+  font-family: Handwriting, Trebuchet MS, serif;
+}
+
 .feed .Item .Action {
   padding-top: 3px;
 }

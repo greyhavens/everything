@@ -115,7 +115,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
         info.setWidget(row++, 1, Widgets.newRow(message, post));
 
         final FlowPanel comments = new FlowPanel();
-        info.setWidget(row++, 0, comments, 2, null);
+        info.setWidget(row++, 0, comments, 2);
         showComments(comments, result.comments, false);
 
         new ClickCallback<CategoryComment>(post, message) {
@@ -250,7 +250,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
                 }
             }));
         } else if (comments.size() == 0) {
-            combox.add(Widgets.newLabel("No comments.", null));
+            combox.add(Widgets.newLabel("No comments."));
         }
     }
 
@@ -288,7 +288,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             final TextBox imgurl = Widgets.newTextBox("", -1, 25);
             DefaultTextListener.configure(imgurl, "<paste image url, press enter>");
             tip = Widgets.newLabel("Or slurp one directly from the Internets", "tipLabel");
-            _ctrl.setWidget(row++, 2, Widgets.newFlowPanel(imgurl, tip), 2, null);
+            _ctrl.setWidget(row++, 2, Widgets.newFlowPanel(imgurl, tip), 2);
             new ClickCallback<String>(new Button("dummy"), imgurl) {
                 protected boolean callService () {
                     _editorsvc.slurpImage(imgurl.getText().trim(), this);
@@ -349,7 +349,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
                 }
             };
             _ctrl.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
-            _ctrl.setWidget(row++, 1, Widgets.newRow(cancel, delete, save), 3, null);
+            _ctrl.setWidget(row++, 1, Widgets.newRow(cancel, delete, save), 3);
                     
             final Timer updater = new Timer() {
                 @Override public void run () {

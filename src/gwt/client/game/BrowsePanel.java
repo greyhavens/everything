@@ -51,7 +51,7 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
                 String subcatname = subcat.getKey();
-                final int row = table.addText(catname, 1, null);
+                final int row = table.addText(catname, 1);
                 catname = ""; // subsequent rows don't repeat the same category
                 table.setText(row, 1, subcatname);
                 FlowPanel cards = new FlowPanel();
@@ -90,8 +90,7 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
             table.removeRow(_showingRow);
         }
         table.insertRow(row);
-        table.setWidget(
-            row, 0, new SeriesPanel(_ctx, coll.owner.userId, categoryId, owned), 3, null);
+        table.setWidget(row, 0, new SeriesPanel(_ctx, coll.owner.userId, categoryId, owned), 3);
         _showingRow = row;
     }
 

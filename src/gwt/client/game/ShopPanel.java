@@ -37,7 +37,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
         _ctx.getPupsModel().refresh(data.powerups);
 
         SmartTable table = new SmartTable(5, 0);
-        table.setWidget(0, 0, Widgets.newRow(Widgets.newLabel("You have:", null),
+        table.setWidget(0, 0, Widgets.newRow(Widgets.newLabel("You have:"),
                                              new CoinLabel(_ctx.getCoins())));
 
         table.setText(1, 0, "Powerup", 1, "Header");
@@ -48,7 +48,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
             int row = table.addWidget(
                 Widgets.newFlowPanel(
                     Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
-                    Widgets.newLabel(Messages.xlate(type + "_descrip"), "tipLabel")), 1, null);
+                    Widgets.newLabel(Messages.xlate(type + "_descrip"), "tipLabel")), 1);
             table.setWidget(row, 1, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
                             1, "right");
             table.setWidget(row, 2, new CoinLabel(type.cost), 1, "right");

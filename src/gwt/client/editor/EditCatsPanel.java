@@ -86,7 +86,7 @@ public class EditCatsPanel extends SmartTable
             _level = level;
             add(_input = Widgets.newTextBox("", Category.MAX_NAME_LENGTH, 15));
             add(_contents = Widgets.newFlowPanel("List"));
-            add(_empty = Widgets.newLabel("<empty>", null));
+            add(_empty = Widgets.newLabel("<empty>"));
             DefaultTextListener.configure(_input, "<add new>");
 
             // wire up our create callback

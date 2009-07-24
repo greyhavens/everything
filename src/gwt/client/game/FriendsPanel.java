@@ -35,7 +35,7 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
     @Override // from DataPanel
     protected void init (List<FriendStatus> friends)
     {
-        SmartTable table = new SmartTable(5, 0);
+        SmartTable table = new SmartTable("handwriting", 5, 0);
         table.setWidth("100%");
         if (friends.size() == 0) {
             table.setText(0, 0, "You have no friends. This makes us sad.");
@@ -44,7 +44,7 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
             return;
         }
 
-        table.setText(0, 0, "Browse your friends' collections and see whent hey last played.", 6);
+        table.setText(0, 0, "Browse your friends' collections and see when they last played.", 6);
         int row = 1, col = 0;
         for (FriendStatus friend : friends) {
             table.setWidget(row, 2*col, XFBML.newProfilePic(friend.name.facebookId));

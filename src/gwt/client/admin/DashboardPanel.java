@@ -65,14 +65,14 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
         // set up our thing database stats
         FlowPanel stats = new FlowPanel();
         stats.add(Widgets.newLabel("Thing Stats", "Header"));
-        stats.add(Widgets.newLabel("Total things: " + data.stats.totalThings, null));
-        stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories, null));
-        stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers, null));
-        stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards, null));
+        stats.add(Widgets.newLabel("Total things: " + data.stats.totalThings));
+        stats.add(Widgets.newLabel("Total categories: " + data.stats.totalCategories));
+        stats.add(Widgets.newLabel("Total players: " + data.stats.totalPlayers));
+        stats.add(Widgets.newLabel("Total cards: " + data.stats.totalCards));
 
         final NumberTextBox flips = NumberTextBox.newIntBox(2, 2);
         final Button grant = new Button("Grant");
-        stats.add(Widgets.newRow(Widgets.newLabel("Grant free flips:", null), flips, grant));
+        stats.add(Widgets.newRow(Widgets.newLabel("Grant free flips:"), flips, grant));
         new ClickCallback<Void>(grant, flips) {
             protected boolean callService () {
                 int togrant = flips.getNumber().intValue();
@@ -128,7 +128,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             }
             protected boolean gotResult (List<PlayerName> players) {
                 if (players.size() == 0) {
-                    details.setWidget(Widgets.newLabel("No match.", null));
+                    details.setWidget(Widgets.newLabel("No match."));
                 } else {
                     details.setWidget(makePlayerList(details, players));
                 }
@@ -156,7 +156,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
                 return true;
             }
         };
-        contents.setWidget(2, 0, Widgets.newFlowPanel(ontitle, onews, upnews), 2, null);
+        contents.setWidget(2, 0, Widgets.newFlowPanel(ontitle, onews, upnews), 2);
         setLatestNews(onews, upnews, data.latestNews);
 
         Widget ntitle = Widgets.newLabel("Add News", "Header");
@@ -184,7 +184,7 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
                 return true;
             }
         };
-        contents.setWidget(3, 0, Widgets.newFlowPanel(ntitle, nnews, post), 2, null);
+        contents.setWidget(3, 0, Widgets.newFlowPanel(ntitle, nnews, post), 2);
     }
 
     protected void setLatestNews (LimitedTextArea text, Button action, News news)
