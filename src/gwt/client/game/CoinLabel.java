@@ -16,7 +16,7 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public static String getCoinHTML (int coins)
     {
-        return "&Sigma;" + coins;
+        return "<img style=\"vertical-align: bottom\" src=\"images/money.png\">" + coins;
     }
 
     /**
@@ -50,6 +50,7 @@ public class CoinLabel extends ValueHTML<Integer>
     {
         super(coins);
         addStyleName("inline");
+        addStyleName("machine");
         _label = label;
     }
 

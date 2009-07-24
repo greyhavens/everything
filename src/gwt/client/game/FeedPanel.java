@@ -51,11 +51,12 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         FlowPanel action = Widgets.newFlowPanel("Action");
         action.add(Args.createInlink(getName(item.actor, true),
                                      Page.BROWSE, item.actor.userId));
-        String objmsg;
+        String objmsg, comtitle = null;
         switch (item.type) {
         case FLIPPED:
             objmsg = format(item.objects, "card", "cards");
             action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
+            comtitle = item.actor + " flipped the " + objmsg + ".";
             break;
         case GIFTED:
             objmsg = format(item.objects, "card", "cards");
@@ -65,6 +66,7 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             String post = (item.message == null) ? "." :
                 ". " + item.actor.name + " said \"" + item.message + "\"";
             action.add(Widgets.newInlineLabel(post));
+            comtitle = item.actor + " gave the  " + objmsg + " to " + item.target + ".";
             break;
         case COMMENT:
             action.add(Widgets.newInlineLabel(" commented on your category "));
@@ -73,12 +75,18 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         case COMPLETED:
             objmsg = format(item.objects, "series", "series");
             action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
+            comtitle = item.actor + " completed the " + objmsg + "!";
             break;
         default:
             action.add(Widgets.newInlineLabel(" did something mysterious."));
             break;
         }
         action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
+// need to find out how to just show _Comments_ and expand it only if there are comments
+//         if (comtitle != null) {
+//             String xid = "feed:" + item.actor.facebookId + ":" + item.when.getTime();
+//             action.add(XFBML.newCommentsBox(xid, comtitle, 3));
+//         }
         return Widgets.newRow(HasAlignment.ALIGN_TOP, "Item",
                               XFBML.newProfilePic(item.actor.facebookId), action);
     }

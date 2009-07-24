@@ -54,6 +54,14 @@ public class XFBML
     }
 
     /**
+     * Creates a comments box with the specified unique id, title and number of visible posts.
+     */
+    public static Widget newCommentsBox (String xid, String title, int vizposts)
+    {
+        return newTag("comments", "xid", xid, "numposts", ""+vizposts, "title", title);
+    }
+
+    /**
      * Parses the XFBML widgets in the supplied DOM tree rooted at the specified element.
      */
     public static void parse (Widget root)
