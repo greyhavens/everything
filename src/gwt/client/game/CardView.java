@@ -113,9 +113,9 @@ public abstract class CardView extends FlowPanel
 
     protected String getTitleSize (String name)
     {
-        if (name.length() < 16) {
+        if (name.length() < 20) {
             return "NormalTitle";
-        } else if (name.length() < 24) {
+        } else if (name.length() < 28) {
             return "LongTitle";
         } else {
             return "ReallyLongTitle";
