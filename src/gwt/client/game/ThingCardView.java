@@ -26,10 +26,11 @@ public class ThingCardView extends FlowPanel
     protected ThingCardView (ThingCard card, Command onClick)
     {
         setStyleName("thingCard");
-        addStyleName((card == null || card.image == null) ? "thingCardBack" : "thingCardFront");
+        boolean back = (card == null || card.image == null);
+        addStyleName(back ? "thingCardBack" : "thingCardFront");
 
         String name = (card == null || card.name == null) ? "?" : card.name;
-        add(Widgets.newLabel(name, "Name", "machine"));
+        add(Widgets.newLabel(name, "Name", back ? "handwriting" : "machine"));
         add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
         add(new RarityLabel(card == null ? null : card.rarity));
     }
