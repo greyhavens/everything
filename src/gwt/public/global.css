@@ -82,6 +82,10 @@ fb\:profile-pic img {
   background: #99CCFF;
 }
 
+.gwt-ConfirmPopup .popupContent {
+  padding: 15px;
+}
+
 .gwt-ConfirmPopup, .infoPopup, .errorPopup {
   z-index: 10;
 }
