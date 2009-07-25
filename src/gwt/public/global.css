@@ -110,6 +110,9 @@ fb\:profile-pic img {
 .gwt-PushButton-down-hovering {
   background: url(images/button/down.png);
 }
+.gwt-PushButton-down-hovering .html-face {
+  padding: 12px 0px 10px 2px;
+}
 .gwt-PushButton-up-disabled {
   background: url(images/button/up.png);
   color: #CCCCCC;
@@ -136,7 +139,7 @@ fb\:profile-pic img {
   background: url(images/button/small_down.png);
 }
 .smallButton-down-hovering .html-face {
-  padding: 3px 0px 1px 1px;
+  padding: 3px 0px 1px 2px;
 }
 .smallButton-up-disabled {
   background: url(images/button/small_up.png);
