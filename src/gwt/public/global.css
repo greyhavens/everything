@@ -115,6 +115,34 @@ fb\:profile-pic img {
   color: #CCCCCC;
 }
 
+.smallButton {
+  color: #442D17;
+  width: 50px;
+  height: 22px;
+}
+.smallButton .html-face {
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
+  font-size: 14px;
+  padding: 2px 0px;
+  text-align: center;
+}
+.smallButton-up {
+  background: url(images/button/small_up.png);
+}
+.smallButton-up-hovering {
+  background: url(images/button/small_over.png);
+}
+.smallButton-down-hovering {
+  background: url(images/button/small_down.png);
+}
+.smallButton-down-hovering .html-face {
+  padding: 3px 0px 1px 1px;
+}
+.smallButton-up-disabled {
+  background: url(images/button/small_up.png);
+  color: #CCCCCC;
+}
+
 .popup, .gwt-ConfirmPopup, .infoPopup, .errorPopup {
   border: 1px solid #442D17;
   background: url(images/page_repeat.png) center;

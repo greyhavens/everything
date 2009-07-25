@@ -73,6 +73,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             message.setVisible(false);
             grid.setWidget(row, col+1, message);
             final PushButton give = new PushButton("Give");
+            give.setStyleName("smallButton");
             grid.setWidget(row, col+2, give);
             new ClickCallback<Void>(give, message) {
                 protected boolean callService () {
