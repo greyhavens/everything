@@ -17,6 +17,14 @@ import com.threerings.gwt.util.Commands;
 public class ImageUtil
 {
     /**
+     * Returns the URL for the supplied image.
+     */
+    public static String getImageURL (String image)
+    {
+        return S3_BUCKET + image;
+    }
+
+    /**
      * Returns a widget that will display the specified card image, centered within it.
      */
     public static Widget getImageBox (String image)
@@ -46,7 +54,7 @@ public class ImageUtil
     {
         Widget clicky;
         if (image != null && image.length() > 0) {
-            clicky = Widgets.newActionImage(S3_BUCKET + image, Commands.onClick(onClick));
+            clicky = Widgets.newActionImage(getImageURL(image), Commands.onClick(onClick));
         } else {
             clicky = Widgets.newActionLabel("", "Shim", Commands.onClick(onClick));
         }

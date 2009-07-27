@@ -4,6 +4,8 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PushButton;
@@ -20,6 +22,7 @@ import com.threerings.everything.data.CardIdent;
 import client.ui.DataPopup;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.ImageUtil;
 
 /**
  * Displays a full-sized card in a nice looking popup.
@@ -94,14 +97,24 @@ public class CardPopup extends DataPopup<Card>
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
+        PushButton brag = new PushButton("Brag", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                showBragDialog(card.thing.name, card.thing.descrip,
+                               ImageUtil.getImageURL(card.thing.image));
+            }
+        });
         PushButton done = new PushButton("Keep", onHide());
 
         if (_ctx.getMe().equals(card.owner)) {
-            return CardView.create(card, _title, status, sell, gift, done);
+            return CardView.create(card, _title, status, sell, gift, brag, done);
         } else {
             return CardView.create(card, _title, status, done);
         }
     }
+
+    protected static native void showBragDialog (String thing, String descrip, String image) /*-{
+        $wnd.FB_ShowBragDialog(thing, descrip, image);
+    }-*/;
 
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;

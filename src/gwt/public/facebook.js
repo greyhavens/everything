@@ -1,10 +1,11 @@
 /* Wire up some specific functions. */
 window.FB_Init = function (apiKey) {
-    FB_RequireFeatures(["XFBML"], function () {
+    FB_RequireFeatures(["XFBML", "Connect"], function () {
         // FB.XFBML.Host.autoParseDomTree = false;
         FB.init(apiKey, "xd_receiver.html");
     });
-}
+};
+
 window.FB_RequireSession = function () {
     FB.Bootstrap.ensureInit(function () {
         FB.Connect.requireSession(function () {
@@ -15,13 +16,28 @@ window.FB_RequireSession = function () {
         });
     });
 };
+
 window.FB_ParseXFBML = function (elem) {
     FB.Bootstrap.ensureInit(function () {
         if (elem != null) {
             FB.XFBML.Host.parseDomElement(elem);
         }
     });
-}
+};
+
+window.FB_ShowBragDialog = function (thing_name, thing_descrip, thing_image) {
+    var attachment = {
+        'name': thing_name,
+        'description': thing_descrip,
+        'href': 'http://apps.facebook.com/everythinggame/',
+        'media': [{'type': 'image',
+                   'src': thing_image,
+                   'href': 'http://apps.facebook.com/everythinggame/' }],
+        'properties': {'The Everything Game': {'text': 'What will you get?',
+                                               'href': 'http://apps.facebook.com/everythinggame/'}},
+    };
+    FB.Connect.streamPublish("Woo!", attachment);
+};
 
 /* Start up our iframe resizer once FB_Init is called by GWT */
 if (window != window.top) {
