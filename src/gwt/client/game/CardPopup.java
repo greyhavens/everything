@@ -62,6 +62,11 @@ public class CardPopup extends DataPopup<Card>
 
     protected Widget createContents (final Card card)
     {
+        // if we're looking at someone else's card, we don't need any fancy stuff
+        if (!_ctx.getMe().equals(card.owner)) {
+            return CardView.create(card, _title, null, new PushButton("Close", onHide()));
+        }
+
         String status = null;
         if (_haveCount > 1) {
             status = "You already have " + _haveCount + " of these cards.";
@@ -113,11 +118,7 @@ public class CardPopup extends DataPopup<Card>
         PushButton done = new PushButton("Keep", onHide());
         done.setTitle("Keep this card for your collection.");
 
-        if (_ctx.getMe().equals(card.owner)) {
-            return CardView.create(card, _title, status, sell, gift, brag, done);
-        } else {
-            return CardView.create(card, _title, status, done);
-        }
+        return CardView.create(card, _title, status, sell, gift, brag, done);
     }
 
     protected static native void showBragDialog (String thing, String descrip, String image) /*-{
