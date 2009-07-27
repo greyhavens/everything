@@ -6,15 +6,19 @@ package client.game;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
@@ -35,9 +39,12 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
 
 import client.ui.DataPanel;
+import client.ui.PowerupUI;
+import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.Messages;
+import client.util.Page;
 import client.util.PanelCallback;
 import client.util.PopupCallback;
 
@@ -49,6 +56,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     public GridPanel (Context ctx)
     {
         super(ctx, "page", "grid");
+        addStyleName("machine");
         _gamesvc.getGrid(createCallback());
     }
 
@@ -58,19 +66,20 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         clear();
         _data = data;
 
-        add(_info = new SmartTable(5, 0));
-        _info.setText(1, 0, "Unflipped cards:");
-        _info.setWidget(1, 2, new Button("Powerups", new ClickHandler() {
+        add(_info = new SmartTable("Info", 5, 0));
+        _info.setWidget(0, 2, hoverize(Widgets.newActionLabel("", "Powerups", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showPowerupsMenu((Widget)event.getSource());
             }
-        }), 1, "right");
+        })), 1, "PupBox");
+        _info.getFlexCellFormatter().setRowSpan(0, 2, 2);
+        _info.setText(1, 0, "Unflipped cards:");
         updateRemaining(_data.grid.unflipped);
         updateGameStatus(_data.status);
 
-        add(_cards = new SmartTable(5, 0));
+        add(_cards = new SmartTable("Cards", 5, 0));
 
-        add(_status = new SmartTable(5, 0));
+        add(_status = new SmartTable("Status", 5, 0));
         _status.setText(0, 0, "New grid " + format(_data.grid.expires));
         updateGrid();
     }
@@ -110,15 +119,12 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         // let the context know that we know of a fresher coins value
         _ctx.getCoins().update(status.coins);
 
-        _info.setWidget(0, 0, new CoinLabel("You have ", _ctx.getCoins()), 1, "left");
         if (status.freeFlips > 0) {
-            _info.setText(0, 1, "Next flip is free!", 1, "Bold");
-            _info.setText(0, 2, "Free flips left: " + status.freeFlips, 1, "right");
+            _info.setText(0, 0, "Free flips left: " + status.freeFlips, 1);
         } else {
-            _info.setWidget(0, 1, new CoinLabel("Next flip costs ", status.nextFlipCost),
-                            1, "Bold");
-            _info.setText(0, 2, "");
+            _info.setWidget(0, 0, new CoinLabel("Next flip costs ", status.nextFlipCost), 1);
         }
+        _info.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()), 1, "right");
     }
 
     protected void flipCard (final int position)
@@ -158,11 +164,22 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     protected void showPowerupsMenu (final Widget trigger)
     {
         FlowPanel contents = new FlowPanel();
-        final PopupPanel popup = Popups.newPopup("popup", contents);
+        final PopupPanel popup = Popups.newPopup("powerPopup", contents);
         popup.setAutoHideEnabled(true);
+        contents.add(Widgets.newActionLabel("", "Top", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                popup.hide();
+            }
+        }));
+
+        SmartTable items = new SmartTable("Items", 0, 0);
+        contents.add(items);
         for (final Powerup pup : Powerup.POST_GRID) {
             final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
+            int row = items.addWidget(PowerupUI.newIcon(pup), 1, "Icon");
+            items.getRowFormatter().setStyleName(row, "Item");
             Label plabel = Widgets.newInlineLabel(" " + Messages.xlate(pup.toString()));
+            plabel.setTitle(Messages.xlate(pup + "_descrip"));
             if (charges.get() > 0) {
                 new ClickCallback<Grid>(plabel) {
                     protected boolean callService () {
@@ -181,15 +198,41 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                         return false;
                     }
                 };
+            } else {
+                items.getRowFormatter().addStyleName(row, "Disabled");
             }
-            contents.add(Widgets.newFlowPanel(ValueLabel.create("inline", charges), plabel));
+            items.setWidget(row, 1, plabel);
+            items.setWidget(row, 2, ValueLabel.create("inline", charges), 1, "Charges");
         }
-        Popups.showNear(popup, trigger);
+
+        int row = items.addText(0, 0, "");
+        items.getRowFormatter().setStyleName(row, "Item");
+        Hyperlink shop = Args.createLink("Buy Powerups", Page.SHOP);
+        shop.addClickHandler(Popups.createHider(popup));
+        items.setWidget(row, 1, shop, 2);
+
+        contents.add(Widgets.newLabel("", "Bottom"));
+        Popups.showOver(popup, trigger);
     }
 
     protected static String format (Date date)
     {
         return DateUtil.formatDateTime(date).toLowerCase();
+    }
+
+    protected static Label hoverize (final Label widget)
+    {
+        widget.addMouseOverHandler(new MouseOverHandler() {
+            public void onMouseOver (MouseOverEvent event) {
+                widget.addStyleDependentName("up-hovering");
+            }
+        });
+        widget.addMouseOutHandler(new MouseOutHandler() {
+            public void onMouseOut (MouseOutEvent event) {
+                widget.removeStyleDependentName("up-hovering");
+            }
+        });
+        return widget;
     }
 
     protected GameService.GridResult _data;

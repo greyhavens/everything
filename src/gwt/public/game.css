@@ -232,11 +232,14 @@
 
 /** GridPanel styles */
 .grid {
-  font-family: Machine Bold, Helvetia, Arial, sans-serif;
   background: url(images/page_flip.png) no-repeat;
 }
 
-.grid > table {
+.grid .Info {
+  margin: 0px auto;
+}
+
+.grid .Cards, .grid .Status {
   width: 555px;
   margin: 0px auto;
 }
@@ -245,9 +248,58 @@
   font-weight: bold;
 }
 
+.grid .PupBox {
+  padding-left: 20px;
+}
+
 .grid .Powerups {
-  border: 1px solid;
-  text-align: center;
+  background: url(images/powerup/button_up.png);
+  width: 201px;
+  height: 50px;
+  margin-left: auto;
+}
+.grid .Powerups-up-hovering {
+  background: url(images/powerup/button_over.png);
+}
+
+.powerPopup {
+  z-index: 5;
+}
+
+.powerPopup .Top {
+  background: url(images/powerup/menu_top.png);
+  width: 201px;
+  height: 49px;
+}
+
+.powerPopup .Items {
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
+  width: 201px;
+  font-size: 12px;
+}
+
+.powerPopup .Icon {
+  padding: 2px 5px 0px 25px;
+}
+
+.powerPopup .Item {
+  background: url(images/powerup/item_up.png);
+  padding-top: 2px;
+  height: 38px;
+}
+
+.powerPopup .Disabled {
+  color: #999999;
+}
+
+.powerPopup .Charges {
+  padding-right: 30px;
+}
+
+.powerPopup .Bottom {
+  background: url(images/powerup/menu_bottom.png);
+  width: 201px;
+  height: 19px;
 }
 
 /** SeriesPopup styles */
@@ -277,9 +329,6 @@
 }
 
 /** ShopPanel styles */
-.shop {
-}
-
 .shop .Header {
   font-size: 18px;
 }

@@ -17,6 +17,7 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Powerup;
 
 import client.ui.DataPanel;
+import client.ui.PowerupUI;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.Messages;
@@ -39,25 +40,26 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
 
         SmartTable table = new SmartTable(5, 0);
         table.setWidget(0, 0, Widgets.newRow(Widgets.newLabel("You have:", "machine"),
-                                             new CoinLabel(_ctx.getCoins())));
+                                             new CoinLabel(_ctx.getCoins())), 5);
 
-        table.setText(1, 0, "Powerup", 1, "Header");
+        table.setText(1, 0, "Powerup", 2, "Header");
         table.setText(1, 1, "Have", 1, "Header");
         table.setText(1, 2, "Cost", 2, "Header", "center");
 
         for (final Powerup type : Powerup.values()) {
-            int row = table.addWidget(
-                Widgets.newFlowPanel(Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
-                                     Widgets.newLabel(Messages.xlate(type + "_descrip"),
-                                                      "handwriting")), 1);
-            table.setWidget(row, 1, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
+            int row = table.addWidget(PowerupUI.newIcon(type), 1, "Icon");
+            table.setWidget(row, 1, Widgets.newFlowPanel(
+                                Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
+                                Widgets.newLabel(Messages.xlate(type + "_descrip"),
+                                                 "handwriting")), 1);
+            table.setWidget(row, 2, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
                             1, "right");
-            table.setWidget(row, 2, new CoinLabel(type.cost), 1, "right");
+            table.setWidget(row, 3, new CoinLabel(type.cost), 1, "right");
             if (type.charges > 1) {
-                table.setHTML(row, 3, "for " + type.charges);
+                table.setHTML(row, 4, "for " + type.charges);
             }
             final PushButton buy = new PushButton("Buy");
-            table.setWidget(row, 4, buy);
+            table.setWidget(row, 5, buy);
             new ClickCallback<Void>(buy) {
                 protected boolean callService () {
                     if (_ctx.getCoins().get() < type.cost) {
