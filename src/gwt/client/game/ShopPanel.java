@@ -56,7 +56,7 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
                             1, "right");
             table.setWidget(row, 3, new CoinLabel(type.cost), 1, "right");
             if (type.charges > 1) {
-                table.setHTML(row, 4, "for " + type.charges);
+                table.setText(row, 4, "for " + type.charges, 1, "nowrap");
             }
             final PushButton buy = new PushButton("Buy");
             table.setWidget(row, 5, buy);
