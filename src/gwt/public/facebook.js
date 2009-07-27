@@ -1,6 +1,6 @@
 /* Wire up some specific functions. */
 window.FB_Init = function (apiKey) {
-    FB_RequireFeatures(["XFBML", "Connect"], function () {
+    FB_RequireFeatures(["XFBML"], function () {
         // FB.XFBML.Host.autoParseDomTree = false;
         FB.init(apiKey, "xd_receiver.html");
     });
