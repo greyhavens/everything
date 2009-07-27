@@ -44,17 +44,17 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
             return;
         }
 
-        table.setText(0, 0, "Browse your friends' collections and see when they last played.", 6);
+        table.setText(0, 0, "Browse your friends' collections and see when they last played:",
+                      COLUMNS, "machine");
         int row = 1, col = 0;
         for (FriendStatus friend : friends) {
-            table.setWidget(row, 2*col, XFBML.newProfilePic(friend.name.facebookId));
-            table.getFlexCellFormatter().setRowSpan(row, 2*col, 2);
-            table.getFlexCellFormatter().setHorizontalAlignment(
-                row, 2*col, HasAlignment.ALIGN_RIGHT);
-            table.setWidget(row, 2*col+1, Args.createInlink(friend.name));
-            table.setText(row+1, col, DateUtil.formatDateTime(friend.lastSession));
-            if (++col == 3) {
-                row += 2;
+            table.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_RIGHT);
+            table.setWidget(row, col++, XFBML.newProfilePic(friend.name.facebookId));
+            String lastOnline = DateUtil.formatDateTime(friend.lastSession);
+            table.setWidget(row, col++, Widgets.newFlowPanel(Args.createInlink(friend.name),
+                                                             Widgets.newLabel(lastOnline)));
+            if (col == COLUMNS) {
+                row++;
                 col = 0;
             }
         }
@@ -63,4 +63,5 @@ public class FriendsPanel extends DataPanel<List<FriendStatus>>
     }
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
+    protected static final int COLUMNS = 6;
 }
