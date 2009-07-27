@@ -20,9 +20,11 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 
 import client.ui.DataPopup;
+import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.ImageUtil;
+import client.util.Page;
 
 /**
  * Displays a full-sized card in a nice looking popup.
@@ -110,7 +112,10 @@ public class CardPopup extends DataPopup<Card>
         PushButton brag = new PushButton("Brag", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showBragDialog(card.thing.name, card.thing.descrip,
-                               ImageUtil.getImageURL(card.thing.image));
+                               ImageUtil.getImageURL(card.thing.image),
+                               "http://apps.facebook.com/everythinggame/?token=" +
+                               Args.createLinkToken(Page.BROWSE, card.owner.userId,
+                                                    card.thing.categoryId));
             }
         });
         brag.setTitle("Post this card to your Facebook feed.");
@@ -121,8 +126,9 @@ public class CardPopup extends DataPopup<Card>
         return CardView.create(card, _title, status, sell, gift, brag, done);
     }
 
-    protected static native void showBragDialog (String thing, String descrip, String image) /*-{
-        $wnd.FB_ShowBragDialog(thing, descrip, image);
+    protected static native void showBragDialog (String thing, String descrip, String image,
+                                                 String url) /*-{
+        $wnd.FB_ShowBragDialog(thing, descrip, image, url);
     }-*/;
 
     protected String _title;

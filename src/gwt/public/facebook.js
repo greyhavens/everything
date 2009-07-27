@@ -25,14 +25,14 @@ window.FB_ParseXFBML = function (elem) {
     });
 };
 
-window.FB_ShowBragDialog = function (thing_name, thing_descrip, thing_image) {
+window.FB_ShowBragDialog = function (thing_name, thing_descrip, thing_image, series_url) {
     var attachment = {
         'name': thing_name,
         'description': thing_descrip,
-        'href': 'http://apps.facebook.com/everythinggame/',
+        'href': series_url,
         'media': [{'type': 'image',
                    'src': thing_image,
-                   'href': 'http://apps.facebook.com/everythinggame/' }],
+                   'href': series_url }],
         'properties': {'Play Everything': {'text': 'What will you get?',
                                            'href': 'http://apps.facebook.com/everythinggame/'}},
     };
