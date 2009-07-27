@@ -33,9 +33,10 @@ import client.util.PanelCallback;
  */
 public class BrowsePanel extends DataPanel<PlayerCollection>
 {
-    public BrowsePanel (Context ctx, int ownerId)
+    public BrowsePanel (Context ctx, int ownerId, int selCatId)
     {
         super(ctx, "page", "browse");
+        _selectedCatId = selCatId;
         _gamesvc.getCollection(ownerId, createCallback());
     }
 
@@ -47,6 +48,7 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
         header.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
         // header.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
 
+        ClickHandler toCall = null;
         final SmartTable table = new SmartTable("handwriting", 5, 0);
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
@@ -61,11 +63,15 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
                         cards.add(Widgets.newInlineLabel(" "));
                     }
                     final Value<Integer> owned = new Value<Integer>(card.owned);
-                    Widget name = Widgets.newActionLabel(card.name, "inline", new ClickHandler() {
+                    ClickHandler onClick = new ClickHandler() {
                         public void onClick (ClickEvent event) {
                             showSeries(table, coll, card.categoryId, owned, row+1);
                         }
-                    });
+                    };
+                    if (_selectedCatId == card.categoryId) {
+                        toCall = onClick;
+                    }
+                    Widget name = Widgets.newActionLabel(card.name, "inline", onClick);
                     if (card.owned == card.things) {
                         name.addStyleName("Complete");
                     }
@@ -86,6 +92,11 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
         add(header);
         add(table);
         XFBML.parse(this);
+
+        // if we have a category that should be selected, select it now
+        if (toCall != null) {
+            toCall.onClick(null);
+        }
     }
 
     protected void showSeries (SmartTable table, PlayerCollection coll, int categoryId,
@@ -99,6 +110,7 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
         _showingRow = row;
     }
 
+    protected int _selectedCatId;
     protected int _showingRow;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

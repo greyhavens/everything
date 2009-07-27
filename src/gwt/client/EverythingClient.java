@@ -147,7 +147,9 @@ public class EverythingClient
         default:
         case LANDING: setContent(new LandingPanel(this, _news)); break;
         case FLIP: setContent(new GridPanel(this)); break;
-        case BROWSE: setContent(new BrowsePanel(this, args.get(0, getMe().userId))); break;
+        case BROWSE:
+            setContent(new BrowsePanel(this, args.get(0, getMe().userId), args.get(1, 0)));
+            break;
         case SHOP: setContent(new ShopPanel(this)); break;
         case FRIENDS: setContent(new FriendsPanel(this)); break;
         case EDIT_CATS:
