@@ -117,7 +117,7 @@ public class EverythingServlet extends EveryServiceServlet
             }
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
-            log.info("Hello newbie!", "who", player.who(), "name", player.who(), "tz", tz);
+            log.info("Hello newbie!", "who", player.who(), "surname", player.surname, "tz", tz);
 
             // look up their friends' facebook ids and make friend mappings for them
             updateFacebookFriends(player, fbinfo.right);
