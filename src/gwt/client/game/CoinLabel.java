@@ -16,7 +16,8 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public static String getCoinHTML (int coins)
     {
-        return "<img style=\"vertical-align: bottom\" src=\"images/money.png\">" + coins;
+        return "<span style=\"white-space: nowrap\">" +
+            "<img style=\"vertical-align: bottom\" src=\"images/money.png\">" + coins + "</span>";
     }
 
     /**
