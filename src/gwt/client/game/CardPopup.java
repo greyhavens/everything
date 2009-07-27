@@ -71,6 +71,9 @@ public class CardPopup extends DataPopup<Card>
             status = "You only need <b>one more card</b> to complete this series!";
         } else if (_thingsRemaining == 0) {
             status = "You have completed the <b>" + card.getSeries().name + "</b> series!";
+        } else {
+            int total = card.getSeries().things, have = (total - _thingsRemaining);
+            status = "You have " + have + " of " + total + " " + card.getSeries().name + ".";
         }
 
         PushButton gift = new PushButton("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
@@ -79,8 +82,10 @@ public class CardPopup extends DataPopup<Card>
                 _status.update("Gifted!");
             }
         }));
+        gift.setTitle("Give this card to a friend.");
 
         PushButton sell = new PushButton("Sell");
+        sell.setTitle("Sell this card back for half its value.");
         new ClickCallback<Integer>(sell) {
             protected boolean callService () {
                 _gamesvc.sellCard(card.thing.thingId, card.created.getTime(), this);
@@ -103,7 +108,10 @@ public class CardPopup extends DataPopup<Card>
                                ImageUtil.getImageURL(card.thing.image));
             }
         });
+        brag.setTitle("Post this card to your Facebook feed.");
+
         PushButton done = new PushButton("Keep", onHide());
+        done.setTitle("Keep this card for your collection.");
 
         if (_ctx.getMe().equals(card.owner)) {
             return CardView.create(card, _title, status, sell, gift, brag, done);
