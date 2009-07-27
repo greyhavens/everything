@@ -33,8 +33,8 @@ window.FB_ShowBragDialog = function (thing_name, thing_descrip, thing_image) {
         'media': [{'type': 'image',
                    'src': thing_image,
                    'href': 'http://apps.facebook.com/everythinggame/' }],
-        'properties': {'The Everything Game': {'text': 'What will you get?',
-                                               'href': 'http://apps.facebook.com/everythinggame/'}},
+        'properties': {'Play Everything': {'text': 'What will you get?',
+                                           'href': 'http://apps.facebook.com/everythinggame/'}},
     };
     FB.Connect.streamPublish("Woo!", attachment);
 };
