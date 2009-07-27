@@ -45,6 +45,7 @@ import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.News;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -67,9 +68,18 @@ public class EverythingServlet extends EveryServiceServlet
             throw new ServiceException(EverythingCodes.E_STALE_APP);
         }
 
+        SessionData data = new SessionData();
+        data.facebookKey = _app.getFacebookKey();
+        for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
+            data.news = news;
+        }
+        data.powerups = Maps.newHashMap();
+
         OOOUser user = getUser();
         if (user == null) {
-            throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
+            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset);
+            data.name = PlayerName.createGuest();
+            return data; // allow the player to do some things anonymously
         }
 
         PlayerRecord player = _playerRepo.loadPlayer(user.userId);
@@ -78,7 +88,8 @@ public class EverythingServlet extends EveryServiceServlet
             if (fbinfo == null || fbinfo.right == null) {
                 log.info("Have no session key for user, can't create player", "who", user.userId,
                          "fbinfo", fbinfo);
-                throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
+                data.name = PlayerName.createGuest();
+                return data; // allow the player to do some things anonymously
             }
 
             // load up this player's Facebook profile info
@@ -139,7 +150,6 @@ public class EverythingServlet extends EveryServiceServlet
             }
         }
 
-        SessionData data = new SessionData();
         data.name = player.getName();
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
@@ -150,10 +160,6 @@ public class EverythingServlet extends EveryServiceServlet
             data.gridsConsumed = grid.gridId;
             data.gridExpires = grid.expires.getTime();
         }
-        for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
-            data.news = news;
-        }
-        data.facebookKey = _app.getFacebookKey();
         return data;
     }
 

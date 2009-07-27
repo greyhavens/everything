@@ -45,7 +45,7 @@ public class AuthServlet extends AppServlet
         }
 
         // otherwise pass the buck to the app servlet, it may have to get jiggy
-        doFacebookAuth(req, rsp, _app.getFacebookKey(), "/" + _appvers + "/everything/");
+        doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, "/" + _appvers + "/everything/");
     }
 
     @Inject protected EverythingApp _app;

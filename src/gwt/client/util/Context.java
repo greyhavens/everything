@@ -21,6 +21,9 @@ public interface Context
     /** Returns this player's name. */
     PlayerName getMe ();
 
+    /** Returns HTML for an anchor tag that will add our app. */
+    String getFacebookAddLink (String text);
+
     /** Returns true if this player is still pretty new. */
     boolean isNewbie ();
 

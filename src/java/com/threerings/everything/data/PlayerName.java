@@ -24,6 +24,14 @@ public class PlayerName
     public String surname;
 
     /**
+     * Returns true if we're a guest.
+     */
+    public boolean isGuest ()
+    {
+        return userId == 0;
+    }
+
+    /**
      * Formats this name for viewing.
      */
     public String toString ()
@@ -44,6 +52,16 @@ public class PlayerName
     {
         PlayerName name = new PlayerName();
         name.userId = userId;
+        return name;
+    }
+
+    /**
+     * Creates a name for a guest player.
+     */
+    public static PlayerName createGuest ()
+    {
+        PlayerName name = create(0);
+        name.name = "Guest";
         return name;
     }
 }

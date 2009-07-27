@@ -75,9 +75,15 @@ public class EverythingApp extends App
     /**
      * Returns the URL we can send people to do access our Facebook app.
      */
-    public String getFacebookAppURL ()
+    public String getFacebookAppURL (Object... args)
     {
-        return "http://www.facebook.com/login.php?api_key=" + getFacebookKey() + "&canvas=1&v=1.0";
+        StringBuilder token = new StringBuilder();
+        for (Object arg : args) {
+            token.append((token.length() == 0) ? "?token=" : "~");
+            token.append(arg);
+        }
+        String appname = _config.getValue(getFacebookKey("facebook_appname"), "missing_appname");
+        return "http://apps.facebook.com/" + appname + "/" + token;
     }
 
     /**

@@ -23,6 +23,10 @@ public class LandingPanel extends FlowPanel
         setStyleName("landing");
         addStyleName("page"); // we're a top-level page
 
+        if (ctx.getMe().isGuest()) {
+            add(new AddAppPanel(ctx, false));
+        }
+
         if (ctx.isNewbie()) {
             add(Widgets.newLabel("Welcome to Everything!", "Title"));
             FlowPanel intro = new FlowPanel();
@@ -40,8 +44,10 @@ public class LandingPanel extends FlowPanel
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
         }
 
-        add(Widgets.newLabel("Recent Happenings", "Title"));
-        add(new FeedPanel(ctx));
+        if (!ctx.getMe().isGuest()) {
+            add(Widgets.newLabel("Recent Happenings", "Title"));
+            add(new FeedPanel(ctx));
+        }
     }
 
     protected static String formatNews (String text)

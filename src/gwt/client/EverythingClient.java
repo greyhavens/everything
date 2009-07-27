@@ -30,11 +30,13 @@ import com.threerings.everything.data.SessionData;
 import client.admin.DashboardPanel;
 import client.editor.EditCatsPanel;
 import client.editor.EditSeriesPanel;
+import client.game.AddAppPanel;
 import client.game.BrowsePanel;
 import client.game.FriendsPanel;
 import client.game.GridPanel;
 import client.game.LandingPanel;
 import client.game.ShopPanel;
+import client.ui.XFBML;
 import client.util.Args;
 import client.util.CategoriesModel;
 import client.util.Context;
@@ -57,11 +59,7 @@ public class EverythingClient
         _everysvc.validateSession(
             Build.version(), getTimezoneOffset(), new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
-                if (data == null) {
-                    setInfoContent("TODO: Redirect to splash/fbconnect page.");
-                } else {
-                    gotSessionData(data);
-                }
+                gotSessionData(data);
             }
             public void onFailure (Throwable cause) {
                 setContent(Widgets.newLabel(Errors.xlate(cause), "errorLabel"));
@@ -88,6 +86,19 @@ public class EverythingClient
     public PlayerName getMe ()
     {
         return _data.name;
+    }
+
+    // from interface Context
+    public String getFacebookAddLink (String text)
+    {
+        StringBuilder buf = new StringBuilder();
+        buf.append("<a target=\"_top\" href=\"");
+        buf.append("http://www.facebook.com/login.php?api_key=");
+        buf.append(_data.facebookKey);
+        buf.append("&canvas=1&v=1.0\">");
+        buf.append(text);
+        buf.append("</a>");
+        return buf.toString();
     }
 
     // from interface Context
@@ -143,27 +154,67 @@ public class EverythingClient
     {
         Args args = new Args(event.getValue());
 
-        switch (args.page) {
-        default:
-        case LANDING: setContent(new LandingPanel(this, _news)); break;
-        case FLIP: setContent(new GridPanel(this)); break;
-        case BROWSE:
-            setContent(new BrowsePanel(this, args.get(0, getMe().userId), args.get(1, 0)));
-            break;
-        case SHOP: setContent(new ShopPanel(this)); break;
-        case FRIENDS: setContent(new FriendsPanel(this)); break;
-        case EDIT_CATS:
-            if (!(_content instanceof EditCatsPanel)) {
-                setContent(new EditCatsPanel(this));
-            }
-            ((EditCatsPanel)_content).setArgs(args);
-            break;
-        case EDIT_SERIES: setContent(new EditSeriesPanel(this, args.get(0, 0))); break;
-        case DASHBOARD: setContent(new DashboardPanel(this, _news)); break;
-        }
-
         // if we have showing popups, clear them out
         _pstack.clear();
+
+        // these are OK to view as a guest
+        switch (args.page) {
+        case LANDING:
+            setContent(new LandingPanel(this, _news));
+            return;
+        case BROWSE:
+            if (args.get(0, getMe().userId) != 0) {
+                setContent(new BrowsePanel(this, args.get(0, getMe().userId), args.get(1, 0)));
+                return;
+            }
+            break;
+        }
+
+        // otherwise guests see the "add this app to play" button
+        if (getMe().isGuest()) {
+            setContent(new AddAppPanel(this, true));
+            return;
+        }
+
+        // these are OK as a regular player
+        switch (args.page) {
+        case FLIP:
+            setContent(new GridPanel(this));
+            return;
+        case SHOP:
+            setContent(new ShopPanel(this));
+            return;
+        case FRIENDS:
+            setContent(new FriendsPanel(this));
+            return;
+        }
+
+        // these are OK for editors
+        if (isEditor()) {
+            switch (args.page) {
+            case EDIT_CATS:
+                if (!(_content instanceof EditCatsPanel)) {
+                    setContent(new EditCatsPanel(this));
+                }
+                ((EditCatsPanel)_content).setArgs(args);
+                return;
+            case EDIT_SERIES:
+                setContent(new EditSeriesPanel(this, args.get(0, 0)));
+                return;
+            }
+        }
+
+        // these are OK for admins
+        if (isAdmin()) {
+            switch (args.page) {
+            case DASHBOARD:
+                setContent(new DashboardPanel(this, _news));
+                return;
+            }
+        }
+
+        // otherwise default to displaying the landing panel
+        setContent(new LandingPanel(this, _news));
     }
 
     protected void gotSessionData (SessionData data)

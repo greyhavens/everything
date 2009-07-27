@@ -7,9 +7,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 
 import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.data.Build;
 
+import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -24,7 +26,11 @@ public class HeaderPanel extends FlowPanel
         setStyleName("header");
 
         SmartTable bits = new SmartTable("Bits", 0, 0);
-        bits.setText(0, 0, "Hello: " + ctx.getMe().name.toString(), 1, "machine");
+        if (ctx.getMe().isGuest()) {
+            bits.setHTML(0, 0, ctx.getFacebookAddLink("Play Everything!"), 1, "machine");
+        } else {
+            bits.setText(0, 0, "Hello: " + ctx.getMe().name.toString(), 1, "machine");
+        }
         bits.setText(0, 1, "Build: " + Build.time(), 1, "machine");
         bits.getFlexCellFormatter().setHorizontalAlignment(0, 1, HasAlignment.ALIGN_RIGHT);
         add(bits);
@@ -43,5 +49,12 @@ public class HeaderPanel extends FlowPanel
             links.setWidget(1, col++, Args.createLink("Dashboard", Page.DASHBOARD), 1, "machine");
         }
         add(links);
+    }
+
+    @Override // from Widget
+    protected void onLoad ()
+    {
+        super.onLoad();
+        XFBML.parse(this);
     }
 }

@@ -58,8 +58,8 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public PlayerCollection getCollection (int ownerId) throws ServiceException
     {
-        PlayerRecord player = requirePlayer();
-        // TODO: require that the caller be a friend of owner?
+//         PlayerRecord player = requirePlayer();
+//         // TODO: require that the caller be a friend of owner?
 
         PlayerCollection coll = new PlayerCollection();
         coll.owner = _playerRepo.loadPlayerName(ownerId);
@@ -95,8 +95,8 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public Series getSeries (int ownerId, int categoryId) throws ServiceException
     {
-        PlayerRecord player = requirePlayer();
-        // TODO: require that the caller be a friend of owner?
+//         PlayerRecord player = requirePlayer();
+//         // TODO: require that the caller be a friend of owner?
 
         Category category = _thingRepo.loadCategory(categoryId);
         if (category == null) {
@@ -332,7 +332,8 @@ public class GameServlet extends EveryServiceServlet
 
         // send a Facebook notification to the recipient (TODO: localization?)
         String feedmsg = String.format(
-            "gave you the <b>%s</b> card in <a href=\"%s\">Everything</a>.",
+            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
+            _app.getFacebookAppURL("BROWSE", friendId, thing.categoryId),
             thing.name, _app.getFacebookAppURL());
         if (!StringUtil.isBlank(message)) {
             // TODO: escape HTML

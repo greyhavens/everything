@@ -182,6 +182,12 @@
   width: 100%;
 }
 
+/** AddAppPanel styles */
+.addApp {
+  font-size: 18px;
+  padding-bottom: 15px;
+}
+
 /** LandingPanel styles */
 .landing {
   font-family: Times, Times New Roman, serif;
