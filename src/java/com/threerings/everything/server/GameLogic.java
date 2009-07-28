@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.util.ArrayIntSet;
+import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
@@ -41,7 +42,6 @@ import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 
 import com.threerings.everything.server.persist.CardRecord;
-import com.threerings.everything.server.persist.CategoryRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -76,7 +76,7 @@ public class GameLogic
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
-        grid.thingIds = selectGridThings(player, Grid.GRID_SIZE);
+        grid.thingIds = selectGridThings(player);
         grid.status = GridStatus.NORMAL;
 
         // grids generally expire at midnight in the player's timezone
@@ -252,10 +252,34 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    protected int[] selectGridThings (PlayerRecord player, int count)
+    protected int[] selectGridThings (PlayerRecord player)
     {
+        ThingIndex index = getThingIndex();
+        IntSet thingIds = new ArrayIntSet();
+
         // TODO: see if this player has any active powerups, apply them during selection
-        return getThingIndex().selectThings(count);
+
+        // load up this player's collection summary, identify incomplete series
+        IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(player.userId);
+        ArrayIntSet ownedCats = new ArrayIntSet();
+        for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
+            if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
+                ownedCats.add(entry.getIntKey());
+            }
+        }
+
+        // select up to half of our cards from series we are collecting
+        int ownedCount = Math.min(ownedCats.size(), Grid.GRID_SIZE/2);
+        index.selectThings(ownedCount, ownedCats, thingIds);
+
+        // now select the remainder randomly from all possible things
+        int randoCount = Grid.GRID_SIZE - thingIds.size();
+        index.selectThings(randoCount, thingIds);
+
+        // shuffle the resulting thing ids for maximum randosity
+        int[] ids = thingIds.toIntArray();
+        ArrayUtil.shuffle(ids);
+        return ids;
     }
 
     /**
@@ -289,9 +313,9 @@ public class GameLogic
     protected ThingIndex createThingIndex ()
     {
         IntIntMap catmap = new IntIntMap();
-        for (CategoryRecord catrec : _thingRepo.loadActiveCategories()) {
-            if (catrec.parentId != 0) {
-                catmap.put(catrec.categoryId, catrec.parentId);
+        for (Category cat : _thingRepo.loadAllCategories()) {
+            if (cat.parentId != 0) {
+                catmap.put(cat.categoryId, cat.parentId);
             }
         }
         return new ThingIndex(catmap, _thingRepo.loadActiveThings());

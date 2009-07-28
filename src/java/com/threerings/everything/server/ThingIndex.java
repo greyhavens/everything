@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
+import com.samskivert.util.IntSet;
 
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
@@ -26,7 +29,6 @@ public class ThingIndex
 {
     public ThingIndex (IntIntMap catmap, Iterable<ThingInfoRecord> things)
     {
-        ArrayIntSet tmpset = new ArrayIntSet();
         for (ThingInfoRecord thing : things) {
             ThingInfo info = new ThingInfo();
             info.thingId = thing.thingId;
@@ -35,10 +37,9 @@ public class ThingIndex
             // resolve the categories of which this thing is a member
             int categoryId = thing.categoryId;
             while (categoryId != 0) {
-                tmpset.add(categoryId);
+                _bycat.put(categoryId, info);
                 categoryId = catmap.getOrElse(categoryId, 0);
             }
-            info.categoryIds = tmpset.toIntArray();
             _things.add(info);
         }
         // finally shuffle our things to avoid aliasing if the RNG is not perfect
@@ -50,37 +51,65 @@ public class ThingIndex
     // TODO: support category or other limitations on thing selection
 
     /**
+     * Returns the number of cards in the specified category.
+     */
+    public int getCategorySize (int categoryId)
+    {
+        return _bycat.get(categoryId).size();
+    }
+
+    /**
      * Selects the specified number of things from the index weighted properly according to their
      * rarity.
      */
-    public int[] selectThings (int count)
+    public void selectThings (int count, IntSet into)
     {
-        Preconditions.checkArgument(_things.size() >= count,
+        log.debug("Selecting " + count + " things from entire collection " + _things.size());
+        selectThings(count, _things, _totalWeight, into);
+    }
+
+    /**
+     * Selects the specified number of things from the subset of things in the specified set of
+     * categories.
+     */
+    public void selectThings (int count, IntSet catIds, IntSet into)
+    {
+        List<ThingInfo> things = Lists.newArrayList();
+        int totalWeight = 0;
+        for (int catId : catIds) {
+            for (ThingInfo info : _bycat.get(catId)) {
+                things.add(info);
+                totalWeight += info.weight;
+            }
+        }
+        log.debug("Selecting " + count + " things from " + catIds + " " + things.size());
+        selectThings(count, things, totalWeight, into);
+    }
+
+    protected void selectThings (int count, List<ThingInfo> things, int totalWeight, IntSet into)
+    {
+        Preconditions.checkArgument(things.size() >= count,
                                     "Cannot select " + count + " things. " +
-                                    "Index only contains " + _things.size() + " things.");
+                                    "Index only contains " + things.size() + " things.");
 
         // select the requested number of random things
-        int iters = 0;
-        ArrayIntSet things = new ArrayIntSet();
-        while (things.size() < count) {
+        int iters = 0, added = 0;
+        while (added < count) {
             if (iters++ >= MAX_SELECT_ITERS) {
                 throw new RuntimeException("Failed to select " + count + " things after " +
                                            MAX_SELECT_ITERS + " attempts.");
             }
-            things.add(pickWeightedThing());
+            if (into.add(pickWeightedThing(things, totalWeight))) {
+                added++;
+            }
         }
-
-        // shuffle the thing ids for maximum randosity
-        int[] thingIds = things.toIntArray();
-        ArrayUtil.shuffle(thingIds, _rando);
-        return thingIds;
     }
 
-    protected int pickWeightedThing ()
+    protected int pickWeightedThing (List<ThingInfo> things, int totalWeight)
     {
-        int rando = _rando.nextInt(_totalWeight);
-        for (int ii = 0, ll = _things.size(); ii < ll; ii++) {
-            ThingInfo info = _things.get(ii);
+        int rando = _rando.nextInt(totalWeight);
+        for (int ii = 0, ll = things.size(); ii < ll; ii++) {
+            ThingInfo info = things.get(ii);
             if (rando < info.weight) {
                 return info.thingId;
             }
@@ -93,11 +122,11 @@ public class ThingIndex
     {
         public int thingId;
         public int weight;
-        public int[] categoryIds;
     }
 
     protected List<ThingInfo> _things = Lists.newArrayList();
     protected int _totalWeight;
+    protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
     protected Random _rando = new Random();
 
     /** Used to avoid infinite loopage. */

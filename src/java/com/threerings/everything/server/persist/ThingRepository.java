@@ -94,6 +94,14 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Loads and returns all categories.
+     */
+    public Collection<Category> loadAllCategories ()
+    {
+        return findAll(CategoryRecord.class).map(CategoryRecord.TO_CATEGORY);
+    }
+
+    /**
      * Creates a new category.
      *
      * @return the category's newly assigned id.
@@ -243,15 +251,6 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads all categories in the database that are active.
-     */
-    public Collection<CategoryRecord> loadActiveCategories ()
-    {
-        return findAll(CategoryRecord.class, CacheStrategy.NONE,
-                       new Where(CategoryRecord.ACTIVE.eq(true)));
-    }
-
-    /**
      * Loads summary information on every active thing in the repository.
      */
     public Collection<ThingInfoRecord> loadActiveThings ()
@@ -263,9 +262,9 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads data on all series owned by the specified player.
+     * Loads the category id and count of unique things owned by the player in each category.
      */
-    public List<SeriesCard> loadPlayerSeries (int ownerId)
+    public IntIntMap loadPlayerSeriesInfo (int ownerId)
     {
         IntIntMap owned = new IntIntMap();
         for (OwnedRecord orec : findAll(OwnedRecord.class,
@@ -275,12 +274,18 @@ public class ThingRepository extends DepotRepository
                                         new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
             owned.put(orec.categoryId, orec.owned);
         }
+        return owned;
+    }
 
-        // now load up the category info for those categories
+    /**
+     * Loads data on all series owned by the specified player.
+     */
+    public List<SeriesCard> loadPlayerSeries (int ownerId)
+    {
+        IntIntMap owned = loadPlayerSeriesInfo(ownerId);
         List<SeriesCard> cards = Lists.newArrayList();
-        for (CategoryRecord crec :
-                 findAll(CategoryRecord.class,
-                         new Where(CategoryRecord.CATEGORY_ID.in(owned.keySet())))) {
+        Where where = new Where(CategoryRecord.CATEGORY_ID.in(owned.keySet()));
+        for (CategoryRecord crec : findAll(CategoryRecord.class, where)) {
             SeriesCard card = CategoryRecord.TO_SERIES_CARD.apply(crec);
             card.owned = owned.getOrElse(crec.categoryId, 0);
             cards.add(card);
