@@ -19,6 +19,7 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 
+import client.ui.ButtonUI;
 import client.ui.DataPopup;
 import client.util.Args;
 import client.util.ClickCallback;
@@ -66,7 +67,7 @@ public class CardPopup extends DataPopup<Card>
     {
         // if we're looking at someone else's card, we don't need any fancy stuff
         if (!_ctx.getMe().equals(card.owner)) {
-            return CardView.create(card, _title, null, new PushButton("Close", onHide()));
+            return CardView.create(card, _title, null, ButtonUI.newButton("Close", onHide()));
         }
 
         String status = null;
@@ -83,7 +84,8 @@ public class CardPopup extends DataPopup<Card>
             status = "You have " + have + " of " + total + " " + card.getSeries().name + ".";
         }
 
-        PushButton gift = new PushButton("Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+        PushButton gift = ButtonUI.newButton(
+            "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
                 CardPopup.this.hide();
                 _status.update("Gifted!");
@@ -91,7 +93,7 @@ public class CardPopup extends DataPopup<Card>
         }));
         gift.setTitle("Give this card to a friend.");
 
-        PushButton sell = new PushButton("Sell");
+        PushButton sell = ButtonUI.newButton("Sell");
         sell.setTitle("Sell this card back for half its value.");
         new ClickCallback<Integer>(sell) {
             protected boolean callService () {
@@ -109,7 +111,7 @@ public class CardPopup extends DataPopup<Card>
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
-        PushButton brag = new PushButton("Brag", new ClickHandler() {
+        PushButton brag = ButtonUI.newButton("Brag", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showBragDialog(card.thing.name, card.thing.descrip,
                                ImageUtil.getImageURL(card.thing.image),
@@ -120,7 +122,7 @@ public class CardPopup extends DataPopup<Card>
         });
         brag.setTitle("Post this card to your Facebook feed.");
 
-        PushButton done = new PushButton("Keep", onHide());
+        PushButton done = ButtonUI.newButton("Keep", onHide());
         done.setTitle("Keep this card for your collection.");
 
         return CardView.create(card, _title, status, sell, gift, brag, done);

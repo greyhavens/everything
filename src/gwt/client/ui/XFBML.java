@@ -76,11 +76,18 @@ public class XFBML
 
     /**
      * Wraps the supplied widget in a fb:serverfbml div and sacrifices the necessary chickens to
-     * make it work.
+     * make it work. The returned widget will automatically call {@link #parse} on itself when it
+     * is added to the DOM.
      */
-    public static Widget serverize (Widget target)
+    public static Widget serverize (Widget target, String... attrsValues)
     {
-        FlowPanel panel = new XFBMLPanel("serverfbml");
+        FlowPanel panel = new XFBMLPanel("serverfbml") {
+            protected void onLoad () {
+                super.onLoad();
+                parse(getParent()); // we need to parse our parent for some reason
+            }
+        };
+        addAttributes(panel.getElement(), attrsValues);
         Element script = DOM.createElement("script");
         script.setAttribute("type", "text/fbml");
         panel.getElement().appendChild(script);
@@ -120,15 +127,20 @@ public class XFBML
         nativeParse(root.getElement());
     }
 
+    protected static void addAttributes (Element element, String... attrsValues)
+    {
+        for (int ii = 0; ii < attrsValues.length; ii += 2) {
+            element.setAttribute(attrsValues[ii], attrsValues[ii+1]);
+        }
+    }
+
     protected static class XFBMLWidget extends Widget
     {
         public XFBMLWidget (String tag, String... attrsValues) {
             setElement(DOM.createElement(NAMESPACE + tag));
             // we need to have <fb:x></fb:x>, not <fb:x/>, so add an empty text node
             getElement().appendChild(Document.get().createTextNode(""));
-            for (int ii = 0; ii < attrsValues.length; ii += 2) {
-                getElement().setAttribute(attrsValues[ii], attrsValues[ii+1]);
-            }
+            addAttributes(getElement(), attrsValues);
         }
     }
 
@@ -136,9 +148,7 @@ public class XFBML
     {
         public XFBMLPanel (String tag, String... attrsValues) {
             setElement(DOM.createElement(NAMESPACE + tag));
-            for (int ii = 0; ii < attrsValues.length; ii += 2) {
-                getElement().setAttribute(attrsValues[ii], attrsValues[ii+1]);
-            }
+            addAttributes(getElement(), attrsValues);
         }
     }
 

@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,6 +27,7 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Thing;
 
+import client.ui.ButtonUI;
 import client.ui.DataPopup;
 import client.ui.XFBML;
 import client.util.Args;
@@ -58,16 +60,6 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         _gamesvc.getGiftCardInfo(thing.thingId, created, createCallback());
     }
 
-    @Override // from PopupPanel
-    public void setWidget (Widget contents)
-    {
-        super.setWidget(contents);
-
-        if (_serverfbml != null) {
-            XFBML.parse(this);
-        }
-    }
-
     @Override // from DataPopup<GameService.GiftInfoResult>
     protected Widget createContents (GameService.GiftInfoResult result)
     {
@@ -89,8 +81,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             DefaultTextListener.configure(message, defmsg);
             message.setVisible(false);
             grid.setWidget(row, col+1, message);
-            final PushButton give = new PushButton("Give");
-            give.setStyleName("smallButton");
+            final PushButton give = ButtonUI.newSmallButton("Give");
             grid.setWidget(row, col+2, give);
             new ClickCallback<Void>(give, message) {
                 protected boolean callService () {
@@ -122,6 +113,23 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
 
+        PushButton pick = ButtonUI.newSmallButton("Pick", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                GiftCardPopup.this.hide();
+                _ctx.displayPopup(makeInvitePopup());
+            }
+        });
+
+        return Widgets.newFlowPanel(
+            Widgets.newLabel("Send it to an Everything friend:", "machine"),
+            Widgets.newScrollPanelY(grid, 400),
+            Widgets.newShim(10, 10),
+            Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"), pick),
+            Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
+    }
+
+    protected PopupPanel makeInvitePopup ()
+    {
         String link = Args.createLinkToken(Page.BROWSE, "", _thing.categoryId);
         String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
             "</b> card in The Everything Game." +
@@ -134,12 +142,15 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
         other.add(XFBML.newHiddenInput("created", ""+_created));
         other.add(XFBML.newHiddenInput("from", History.getToken()));
-        _serverfbml = XFBML.serverize(other);
 
-        return Widgets.newFlowPanel(
-            Widgets.newScrollPanelY(grid, 400),
-            Widgets.newLabel("Send it to any Facebook friend:", "machine"), _serverfbml,
-            Widgets.newFlowPanel("Buttons", new PushButton("Done", onHide())));
+        FlowPanel contents = Widgets.newFlowPanel(
+            Widgets.newLabel("Send this card to a Facebook friend:", "Title", "machine"),
+            XFBML.serverize(other, "style", "min-height: 400px"));
+        PopupPanel popup = Popups.newPopup("inviteCard", contents);
+        popup.addStyleName("popup");
+        contents.add(Widgets.newFlowPanel(
+                         "Buttons", ButtonUI.newButton("Cancel", Popups.createHider(popup))));
+        return popup;
     }
 
     protected static String getInviteURL ()
@@ -152,7 +163,6 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     protected Thing _thing;
     protected long _created;
     protected Runnable _onGifted;
-    protected Widget _serverfbml;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }

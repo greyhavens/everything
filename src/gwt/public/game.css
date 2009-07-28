@@ -334,8 +334,17 @@
   font-weight: bold;
 }
 
-.giftCard .Buttons .gwt-PushButton {
-  margin: 0px auto;
+.giftCard .Buttons .gwt-PushButton, .inviteCard .Buttons .gwt-PushButton {
+  margin: 0px 0px 0px auto;
+}
+
+.inviteCard {
+  min-width: 600px;
+  min-height: 465px;
+}
+
+.inviteCard .Title {
+  padding-bottom: 3px;
 }
 
 /** ShopPanel styles */

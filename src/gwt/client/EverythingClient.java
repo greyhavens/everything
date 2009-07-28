@@ -164,7 +164,10 @@ public class EverythingClient
             return;
         case BROWSE:
             if (args.get(0, getMe().userId) != 0) {
-                setContent(new BrowsePanel(this, args.get(0, getMe().userId), args.get(1, 0)));
+                if (!(_content instanceof BrowsePanel)) {
+                    setContent(new BrowsePanel(this));
+                }
+                ((BrowsePanel)_content).setArgs(args.get(0, getMe().userId), args.get(1, 0));
                 return;
             }
             break;
