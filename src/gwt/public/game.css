@@ -353,3 +353,8 @@
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-weight: bold;
 }
+
+/** FriendsPanel styles */
+.friends {
+  background: url(images/page_news.png) no-repeat;
+}
