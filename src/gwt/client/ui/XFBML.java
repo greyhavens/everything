@@ -6,8 +6,12 @@ package client.ui;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import com.threerings.gwt.ui.Widgets;
 
 /**
  * Utility methods for dealing with XFBML.
@@ -45,6 +49,53 @@ public class XFBML
     }
 
     /**
+     * Creates an XFBML panel that uses the supplied tag name and attribute name/value pairs and
+     * can contain other XFBML widgets.
+     */
+    public static FlowPanel newPanel (String tag, String... attrsValues)
+    {
+        return new XFBMLPanel(tag, attrsValues);
+    }
+
+    /**
+     * Creates a hidden input form field to place inside a request-form tag to pass information to
+     * the servlet that receives the request-form POST.
+     */
+    public static Widget newHiddenInput (final String name, final String value)
+    {
+        return new Widget() {
+            /*constructor*/ {
+                setElement(DOM.createElement("input"));
+                getElement().setAttribute("fb_protected", "true");
+                getElement().setAttribute("type", "hidden");
+                getElement().setAttribute("name", name);
+                getElement().setAttribute("value", value);
+            }
+        };
+    }
+
+    /**
+     * Wraps the supplied widget in a fb:serverfbml div and sacrifices the necessary chickens to
+     * make it work.
+     */
+    public static Widget serverize (Widget target)
+    {
+        FlowPanel panel = new XFBMLPanel("serverfbml");
+        Element script = DOM.createElement("script");
+        script.setAttribute("type", "text/fbml");
+        panel.getElement().appendChild(script);
+        // now for the tricky bit:
+        //   1. GWT and/or DOM does not support adding child nodes to a script tag
+        //   2. IE does not support setting innerHTML on script tags (it just silently blanks it)
+        //   3. IE crashes when setting innerText on script tags
+        // so... write to the "text" property of the script tag. voila
+        // http://www.codingforums.com/archive/index.php/t-39551.html
+        String fbml = Widgets.newFlowPanel(target).getElement().getInnerHTML();
+        script.setPropertyString("text", "<fb:fbml>" + fbml + "</fb:fbml>");
+        return panel;
+    }
+
+    /**
      * Returns a profile picture for the specified user, which links to their profile.
      */
     public static Widget newProfilePic (long facebookId)
@@ -75,6 +126,16 @@ public class XFBML
             setElement(DOM.createElement(NAMESPACE + tag));
             // we need to have <fb:x></fb:x>, not <fb:x/>, so add an empty text node
             getElement().appendChild(Document.get().createTextNode(""));
+            for (int ii = 0; ii < attrsValues.length; ii += 2) {
+                getElement().setAttribute(attrsValues[ii], attrsValues[ii+1]);
+            }
+        }
+    }
+
+    protected static class XFBMLPanel extends FlowPanel
+    {
+        public XFBMLPanel (String tag, String... attrsValues) {
+            setElement(DOM.createElement(NAMESPACE + tag));
             for (int ii = 0; ii < attrsValues.length; ii += 2) {
                 getElement().setAttribute(attrsValues[ii], attrsValues[ii+1]);
             }

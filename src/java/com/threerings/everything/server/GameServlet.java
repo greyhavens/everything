@@ -319,37 +319,8 @@ public class GameServlet extends EveryServiceServlet
                         "friendId", friendId);
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
-
         CardRecord card = requireCard(player.userId, thingId, created);
-
-        // transfer the card to the target player
-        _gameRepo.giftCard(card, friendId);
-
-        // record that this player gifted this card
-        Thing thing = _thingRepo.loadThing(thingId);
-        _playerRepo.recordFeedItem(
-            player.userId, FeedItem.Type.GIFTED, friendId, thing.name, message);
-
-        // send a Facebook notification to the recipient (TODO: localization?)
-        String feedmsg = String.format(
-            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
-            _app.getFacebookAppURL("BROWSE", friendId, thing.categoryId),
-            thing.name, _app.getFacebookAppURL());
-        if (!StringUtil.isBlank(message)) {
-            // TODO: escape HTML
-            feedmsg += " They said '" + message + "'.";
-        }
-        _playerLogic.sendFacebookNotification(player, friend, feedmsg);
-
-        // check whether the recipient just completed a set
-        Set<Integer> things = Sets.newHashSet(
-            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
-        Set<Integer> holdings = Sets.newHashSet(
-            Iterables.transform(_gameRepo.loadCards(friendId, things), Functions.CARD_THING_ID));
-        holdings.add(card.thingId);
-        if (things.size() - holdings.size() == 0) {
-            _gameLogic.maybeReportCompleted(friendId, _thingRepo.loadCategory(thing.categoryId));
-        }
+        _gameLogic.giftCard(player, card, friend, message);
     }
 
     // from interface GameService
@@ -481,9 +452,7 @@ public class GameServlet extends EveryServiceServlet
         return card;
     }
 
-    @Inject protected EverythingApp _app;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected PlayerLogic _playerLogic;
     @Inject protected ThingRepository _thingRepo;
 }

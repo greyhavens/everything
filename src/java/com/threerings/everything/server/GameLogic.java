@@ -27,6 +27,7 @@ import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
+import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.Card;
@@ -198,6 +199,43 @@ public class GameLogic
     }
 
     /**
+     * Transfers the specified card to the specified target player. Takes care of feed message
+     * generation and set completion checking and all the whatnots.
+     */
+    public void giftCard (PlayerRecord owner, CardRecord card, PlayerRecord target, String message)
+    {
+        // transfer the card to the target player
+        int targetId = target.userId;
+        _gameRepo.giftCard(card, targetId);
+
+        // record that this player gifted this card
+        Thing thing = _thingRepo.loadThing(card.thingId);
+        _playerRepo.recordFeedItem(
+            owner.userId, FeedItem.Type.GIFTED, targetId, thing.name, message);
+
+        // send a Facebook notification to the recipient (TODO: localization?)
+        String feedmsg = String.format(
+            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
+            _app.getFacebookAppURL("BROWSE", targetId, thing.categoryId),
+            thing.name, _app.getFacebookAppURL());
+        if (!StringUtil.isBlank(message)) {
+            // TODO: escape HTML
+            feedmsg += " They said '" + message + "'.";
+        }
+        _playerLogic.sendFacebookNotification(owner, target, feedmsg);
+
+        // check whether the recipient just completed a set
+        Set<Integer> things = Sets.newHashSet(
+            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
+        Set<Integer> holdings = Sets.newHashSet(
+            Iterables.transform(_gameRepo.loadCards(targetId, things), Functions.CARD_THING_ID));
+        holdings.add(card.thingId);
+        if (things.size() - holdings.size() == 0) {
+            maybeReportCompleted(targetId, _thingRepo.loadCategory(thing.categoryId));
+        }
+    }
+
+    /**
      * Records and reports that the specified player completed the specified series if they haven't
      * already completed the series.
      */
@@ -303,7 +341,9 @@ public class GameLogic
     protected ThingIndex _index;
     protected long _nextIndexUpdate;
 
+    @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;
 

@@ -8,6 +8,8 @@ import java.util.Collections;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,10 +23,14 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
+import com.threerings.everything.data.Thing;
 
 import client.ui.DataPopup;
+import client.ui.XFBML;
+import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.Page;
 
 /**
  * Displays information on which of a player's friends has a particular card and allows them to
@@ -36,19 +42,29 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new GiftCardPopup(ctx, card.thing.thingId, card.created.getTime(),
+                ctx.displayPopup(new GiftCardPopup(ctx, card.thing, card.created.getTime(),
                                                    onGifted));
             }
         };
     }
 
-    public GiftCardPopup (Context ctx, int thingId, long created, Runnable onGifted)
+    public GiftCardPopup (Context ctx, Thing thing, long created, Runnable onGifted)
     {
         super("giftCard", ctx);
-        _thingId = thingId;
+        _thing = thing;
         _created = created;
         _onGifted = onGifted;
-        _gamesvc.getGiftCardInfo(thingId, created, createCallback());
+        _gamesvc.getGiftCardInfo(thing.thingId, created, createCallback());
+    }
+
+    @Override // from PopupPanel
+    public void setWidget (Widget contents)
+    {
+        super.setWidget(contents);
+
+        if (_serverfbml != null) {
+            XFBML.parse(this);
+        }
     }
 
     @Override // from DataPopup<GameService.GiftInfoResult>
@@ -84,7 +100,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                         return false;
                     }
                     String msg = DefaultTextListener.getText(message, defmsg);
-                    _gamesvc.giftCard(_thingId, _created, info.friend.userId, msg, this);
+                    _gamesvc.giftCard(_thing.thingId, _created, info.friend.userId, msg, this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {
@@ -100,17 +116,42 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 col = 0;
             }
         }
-        String msg = (result.friends.size() == 0) ? "All of your friends already have this card." :
+        String msg = (result.friends.size() == 0) ?
+            "All of your Everything friends already have this card." :
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
+
+        String link = Args.createLinkToken(Page.BROWSE, "", _thing.categoryId);
+        String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
+            "</b> card in The Everything Game." +
+            "<fb:req-choice url='?token=" + link + "' label='View the card!' />";
+        FlowPanel other = XFBML.newPanel("request-form", "action", getInviteURL(), "method", "POST",
+                                         "invite", "true", "type", "Everything Game",
+                                         "content", content);
+        other.add(XFBML.newTag("friend-selector"));
+        other.add(XFBML.newTag("request-form-submit"));
+        other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
+        other.add(XFBML.newHiddenInput("created", ""+_created));
+        other.add(XFBML.newHiddenInput("from", History.getToken()));
+        _serverfbml = XFBML.serverize(other);
+
         return Widgets.newFlowPanel(
             Widgets.newScrollPanelY(grid, 400),
+            Widgets.newLabel("Send it to any Facebook friend:", "machine"), _serverfbml,
             Widgets.newFlowPanel("Buttons", new PushButton("Done", onHide())));
     }
 
-    protected int _thingId;
+    protected static String getInviteURL ()
+    {
+        String url = Window.Location.getHref();
+        int eidx = url.indexOf("/everything");
+        return url.substring(0, eidx + "/everything".length()) + "/invite";
+    }
+
+    protected Thing _thing;
     protected long _created;
     protected Runnable _onGifted;
+    protected Widget _serverfbml;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
