@@ -205,7 +205,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             items.setWidget(row, 2, ValueLabel.create("inline", charges), 1, "Charges");
         }
 
-        int row = items.addText(0, 0, "");
+        int row = items.addText("", 1);
         items.getRowFormatter().setStyleName(row, "Item");
         Hyperlink shop = Args.createLink("Buy Powerups", Page.SHOP);
         shop.addClickHandler(Popups.createHider(popup));

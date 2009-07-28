@@ -279,6 +279,7 @@
 }
 
 .powerPopup .Items {
+  background: url(images/powerup/item_up.png);
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   width: 201px;
   font-size: 12px;
@@ -289,7 +290,6 @@
 }
 
 .powerPopup .Item {
-  background: url(images/powerup/item_up.png);
   padding-top: 2px;
   height: 38px;
 }
