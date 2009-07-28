@@ -114,19 +114,21 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
 
-//         PushButton pick = ButtonUI.newSmallButton("Pick", new ClickHandler() {
-//             public void onClick (ClickEvent event) {
-//                 GiftCardPopup.this.hide();
-//                 _ctx.displayPopup(makeInvitePopup());
-//             }
-//         });
-
-        return Widgets.newFlowPanel(
+        FlowPanel bits = Widgets.newFlowPanel(
             Widgets.newLabel("Send it to an Everything friend:", "machine"),
-            Widgets.newScrollPanelY(grid, 400),
-//             Widgets.newShim(10, 10),
-//             Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"), pick),
-            Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
+            Widgets.newScrollPanelY(grid, 400));
+        if (_ctx.isAdmin()) {
+            bits.add(Widgets.newShim(10, 10));
+            bits.add(Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"),
+                                    ButtonUI.newSmallButton("Pick", new ClickHandler() {
+                                        public void onClick (ClickEvent event) {
+                                            GiftCardPopup.this.hide();
+                                            _ctx.displayPopup(makeInvitePopup());
+                                        }
+                                    })));
+        }
+        bits.add(Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
+        return bits;
     }
 
     protected PopupPanel makeInvitePopup ()
