@@ -5,6 +5,8 @@ package client.util;
 
 import com.google.gwt.user.client.ui.Hyperlink;
 
+import com.threerings.gwt.ui.Anchor;
+
 import com.threerings.everything.data.PlayerName;
 
 /**
@@ -50,6 +52,15 @@ public class Args
     public static Hyperlink createInlink (PlayerName name)
     {
         return createInlink(name.toString(), Page.BROWSE, name.userId);
+    }
+
+    /**
+     * Creates a link that opens the Facebook send message interface in a new window.
+     */
+    public static Anchor createMessageAnchor (PlayerName name)
+    {
+        return new Anchor("http://www.facebook.com/message.php?id=" + name.facebookId,
+                          "Send message", "_blank");
     }
 
     /**

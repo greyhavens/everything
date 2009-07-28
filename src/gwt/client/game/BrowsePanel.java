@@ -25,6 +25,7 @@ import com.threerings.everything.data.SeriesCard;
 
 import client.ui.DataPanel;
 import client.ui.XFBML;
+import client.util.Args;
 import client.util.Context;
 import client.util.PanelCallback;
 
@@ -45,8 +46,11 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
     {
         SmartTable header = new SmartTable("machine", 5, 0);
         header.setWidget(0, 0, XFBML.newProfilePic(coll.owner.facebookId));
-        header.setText(0, 1, coll.owner.toString() + "'s Collection", 2, "Title");
-        // header.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_BOTTOM);
+        Widget title = Widgets.newLabel(coll.owner.toString() + "'s Collection", "Title");
+        if (!_ctx.getMe().equals(coll.owner)) {
+            title = Widgets.newFlowPanel(title, Args.createMessageAnchor(coll.owner));
+        }
+        header.setWidget(0, 1, title, 2, "Header");
 
         ClickHandler toCall = null;
         final SmartTable table = new SmartTable("handwriting", 5, 0);

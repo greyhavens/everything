@@ -210,8 +210,12 @@
   font-size: 16px;
 }
 
-.browse .Title {
+.browse .Header .Title {
   font-weight: bold;
+}
+
+.browse .Header a {
+  font-size: 12px;
 }
 
 .browse .Complete {
