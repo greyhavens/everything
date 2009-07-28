@@ -33,20 +33,36 @@ import static com.threerings.everything.Log.log;
 public class InviteServlet extends AppServlet
 {
     @Override // from HttpServlet
+    protected void doGet (HttpServletRequest req, HttpServletResponse rsp)
+        throws IOException
+    {
+        // this path should only happen when they cancel the multi-friend-selector
+        if (!StringUtil.isBlank(req.getParameter("ids"))) {
+            log.warning("Got a GET request on invite servlet with ids",
+                        "ids", req.getParameter("ids"));
+        }
+        String from = ParameterUtil.getParameter(req, "from", "LANDING");
+        log.info("Processing skip", "from", from);
+        writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
+    }
+
+    @Override // from HttpServlet
     protected void doPost (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
     {
         OOOUser user = getUser(req);
         PlayerRecord player = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
         String from = ParameterUtil.getParameter(req, "from", "LANDING");
-        String targetFBId = null, thingId = null, created = null;
+        String thingId = null, created = null, targetFBId = req.getParameter("ids");
+        if (targetFBId == null) { // they chose to skip
+            writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
+            return;
+        }
 
         try {
             if (player == null) {
                 throw new Exception("missing inviter");
             }
-
-            targetFBId = requireParameter(req, "friend_selector_id");
             thingId = requireParameter(req, "thing");
             created = requireParameter(req, "created");
 

@@ -339,12 +339,9 @@
 }
 
 .inviteCard {
-  min-width: 600px;
-  min-height: 465px;
-}
-
-.inviteCard .Title {
-  padding-bottom: 3px;
+  min-width: 486px;
+  min-height: 413px;
+  z-index: 5;
 }
 
 /** ShopPanel styles */

@@ -139,22 +139,19 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                                          "invite", "true", "type", "Everything Game",
                                          "content", content);
         FlowPanel wrap = new FlowPanel();
-        DOM.setStyleAttribute(wrap.getElement(), "margin", "5px");
-        wrap.add(XFBML.newTag("friend-selector"));
-        wrap.add(XFBML.newTag("request-form-submit"));
+        DOM.setStyleAttribute(wrap.getElement(), "width", "100%");
+        DOM.setStyleAttribute(wrap.getElement(), "padding", "0px 50px");
+        DOM.setStyleAttribute(wrap.getElement(), "background", "#D2D9E6");
+        String action = "Who do you want to give the " + _thing.name + " card to?";
+        wrap.add(XFBML.newTag("multi-friend-selector", "actiontext", action, "max", "1",
+                              "email_invite", "false", "cols", "3", "rows", "3",
+                              "showborder", "true"));
         other.add(wrap);
         other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
         other.add(XFBML.newHiddenInput("created", ""+_created));
         other.add(XFBML.newHiddenInput("from", History.getToken()));
-
-        FlowPanel contents = Widgets.newFlowPanel(
-            Widgets.newLabel("Send this card to a Facebook friend:", "Title", "machine"),
-            XFBML.serverize(other, "style", "min-height: 400px"));
-        PopupPanel popup = Popups.newPopup("inviteCard", contents);
-        popup.addStyleName("popup");
-        contents.add(Widgets.newFlowPanel(
-                         "Buttons", ButtonUI.newButton("Cancel", Popups.createHider(popup))));
-        return popup;
+        String style = "width: 586px; min-height: 400px";
+        return Popups.newPopup("inviteCard", XFBML.serverize(other, "style", style));
     }
 
     protected static String getInviteURL ()
