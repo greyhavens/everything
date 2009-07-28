@@ -8,6 +8,7 @@ import java.util.Collections;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -113,18 +114,18 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
 
-        PushButton pick = ButtonUI.newSmallButton("Pick", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                GiftCardPopup.this.hide();
-                _ctx.displayPopup(makeInvitePopup());
-            }
-        });
+//         PushButton pick = ButtonUI.newSmallButton("Pick", new ClickHandler() {
+//             public void onClick (ClickEvent event) {
+//                 GiftCardPopup.this.hide();
+//                 _ctx.displayPopup(makeInvitePopup());
+//             }
+//         });
 
         return Widgets.newFlowPanel(
             Widgets.newLabel("Send it to an Everything friend:", "machine"),
             Widgets.newScrollPanelY(grid, 400),
-            Widgets.newShim(10, 10),
-            Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"), pick),
+//             Widgets.newShim(10, 10),
+//             Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"), pick),
             Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
     }
 
@@ -137,8 +138,11 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         FlowPanel other = XFBML.newPanel("request-form", "action", getInviteURL(), "method", "POST",
                                          "invite", "true", "type", "Everything Game",
                                          "content", content);
-        other.add(XFBML.newTag("friend-selector"));
-        other.add(XFBML.newTag("request-form-submit"));
+        FlowPanel wrap = new FlowPanel();
+        DOM.setStyleAttribute(wrap.getElement(), "margin", "5px");
+        wrap.add(XFBML.newTag("friend-selector"));
+        wrap.add(XFBML.newTag("request-form-submit"));
+        other.add(wrap);
         other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
         other.add(XFBML.newHiddenInput("created", ""+_created));
         other.add(XFBML.newHiddenInput("from", History.getToken()));
