@@ -21,6 +21,9 @@ public interface Context
     /** Returns this player's name. */
     PlayerName getMe ();
 
+    /** Returns the URL to the page that will add our app. */
+    String getFacebookAddURL ();
+
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text);
 

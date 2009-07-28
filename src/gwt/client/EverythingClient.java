@@ -89,16 +89,17 @@ public class EverythingClient
     }
 
     // from interface Context
+    public String getFacebookAddURL ()
+    {
+        return "http://www.facebook.com/login.php?api_key=" + _data.facebookKey + "&canvas=1&v=1.0";
+    }
+
+    // from interface Context
     public String getFacebookAddLink (String text)
     {
         StringBuilder buf = new StringBuilder();
-        buf.append("<a target=\"_top\" href=\"");
-        buf.append("http://www.facebook.com/login.php?api_key=");
-        buf.append(_data.facebookKey);
-        buf.append("&canvas=1&v=1.0\">");
-        buf.append(text);
-        buf.append("</a>");
-        return buf.toString();
+        buf.append("<a target=\"_top\" href=\"").append(getFacebookAddURL()).append("\">");
+        return buf.append(text).append("</a>").toString();
     }
 
     // from interface Context

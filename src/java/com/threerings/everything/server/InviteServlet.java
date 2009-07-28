@@ -61,15 +61,15 @@ public class InviteServlet extends AppServlet
             Map<String, Integer> ids = _userLogic.mapFacebookIds(
                 Collections.singletonList(targetFBId));
             Integer targetId = ids.get(targetFBId);
-            if (targetId != null) {
-                PlayerRecord target = _playerRepo.loadPlayer(targetId);
-                if (target != null) {
-                    _gameLogic.giftCard(player, card, target, null);
-                } else {
-                    // TODO: put the card in escrow
-                }
+            PlayerRecord target;
+            if (targetId != null && (target = _playerRepo.loadPlayer(targetId)) != null) {
+                log.info("Gifting card directly to player", "gifter", player.who(),
+                         "thing", card.thingId, "recip", target.who());
+                _gameLogic.giftCard(player, card, target, null);
             } else {
-                // TODO: put the card in escrow
+                log.info("Escrowing card for hopeful future player", "gifter", player.who(),
+                         "thing", card.thingId, "recip", targetFBId);
+                _gameRepo.escrowCard(card, targetFBId);
             }
 
         } catch (Exception e) {

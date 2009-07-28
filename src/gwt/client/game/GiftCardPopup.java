@@ -114,29 +114,27 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
 
-        FlowPanel bits = Widgets.newFlowPanel(
+        return Widgets.newFlowPanel(
             Widgets.newLabel("Send it to an Everything friend:", "machine"),
-            Widgets.newScrollPanelY(grid, 400));
-        if (_ctx.isAdmin()) {
-            bits.add(Widgets.newShim(10, 10));
-            bits.add(Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"),
-                                    ButtonUI.newSmallButton("Pick", new ClickHandler() {
-                                        public void onClick (ClickEvent event) {
-                                            GiftCardPopup.this.hide();
-                                            _ctx.displayPopup(makeInvitePopup());
-                                        }
-                                    })));
-        }
-        bits.add(Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
-        return bits;
+            Widgets.newScrollPanelY(grid, 400),
+            Widgets.newShim(10, 10),
+            Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"),
+                           ButtonUI.newSmallButton("Pick", new ClickHandler() {
+                               public void onClick (ClickEvent event) {
+                                   GiftCardPopup.this.hide();
+                                   _ctx.displayPopup(makeInvitePopup());
+                               }
+                           })),
+            Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
     }
 
     protected PopupPanel makeInvitePopup ()
     {
-        String link = Args.createLinkToken(Page.BROWSE, "", _thing.categoryId);
+        String url = _ctx.getFacebookAddURL() + "*token=" +
+            Args.createLinkToken(Page.BROWSE, "", _thing.categoryId);
         String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
             "</b> card in The Everything Game." +
-            "<fb:req-choice url='?token=" + link + "' label='View the card!' />";
+            "<fb:req-choice url='" + url + "' label='View the card!' />";
         FlowPanel other = XFBML.newPanel("request-form", "action", getInviteURL(), "method", "POST",
                                          "invite", "true", "type", "Everything Game",
                                          "content", content);

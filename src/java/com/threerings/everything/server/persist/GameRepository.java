@@ -32,6 +32,8 @@ import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.Powerup;
 
+import static com.threerings.everything.Log.log;
+
 /**
  * Maintains game related persistent data.
  */
@@ -137,6 +139,41 @@ public class GameRepository extends DepotRepository
         updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.created),
                       CardRecord.OWNER_ID, toUserId,
                       CardRecord.GIVER_ID, card.ownerId);
+    }
+
+    /**
+     * Places the specified card into escrow, for delivery to the player that registers with the
+     * supplied external id if and when they do so.
+     */
+    public void escrowCard (CardRecord card, String externalId)
+    {
+        // create an escrow record for this card
+        EscrowedCardRecord erec = new EscrowedCardRecord();
+        erec.externalId = externalId;
+        erec.thingId = card.thingId;
+        erec.created = card.created;
+        erec.escrowed = new Timestamp(System.currentTimeMillis());
+        insert(erec);
+
+        // gift the card to player 0 to remove it from the gifter's collection
+        giftCard(card, 0);
+    }
+
+    /**
+     * Transfers any cards from escrowd into the collection of the newly created player.
+     */
+    public void unescrowCards (String externalId, PlayerRecord player)
+    {
+        Where where = new Where(EscrowedCardRecord.EXTERNAL_ID.eq(externalId));
+        for (EscrowedCardRecord card : findAll(EscrowedCardRecord.class, where)) {
+            // transfer the card to the player
+            log.info("Transfering escrowed card to new player", "card", card.thingId,
+                     "player", player.who());
+            updatePartial(CardRecord.getKey(0, card.thingId, card.created),
+                          CardRecord.OWNER_ID, player.userId);
+            // delete the escrow record
+            delete(card);
+        }
     }
 
     /**
@@ -324,5 +361,6 @@ public class GameRepository extends DepotRepository
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
         classes.add(SeriesRecord.class);
+        classes.add(EscrowedCardRecord.class);
     }
 }

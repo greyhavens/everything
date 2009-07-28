@@ -130,6 +130,9 @@ public class EverythingServlet extends EveryServiceServlet
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             log.info("Hello newbie!", "who", player.who(), "surname", player.surname, "tz", tz);
 
+            // transfer any escrowed cards into their collection
+            _gameRepo.unescrowCards(fbinfo.left, player);
+
             // look up their friends' facebook ids and make friend mappings for them
             updateFacebookFriends(player, fbinfo.right);
 
