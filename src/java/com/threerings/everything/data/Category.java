@@ -5,12 +5,30 @@ package com.threerings.everything.data;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import com.samskivert.depot.ByteEnum;
+
 /**
  * Contains data for a category or sub-category.
  */
 public class Category
     implements Created, IsSerializable, Comparable<Category>
 {
+    /** This category's activation state. */
+    public enum State implements ByteEnum {
+        IN_DEVELOPMENT(0), PENDING_REVIEW(1), ACTIVE(2);
+
+        // from ByteEnum
+        public byte toByte () {
+            return _code;
+        }
+
+        State (int code) {
+            _code = (byte)code;
+        }
+
+        protected byte _code;
+    }
+
     /** The maximum length of a category name. */
     public static final int MAX_NAME_LENGTH = 64;
 
@@ -27,7 +45,10 @@ public class Category
     public PlayerName creator;
 
     /** True if this category is active (and hence items in it are usable in the game). */
-    public boolean active;
+    protected boolean active;
+
+    /** The activation state of this category. */
+    public State state;
 
     /** The number of things in this category (only valid for leaf categories). */
     public int things;
@@ -48,6 +69,22 @@ public class Category
             buf.append(cat.name);
         }
         return buf.toString();
+    }
+
+    /**
+     * Returns true if this category is in development, false if not.
+     */
+    public boolean isInDevelopment ()
+    {
+        return state == State.IN_DEVELOPMENT;
+    }
+
+    /**
+     * Returns true if this category is active, false if not.
+     */
+    public boolean isActive ()
+    {
+        return state == State.ACTIVE;
     }
 
     // from interface Created

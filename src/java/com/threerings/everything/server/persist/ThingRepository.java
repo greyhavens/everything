@@ -13,6 +13,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.depot.CountRecord;
+import com.samskivert.depot.DataMigration;
+import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
@@ -39,6 +41,14 @@ public class ThingRepository extends DepotRepository
     @Inject public ThingRepository (PersistenceContext ctx)
     {
         super(ctx);
+
+        // temp: migrate "active" to "state = ACTIVE"
+        registerMigration(new DataMigration("2009_07_29_category_active") {
+            public void invoke () throws DatabaseException {
+                updatePartial(CategoryRecord.class, new Where(CategoryRecord.ACTIVE.eq(true)),
+                              null, CategoryRecord.STATE, Category.State.ACTIVE);
+            }
+        });
     }
 
     /**
@@ -88,7 +98,7 @@ public class ThingRepository extends DepotRepository
     {
         return findAll(CategoryRecord.class,
                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
-                       new Where(CategoryRecord.ACTIVE.eq(false)),
+                       new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
                        new GroupBy(CategoryRecord.CATEGORY_ID)).
             map(CategoryRecord.TO_CATEGORY);
     }
@@ -258,7 +268,7 @@ public class ThingRepository extends DepotRepository
         return findAll(ThingInfoRecord.class,
                        CacheStrategy.NONE,
                        ThingRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
-                       new Where(CategoryRecord.ACTIVE.eq(true)));
+                       new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE)));
     }
 
     /**

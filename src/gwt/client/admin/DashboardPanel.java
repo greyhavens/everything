@@ -98,7 +98,11 @@ public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
             if (cats.getWidgetCount() > 0) {
                 cats.add(Widgets.newInlineLabel(", "));
             }
-            cats.add(Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId));
+            Widget link = Args.createInlink(cat.name, Page.EDIT_SERIES, cat.categoryId);
+            if (cat.state == Category.State.PENDING_REVIEW) {
+                link.addStyleName("Pending");
+            }
+            cats.add(link);
         }
         contents.setWidget(0, 1, Widgets.newFlowPanel(
                                Widgets.newLabel("Pending Categories", "Header"), cats));

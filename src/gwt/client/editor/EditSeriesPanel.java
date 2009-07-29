@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.Bindings;
 import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.EnumListBox;
 import com.threerings.gwt.ui.LimitedTextArea;
@@ -30,6 +31,8 @@ import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
+import com.threerings.gwt.util.Function;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.client.EditorServiceAsync;
@@ -45,7 +48,8 @@ import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.MediaUploader;
-import client.util.PanelCallback;
+import client.util.Messages;
+import client.util.PopupCallback;
 
 /**
  * Displays an interface for editing a particular series.
@@ -61,54 +65,97 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
     @Override // from DataPanel
     protected void init (final EditorService.SeriesResult result)
     {
+        final Value<Category> series = Value.create(result.categories[result.categories.length-1]);
+        final Value<Boolean> editable = series.map(new Function<Category, Boolean>() {
+            public Boolean apply (Category series) {
+                return _ctx.isAdmin() ||
+                    (series.isInDevelopment() && _ctx.getMe().equals(series.creator));
+            }
+        });
+
         // add some metadata at the top
-        final Category series = result.categories[result.categories.length-1];
+        // TODO: make this a ValueLabel
         add(Widgets.newLabel(Category.getHierarchy(result.categories), "Header", "handwriting"));
 
         SmartTable info = new SmartTable("handwriting", 5, 0);
         add(info);
         int row = 0;
         info.setText(row, 0, "Creator:");
-        info.setWidget(row++, 1, Args.createInlink(series.creator));
+        info.setWidget(row++, 1, Args.createInlink(series.get().creator));
 
-        if (_ctx.isAdmin() || _ctx.getMe().equals(series.creator)) {
-            final TextBox name = Widgets.newTextBox(series.name, Category.MAX_NAME_LENGTH, 15);
+        if (_ctx.isAdmin() || _ctx.getMe().equals(series.get().creator)) {
+            final TextBox name = Widgets.newTextBox(
+                series.get().name, Category.MAX_NAME_LENGTH, 15);
             Button update = new Button("Update");
             info.setText(row, 0, "Name:");
             info.setWidget(row++, 1, Widgets.newRow(name, update));
+            Bindings.bindEnabled(editable, name, update);
             new ClickCallback<Void>(update, name) {
                 protected boolean callService () {
-                    series.name = name.getText().trim();
-                    _editorsvc.updateCategory(series, this);
+                    series.get().name = name.getText().trim();
+                    _editorsvc.updateCategory(series.get(), this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {
+                    series.update(series.get());
                     Popups.infoNear("Name updated.", name);
                     return true;
                 }
             };
         }
 
-        final CheckBox active = new CheckBox();
-        active.setValue(series.active);
-        active.setEnabled(_ctx.isAdmin());
-        info.setText(row, 0, "Activated:");
-        info.setWidget(row++, 1, active);
-        if (_ctx.isAdmin()) {
-            new ClickCallback<Void>(active) {
-                protected boolean callService () {
-                    series.active = active.getValue();
-                    _editorsvc.updateCategory(series, this);
-                    return true;
+        final EnumListBox<Category.State> state =
+            new EnumListBox<Category.State>(Category.State.class) {
+            @Override protected String toLabel (Category.State value) {
+                return Messages.xlate(value.toString());
+            }
+        };
+        series.addListener(new Value.Listener<Category>() {
+            public void valueChanged (Category series) {
+                state.setSelectedValue(series.state);
+            }
+        });
+        final ChangeHandler onStateChange = new ChangeHandler() {
+            public void onChange (ChangeEvent event) {
+                if (series.get().state == state.getSelectedValue()) {
+                    return;
                 }
-                protected boolean gotResult (Void result) {
-                    String msg = series.active ? "Category activated." : "Category deactivated.";
-                    Popups.infoNear(msg, active);
-                    updateActive(series);
-                    return true;
+                series.get().state = state.getSelectedValue();
+                _editorsvc.updateCategory(series.get(), new PopupCallback<Void>() {
+                    public void onSuccess (Void result) {
+                        series.update(series.get());
+                        switch (series.get().state) {
+                        case IN_DEVELOPMENT: Popups.infoNear("Series is editable.", state); break;
+                        case PENDING_REVIEW: Popups.infoNear("Submitted for review.", state); break;
+                        case ACTIVE: Popups.infoNear("Series activated.", state); break;
+                        }
+                    }
+                });
+            }
+        };
+        state.addChangeHandler(onStateChange);
+        state.setEnabled(_ctx.isAdmin());
+        final Button chstate = new Button("", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                if (series.get().state == Category.State.PENDING_REVIEW) {
+                    state.setSelectedValue(Category.State.IN_DEVELOPMENT);
+                } else {
+                    state.setSelectedValue(Category.State.PENDING_REVIEW);
                 }
-            };
-        }
+                onStateChange.onChange(null); // annoyingly setSelectedValue doesn't do this
+            }
+        });
+        series.addListener(new Value.Listener<Category>() {
+            public void valueChanged (Category series) {
+                switch (series.state) {
+                case IN_DEVELOPMENT: chstate.setText("Submit for review"); break;
+                case PENDING_REVIEW: chstate.setText("Cancel review"); break;
+                }
+                chstate.setVisible(!_ctx.isAdmin() && !series.isActive());
+            }
+        });
+        info.setText(row, 0, "State:");
+        info.setWidget(row++, 1, Widgets.newRow(state, chstate));
 
         final TextBox message = Widgets.newTextBox("", 255, 35);
         final Button post = new Button("Add");
@@ -125,7 +172,7 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
                 if (text.length() == 0) {
                     return false;
                 }
-                _editorsvc.postComment(series.categoryId, text, this);
+                _editorsvc.postComment(series.get().categoryId, text, this);
                 return true;
             }
             protected boolean gotResult (CategoryComment comment) {
@@ -143,32 +190,33 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
         int position = 0;
         for (Thing thing : result.things) {
             // create a fake card and display it
-            add(new ThingEditor(createCard(result, thing, position++)));
+            add(new ThingEditor(editable, createCard(result, thing, position++)));
         }
 
         // finally add a UI for creating new things
         add(Widgets.newHTML("Add Things", "Header", "machine"));
         final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
         DefaultTextListener.configure(thing, "<new thing name>");
-        Button create = new Button("Add Thing");
+        final Button create = new Button("Add Thing");
         new ClickCallback<Integer>(create, thing) {
             protected boolean callService () {
                 String text = thing.getText().trim();
                 if (text.length() == 0) {
                     return false;
                 }
-                _thing = createBlankThing(text, series.categoryId);
+                _thing = createBlankThing(text, series.get().categoryId);
                 _editorsvc.createThing(_thing, this);
                 return true;
             }
 
             protected boolean gotResult (Integer thingId) {
-                _ctx.getCatsModel().thingAdded(series);
+                _ctx.getCatsModel().thingAdded(series.get());
                 thing.setText("");
                 _thing.thingId = thingId;
                 result.things.add(_thing);
                 int position = result.things.size()-1;
-                ThingEditor editor = new ThingEditor(createCard(result, _thing, position));
+                ThingEditor editor = new ThingEditor(
+                    editable, createCard(result, _thing, position));
                 insert(editor, getWidgetCount()-2);
                 editor.setEditing(true);
                 _thing = null;
@@ -178,23 +226,10 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             protected Thing _thing;
         };
         add(Widgets.newRow(thing, create));
+        Bindings.bindEnabled(editable, thing, create);
 
         // only allow adding new items if the series is active
-        updateActive(series);
-    }
-
-    protected void updateActive (Category series)
-    {
-        boolean editable = !series.active &&
-            (_ctx.getMe().equals(series.creator) || _ctx.isAdmin());
-        for (int ii = 0; ii < getWidgetCount(); ii++) {
-            Widget child = getWidget(ii);
-            if (child instanceof ThingEditor) {
-                ((ThingEditor)child).setEditable(editable);
-            } else if (child instanceof TextBox) {
-                ((TextBox)child).setEnabled(editable);
-            }
-        }
+        series.update(series.get());
     }
 
     protected Card createCard (EditorService.SeriesResult result, Thing thing, int position)
@@ -257,8 +292,14 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
 
     protected class ThingEditor extends FlowPanel
     {
-        public ThingEditor (final Card card) {
+        public ThingEditor (final Value<Boolean> editable, final Card card) {
             setStyleName("Editor");
+
+            editable.addListener(new Value.Listener<Boolean>() {
+                public void valueChanged (Boolean editable) {
+                    _edit.setEnabled(editable);
+                }
+            });
 
             int row = 0;
             _ctrl = new SmartTable(5, 0);
@@ -374,11 +415,6 @@ public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
             source.addKeyPressHandler(trigger);
 
             updateCard(card);
-        }
-
-        public void setEditable (boolean editable)
-        {
-            _edit.setEnabled(editable);
         }
 
         public void setEditing (boolean editing)

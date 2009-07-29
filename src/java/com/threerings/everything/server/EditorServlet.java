@@ -47,6 +47,7 @@ public class EditorServlet extends EveryServiceServlet
     public int createCategory (Category category) throws ServiceException
     {
         PlayerRecord editor = requireEditor();
+        category.state = Category.State.IN_DEVELOPMENT;
         category.creator = editor.getName();
         category.categoryId = _thingRepo.createCategory(category);
         _adminLogic.noteAction(editor, "created", category);
@@ -59,7 +60,7 @@ public class EditorServlet extends EveryServiceServlet
         // make sure they have editing privileges on this object (and that it exists)
         Category ocategory = _thingRepo.loadCategory(category.categoryId);
         PlayerRecord editor = checkEditor(ocategory);
-        boolean activeChanged = (ocategory.active != category.active);
+        boolean activeChanged = (ocategory.isActive() != category.isActive());
 
         // only editors can activate and deactivate categories
         if (activeChanged) {
@@ -67,7 +68,7 @@ public class EditorServlet extends EveryServiceServlet
         }
 
         // if we're activating, check to see if the creator has been paid for all of its things
-        if (!ocategory.active && category.active) {
+        if (!ocategory.isActive() && category.isActive()) {
             int things = _thingRepo.getThingCount(ocategory.categoryId);
             if (ocategory.paid < things) {
                 int payout = (things - ocategory.paid) * GameCodes.COINS_PER_CREATED_CARD;
@@ -78,9 +79,9 @@ public class EditorServlet extends EveryServiceServlet
             }
         }
 
-        // fill in user updatable values: name, active and parentId
+        // fill in user updatable values: name, state and parentId
         ocategory.name = category.name;
-        ocategory.active = category.active;
+        ocategory.state = category.state;
         ocategory.parentId = category.parentId;
 
         // actually update the category
@@ -88,7 +89,7 @@ public class EditorServlet extends EveryServiceServlet
 
         String action;
         if (activeChanged) {
-            action = (category.active) ? "activated" : "deactivated";
+            action = (category.isActive()) ? "activated" : "deactivated";
             // if a category changed active state, queue a reload of the thing index
             log.info("Category active status changed. TODO: reload thing index.");
         } else {
@@ -164,7 +165,7 @@ public class EditorServlet extends EveryServiceServlet
         if (series == null) {
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
-        if (series.active || (series.getCreatorId() != editor.userId && !user.isAdmin())) {
+        if (series.isActive() || (series.getCreatorId() != editor.userId && !user.isAdmin())) {
             throw new ServiceException(AppCodes.E_ACCESS_DENIED);
         }
 

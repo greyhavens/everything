@@ -15,3 +15,7 @@
 .dashboard .Details {
   margin-top: 5px;
 }
+
+.dashboard .Pending {
+  font-weight: bold;
+}

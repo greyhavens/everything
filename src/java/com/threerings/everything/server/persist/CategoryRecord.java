@@ -31,13 +31,14 @@ public class CategoryRecord extends PersistentRecord
     public static final ColumnExp PARENT_ID = colexp(_R, "parentId");
     public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
     public static final ColumnExp ACTIVE = colexp(_R, "active");
+    public static final ColumnExp STATE = colexp(_R, "state");
     public static final ColumnExp THINGS = colexp(_R, "things");
     public static final ColumnExp PAID = colexp(_R, "paid");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 5;
+    public static final int SCHEMA_VERSION = 6;
 
     /** A function for converting persistent records to runtime records. */
     public static Function<CategoryRecord, Category> TO_CATEGORY =
@@ -66,6 +67,9 @@ public class CategoryRecord extends PersistentRecord
 
     /** True if this category is active (and hence items in it are usable in the game). */
     public boolean active;
+
+    /** The activation state of this category. */
+    public Category.State state;
 
     /** The number of things in this category (only valid for leaf categories). */
     public int things;
