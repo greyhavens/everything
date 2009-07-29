@@ -30,4 +30,9 @@ public interface EverythingServiceAsync
      * The async version of {@link EverythingService#getFriends}.
      */
     void getFriends (AsyncCallback<List<FriendStatus>> callback);
+
+    /**
+     * The async version of {@link EverythingService#getCredits}.
+     */
+    void getCredits (AsyncCallback<EverythingService.CreditsResult> callback);
 }

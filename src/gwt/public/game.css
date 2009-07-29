@@ -189,7 +189,7 @@
   padding-bottom: 15px;
 }
 
-/** LandingPanel styles */
+/** LandingPage styles */
 .landing {
   font-family: Times, Times New Roman, serif;
   background: url(images/page_news.png) no-repeat;
@@ -206,7 +206,7 @@
   font-family: Trebuchet MS, sans-serif;
 }
 
-/** BrowsePanel styles */
+/** BrowsePage styles */
 .browse {
   font-size: 16px;
 }
@@ -245,7 +245,7 @@
   font-style: italic;
 }
 
-/** GridPanel styles */
+/** GridPage styles */
 .grid {
   background: url(images/page_flip.png) no-repeat;
 }
@@ -358,7 +358,7 @@
   z-index: 5;
 }
 
-/** ShopPanel styles */
+/** ShopPage styles */
 .shop .Header {
   font-size: 18px;
 }
@@ -368,7 +368,29 @@
   font-weight: bold;
 }
 
-/** FriendsPanel styles */
+/** FriendsPage styles */
 .friends {
   background: url(images/page_news.png) no-repeat;
+}
+
+/** CreditsPage styles */
+.credits {
+  font-size: 16px;
+}
+
+.credits .Title {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.credits .Subtitle {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.credits .Peeps {
+  width: 525px;
+  margin: 0px auto;
 }

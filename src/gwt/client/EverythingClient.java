@@ -32,6 +32,7 @@ import client.editor.EditCatsPage;
 import client.editor.EditSeriesPage;
 import client.game.AddAppPanel;
 import client.game.BrowsePage;
+import client.game.CreditsPage;
 import client.game.FriendsPage;
 import client.game.GridPage;
 import client.game.LandingPage;
@@ -162,6 +163,9 @@ public class EverythingClient
         switch (args.page) {
         case LANDING:
             setContent(new LandingPage(this, _news));
+            return;
+        case CREDITS:
+            setContent(new CreditsPage(this));
             return;
         case BROWSE:
             if (args.get(0, getMe().userId) != 0) {

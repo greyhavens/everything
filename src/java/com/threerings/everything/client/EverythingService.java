@@ -5,6 +5,7 @@ package com.threerings.everything.client;
 
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -12,6 +13,7 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -25,6 +27,15 @@ public interface EverythingService extends RemoteService
 
     /** Thrown by {@link #validateSession} if we can't communicate with Facebook. */
     public static final String E_FACEBOOK_DOWN = "e.facebook_down";
+
+    /** Provides results for {@link #getCredits}. */
+    public static class CreditsResult implements IsSerializable
+    {
+        public PlayerName design;
+        public PlayerName art;
+        public PlayerName code;
+        public List<PlayerName> editors;
+    }
 
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
@@ -40,4 +51,9 @@ public interface EverythingService extends RemoteService
      * Returns the names of the caller's friends.
      */
     List<FriendStatus> getFriends () throws ServiceException;
+
+    /**
+     * Returns the data needed for the credits page.
+     */
+    CreditsResult getCredits () throws ServiceException;
 }

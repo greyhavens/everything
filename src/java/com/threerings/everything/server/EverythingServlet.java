@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,8 @@ import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
 
 import com.samskivert.util.CalendarUtil;
+import com.samskivert.util.Comparators;
+import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.Tuple;
@@ -243,6 +246,24 @@ public class EverythingServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
         return Lists.newArrayList(_playerRepo.loadFriendStatus(player.userId));
+    }
+
+    // from interface EverythingService
+    public CreditsResult getCredits () throws ServiceException
+    {
+        CreditsResult result = new CreditsResult();
+        result.design = _playerRepo.loadPlayerName(2); // mdb
+        result.art = _playerRepo.loadPlayerName(30); // josh
+        result.code = _playerRepo.loadPlayerName(2); // mdb
+        final IntIntMap edinfo = _thingRepo.loadEditorInfo();
+        result.editors = Lists.newArrayList(_playerRepo.loadPlayerNames(edinfo.keySet()).values());
+        Collections.sort(result.editors, new Comparator<PlayerName>() {
+            public int compare (PlayerName one, PlayerName two) {
+                return Comparators.compare(edinfo.getOrElse(one.userId, 0),
+                                           edinfo.getOrElse(two.userId, 0));
+            }
+        });
+        return result;
     }
 
     protected void updateFacebookFriends (final PlayerRecord prec, String fbSessionKey)

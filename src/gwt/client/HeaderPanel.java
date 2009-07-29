@@ -50,6 +50,7 @@ public class HeaderPanel extends FlowPanel
         if (ctx.isEditor()) {
             links.setWidget(1, col++, Args.createLink("Add Things", Page.EDIT_CATS), 1, "machine");
         }
+        links.setWidget(1, col++, Args.createLink("Credits", Page.CREDITS), 1, "machine");
         add(links);
     }
 

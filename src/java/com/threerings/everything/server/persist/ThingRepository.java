@@ -112,6 +112,20 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Returns a mapping from editor to total number of things in active series created by that
+     * editor.
+     */
+    public IntIntMap loadEditorInfo ()
+    {
+        IntIntMap info = new IntIntMap();
+        Where where = new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE));
+        for (CategoryRecord catrec : findAll(CategoryRecord.class, where)) {
+            info.increment(catrec.creatorId, catrec.things);
+        }
+        return info;
+    }
+
+    /**
      * Creates a new category.
      *
      * @return the category's newly assigned id.
