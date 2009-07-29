@@ -68,7 +68,8 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
         if (_table != null) {
             remove(_table);
         }
-        _table = new SmartTable("handwriting", 5, 0);
+        _table = new SmartTable("Taxonomy", 5, 0);
+        _table.addStyleName("handwriting");
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
@@ -81,8 +82,13 @@ public class BrowsePanel extends DataPanel<PlayerCollection>
                     if (cards.getWidgetCount() > 0) {
                         cards.add(Widgets.newInlineLabel(" "));
                     }
-                    Widget name = Args.createInlink(
-                        card.name, Page.BROWSE, coll.owner.userId, card.categoryId);
+                    Widget name;
+                    if (_seriesId == card.categoryId) {
+                        name = Args.createInlink(card.name, Page.BROWSE);
+                    } else {
+                        name = Args.createInlink(
+                            card.name, Page.BROWSE, coll.owner.userId, card.categoryId);
+                    }
                     if (card.owned == card.things) {
                         name.addStyleName("Complete");
                     }

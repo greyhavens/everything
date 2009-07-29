@@ -220,11 +220,15 @@
   font-size: 12px;
 }
 
-.browse .Complete {
+.browse .Taxonomy {
+  min-width: 580px;
+}
+
+.browse .Taxonomy .Complete {
   font-weight: bold;
 }
 
-.browse .Held {
+.browse .Taxonomy .Held {
   font-size: 14px;
   display: inline;
 }
