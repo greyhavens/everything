@@ -107,8 +107,10 @@ public abstract class CardView extends FlowPanel
             add(info);
             if (card.giver != null) {
                 add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
+                add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
+            } else {
+                add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.created), "When"));
             }
-            add(Widgets.newLabel("Received on: " + _dfmt.format(card.created), "When"));
         }
     }
 

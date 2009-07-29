@@ -96,7 +96,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     Value<Integer> owned = new Value<Integer>(card.owned);
                     cards.add(new ValueLabel<Integer>("Held", owned) {
                         protected String getText (Integer owned) {
-                            return " (" + owned + " of " + card.things + ")";
+                            return " " + owned + " of " + card.things;
                         }
                     });
                     if (_seriesId == card.categoryId) {
