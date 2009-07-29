@@ -36,6 +36,10 @@ public interface GameService extends RemoteService
     /** Thrown by {@link #getSeries} if the series in question does not exist. */
     public static final String E_UNKNOWN_SERIES = "e.unknown_series";
 
+    /** Thrown by {@link #getGrid} if the player has too few series for the ALL_COLLECTED_SERIES
+     * powerup. */
+    public static final String E_TOO_FEW_SERIES = "e.too_few_series";
+
     /** Thrown by {@link #flipCard} or {@link #usePowerup} if the grid in question has expired. */
     public static final String E_GRID_EXPIRED = "e.grid_expired";
 
@@ -127,7 +131,7 @@ public interface GameService extends RemoteService
     /**
      * Returns the player's current grid.
      */
-    GridResult getGrid () throws ServiceException;
+    GridResult getGrid (Powerup pup, boolean expectHave) throws ServiceException;
 
     /**
      * Requests to flip the card at the specified position in the specified grid.

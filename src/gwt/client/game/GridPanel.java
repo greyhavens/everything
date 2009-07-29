@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.samskivert.depot.util.ByteEnumUtil;
@@ -38,6 +39,7 @@ import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
 
+import client.ui.ButtonUI;
 import client.ui.DataPanel;
 import client.ui.PowerupUI;
 import client.util.Args;
@@ -57,14 +59,87 @@ public class GridPanel extends DataPanel<GameService.GridResult>
     {
         super(ctx, "page", "grid");
         addStyleName("machine");
-        _gamesvc.getGrid(createCallback());
+
+        // if we expect that we've already got a grid, request that
+        if (ctx.getGridExpiry() > System.currentTimeMillis()) {
+            _gamesvc.getGrid(Powerup.NOOP, true, createCallback());
+        } else {
+            figurePreGrid();
+        }
     }
 
     @Override // from DataPanel
     protected void init (GameService.GridResult data)
     {
+        if (data == null) { // oops, we thought we had a valid grid, but didn't, refigure
+            figurePreGrid();
+        } else {
+            _data = data;
+            showGrid();
+        }
+    }
+
+    protected void figurePreGrid ()
+    {
+        if (_ctx.getPupsModel().havePreGrid()) {
+            // if we have pre-grid powerups, then just show the use powerup display
+            showPreGrid();
+
+        } else if (_ctx.isNewbie()) {
+            // otherwise, if we're a newbie just fetch the grid directly
+            _gamesvc.getGrid(Powerup.NOOP, false, createCallback());
+
+        } else {
+            // we're a non-newbie, show the "Buy powerups or Get your grid" display
+            showPreGrid();
+        }
+    }
+
+    protected void showPreGrid ()
+    {
         clear();
-        _data = data;
+
+        SmartTable contents = new SmartTable("PreGrid", 5, 0);
+        contents.setText(0, 0, "It's time for a new grid!", 2, "Title", "machine");
+        contents.setText(1, 0, "Use a powerup:", 1, "machine");
+        contents.setWidget(2, 0, new PowerupsMenu(Powerup.PRE_GRID, null) {
+            protected void activatePup (Label plabel, final Powerup pup,
+                                        final Value<Integer> charges) {
+                new ClickCallback<GameService.GridResult>(plabel) {
+                    protected boolean callService () {
+                        _gamesvc.getGrid(pup, false, this);
+                        return true;
+                    }
+                    protected boolean gotResult (GameService.GridResult data) {
+                        charges.update(charges.get()-1);
+                        init(data);
+                        return false;
+                    }
+                };
+            }
+        });
+
+        contents.setText(1, 1, "Or get a stock grid", 1, "machine");
+        PushButton get = ButtonUI.newButton("Get!");
+        new ClickCallback<GameService.GridResult>(get) {
+            protected boolean callService () {
+                _gamesvc.getGrid(Powerup.NOOP, false, this);
+                return true;
+            }
+            protected boolean gotResult (GameService.GridResult data) {
+                init(data);
+                return false;
+            }
+        };
+        contents.setWidget(2, 1, get);
+        contents.getFlexCellFormatter().setHorizontalAlignment(2, 1, HasAlignment.ALIGN_CENTER);
+        contents.getFlexCellFormatter().setVerticalAlignment(2, 1, HasAlignment.ALIGN_TOP);
+        add(contents);
+    }
+
+    protected void showGrid ()
+    {
+        clear();
 
         add(_info = new SmartTable("Info", 5, 0));
         _info.setWidget(0, 2, hoverize(Widgets.newActionLabel("", "Powerups", new ClickHandler() {
@@ -163,24 +238,11 @@ public class GridPanel extends DataPanel<GameService.GridResult>
 
     protected void showPowerupsMenu (final Widget trigger)
     {
-        FlowPanel contents = new FlowPanel();
-        final PopupPanel popup = Popups.newPopup("powerPopup", contents);
-        popup.setAutoHideEnabled(true);
-        contents.add(Widgets.newActionLabel("", "Top", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                popup.hide();
-            }
-        }));
-
-        SmartTable items = new SmartTable("Items", 0, 0);
-        contents.add(items);
-        for (final Powerup pup : Powerup.POST_GRID) {
-            final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
-            int row = items.addWidget(PowerupUI.newIcon(pup), 1, "Icon");
-            items.getRowFormatter().setStyleName(row, "Item");
-            Label plabel = Widgets.newInlineLabel(" " + Messages.xlate(pup.toString()));
-            plabel.setTitle(Messages.xlate(pup + "_descrip"));
-            if (charges.get() > 0) {
+        final PopupPanel popup = new PopupPanel(true);
+        popup.setStyleName("powerPopup");
+        popup.setWidget(new PowerupsMenu(Powerup.POST_GRID, popup) {
+            protected void activatePup (Label plabel, final Powerup pup,
+                                        final Value<Integer> charges) {
                 new ClickCallback<Grid>(plabel) {
                     protected boolean callService () {
                         popup.hide();
@@ -198,21 +260,48 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                         return false;
                     }
                 };
-            } else {
-                items.getRowFormatter().addStyleName(row, "Disabled");
             }
-            items.setWidget(row, 1, plabel);
-            items.setWidget(row, 2, ValueLabel.create("inline", charges), 1, "Charges");
+        });
+        Popups.showOver(popup, trigger);
+    }
+
+    protected abstract class PowerupsMenu extends FlowPanel
+    {
+        public PowerupsMenu (Powerup[] pups, PopupPanel popup)
+        {
+            setStyleName("powerMenu");
+            ClickHandler hider = (popup == null) ? null : Popups.createHider(popup);
+            add(Widgets.newActionLabel("", "Top", hider));
+
+            SmartTable items = new SmartTable("Items", 0, 0);
+            add(items);
+            for (final Powerup pup : pups) {
+                final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
+                int row = items.addWidget(PowerupUI.newIcon(pup), 1, "Icon");
+                items.getRowFormatter().setStyleName(row, "Item");
+                Label plabel = Widgets.newInlineLabel(" " + Messages.xlate(pup.toString()));
+                plabel.setTitle(Messages.xlate(pup + "_descrip"));
+                if (charges.get() > 0) {
+                    activatePup(plabel, pup, charges);
+                } else {
+                    items.getRowFormatter().addStyleName(row, "Disabled");
+                }
+                items.setWidget(row, 1, plabel);
+                items.setWidget(row, 2, ValueLabel.create("inline", charges), 1, "Charges");
+            }
+
+            int row = items.addText("", 1);
+            items.getRowFormatter().setStyleName(row, "Item");
+            Hyperlink shop = Args.createLink("Buy Powerups", Page.SHOP);
+            if (hider != null) {
+                shop.addClickHandler(hider);
+            }
+            items.setWidget(row, 1, shop, 2);
+
+            add(Widgets.newLabel("", "Bottom"));
         }
 
-        int row = items.addText("", 1);
-        items.getRowFormatter().setStyleName(row, "Item");
-        Hyperlink shop = Args.createLink("Buy Powerups", Page.SHOP);
-        shop.addClickHandler(Popups.createHider(popup));
-        items.setWidget(row, 1, shop, 2);
-
-        contents.add(Widgets.newLabel("", "Bottom"));
-        Popups.showOver(popup, trigger);
+        protected abstract void activatePup (Label plabel, Powerup pup, Value<Integer> charges);
     }
 
     protected static String format (Date date)

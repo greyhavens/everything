@@ -141,17 +141,21 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public GridResult getGrid () throws ServiceException
+    public GridResult getGrid (Powerup pup, boolean expectHave) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
         long now = System.currentTimeMillis();
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid == null || grid.expires.getTime() < now) {
+            if (expectHave) {
+                return null; // they thought they had a grid, but they don't, let them know
+            }
+
             // note the time that their old grid expired
             long oexpires = (grid == null) ? (now - GameUtil.ONE_DAY) : grid.expires.getTime();
 
             // generate a new grid
-            grid = _gameLogic.generateGrid(player, grid);
+            grid = _gameLogic.generateGrid(player, pup, grid);
 
             // store the new grid in ze database and reset the player's flipped status
             _gameRepo.storeGrid(grid);
@@ -162,7 +166,7 @@ public class GameServlet extends EveryServiceServlet
             int grantFlips = GameUtil.computeFreeFlips(player, elapsed);
             _playerRepo.grantFreeFlips(player, grantFlips);
 
-            log.info("Generated grid", "for", player.who(), "things", grid.thingIds,
+            log.info("Generated grid", "for", player.who(), "pup", pup, "things", grid.thingIds,
                      "expires", grid.expires, "elapsed", elapsed, "flips", grantFlips);
         }
 
@@ -337,6 +341,11 @@ public class GameServlet extends EveryServiceServlet
     public void buyPowerup (Powerup type) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
+
+        // sanity check
+        if (type == null || type.cost <= 0) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
 
         // if this is a permanent powerup, make sure they don't already own it
         if (type.isPermanent()) {

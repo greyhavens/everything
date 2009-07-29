@@ -20,6 +20,19 @@ public class PowerupsModel
         refresh(powerups);
     }
 
+    /**
+     * Returns true if we have any pre-grid powerups.
+     */
+    public boolean havePreGrid ()
+    {
+        for (Powerup pup : Powerup.PRE_GRID) {
+            if (getCharges(pup).get() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Value<Integer> getCharges (Powerup type)
     {
         Value<Integer> charges = _powerups.get(type);

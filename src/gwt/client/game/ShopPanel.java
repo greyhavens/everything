@@ -47,6 +47,9 @@ public class ShopPanel extends DataPanel<GameService.ShopResult>
         table.setText(1, 2, "Cost", 2, "Header", "center");
 
         for (final Powerup type : Powerup.values()) {
+            if (type.cost <= 0) {
+                continue; // skip non-salable pups
+            }
             int row = table.addWidget(PowerupUI.newIcon(type), 1, "Icon");
             table.setWidget(row, 1, Widgets.newFlowPanel(
                                 Widgets.newLabel(Messages.xlate(type.toString()), "Name"),

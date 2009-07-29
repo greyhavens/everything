@@ -3,6 +3,8 @@
 
 package com.threerings.everything.data;
 
+import java.util.EnumSet;
+
 import com.samskivert.depot.ByteEnum;
 
 /**
@@ -20,6 +22,9 @@ public enum Rarity implements ByteEnum
     VIII(7, 380, "Very rare"),
     IX(8, 615, "Ultra rare"),
     X(9, 995, "Mythical");
+
+    /** Cards considered rare enough to be exciting. */
+    public static EnumSet<Rarity> BONUS = EnumSet.of(V, VI, VII, VIII, IX, X);
 
     /** The coin value of a card of this rarity. */
     public final int value;

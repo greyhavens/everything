@@ -12,6 +12,9 @@ import com.samskivert.depot.ByteEnum;
  */
 public enum Powerup implements ByteEnum
 {
+    /** The non-powerup. */
+    NOOP(0, 0, 0),
+
     //
     // consumable powerups (id starts at 1)
 
@@ -36,6 +39,42 @@ public enum Powerup implements ByteEnum
         }
     },
 
+    /** Generates grid that contains only cards not held by the player. */
+    ALL_NEW_CARDS(4, 250, 3),
+
+    /** Generates grid that contains only cards in series being collected. */
+    ALL_COLLECTED_SERIES(5, 250, 3),
+
+    /** Generates grid that contains at least one rarity VII card. */
+    ENSURE_ONE_VII(6, 250, 3) {
+        public Rarity getBonusRarity () {
+            return Rarity.VII;
+        }
+    },
+
+    /** Generates grid that contains at least one rarity VIII card. */
+    ENSURE_ONE_VIII(7, 500, 3) {
+        public Rarity getBonusRarity () {
+            return Rarity.VIII;
+        }
+    },
+
+    /** Generates grid that contains at least one rarity IX card. */
+    ENSURE_ONE_IX(8, 750, 3) {
+        public Rarity getBonusRarity () {
+            return Rarity.IX;
+        }
+    },
+
+    /** Generates grid that contains at least one rarity X card. */
+    ENSURE_ONE_X(9, 1000, 3) {
+        public Rarity getBonusRarity () {
+            return Rarity.X;
+        }
+    },
+
+    // TODO: all cards from category X?
+
     //
     // permanent powerups (id starts at 64)
 
@@ -47,11 +86,15 @@ public enum Powerup implements ByteEnum
     };
 
     /** Those powerups that can be used during the grid creation process. */
-    // public static EnumSet<Powerup> PRE_GRID = EnumSet.of(TODO);
+    public static Powerup[] PRE_GRID = new Powerup[] {
+        ALL_NEW_CARDS, ALL_COLLECTED_SERIES, ENSURE_ONE_VII, ENSURE_ONE_VIII, ENSURE_ONE_IX,
+        ENSURE_ONE_X
+    };
 
     /** Those powerups that can be used on a realized grid. */
-    public static EnumSet<Powerup> POST_GRID =
-        EnumSet.of(SHOW_CATEGORY, SHOW_SUBCATEGORY, SHOW_SERIES);
+    public static Powerup[] POST_GRID = new Powerup[] {
+        SHOW_CATEGORY, SHOW_SUBCATEGORY, SHOW_SERIES
+    };
 
     /** The cost of this powerup in coins. */
     public final int cost;
@@ -81,6 +124,15 @@ public enum Powerup implements ByteEnum
      * this is not a flag activating powerup.
      */
     public Player.Flag getTargetFlag ()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the rarity of the bonus card placed into a grid created with this powerup. If null,
+     * the default is used (anything V or higher).
+     */
+    public Rarity getBonusRarity ()
     {
         return null;
     }

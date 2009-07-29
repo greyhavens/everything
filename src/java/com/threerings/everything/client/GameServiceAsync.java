@@ -35,7 +35,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#getGrid}.
      */
-    void getGrid (AsyncCallback<GameService.GridResult> callback);
+    void getGrid (Powerup pup, boolean expectHave, AsyncCallback<GameService.GridResult> callback);
 
     /**
      * The async version of {@link GameService#flipCard}.

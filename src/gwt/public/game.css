@@ -245,6 +245,15 @@
   background: url(images/page_flip.png) no-repeat;
 }
 
+.grid .PreGrid {
+  margin: 0px auto;
+}
+
+.grid .PreGrid .Title {
+  font-size: 18px;
+  text-align: center;
+}
+
 .grid .Info {
   margin: 0px auto;
 }
@@ -272,44 +281,44 @@
   background: url(images/powerup/button_over.png);
 }
 
-.powerPopup {
-  z-index: 5;
-}
-
-.powerPopup .Top {
+.powerMenu .Top {
   background: url(images/powerup/menu_top.png);
   width: 201px;
   height: 49px;
 }
 
-.powerPopup .Items {
+.powerMenu .Items {
   background: url(images/powerup/item_up.png);
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   width: 201px;
   font-size: 12px;
 }
 
-.powerPopup .Icon {
+.powerMenu .Icon {
   padding: 2px 5px 0px 25px;
 }
 
-.powerPopup .Item {
+.powerMenu .Item {
   padding-top: 2px;
   height: 38px;
 }
 
-.powerPopup .Disabled {
+.powerMenu .Disabled {
   color: #999999;
 }
 
-.powerPopup .Charges {
+.powerMenu .Charges {
   padding-right: 30px;
 }
 
-.powerPopup .Bottom {
+.powerMenu .Bottom {
   background: url(images/powerup/menu_bottom.png);
   width: 201px;
   height: 19px;
+}
+
+.powerPopup {
+  z-index: 5;
 }
 
 /** SeriesPopup styles */

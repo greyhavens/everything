@@ -31,15 +31,18 @@ import com.samskivert.util.IntSet;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.client.GameCodes;
+import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
+import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
@@ -71,13 +74,19 @@ public class GameLogic
     /**
      * Generates a new grid for the supplied player.
      */
-    public GridRecord generateGrid (PlayerRecord player, GridRecord previous)
+    public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
+        throws ServiceException
     {
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
-        grid.thingIds = selectGridThings(player);
+        grid.thingIds = selectGridThings(player, pup);
         grid.status = GridStatus.NORMAL;
+
+        // now that we successfully selected things for our grid, consume the powerup
+        if (pup != Powerup.NOOP && !_gameRepo.consumePowerupCharge(player.userId, pup)) {
+            throw new ServiceException(GameService.E_LACK_CHARGE);
+        }
 
         // grids generally expire at midnight in the player's timezone
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(player.timezone));
@@ -252,12 +261,11 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    protected int[] selectGridThings (PlayerRecord player)
+    protected int[] selectGridThings (PlayerRecord player, Powerup pup)
+        throws ServiceException
     {
         ThingIndex index = getThingIndex();
         IntSet thingIds = new ArrayIntSet();
-
-        // TODO: see if this player has any active powerups, apply them during selection
 
         // load up this player's collection summary, identify incomplete series
         IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(player.userId);
@@ -268,13 +276,47 @@ public class GameLogic
             }
         }
 
+        // select the bonus card for the grid
+        Rarity bonus = (pup == null) ? null : pup.getBonusRarity();
+        if (bonus == null) {
+            thingIds.add(index.pickBonusThing());
+        } else {
+            thingIds.add(index.pickThingOf(bonus));
+        }
+
         // select up to half of our cards from series we are collecting
-        int ownedCount = Math.min(ownedCats.size(), Grid.GRID_SIZE/2);
-        index.selectThings(ownedCount, ownedCats, thingIds);
+        int ownedCount;
+        switch (pup) {
+        case ALL_COLLECTED_SERIES:
+            if (ownedCats.size() < Grid.GRID_SIZE/2) {
+                throw new ServiceException(GameService.E_TOO_FEW_SERIES);
+            }
+            ownedCount = ownedCats.size();
+            break;
+        case ALL_NEW_CARDS:
+            ownedCount = 0;
+            break;
+        default:
+            ownedCount = Math.min(ownedCats.size(), Grid.GRID_SIZE/2);
+            break;
+        }
+        if (ownedCount > 0) {
+            index.selectThingsFrom(ownedCats, ownedCount, thingIds);
+        }
+
+        // if they requested all new cards, load up the things they own
+        IntSet excludeIds = new ArrayIntSet();
+        if (pup == Powerup.ALL_NEW_CARDS) {
+            for (CardRecord card : _gameRepo.loadCards(player.userId)) {
+                excludeIds.add(card.thingId);
+            }
+        }
 
         // now select the remainder randomly from all possible things
         int randoCount = Grid.GRID_SIZE - thingIds.size();
-        index.selectThings(randoCount, thingIds);
+        if (randoCount > 0) {
+            index.selectThings(randoCount, thingIds, excludeIds);
+        }
 
         // shuffle the resulting thing ids for maximum randosity
         int[] ids = thingIds.toIntArray();
