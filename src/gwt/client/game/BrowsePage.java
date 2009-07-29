@@ -84,7 +84,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     }
                     Widget name;
                     if (_seriesId == card.categoryId) {
-                        name = Args.createInlink(card.name, Page.BROWSE);
+                        name = Args.createInlink(card.name, Page.BROWSE, coll.owner.userId);
                     } else {
                         name = Args.createInlink(
                             card.name, Page.BROWSE, coll.owner.userId, card.categoryId);
