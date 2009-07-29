@@ -44,8 +44,17 @@ public class AuthServlet extends AppServlet
             }
         }
 
+        // if we're the release candidate, use /candidate/everything/ otherwise use the versionless
+        // URL and let GWT complain if someone makes an out of date service request (mostly things
+        // are fine from version to version and not using the versioned URL means we don't start
+        // 404ing after a release)
+        String indexPath = "/everything/";
+        if (_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+            indexPath = "/" + AppCodes.RELEASE_CANDIDATE + indexPath;
+        }
+
         // otherwise pass the buck to the app servlet, it may have to get jiggy
-        doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, "/" + _appvers + "/everything/");
+        doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, indexPath);
     }
 
     @Inject protected EverythingApp _app;
