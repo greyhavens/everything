@@ -16,9 +16,9 @@ import client.util.Context;
 /**
  * The main interface displayed when the player arrives at the game.
  */
-public class LandingPanel extends FlowPanel
+public class LandingPage extends FlowPanel
 {
-    public LandingPanel (Context ctx, Value<News> news)
+    public LandingPage (Context ctx, Value<News> news)
     {
         setStyleName("landing");
         addStyleName("page"); // we're a top-level page

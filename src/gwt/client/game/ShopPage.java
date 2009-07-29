@@ -25,9 +25,9 @@ import client.util.Messages;
 /**
  * Displays the shop where a player can buy powerups.
  */
-public class ShopPanel extends DataPanel<GameService.ShopResult>
+public class ShopPage extends DataPanel<GameService.ShopResult>
 {
-    public ShopPanel (Context ctx)
+    public ShopPage (Context ctx)
     {
         super(ctx, "page", "shop");
         _gamesvc.getShopInfo(createCallback());

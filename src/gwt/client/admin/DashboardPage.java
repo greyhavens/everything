@@ -44,9 +44,9 @@ import client.util.PopupCallback;
 /**
  * Displays an admin dashboard.
  */
-public class DashboardPanel extends DataPanel<AdminService.DashboardResult>
+public class DashboardPage extends DataPanel<AdminService.DashboardResult>
 {
-    public DashboardPanel (Context ctx, Value<News> news)
+    public DashboardPage (Context ctx, Value<News> news)
     {
         super(ctx, "page", "dashboard");
         _news = news;

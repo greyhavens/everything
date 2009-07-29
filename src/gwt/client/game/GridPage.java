@@ -53,9 +53,9 @@ import client.util.PopupCallback;
 /**
  * Displays a player's grid, allows flipping of cards.
  */
-public class GridPanel extends DataPanel<GameService.GridResult>
+public class GridPage extends DataPanel<GameService.GridResult>
 {
-    public GridPanel (Context ctx)
+    public GridPage (Context ctx)
     {
         super(ctx, "page", "grid");
         addStyleName("machine");

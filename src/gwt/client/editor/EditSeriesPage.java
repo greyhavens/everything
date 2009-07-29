@@ -54,9 +54,9 @@ import client.util.PopupCallback;
 /**
  * Displays an interface for editing a particular series.
  */
-public class EditSeriesPanel extends DataPanel<EditorService.SeriesResult>
+public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
 {
-    public EditSeriesPanel (Context ctx, int categoryId)
+    public EditSeriesPage (Context ctx, int categoryId)
     {
         super(ctx, "page", "editSeries");
         _editorsvc.loadSeries(categoryId, createCallback());

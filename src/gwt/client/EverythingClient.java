@@ -27,15 +27,15 @@ import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
-import client.admin.DashboardPanel;
-import client.editor.EditCatsPanel;
-import client.editor.EditSeriesPanel;
+import client.admin.DashboardPage;
+import client.editor.EditCatsPage;
+import client.editor.EditSeriesPage;
 import client.game.AddAppPanel;
-import client.game.BrowsePanel;
-import client.game.FriendsPanel;
-import client.game.GridPanel;
-import client.game.LandingPanel;
-import client.game.ShopPanel;
+import client.game.BrowsePage;
+import client.game.FriendsPage;
+import client.game.GridPage;
+import client.game.LandingPage;
+import client.game.ShopPage;
 import client.ui.XFBML;
 import client.util.Args;
 import client.util.CategoriesModel;
@@ -161,14 +161,14 @@ public class EverythingClient
         // these are OK to view as a guest
         switch (args.page) {
         case LANDING:
-            setContent(new LandingPanel(this, _news));
+            setContent(new LandingPage(this, _news));
             return;
         case BROWSE:
             if (args.get(0, getMe().userId) != 0) {
-                if (!(_content instanceof BrowsePanel)) {
-                    setContent(new BrowsePanel(this));
+                if (!(_content instanceof BrowsePage)) {
+                    setContent(new BrowsePage(this));
                 }
-                ((BrowsePanel)_content).setArgs(args.get(0, getMe().userId), args.get(1, 0));
+                ((BrowsePage)_content).setArgs(args.get(0, getMe().userId), args.get(1, 0));
                 return;
             }
             break;
@@ -183,13 +183,13 @@ public class EverythingClient
         // these are OK as a regular player
         switch (args.page) {
         case FLIP:
-            setContent(new GridPanel(this));
+            setContent(new GridPage(this));
             return;
         case SHOP:
-            setContent(new ShopPanel(this));
+            setContent(new ShopPage(this));
             return;
         case FRIENDS:
-            setContent(new FriendsPanel(this));
+            setContent(new FriendsPage(this));
             return;
         }
 
@@ -197,13 +197,13 @@ public class EverythingClient
         if (isEditor()) {
             switch (args.page) {
             case EDIT_CATS:
-                if (!(_content instanceof EditCatsPanel)) {
-                    setContent(new EditCatsPanel(this));
+                if (!(_content instanceof EditCatsPage)) {
+                    setContent(new EditCatsPage(this));
                 }
-                ((EditCatsPanel)_content).setArgs(args);
+                ((EditCatsPage)_content).setArgs(args);
                 return;
             case EDIT_SERIES:
-                setContent(new EditSeriesPanel(this, args.get(0, 0)));
+                setContent(new EditSeriesPage(this, args.get(0, 0)));
                 return;
             }
         }
@@ -212,13 +212,13 @@ public class EverythingClient
         if (isAdmin()) {
             switch (args.page) {
             case DASHBOARD:
-                setContent(new DashboardPanel(this, _news));
+                setContent(new DashboardPage(this, _news));
                 return;
             }
         }
 
         // otherwise default to displaying the landing panel
-        setContent(new LandingPanel(this, _news));
+        setContent(new LandingPage(this, _news));
     }
 
     protected void gotSessionData (SessionData data)

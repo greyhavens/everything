@@ -24,9 +24,9 @@ import client.util.Context;
 /**
  * Displays all of a player's friends and allows them to browse their collections.
  */
-public class FriendsPanel extends DataPanel<List<FriendStatus>>
+public class FriendsPage extends DataPanel<List<FriendStatus>>
 {
-    public FriendsPanel (Context ctx)
+    public FriendsPage (Context ctx)
     {
         super(ctx, "page", "friends");
         _everysvc.getFriends(createCallback());

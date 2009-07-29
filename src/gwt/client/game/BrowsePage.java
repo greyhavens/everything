@@ -31,9 +31,9 @@ import client.util.PanelCallback;
 /**
  * Displays a player's collection.
  */
-public class BrowsePanel extends DataPanel<PlayerCollection>
+public class BrowsePage extends DataPanel<PlayerCollection>
 {
-    public BrowsePanel (Context ctx)
+    public BrowsePage (Context ctx)
     {
         super(ctx, "page", "browse");
     }

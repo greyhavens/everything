@@ -38,9 +38,9 @@ import client.util.PopupCallback;
 /**
  * Provides an interface for editing categories and things.
  */
-public class EditCatsPanel extends SmartTable
+public class EditCatsPage extends SmartTable
 {
-    public EditCatsPanel (Context ctx)
+    public EditCatsPage (Context ctx)
     {
         super("editCats", 5, 0);
         addStyleName("page");
