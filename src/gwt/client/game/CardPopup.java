@@ -67,7 +67,9 @@ public class CardPopup extends DataPopup<Card>
     {
         // if we're looking at someone else's card, we don't need any fancy stuff
         if (!_ctx.getMe().equals(card.owner)) {
-            return CardView.create(card, _title, null, ButtonUI.newButton("Close", onHide()));
+            PushButton want = ButtonUI.newButton("Want", makeThingHandler(card, "I wants it!"));
+            want.setTitle("Post to your Facebook feed that you want this card.");
+            return CardView.create(card, _title, null, want, ButtonUI.newButton("Close", onHide()));
         }
 
         String status = null;
@@ -111,15 +113,7 @@ public class CardPopup extends DataPopup<Card>
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
-        PushButton brag = ButtonUI.newButton("Brag", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                showBragDialog(card.thing.name, card.thing.descrip,
-                               ImageUtil.getImageURL(card.thing.image),
-                               "http://apps.facebook.com/everythinggame/?token=" +
-                               Args.createLinkToken(Page.BROWSE, card.owner.userId,
-                                                    card.thing.categoryId));
-            }
-        });
+        PushButton brag = ButtonUI.newButton("Brag", makeThingHandler(card, "Woo!"));
         brag.setTitle("Post this card to your Facebook feed.");
 
         PushButton done = ButtonUI.newButton("Keep", onHide());
@@ -128,8 +122,21 @@ public class CardPopup extends DataPopup<Card>
         return CardView.create(card, _title, status, sell, gift, brag, done);
     }
 
-    protected static native void showBragDialog (
-        String thing, String descrip, String image, String url) /*-{
+    protected ClickHandler makeThingHandler (final Card card, final String message)
+    {
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                showThingDialog(message, card.thing.name, card.thing.descrip,
+                                ImageUtil.getImageURL(card.thing.image),
+                                "http://apps.facebook.com/everythinggame/?token=" +
+                                Args.createLinkToken(Page.BROWSE, card.owner.userId,
+                                                     card.thing.categoryId));
+            }
+        };
+    }
+
+    protected static native void showThingDialog (
+        String message, String thing, String descrip, String image, String url) /*-{
         var attachment = {
             'name': thing,
             'description': descrip,
@@ -140,7 +147,7 @@ public class CardPopup extends DataPopup<Card>
             'properties': {'Play Everything': {'text': 'What will you get?',
                                                'href': 'http://apps.facebook.com/everythinggame/'}},
         };
-        $wnd.FB.Connect.streamPublish("Woo!", attachment);
+        $wnd.FB.Connect.streamPublish(message, attachment);
     }-*/;
 
     protected String _title;
