@@ -153,15 +153,18 @@
   background: url(images/card_back.png);
 }
 
-.thingCard .Name {
+.thingCard .Name, .thingCard .Rarity {
   position: absolute;
-  left: 0px;
-  top: 0px;
-  height: 17px;
-  padding-top: 4px;
+  left: 2px;
   margin: 0px 10px;
   width: 105px;
   z-index: 2;
+}
+
+.thingCard .Name {
+  top: 0px;
+  height: 17px;
+  padding-top: 4px;
 }
 .thingCard .NormalName {
   font-size: 14px;
@@ -173,15 +176,12 @@
 
 .thingCard .miniImageBox {
   position: absolute;
-  left: 0px;
+  left: 2px;
   top: 21px;
 }
 
 .thingCard .Rarity {
-  position: absolute;
   top: 128px;
-  left: 0px;
-  width: 100%;
 }
 
 /** AddAppPanel styles */
