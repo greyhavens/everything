@@ -28,7 +28,6 @@
 .imageBox .gwt-Image, .miniImageBox .gwt-Image {
   display: block;
   border: 1px solid #442D17;
-  margin: 0px auto;
 }
 
 /** CardView styles */
