@@ -128,9 +128,19 @@ public class CardPopup extends DataPopup<Card>
         return CardView.create(card, _title, status, sell, gift, brag, done);
     }
 
-    protected static native void showBragDialog (String thing, String descrip, String image,
-                                                 String url) /*-{
-        $wnd.FB_ShowBragDialog(thing, descrip, image, url);
+    protected static native void showBragDialog (
+        String thing, String descrip, String image, String url) /*-{
+        var attachment = {
+            'name': thing,
+            'description': descrip,
+            'href': url,
+            'media': [{'type': 'image',
+                       'src': image,
+                       'href': url }],
+            'properties': {'Play Everything': {'text': 'What will you get?',
+                                               'href': 'http://apps.facebook.com/everythinggame/'}},
+        };
+        $wnd.FB.Connect.streamPublish("Woo!", attachment);
     }-*/;
 
     protected String _title;

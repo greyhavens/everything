@@ -245,7 +245,16 @@ public class EverythingClient
     }-*/;
 
     protected static native void initFacebook (String apiKey) /*-{
-        $wnd.FB_Init(apiKey);
+        $wnd.FB_RequireFeatures(["XFBML"], function () {
+            $wnd.FB.init(apiKey, "xd_receiver.html");
+        });
+
+        // start up our iframe resizer once FB_Init is called by GWT
+        if ($wnd != $wnd.top) {
+            $wnd.FB.Bootstrap.ensureInit(function () {
+                $wnd.FB.CanvasClient.startTimerToSizeToContent();
+            });
+        }
     }-*/;
 
     protected SessionData _data;
