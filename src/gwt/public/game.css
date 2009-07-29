@@ -155,6 +155,7 @@
 
 .thingCard .Name {
   position: absolute;
+  left: 0px;
   top: 0px;
   height: 17px;
   padding-top: 4px;
@@ -172,6 +173,7 @@
 
 .thingCard .miniImageBox {
   position: absolute;
+  left: 0px;
   top: 21px;
 }
 
