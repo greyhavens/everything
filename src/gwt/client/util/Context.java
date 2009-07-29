@@ -40,7 +40,7 @@ public interface Context
     Value<Integer> getCoins ();
 
     /** Returns the time at which our current grid expires. */
-    long getGridExpiry ();
+    Value<Long> getGridExpiry ();
 
     /** Displays a popup, hiding any existing popup (which will be restored when this popup is
      * cleared). */

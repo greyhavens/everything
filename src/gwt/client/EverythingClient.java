@@ -127,9 +127,9 @@ public class EverythingClient
     }
 
     // from interface Context
-    public long getGridExpiry ()
+    public Value<Long> getGridExpiry ()
     {
-        return _data.gridExpires;
+        return _gridExpires;
     }
 
     // from interface Context
@@ -225,6 +225,7 @@ public class EverythingClient
     {
         _data = data;
         _coins = new Value<Integer>(data.coins);
+        _gridExpires = new Value<Long>(data.gridExpires);
         _news = new Value<News>(data.news);
         _pupsmodel = new PowerupsModel(data.powerups);
         setContent(null);
@@ -259,6 +260,7 @@ public class EverythingClient
 
     protected SessionData _data;
     protected Value<Integer> _coins;
+    protected Value<Long> _gridExpires;
     protected Value<News> _news;
 
     protected HeaderPanel _header;

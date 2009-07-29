@@ -61,7 +61,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         addStyleName("machine");
 
         // if we expect that we've already got a grid, request that
-        if (ctx.getGridExpiry() > System.currentTimeMillis()) {
+        if (ctx.getGridExpiry().get() > System.currentTimeMillis()) {
             _gamesvc.getGrid(Powerup.NOOP, true, createCallback());
         } else {
             figurePreGrid();
@@ -75,6 +75,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             figurePreGrid();
         } else {
             _data = data;
+            _ctx.getGridExpiry().update(_data.grid.expires.getTime());
             showGrid();
         }
     }
@@ -100,8 +101,8 @@ public class GridPanel extends DataPanel<GameService.GridResult>
         clear();
 
         SmartTable contents = new SmartTable("PreGrid", 5, 0);
-        contents.setText(0, 0, "It's time for a new grid!", 2, "Title", "machine");
-        contents.setText(1, 0, "Use a powerup:", 1, "machine");
+        contents.setText(0, 0, "It's time for a new grid!", 3, "Title", "machine");
+        contents.setText(1, 0, "Click a powerup:", 1, "machine", "center");
         contents.setWidget(2, 0, new PowerupsMenu(Powerup.PRE_GRID, null) {
             protected void activatePup (Label plabel, final Powerup pup,
                                         final Value<Integer> charges) {
@@ -119,7 +120,7 @@ public class GridPanel extends DataPanel<GameService.GridResult>
             }
         });
 
-        contents.setText(1, 1, "Or get a stock grid", 1, "machine");
+        contents.setText(1, 2, "Or get a stock grid:", 1, "machine");
         PushButton get = ButtonUI.newButton("Get!");
         new ClickCallback<GameService.GridResult>(get) {
             protected boolean callService () {
@@ -131,9 +132,10 @@ public class GridPanel extends DataPanel<GameService.GridResult>
                 return false;
             }
         };
-        contents.setWidget(2, 1, get);
-        contents.getFlexCellFormatter().setHorizontalAlignment(2, 1, HasAlignment.ALIGN_CENTER);
-        contents.getFlexCellFormatter().setVerticalAlignment(2, 1, HasAlignment.ALIGN_TOP);
+        contents.setWidget(2, 1, Widgets.newShim(50, 50));
+        contents.setWidget(2, 2, get);
+        contents.getFlexCellFormatter().setHorizontalAlignment(2, 2, HasAlignment.ALIGN_CENTER);
+        contents.getFlexCellFormatter().setVerticalAlignment(2, 2, HasAlignment.ALIGN_TOP);
         add(contents);
     }
 
