@@ -93,7 +93,12 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         name.addStyleName("Complete");
                     }
                     cards.add(name);
-                    Value<Integer> owned = new Value<Integer>(card.owned);
+                    Value<Integer> owned = new Value<Integer>(card.owned) {
+                        public void update (Integer value) {
+                            super.update(value);
+                            card.owned = value;
+                        }
+                    };
                     cards.add(new ValueLabel<Integer>("Held", owned) {
                         protected String getText (Integer owned) {
                             return " " + owned + " of " + card.things;
