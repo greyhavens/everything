@@ -58,14 +58,14 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
             break;
         case GIFTED:
-            action.add(Widgets.newInlineLabel(" gave"));
+            action.add(Widgets.newInlineLabel(" gave "));
             addGift(action, item);
             if (item.message == null) {
                 for (int ii = 0; ii < items.size(); ii++) {
                     FeedItem eitem = items.get(ii);
                     if (eitem.actor.equals(item.actor) && eitem.type == item.type &&
                         eitem.message == null) {
-                        action.add(Widgets.newInlineLabel(" and "));
+                        action.add(Widgets.newInlineLabel(", "));
                         addGift(action, eitem);
                         items.remove(ii--);
                     }
