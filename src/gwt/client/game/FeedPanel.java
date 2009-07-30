@@ -40,33 +40,42 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
     @Override // from DataPanel
     protected void init (List<FeedItem> items)
     {
-        for (FeedItem item : items) {
-            add(formatItem(item));
+        while (items.size() > 0) {
+            add(formatItem(items.remove(0), items));
         }
         XFBML.parse(this);
     }
 
-    protected Widget formatItem (FeedItem item)
+    protected Widget formatItem (FeedItem item, List<FeedItem> items)
     {
         FlowPanel action = Widgets.newFlowPanel("Action");
         action.add(Args.createInlink(getName(item.actor, true),
                                      Page.BROWSE, item.actor.userId));
-        String objmsg, comtitle = null;
+        String objmsg;
         switch (item.type) {
         case FLIPPED:
             objmsg = format(item.objects, "card", "cards");
             action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
-            comtitle = item.actor + " flipped the " + objmsg + ".";
             break;
         case GIFTED:
-            objmsg = format(item.objects, "card", "cards");
-            action.add(Widgets.newHTML(" gave the " + objmsg + " to ", "inline"));
-            action.add(Args.createInlink(getName(item.target, false),
-                                         Page.BROWSE, item.target.userId));
-            String post = (item.message == null) ? "." :
-                ". " + item.actor.name + " said \"" + item.message + "\"";
-            action.add(Widgets.newInlineLabel(post));
-            comtitle = item.actor + " gave the  " + objmsg + " to " + item.target + ".";
+            action.add(Widgets.newInlineLabel(" gave"));
+            addGift(action, item);
+            if (item.message == null) {
+                for (int ii = 0; ii < items.size(); ii++) {
+                    FeedItem eitem = items.get(ii);
+                    if (eitem.actor.equals(item.actor) && eitem.type == item.type &&
+                        eitem.message == null) {
+                        action.add(Widgets.newInlineLabel(" and "));
+                        addGift(action, eitem);
+                        items.remove(ii--);
+                    }
+                }
+            }
+            action.add(Widgets.newInlineLabel("."));
+            if (item.message != null) {
+                String msg = " " + item.actor.name + " said \"" + item.message + "\"";
+                action.add(Widgets.newInlineLabel(msg));
+            }
             break;
         case COMMENT:
             action.add(Widgets.newInlineLabel(" commented on your category "));
@@ -75,20 +84,21 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         case COMPLETED:
             objmsg = format(item.objects, "series", "series");
             action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
-            comtitle = item.actor + " completed the " + objmsg + "!";
             break;
         default:
             action.add(Widgets.newInlineLabel(" did something mysterious."));
             break;
         }
         action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
-// need to find out how to just show _Comments_ and expand it only if there are comments
-//         if (comtitle != null) {
-//             String xid = "feed:" + item.actor.facebookId + ":" + item.when.getTime();
-//             action.add(XFBML.newCommentsBox(xid, comtitle, 3));
-//         }
         return Widgets.newRow(HasAlignment.ALIGN_TOP, "Item",
                               XFBML.newProfilePic(item.actor.facebookId), action);
+    }
+
+    protected void addGift (FlowPanel action, FeedItem item)
+    {
+        String objmsg = format(item.objects, "card", "cards");
+        action.add(Widgets.newHTML("the " + objmsg + " to ", "inline"));
+        action.add(Args.createInlink(getName(item.target, false), Page.BROWSE, item.target.userId));
     }
 
     protected String getName (PlayerName name, boolean capital)

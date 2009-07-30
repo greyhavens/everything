@@ -299,24 +299,21 @@ public class EverythingServlet extends EveryServiceServlet
         public final int actorId;
         public final FeedItem.Type type;
         public final int targetId;
-        public final int dayOfYear;
 
         public ItemKey (FeedItem item, Calendar cal) {
             this.actorId = item.actor.userId;
             this.type = item.type;
             cal.setTime(item.when);
-            this.dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
             this.targetId = (item.target == null) ? 0 : item.target.userId;
         }
 
         public int hashCode () {
-            return actorId ^ type.hashCode() ^ targetId ^ dayOfYear;
+            return actorId ^ type.hashCode() ^ targetId;
         }
 
         public boolean equals (Object other) {
             ItemKey okey = (ItemKey)other;
-            return actorId == okey.actorId && type == okey.type && targetId == okey.targetId &&
-                dayOfYear == okey.dayOfYear;
+            return actorId == okey.actorId && type == okey.type && targetId == okey.targetId;
         }
     }
 
