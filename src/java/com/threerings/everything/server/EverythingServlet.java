@@ -259,8 +259,8 @@ public class EverythingServlet extends EveryServiceServlet
         result.editors = Lists.newArrayList(_playerRepo.loadPlayerNames(edinfo.keySet()).values());
         Collections.sort(result.editors, new Comparator<PlayerName>() {
             public int compare (PlayerName one, PlayerName two) {
-                return Comparators.compare(edinfo.getOrElse(one.userId, 0),
-                                           edinfo.getOrElse(two.userId, 0));
+                return Comparators.compare(edinfo.getOrElse(two.userId, 0),
+                                           edinfo.getOrElse(one.userId, 0));
             }
         });
         return result;
