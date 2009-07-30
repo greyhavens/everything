@@ -124,7 +124,18 @@ public class EverythingServlet extends EveryServiceServlet
             long birthday = 0L;
             try {
                 if (bdstr != null) {
-                    birthday = _bfmt.parse(bdstr).getTime();
+                    Calendar cal = Calendar.getInstance();
+                    if (bdstr.indexOf(",") == -1) {
+                        cal.setTime(_bdfmt.parse(bdstr));
+                        // when parsing a date that lacks a year, Java leaves the year at 1970, but
+                        // we want to distinguish our unknown year people from people who happen to
+                        // be 39 years old (as of 2009 anyway), so roll the year back to a time
+                        // when we're extremely unlikely to collide with real people
+                        cal.set(Calendar.YEAR, 1875);
+                    } else {
+                        cal.setTime(_bfmt.parse(bdstr));
+                    }
+                    birthday = cal.getTimeInMillis();
                 }
             } catch (Exception e) {
                 log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
@@ -327,6 +338,9 @@ public class EverythingServlet extends EveryServiceServlet
 
     /** Used to parse Facebook profile birthdays. */
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");
+
+    /** Used to parse Facebook profile birthdays that lack years. */
+    protected static SimpleDateFormat _bdfmt = new SimpleDateFormat("MMMM dd");
 
     /** The maximum number of recent feed items returned. */
     protected static final int RECENT_FEED_ITEMS = 50;
