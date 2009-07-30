@@ -198,8 +198,10 @@ public class GridPage extends DataPanel<GameService.GridResult>
 
         if (status.freeFlips > 0) {
             _info.setText(0, 0, "Free flips left: " + status.freeFlips, 1);
-        } else {
+        } else if (status.nextFlipCost > 0) {
             _info.setWidget(0, 0, new CoinLabel("Next flip costs ", status.nextFlipCost), 1);
+        } else {
+            _info.setText(0, 0, "No more flips.", 1);
         }
         _info.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()), 1, "right");
     }
