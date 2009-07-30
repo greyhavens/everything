@@ -22,4 +22,22 @@ public interface PowerupImages extends ImageBundle
 
     @Resource("extra_flip.png")
     AbstractImagePrototype extra_flip ();
+
+    @Resource("all_new_cards.png")
+    AbstractImagePrototype all_new_cards ();
+
+    @Resource("all_collected_series.png")
+    AbstractImagePrototype all_collected_series ();
+
+    @Resource("ensure_one_vii.png")
+    AbstractImagePrototype ensure_one_vii ();
+
+    @Resource("ensure_one_viii.png")
+    AbstractImagePrototype ensure_one_viii ();
+
+    @Resource("ensure_one_ix.png")
+    AbstractImagePrototype ensure_one_ix ();
+
+    @Resource("ensure_one_x.png")
+    AbstractImagePrototype ensure_one_x ();
 }

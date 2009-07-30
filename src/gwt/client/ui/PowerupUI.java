@@ -39,5 +39,11 @@ public class PowerupUI
         _picons.put(Powerup.SHOW_SUBCATEGORY, _pupimgs.show_subcategory());
         _picons.put(Powerup.SHOW_SERIES, _pupimgs.show_series());
         _picons.put(Powerup.EXTRA_FLIP, _pupimgs.extra_flip());
+        _picons.put(Powerup.ALL_NEW_CARDS, _pupimgs.all_new_cards());
+        _picons.put(Powerup.ALL_COLLECTED_SERIES, _pupimgs.all_collected_series());
+        _picons.put(Powerup.ENSURE_ONE_VII, _pupimgs.ensure_one_vii());
+        _picons.put(Powerup.ENSURE_ONE_VIII, _pupimgs.ensure_one_viii());
+        _picons.put(Powerup.ENSURE_ONE_IX, _pupimgs.ensure_one_ix());
+        _picons.put(Powerup.ENSURE_ONE_X, _pupimgs.ensure_one_x());
     }
 }
