@@ -276,12 +276,9 @@ public class GameLogic
             }
         }
 
-        // select the bonus card for the grid
-        Rarity bonus = (pup == null) ? null : pup.getBonusRarity();
-        if (bonus == null) {
-            thingIds.add(index.pickBonusThing());
-        } else {
-            thingIds.add(index.pickThingOf(bonus));
+        // if they requested a specific bonus card for the grid, do that now
+        if (pup.getBonusRarity() != null) {
+            thingIds.add(index.pickThingOf(pup.getBonusRarity()));
         }
 
         // select up to half of our cards from series we are collecting
@@ -291,7 +288,7 @@ public class GameLogic
             if (ownedCats.size() < Grid.GRID_SIZE/2) {
                 throw new ServiceException(GameService.E_TOO_FEW_SERIES);
             }
-            ownedCount = ownedCats.size();
+            ownedCount = Grid.GRID_SIZE - thingIds.size();
             break;
         case ALL_NEW_CARDS:
             ownedCount = 0;
@@ -312,10 +309,29 @@ public class GameLogic
             }
         }
 
+        // if we're not using a powerup, pick a bonus card for the grid
+        if (pup.getBonusRarity() == null && thingIds.size() < Grid.GRID_SIZE) {
+            for (int ii = 0; ii < MAX_BONUS_ATTEMPTS; ii++) {
+                if (thingIds.add(index.pickBonusThing())) {
+                    break;
+                }
+            }
+        }
+
         // now select the remainder randomly from all possible things
         int randoCount = Grid.GRID_SIZE - thingIds.size();
         if (randoCount > 0) {
             index.selectThings(randoCount, thingIds, excludeIds);
+        }
+
+        // sanity check that we don't have too many things
+        if (thingIds.size() > Grid.GRID_SIZE) {
+            log.warning("Zoiks! Generated too many things for grid", "who", player.who(),
+                        "pup", pup, "ownedCount", ownedCount, "randoCount", randoCount,
+                        "excludes", excludeIds.size());
+            while (thingIds.size() > Grid.GRID_SIZE) {
+                thingIds.remove(thingIds.interator().nextInt());
+            }
         }
 
         // shuffle the resulting thing ids for maximum randosity
@@ -418,4 +434,7 @@ public class GameLogic
 
     /** Recompute our thing index every five minutes. */
     protected static final long THING_INDEX_UPDATE_INTERVAL = 5 * 60 * 1000L;
+
+    /** We'll try 10 times to pick a bonus card before giving up. */
+    protected static final int MAX_BONUS_ATTEMPTS = 10;
 }
