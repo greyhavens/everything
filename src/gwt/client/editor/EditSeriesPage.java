@@ -151,7 +151,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 case IN_DEVELOPMENT: chstate.setText("Submit for review"); break;
                 case PENDING_REVIEW: chstate.setText("Cancel review"); break;
                 }
-                chstate.setVisible(!_ctx.isAdmin() && !series.isActive());
+                chstate.setVisible(_ctx.getMe().equals(series.creator) && !series.isActive());
             }
         });
         info.setText(row, 0, "State:");
