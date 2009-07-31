@@ -85,6 +85,10 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             objmsg = format(item.objects, "series", "series");
             action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
             break;
+        case NEW_SERIES:
+            objmsg = format(item.objects, "series", "series");
+            action.add(Widgets.newHTML(" added the " + objmsg + ".", "inline"));
+            break;
         default:
             action.add(Widgets.newInlineLabel(" did something mysterious."));
             break;

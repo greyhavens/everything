@@ -21,6 +21,7 @@ import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
+import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -67,8 +68,15 @@ public class EditorServlet extends EveryServiceServlet
             requireAdmin();
         }
 
-        // if we're activating, check to see if the creator has been paid for all of its things
+        // if we're activating...
         if (!ocategory.isActive() && category.isActive()) {
+            // possibly announce this new series
+            if (ocategory.paid == 0) {
+                Category[] cats = _gameLogic.resolveCategories(category.categoryId);
+                _playerRepo.recordFeedItem(category.creator.userId, FeedItem.Type.NEW_SERIES, 0,
+                                           Category.getHierarchy(cats), null);
+            }
+            // and check to see if the creator has been paid for all of its things
             int things = _thingRepo.getThingCount(ocategory.categoryId);
             if (ocategory.paid < things) {
                 int payout = (things - ocategory.paid) * GameCodes.COINS_PER_CREATED_CARD;
