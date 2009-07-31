@@ -18,6 +18,7 @@ import com.google.inject.name.Named;
 import com.samskivert.io.StreamUtil;
 import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
+import com.threerings.user.OOOUser;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.samsara.app.data.AppCodes;
@@ -128,6 +129,12 @@ public class EverythingApp extends App
         binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
         binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
         return binds.toArray(new Binding[binds.size()]);
+    }
+
+    @Override // from App
+    public int getSiteId ()
+    {
+        return OOOUser.EVERYTHING_SITE_ID;
     }
 
     @Override // from App
