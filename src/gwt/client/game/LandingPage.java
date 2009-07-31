@@ -79,7 +79,7 @@ public class LandingPage extends FlowPanel
         "Everything is a collecting game. Every day you get a new grid of cards and you " +
         "flip them over to get new things to add to your collection. Some cards are rarer " +
         "than others, so good luck.",
-        "You get three free flips every day, but you can buy more flips by spending coins " +
+        "You get five free flips every day, but you can buy more flips by spending coins " +
         "you get from cashing in cards you don't want. Rarer cards are worth more coins when " +
         "you cash them in. You can also give cards to your friends to help them complete their " +
         "collections.",
