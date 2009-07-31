@@ -64,7 +64,7 @@ public class Category
         StringBuilder buf = new StringBuilder();
         for (Category cat : cats) {
             if (buf.length() > 0) {
-                buf.append(" ‣ ");
+                buf.append(" \u2023 ");
             }
             buf.append(cat.name);
         }
