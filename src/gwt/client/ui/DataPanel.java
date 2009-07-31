@@ -37,7 +37,13 @@ public abstract class DataPanel<T> extends FlowPanel
         return new PanelCallback<T>(this) {
             public void onSuccess (T data) {
                 clear();
-                init(data);
+                try {
+                    init(data);
+                } catch (Exception e) {
+                    if (getWidgetCount() == 0) {
+                        add(Widgets.newLabel("Uh oh Spaghetti-Os! Something broke.", "infoLabel"));
+                    }
+                }
             }
         };
     }
