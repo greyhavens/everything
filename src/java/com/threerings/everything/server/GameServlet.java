@@ -246,7 +246,7 @@ public class GameServlet extends EveryServiceServlet
 
         // note that this player completed this series and if appropriate report to their feed
         if (result.thingsRemaining == 0) {
-            _gameLogic.maybeReportCompleted(player.userId, result.card.getSeries());
+            _gameLogic.maybeReportCompleted(player, result.card.getSeries(), "flip");
         }
 
         return result;

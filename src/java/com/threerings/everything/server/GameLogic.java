@@ -240,7 +240,7 @@ public class GameLogic
             Iterables.transform(_gameRepo.loadCards(targetId, things), Functions.CARD_THING_ID));
         holdings.add(card.thingId);
         if (things.size() - holdings.size() == 0) {
-            maybeReportCompleted(targetId, _thingRepo.loadCategory(thing.categoryId));
+            maybeReportCompleted(target, _thingRepo.loadCategory(thing.categoryId), "gift");
         }
     }
 
@@ -248,11 +248,11 @@ public class GameLogic
      * Records and reports that the specified player completed the specified series if they haven't
      * already completed the series.
      */
-    public void maybeReportCompleted (int userId, Category series)
+    public void maybeReportCompleted (PlayerRecord user, Category series, String how)
     {
-        if (_gameRepo.noteCompletedSeries(userId, series.categoryId)) {
-            log.info("Player completed series!", "who", userId, "series", series.name);
-            _playerRepo.recordFeedItem(userId, FeedItem.Type.COMPLETED, 0, series.name, null);
+        if (_gameRepo.noteCompletedSeries(user.userId, series.categoryId)) {
+            log.info("Series completed!", "who", user.who(), "series", series.name, "how", how);
+            _playerRepo.recordFeedItem(user.userId, FeedItem.Type.COMPLETED, 0, series.name, null);
         }
     }
 
