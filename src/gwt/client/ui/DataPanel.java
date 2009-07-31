@@ -6,6 +6,7 @@ package client.ui;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 
 import client.util.Context;
 import client.util.PanelCallback;
@@ -40,6 +41,7 @@ public abstract class DataPanel<T> extends FlowPanel
                 try {
                     init(data);
                 } catch (Exception e) {
+                    Console.log("DataPanel.init failed", e);
                     if (getWidgetCount() == 0) {
                         add(Widgets.newLabel("Uh oh Spaghetti-Os! Something broke.", "infoLabel"));
                     }
