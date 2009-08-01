@@ -36,7 +36,7 @@ public class AuthServlet extends AppServlet
         String passwd = ParameterUtil.getParameter(req, "pass", true);
         if (username != null && passwd != null) {
             try {
-                _servletLogic.logon(_app, username, StringUtil.md5hex(passwd), 2, rsp);
+                _servletLogic.logon(_app, req, rsp, username, StringUtil.md5hex(passwd), 2);
                 rsp.sendRedirect("index.html");
                 return;
             } catch (ServiceException se) {
