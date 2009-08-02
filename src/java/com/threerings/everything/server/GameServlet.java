@@ -229,7 +229,7 @@ public class GameServlet extends EveryServiceServlet
         result.thingsRemaining = things.size() - holdings.size();
 
         // create the card and add it to the player's collection, then resolve it
-        CardRecord card = _gameRepo.createCard(player.userId, thing.thingId);
+        CardRecord card = _gameRepo.createCard(player.userId, thing.thingId, 0);
         result.card = _gameLogic.resolveCard(card, thing, things);
 
         // decrement the unflipped count for the flipped card's rarity so that we can properly

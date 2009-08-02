@@ -128,6 +128,11 @@ public class EverythingApp extends App
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
         binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
         binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
+//         binds.add(Binding.Job.every(1, new Runnable() {
+//             public void run () {
+//                 _gameLogic.processBirthdays();
+//             }
+//         }));
         return binds.toArray(new Binding[binds.size()]);
     }
 
@@ -174,6 +179,7 @@ public class EverythingApp extends App
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+    @Inject protected GameLogic _gameLogic;
 
     // we need to inject all repositories here to ensure that they are resolved when our app is
     // resolved so that everything is registered and ready to go when Samsara initializes Depot

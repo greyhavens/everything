@@ -13,6 +13,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class Card
     implements IsSerializable
 {
+    /** A special id indicating that a card was received as a birthday present. */
+    public static final int BIRTHDAY_GIVER_ID = -1;
+
     /** The player that owns this card. */
     public PlayerName owner;
 

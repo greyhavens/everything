@@ -233,15 +233,8 @@ public class GameLogic
         }
         _playerLogic.sendFacebookNotification(owner, target, feedmsg);
 
-        // check whether the recipient just completed a set
-        Set<Integer> things = Sets.newHashSet(
-            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
-        Set<Integer> holdings = Sets.newHashSet(
-            Iterables.transform(_gameRepo.loadCards(targetId, things), Functions.CARD_THING_ID));
-        holdings.add(card.thingId);
-        if (things.size() - holdings.size() == 0) {
-            maybeReportCompleted(target, _thingRepo.loadCategory(thing.categoryId), "gift");
-        }
+        // check whether the recipient just completed a series
+        checkCompletedSeries(target, thing);
     }
 
     /**
@@ -257,6 +250,23 @@ public class GameLogic
     }
 
     /**
+     * Called every hour to grant a gift to anyone who's birthday has arrived and has not yet
+     * received a gift.
+     */
+    public void processBirthdays ()
+    {
+        // TODO: when we need to scale have one server load up the ids of the birthday players,
+        // divide it up and farm it out to all the servers for gift selection and granting
+        for (PlayerRecord player : _playerRepo.loadBirthdayPlayers()) {
+            try {
+                processBirthday(player);
+            } catch (Exception e) {
+                log.warning("Failure processing player's birthday", "who", player.who(), e);
+            }
+        }
+    }
+
+    /**
      * Selects the things that will be contained in a fresh grid for the specified player. The
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
@@ -268,13 +278,7 @@ public class GameLogic
         IntSet thingIds = new ArrayIntSet();
 
         // load up this player's collection summary, identify incomplete series
-        IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(player.userId);
-        ArrayIntSet ownedCats = new ArrayIntSet();
-        for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
-            if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
-                ownedCats.add(entry.getIntKey());
-            }
-        }
+        IntSet ownedCats = resolveOwnedCats(player.userId, index);
 
         // if they requested a specific bonus card for the grid, do that now
         if (pup.getBonusRarity() != null) {
@@ -338,6 +342,22 @@ public class GameLogic
         int[] ids = thingIds.toIntArray();
         ArrayUtil.shuffle(ids);
         return ids;
+    }
+
+    /**
+     * Returns a set of categories the player is collecting (ie. they have at least one card in the
+     * category but have not completed it).
+     */
+    protected IntSet resolveOwnedCats (int userId, ThingIndex index)
+    {
+        IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(userId);
+        IntSet ownedCats = new ArrayIntSet();
+        for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
+            if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
+                ownedCats.add(entry.getIntKey());
+            }
+        }
+        return ownedCats;
     }
 
     /**
@@ -418,6 +438,41 @@ public class GameLogic
             cats.put(cat.categoryId, cat);
         }
         return cats;
+    }
+
+    /**
+     * Checks whether the player has completed the specified series after receiving the specified
+     * thing and reports it if appropriate.
+     */
+    protected void checkCompletedSeries (PlayerRecord user, Thing thing)
+    {
+        Set<Integer> things = Sets.newHashSet(
+            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
+        Set<Integer> holdings = Sets.newHashSet(
+            Iterables.transform(_gameRepo.loadCards(user.userId, things), Functions.CARD_THING_ID));
+        holdings.add(thing.thingId);
+        if (things.size() - holdings.size() == 0) {
+            maybeReportCompleted(user, _thingRepo.loadCategory(thing.categoryId), "gift");
+        }
+    }
+
+    /**
+     * Selects and gifts a card to the specified player for their birthday.
+     */
+    protected void processBirthday (PlayerRecord user)
+    {
+        ThingIndex index = getThingIndex();
+        int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index));
+        Thing thing = _thingRepo.loadThing(thingId);
+
+        // grant this card to the player
+        CardRecord card = _gameRepo.createCard(user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
+
+        // record a notice in their feed
+        _playerRepo.recordFeedItem(user.userId, FeedItem.Type.BIRTHDAY, 0, thing.name, null);
+
+        // and check whether they've completed this series
+        checkCompletedSeries(user, thing);
     }
 
     protected ThingIndex _index;

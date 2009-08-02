@@ -285,6 +285,22 @@ public class ThingRepository extends DepotRepository
                        new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE)));
     }
 
+//     /**
+//      * Loads the category id and count of unique things owned by the player in each category.
+//      */
+//     public IntIntMap loadPlayerThings (int ownerId)
+//     {
+//         IntIntMap owned = new IntIntMap();
+//         for (OwnedRecord orec : findAll(OwnedRecord.class,
+//                                         CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
+//                                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
+//                                         new GroupBy(CategoryRecord.CATEGORY_ID),
+//                                         new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
+//             owned.put(orec.categoryId, orec.owned);
+//         }
+//         return owned;
+//     }
+
     /**
      * Loads the category id and count of unique things owned by the player in each category.
      */

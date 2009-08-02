@@ -157,6 +157,7 @@ public class PlayerRepository extends DepotRepository
         record.name = name;
         record.surname = surname;
         record.birthdate = (birthday == 0L) ? 0 : toDateVal(birthday);
+        record.lastGiftYear = 2009; // TODO (if after birthday, this year, else last year)
         record.timezone = timezone;
         record.joined = new Timestamp(System.currentTimeMillis());
         record.lastSession = record.joined;

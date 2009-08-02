@@ -33,8 +33,8 @@ public class ThingIndex
         for (ThingInfoRecord thing : things) {
             ThingInfo info = new ThingInfo();
             info.thingId = thing.thingId;
-            info.weight = thing.rarity.weight();
-            _totalWeight += info.weight;
+            info.rarity = thing.rarity;
+            _totalWeight += info.rarity.weight();
             // resolve the categories of which this thing is a member
             int categoryId = thing.categoryId;
             while (categoryId != 0) {
@@ -82,16 +82,9 @@ public class ThingIndex
      */
     public void selectThingsFrom (IntSet catIds, int count, IntSet into)
     {
-        List<ThingInfo> things = Lists.newArrayList();
-        int totalWeight = 0;
-        for (int catId : catIds) {
-            for (ThingInfo info : _bycat.get(catId)) {
-                things.add(info);
-                totalWeight += info.weight;
-            }
-        }
-        log.debug("Selecting " + count + " things from " + catIds + " " + things.size());
-        selectThings(count, things, totalWeight, new ArrayIntSet(), into);
+        ThingList things = getCategoryThings(catIds, Rarity.I);
+        log.debug("Selecting " + count + " things from " + catIds + " " + things.things.size());
+        selectThings(count, things.things, things.totalWeight, new ArrayIntSet(), into);
     }
 
     /**
@@ -101,7 +94,7 @@ public class ThingIndex
     {
         int totalWeight = 0;
         for (ThingInfo info : _byrare.get(rarity)) {
-            totalWeight += info.weight;
+            totalWeight += info.rarity.weight();
         }
         return pickWeightedThing(_byrare.get(rarity), totalWeight);
     }
@@ -115,12 +108,36 @@ public class ThingIndex
         List<ThingInfo> things = Lists.newArrayList();
         for (Rarity rare : Rarity.BONUS) {
             for (ThingInfo info : _byrare.get(rare)) {
-                totalWeight += info.weight;
+                totalWeight += info.rarity.weight();
                 things.add(info);
             }
         }
         Collections.shuffle(things);
         return pickWeightedThing(things, totalWeight);
+    }
+
+    /**
+     * Selects a birthday thing to give to a player who is collecting the specified series.
+     */
+    public int pickBirthdayThing (IntSet ownedCats)
+    {
+        ThingList things = getCategoryThings(ownedCats, Rarity.IX);
+        // TODO
+        return -1;
+    }
+
+    protected ThingList getCategoryThings (IntSet catIds, Rarity minRarity)
+    {
+        ThingList things = new ThingList();
+        for (int catId : catIds) {
+            for (ThingInfo info : _bycat.get(catId)) {
+                if (info.rarity.ordinal() >= minRarity.ordinal()) {
+                    things.things.add(info);
+                    things.totalWeight += info.rarity.weight();
+                }
+            }
+        }
+        return things;
     }
 
     protected void selectThings (int count, List<ThingInfo> things, int totalWeight,
@@ -144,22 +161,33 @@ public class ThingIndex
         }
     }
 
+    protected int pickWeightedThing (ThingList things)
+    {
+        return pickWeightedThing(things.things, things.totalWeight);
+    }
+
     protected int pickWeightedThing (List<ThingInfo> things, int totalWeight)
     {
         int rando = _rando.nextInt(totalWeight);
         for (ThingInfo info : things) {
-            if (rando < info.weight) {
+            if (rando < info.rarity.weight()) {
                 return info.thingId;
             }
-            rando -= info.weight;
+            rando -= info.rarity.weight();
         }
         throw new IllegalStateException("Random weight exceeded total weight! So impossible!");
+    }
+
+    protected static class ThingList
+    {
+        public List<ThingInfo> things = Lists.newArrayList();
+        public int totalWeight;
     }
 
     protected static class ThingInfo
     {
         public int thingId;
-        public int weight;
+        public Rarity rarity;
     }
 
     protected List<ThingInfo> _things = Lists.newArrayList();

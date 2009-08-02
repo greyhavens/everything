@@ -121,12 +121,13 @@ public class GameRepository extends DepotRepository
      * Creates a new card for the specified player for the specified thing. Returns the newly
      * created card record.
      */
-    public CardRecord createCard (int ownerId, int thingId)
+    public CardRecord createCard (int ownerId, int thingId, int giverId)
     {
         CardRecord card = new CardRecord();
         card.ownerId = ownerId;
         card.thingId = thingId;
         card.created = new Timestamp(System.currentTimeMillis());
+        card.giverId = giverId;
         insert(card);
         return card;
     }
