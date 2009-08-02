@@ -5,23 +5,31 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.samskivert.depot.DataMigration;
+import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.Key;
+import com.samskivert.depot.KeySet;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
-import com.samskivert.depot.expression.ValueExp;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.depot.expression.ValueExp;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.StringUtil;
@@ -31,6 +39,7 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.util.GameUtil;
 
 /**
  * Manages player state for the Everything app.
@@ -45,6 +54,23 @@ public class PlayerRepository extends DepotRepository
         // TODO: remove a week or two after 07-17-2009
         _ctx.registerMigration(PlayerRecord.class,
                                new SchemaMigration.Retype(8, PlayerRecord.FREE_FLIPS));
+
+        // temp: migrate "birthday" to "birthdate"
+        registerMigration(new DataMigration("2009_08_01_birthday_to_date") {
+            public void invoke () throws DatabaseException {
+                for (PlayerRecord prec : findAll(PlayerRecord.class)) {
+                    if (prec.birthday == null) {
+                        updatePartial(PlayerRecord.getKey(prec.userId),
+                                      PlayerRecord.BIRTHDATE, -1);
+                    } else {
+                        updatePartial(PlayerRecord.getKey(prec.userId),
+                                      PlayerRecord.BIRTHDATE, toDateVal(prec.birthday.getTime()));
+                    }
+                }
+            }
+        });
+
+        // TODO: drop birthday column once the above has run
     }
 
     /**
@@ -86,6 +112,29 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Returns up to 1000 players who's birthday has arrived and have not yet received a present.
+     * These players will be marked as having received their gift, so be sure to be robust about
+     * making use of the returned ids.
+     */
+    public Collection<PlayerRecord> loadBirthdayPlayers ()
+    {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR), today = toDateVal(cal.getTimeInMillis());
+        // load up the keys for up to 1000 players whose birthday has arrived
+        Where where = new Where(Ops.and(PlayerRecord.BIRTHDATE.lessEq(today),
+                                        PlayerRecord.LAST_GIFT_YEAR.lessThan(year)));
+        Collection<PlayerRecord> players = findAll(PlayerRecord.class, where, new Limit(0, 1000));
+        List<Key<PlayerRecord>> keys = Lists.newArrayListWithExpectedSize(players.size());
+        // mark those players as having been gifted
+        for (PlayerRecord prec : players) {
+            keys.add(PlayerRecord.getKey(prec.userId));
+        }
+        KeySet<PlayerRecord> keyset = KeySet.newKeySet(PlayerRecord.class, keys);
+        updatePartial(PlayerRecord.class, keyset, keyset, PlayerRecord.LAST_GIFT_YEAR, year);
+        return players;
+    }
+
+    /**
      * Searches for players by first or last name.
      */
     public Collection<PlayerName> findPlayers (String query)
@@ -107,7 +156,7 @@ public class PlayerRepository extends DepotRepository
         record.facebookId = facebookId;
         record.name = name;
         record.surname = surname;
-        record.birthday = (birthday == 0L) ? null : new Date(birthday);
+        record.birthdate = (birthday == 0L) ? 0 : toDateVal(birthday);
         record.timezone = timezone;
         record.joined = new Timestamp(System.currentTimeMillis());
         record.lastSession = record.joined;
@@ -301,5 +350,15 @@ public class PlayerRepository extends DepotRepository
         classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
         classes.add(WishRecord.class);
+    }
+
+    /**
+     * Converts a date to MMDD format.
+     */
+    protected static int toDateVal (long when)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(when);
+        return (cal.get(Calendar.MONTH)+1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
     }
 }

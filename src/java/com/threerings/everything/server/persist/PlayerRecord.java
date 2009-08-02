@@ -36,6 +36,8 @@ public class PlayerRecord extends PersistentRecord
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp SURNAME = colexp(_R, "surname");
     public static final ColumnExp BIRTHDAY = colexp(_R, "birthday");
+    public static final ColumnExp BIRTHDATE = colexp(_R, "birthdate");
+    public static final ColumnExp LAST_GIFT_YEAR = colexp(_R, "lastGiftYear");
     public static final ColumnExp TIMEZONE = colexp(_R, "timezone");
     public static final ColumnExp IS_EDITOR = colexp(_R, "isEditor");
     public static final ColumnExp JOINED = colexp(_R, "joined");
@@ -63,7 +65,7 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 9;
+    public static final int SCHEMA_VERSION = 11;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -80,6 +82,13 @@ public class PlayerRecord extends PersistentRecord
     /** This player's birthday (we'll send them something nice on their birthday). */
     @Column(nullable=true)
     public Date birthday;
+
+    /** The day of year on which this player's birthday falls as MMDD. */
+    @Index public int birthdate;
+
+    /** The year for which this player has last received a birthday gift. */
+    @Column(defaultValue="2009")
+    public int lastGiftYear;
 
     /** This player's preferred timezone (which dictates when their grids expire). */
     public String timezone;

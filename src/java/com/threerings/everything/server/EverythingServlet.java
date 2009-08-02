@@ -127,11 +127,6 @@ public class EverythingServlet extends EveryServiceServlet
                     Calendar cal = Calendar.getInstance();
                     if (bdstr.indexOf(",") == -1) {
                         cal.setTime(_bdfmt.parse(bdstr));
-                        // when parsing a date that lacks a year, Java leaves the year at 1970, but
-                        // we want to distinguish our unknown year people from people who happen to
-                        // be 39 years old (as of 2009 anyway), so roll the year back to a time
-                        // when we're extremely unlikely to collide with real people
-                        cal.set(Calendar.YEAR, 1875);
                     } else {
                         cal.setTime(_bfmt.parse(bdstr));
                     }
