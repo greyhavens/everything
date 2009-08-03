@@ -359,6 +359,10 @@
 }
 
 /** ShopPage styles */
+.shop {
+  background: url(images/page_shop.png) no-repeat;
+}
+
 .shop .Header {
   font-size: 18px;
 }
