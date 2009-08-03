@@ -110,9 +110,9 @@ public class ThingRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link ThingCard#created} with 0L.
+     * Initializes {@link ThingCard#received} with 0L.
      */
-    public long getCreated ()
+    public long getReceived ()
     {
         return 0L;
     }
