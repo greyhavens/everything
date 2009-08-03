@@ -151,6 +151,8 @@ public class EverythingServlet extends EveryServiceServlet
             _playerRepo.recordSession(player.userId, now);
             log.info("Welcome back", "who", player.who(), "gone", elapsed);
 
+            // TODO: update their birthday if that's not set
+
             // check to see if they made FB friends with any existing Everything players
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
             if (fbinfo != null) {
