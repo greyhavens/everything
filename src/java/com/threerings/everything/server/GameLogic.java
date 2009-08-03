@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
@@ -43,6 +44,7 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.samsara.app.client.ServiceException;
+import com.threerings.samsara.app.data.AppCodes;
 
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
@@ -255,6 +257,11 @@ public class GameLogic
      */
     public void processBirthdays ()
     {
+        // if we're the candidate, don't do any gifting, leave that to the shipped version
+        if (_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+            return;
+        }
+
         // TODO: when we need to scale have one server load up the ids of the birthday players,
         // divide it up and farm it out to all the servers for gift selection and granting
         for (PlayerRecord player : _playerRepo.loadBirthdayPlayers()) {
@@ -479,6 +486,7 @@ public class GameLogic
     protected ThingIndex _index;
     protected long _nextIndexUpdate;
 
+    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
     @Inject protected PlayerLogic _playerLogic;
