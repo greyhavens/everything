@@ -124,7 +124,7 @@ public class PlayerRepository extends DepotRepository
         Where where = new Where(Ops.and(PlayerRecord.BIRTHDATE.lessEq(today),
                                         PlayerRecord.LAST_GIFT_YEAR.lessThan(year)));
         Collection<PlayerRecord> players = findAll(PlayerRecord.class, where, new Limit(0, 1000));
-        List<Key<PlayerRecord>> keys = Lists.newArrayListWithExpectedSize(players.size());
+        List<Key<PlayerRecord>> keys = Lists.newArrayListWithCapacity(players.size());
         // mark those players as having been gifted
         for (PlayerRecord prec : players) {
             keys.add(PlayerRecord.getKey(prec.userId));
