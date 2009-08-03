@@ -73,7 +73,7 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             }
             action.add(Widgets.newInlineLabel("."));
             if (item.message != null) {
-                String msg = " " + item.actor.name + " said \"" + item.message + "\"";
+                String msg = " " + getFirstName(item.actor) + " said \"" + item.message + "\"";
                 action.add(Widgets.newInlineLabel(msg));
             }
             break;
@@ -112,6 +112,11 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
     protected String getName (PlayerName name, boolean capital)
     {
         return _ctx.getMe().equals(name) ? (capital ? "You" : "you") : name.toString();
+    }
+
+    protected String getFirstName (PlayerName name)
+    {
+        return _ctx.getMe().equals(name) ? "You" : name.name;
     }
 
     protected String format (List<String> objects, String what, String pwhat)
