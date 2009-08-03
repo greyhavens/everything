@@ -156,8 +156,18 @@ public class PlayerRepository extends DepotRepository
         record.facebookId = facebookId;
         record.name = name;
         record.surname = surname;
-        record.birthdate = (birthday == 0L) ? 0 : toDateVal(birthday);
-        record.lastGiftYear = 2009; // TODO (if after birthday, this year, else last year)
+        if (birthday > 0L) {
+            record.birthdate = toDateVal(birthday);
+            Calendar cal = Calendar.getInstance();
+            int year = cal.get(Calendar.YEAR);
+            cal.setTimeInMillis(birthday);
+            cal.set(Calendar.YEAR, year);
+            record.lastGiftYear = year;
+            // if their birthday hasn't happened yet this year, back the gift year up a year
+            if (cal.getTimeInMillis() >= System.currentTimeMillis()) {
+                record.lastGiftYear--;
+            }
+        }
         record.timezone = timezone;
         record.joined = new Timestamp(System.currentTimeMillis());
         record.lastSession = record.joined;
