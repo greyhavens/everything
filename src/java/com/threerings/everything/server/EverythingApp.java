@@ -128,11 +128,11 @@ public class EverythingApp extends App
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
         binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
         binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
-//         binds.add(Binding.Job.every(1, new Runnable() {
-//             public void run () {
-//                 _gameLogic.processBirthdays();
-//             }
-//         }));
+        binds.add(Binding.Job.every(1, new Runnable() {
+            public void run () {
+                _gameLogic.processBirthdays();
+            }
+        }));
         return binds.toArray(new Binding[binds.size()]);
     }
 
