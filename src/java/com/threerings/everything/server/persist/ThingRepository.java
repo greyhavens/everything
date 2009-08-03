@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -16,6 +17,7 @@ import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
@@ -27,6 +29,7 @@ import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
+import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
@@ -285,21 +288,18 @@ public class ThingRepository extends DepotRepository
                        new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE)));
     }
 
-//     /**
-//      * Loads the category id and count of unique things owned by the player in each category.
-//      */
-//     public IntIntMap loadPlayerThings (int ownerId)
-//     {
-//         IntIntMap owned = new IntIntMap();
-//         for (OwnedRecord orec : findAll(OwnedRecord.class,
-//                                         CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
-//                                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
-//                                         new GroupBy(CategoryRecord.CATEGORY_ID),
-//                                         new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
-//             owned.put(orec.categoryId, orec.owned);
-//         }
-//         return owned;
-//     }
+    /**
+     * Loads the thing ids of this player's things that are the specified rarity or higher.
+     */
+    public Set<Integer> loadPlayerThings (int ownerId, Rarity minRarity)
+    {
+        return Sets.newHashSet(
+            findAllKeys(ThingRecord.class, false,
+                        ThingRecord.THING_ID.join(CardRecord.THING_ID),
+                        new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
+                                          ThingRecord.RARITY.greaterEq(minRarity)))).
+            map(Key.<ThingRecord>toInt()));
+    }
 
     /**
      * Loads the category id and count of unique things owned by the player in each category.

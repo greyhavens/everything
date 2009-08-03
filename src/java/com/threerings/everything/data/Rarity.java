@@ -24,7 +24,10 @@ public enum Rarity implements ByteEnum
     X(9, 995, "Mythical");
 
     /** Cards considered rare enough to be exciting. */
-    public static EnumSet<Rarity> BONUS = EnumSet.of(V, VI, VII, VIII, IX, X);
+    public static final EnumSet<Rarity> BONUS = EnumSet.of(V, VI, VII, VIII, IX, X);
+
+    /** The minimum rarity of a thing given on your birthday. */
+    public static final Rarity MIN_GIFT_RARITY = IX;
 
     /** The coin value of a card of this rarity. */
     public final int value;

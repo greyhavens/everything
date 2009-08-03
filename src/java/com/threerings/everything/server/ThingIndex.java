@@ -4,8 +4,10 @@
 package com.threerings.everything.server;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -15,7 +17,6 @@ import com.google.common.collect.Multimap;
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntSet;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.ThingInfoRecord;
@@ -70,7 +71,7 @@ public class ThingIndex
      * Selects the specified number of things from the index weighted properly according to their
      * rarity. Things in the supplied exclusion set will not be chosen.
      */
-    public void selectThings (int count, IntSet into, IntSet excludeIds)
+    public void selectThings (int count, Set<Integer> into, Set<Integer> excludeIds)
     {
         log.debug("Selecting " + count + " things from entire collection " + _things.size());
         selectThings(count, _things, _totalWeight, excludeIds, into);
@@ -80,7 +81,7 @@ public class ThingIndex
      * Selects the specified number of things from the subset of things in the specified set of
      * categories.
      */
-    public void selectThingsFrom (IntSet catIds, int count, IntSet into)
+    public void selectThingsFrom (Set<Integer> catIds, int count, Set<Integer> into)
     {
         ThingList things = getCategoryThings(catIds, Rarity.I);
         log.debug("Selecting " + count + " things from " + catIds + " " + things.things.size());
@@ -119,14 +120,29 @@ public class ThingIndex
     /**
      * Selects a birthday thing to give to a player who is collecting the specified series.
      */
-    public int pickBirthdayThing (IntSet ownedCats)
+    public int pickBirthdayThing (Set<Integer> ownedCats, Set<Integer> heldRares)
     {
-        ThingList things = getCategoryThings(ownedCats, Rarity.IX);
-        // TODO
-        return -1;
+        ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
+
+        // remove the things they already have
+        for (Iterator<ThingInfo> iter = things.things.iterator(); iter.hasNext(); ) {
+            ThingInfo info = iter.next();
+            if (heldRares.contains(info.thingId)) {
+                iter.remove();
+                things.totalWeight -= info.rarity.weight();
+            }
+        }
+
+        // if there are any left, pick one of those as a gift
+        if (things.things.size() > 0) {
+            return pickWeightedThing(things);
+        }
+
+        // otherwise pick a random rarity X item as a gift
+        return pickThingOf(Rarity.X);
     }
 
-    protected ThingList getCategoryThings (IntSet catIds, Rarity minRarity)
+    protected ThingList getCategoryThings (Set<Integer> catIds, Rarity minRarity)
     {
         ThingList things = new ThingList();
         for (int catId : catIds) {
@@ -141,7 +157,7 @@ public class ThingIndex
     }
 
     protected void selectThings (int count, List<ThingInfo> things, int totalWeight,
-                                 IntSet excludeIds, IntSet into)
+                                 Set<Integer> excludeIds, Set<Integer> into)
     {
         Preconditions.checkArgument(things.size() >= count,
                                     "Cannot select " + count + " things. " +

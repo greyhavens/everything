@@ -462,7 +462,8 @@ public class GameLogic
     protected void processBirthday (PlayerRecord user)
     {
         ThingIndex index = getThingIndex();
-        int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index));
+        Set<Integer> heldRares = _thingRepo.loadPlayerThings(user.userId, Rarity.MIN_GIFT_RARITY);
+        int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index), heldRares);
         Thing thing = _thingRepo.loadThing(thingId);
 
         // grant this card to the player
