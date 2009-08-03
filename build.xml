@@ -3,6 +3,7 @@
   <property name="app.ident" value="everything"/>
   <property name="src.dir" value="src/java"/>
   <property name="gsrc.dir" value="src/gwt"/>
+  <property name="wsrc.dir" value="src/web"/>
   <property name="asrc.dir" value="src/as"/>
   <property name="deploy.dir" value="dist"/>
   <property name="pkg.user" value="_samsara"/>
@@ -246,7 +247,8 @@
       <filelist refid="runtime.libs"/>
     </copyfilelist>
     <mkdir dir="${instroot.dir}/web"/>
-    <copy todir="${instroot.dir}/web">
+    <copy todir="${instroot.dir}/web" preservelastmodified="true">
+      <fileset dir="${wsrc.dir}" includes="**"/>
       <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="**"/>
       <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
     </copy>
@@ -263,7 +265,8 @@
 
   <target name="web" depends="prepare" 
           description="Copies updated style sheets into the local installed app.">
-    <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/">
+    <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/" preservelastmodified="true">
+      <fileset dir="${wsrc.dir}" includes="**"/>
       <fileset dir="${gsrc.dir}/public" includes="**"/>
       <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
     </copy>
