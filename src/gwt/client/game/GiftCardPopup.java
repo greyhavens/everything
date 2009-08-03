@@ -46,19 +46,19 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new GiftCardPopup(ctx, card.thing, card.created.getTime(),
+                ctx.displayPopup(new GiftCardPopup(ctx, card.thing, card.received.getTime(),
                                                    onGifted));
             }
         };
     }
 
-    public GiftCardPopup (Context ctx, Thing thing, long created, Runnable onGifted)
+    public GiftCardPopup (Context ctx, Thing thing, long received, Runnable onGifted)
     {
         super("giftCard", ctx);
         _thing = thing;
-        _created = created;
+        _received = received;
         _onGifted = onGifted;
-        _gamesvc.getGiftCardInfo(thing.thingId, created, createCallback());
+        _gamesvc.getGiftCardInfo(thing.thingId, received, createCallback());
     }
 
     @Override // from DataPopup<GameService.GiftInfoResult>
@@ -93,7 +93,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                         return false;
                     }
                     String msg = DefaultTextListener.getText(message, defmsg);
-                    _gamesvc.giftCard(_thing.thingId, _created, info.friend.userId, msg, this);
+                    _gamesvc.giftCard(_thing.thingId, _received, info.friend.userId, msg, this);
                     return true;
                 }
                 protected boolean gotResult (Void result) {
@@ -148,7 +148,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                               "showborder", "true"));
         other.add(wrap);
         other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
-        other.add(XFBML.newHiddenInput("created", ""+_created));
+        other.add(XFBML.newHiddenInput("received", ""+_received));
         other.add(XFBML.newHiddenInput("from", History.getToken()));
         String style = "width: 586px; min-height: 400px";
         return Popups.newPopup("inviteCard", XFBML.serverize(other, "style", style));
@@ -162,7 +162,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     }
 
     protected Thing _thing;
-    protected long _created;
+    protected long _received;
     protected Runnable _onGifted;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

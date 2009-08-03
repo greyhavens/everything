@@ -53,7 +53,7 @@ public class InviteServlet extends AppServlet
         OOOUser user = getUser(req);
         PlayerRecord player = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
         String from = ParameterUtil.getParameter(req, "from", "LANDING");
-        String thingId = null, created = null, targetFBId = null;
+        String thingId = null, received = null, targetFBId = null;
 
         try {
             if (player == null) {
@@ -67,11 +67,11 @@ public class InviteServlet extends AppServlet
             }
 
             thingId = requireParameter(req, "thing");
-            created = requireParameter(req, "created");
+            received = requireParameter(req, "received");
 
             // make sure they own the thing in question
             CardRecord card = _gameRepo.loadCard(
-                player.userId, Integer.parseInt(thingId), Long.parseLong(created));
+                player.userId, Integer.parseInt(thingId), Long.parseLong(received));
             if (card == null) {
                 throw new Exception("missing card");
             }
@@ -95,7 +95,7 @@ public class InviteServlet extends AppServlet
             log.warning("Failed to process invite gift: " + e.getMessage(),
                         "who", (player == null) ? "null" : player.who(),
                         "agent", req.getHeader("User-agent"), "targetFBId", targetFBId,
-                        "thingId", thingId, "created", created);
+                        "thingId", thingId, "received", received);
         }
 
         // one way or the other, send them back from whence they came

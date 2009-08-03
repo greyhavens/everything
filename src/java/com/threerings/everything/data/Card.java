@@ -31,8 +31,8 @@ public class Card
     /** The number of things in this thing's series. */
     public int things;
 
-    /** The time at which this card was created. */
-    public Date created;
+    /** The time at which this card was received. */
+    public Date received;
 
     /** The player that gave this card to the owner or null. */
     public PlayerName giver;

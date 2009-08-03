@@ -23,8 +23,8 @@ public class ThingCard
     /** The rarity of the thing on this card. */
     public Rarity rarity;
 
-    /** The time this card was created (not always available). */
-    public long created;
+    /** The time this card was received (not always available). */
+    public long received;
 
     /**
      * Clones the supplied thing card. We can't use {@link Object#clone} because GWT needs to grok
@@ -37,7 +37,7 @@ public class ThingCard
         card.name = other.name;
         card.image = other.image;
         card.rarity = other.rarity;
-        card.created = other.created;
+        card.received = other.received;
         return card;
     }
 
@@ -58,6 +58,6 @@ public class ThingCard
         if (rv != 0) return rv;
         rv = name.compareTo(other.name);
         if (rv != 0) return rv;
-        return (created < other.created) ? -1 : 1;
+        return (received < other.received) ? -1 : 1;
     }
 }

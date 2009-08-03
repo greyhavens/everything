@@ -99,7 +99,7 @@ public class CardPopup extends DataPopup<Card>
         sell.setTitle("Sell this card back for half its value.");
         new ClickCallback<Integer>(sell) {
             protected boolean callService () {
-                _gamesvc.sellCard(card.thing.thingId, card.created.getTime(), this);
+                _gamesvc.sellCard(card.thing.thingId, card.received.getTime(), this);
                 return true;
             }
             protected boolean gotResult (Integer result) {

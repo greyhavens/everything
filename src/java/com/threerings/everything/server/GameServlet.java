@@ -113,7 +113,7 @@ public class GameServlet extends EveryServiceServlet
             for (CardRecord crec : crecs) {
                 if (crec.thingId == thing.thingId) {
                     ThingCard card = ThingCard.clone(thing);
-                    card.created = crec.created.getTime();
+                    card.received = crec.received.getTime();
                     cards.add(card);
                     added = true;
                 }
@@ -134,7 +134,7 @@ public class GameServlet extends EveryServiceServlet
     public Card getCard (CardIdent ident) throws ServiceException
     {
         // TODO: show less info if the caller is not the owner?
-        CardRecord card = requireCard(ident.ownerId, ident.thingId, ident.created);
+        CardRecord card = requireCard(ident.ownerId, ident.thingId, ident.received);
         Thing thing = _thingRepo.loadThing(card.thingId);
         return _gameLogic.resolveCard(
             card, thing, Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId)));
@@ -253,10 +253,10 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public int sellCard (int thingId, long created) throws ServiceException
+    public int sellCard (int thingId, long received) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        CardRecord card = requireCard(player.userId, thingId, created);
+        CardRecord card = requireCard(player.userId, thingId, received);
 
         // players receive half the value of the thing for cashing in a card
         Thing thing = _thingRepo.loadThing(card.thingId);
@@ -274,10 +274,10 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public GiftInfoResult getGiftCardInfo (int thingId, long created) throws ServiceException
+    public GiftInfoResult getGiftCardInfo (int thingId, long received) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        CardRecord card = requireCard(player.userId, thingId, created);
+        CardRecord card = requireCard(player.userId, thingId, received);
 
         // load up data on the things in this set
         Set<Integer> thingIds = Sets.newHashSet();
@@ -313,7 +313,7 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public void giftCard (int thingId, long created, int friendId, String message)
+    public void giftCard (int thingId, long received, int friendId, String message)
         throws ServiceException
     {
         PlayerRecord player = requirePlayer();
@@ -323,7 +323,7 @@ public class GameServlet extends EveryServiceServlet
                         "friendId", friendId);
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
-        CardRecord card = requireCard(player.userId, thingId, created);
+        CardRecord card = requireCard(player.userId, thingId, received);
         _gameLogic.giftCard(player, card, friend, message);
     }
 
@@ -451,10 +451,10 @@ public class GameServlet extends EveryServiceServlet
         }
     }
 
-    protected CardRecord requireCard (int ownerId, int thingId, long created)
+    protected CardRecord requireCard (int ownerId, int thingId, long received)
         throws ServiceException
     {
-        CardRecord card = _gameRepo.loadCard(ownerId, thingId, created);
+        CardRecord card = _gameRepo.loadCard(ownerId, thingId, received);
         if (card == null) {
             throw new ServiceException(E_UNKNOWN_CARD);
         }

@@ -47,6 +47,10 @@ public class GameRepository extends DepotRepository
         // TODO: remove a week or two after 07-17-2009
         _ctx.registerMigration(PowerupRecord.class,
                                new SchemaMigration.Rename(2, "count", PowerupRecord.CHARGES));
+
+        // TODO: remove a week or two after 08-03-2009
+        _ctx.registerMigration(CardRecord.class,
+                               new SchemaMigration.Rename(4, "created", CardRecord.RECEIVED));
     }
 
     /**
@@ -84,9 +88,9 @@ public class GameRepository extends DepotRepository
     /**
      * Loads the specified card from the repository.
      */
-    public CardRecord loadCard (int ownerId, int thingId, long created)
+    public CardRecord loadCard (int ownerId, int thingId, long received)
     {
-        return load(CardRecord.getKey(ownerId, thingId, new Timestamp(created)));
+        return load(CardRecord.getKey(ownerId, thingId, new Timestamp(received)));
     }
 
     /**
@@ -126,7 +130,7 @@ public class GameRepository extends DepotRepository
         CardRecord card = new CardRecord();
         card.ownerId = ownerId;
         card.thingId = thingId;
-        card.created = new Timestamp(System.currentTimeMillis());
+        card.received = new Timestamp(System.currentTimeMillis());
         card.giverId = giverId;
         insert(card);
         return card;
@@ -145,9 +149,10 @@ public class GameRepository extends DepotRepository
      */
     public void giftCard (CardRecord card, int toUserId)
     {
-        updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.created),
+        updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.received),
                       CardRecord.OWNER_ID, toUserId,
-                      CardRecord.GIVER_ID, card.ownerId);
+                      CardRecord.GIVER_ID, card.ownerId,
+                      CardRecord.RECEIVED, new Timestamp(System.currentTimeMillis()));
     }
 
     /**
@@ -160,7 +165,7 @@ public class GameRepository extends DepotRepository
         EscrowedCardRecord erec = new EscrowedCardRecord();
         erec.externalId = externalId;
         erec.thingId = card.thingId;
-        erec.created = card.created;
+        erec.created = card.received;
         erec.escrowed = new Timestamp(System.currentTimeMillis());
         insert(erec);
 

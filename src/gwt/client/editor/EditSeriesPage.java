@@ -240,7 +240,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         card.thing = thing;
         card.position = position;
         card.things = result.things.size();
-        card.created = new Date();
+        card.received = new Date();
         return card;
     }
 

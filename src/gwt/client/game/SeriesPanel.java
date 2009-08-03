@@ -62,7 +62,7 @@ public class SeriesPanel extends DataPanel<Series>
                 }
             });
             Command onClick = (card == null) ? null : CardPopup.onClick(
-                _ctx, new CardIdent(_ownerId, card.thingId, card.created), status);
+                _ctx, new CardIdent(_ownerId, card.thingId, card.received), status);
             grid.setWidget(row, col, ThingCardView.create(ii, card, onClick));
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
             grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);

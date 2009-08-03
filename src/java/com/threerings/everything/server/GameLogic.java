@@ -159,7 +159,7 @@ public class GameLogic
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
         card.thing = thing;
         card.categories = resolveCategories(card.thing.categoryId);
-        card.created = new Date(record.created.getTime());
+        card.received = new Date(record.received.getTime());
         if (record.giverId != 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         }

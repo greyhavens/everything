@@ -19,8 +19,8 @@ public class CardIdent
     /** The thing on the card. */
     public int thingId;
 
-    /** The time at which the card was created. */
-    public long created;
+    /** The time at which the card was received. */
+    public long received;
 
     /** Used when unserializing. */
     public CardIdent ()
@@ -30,18 +30,18 @@ public class CardIdent
     /**
      * Creates an id for the specified card.
      */
-    public CardIdent (int ownerId, int thingId, Date created)
+    public CardIdent (int ownerId, int thingId, Date received)
     {
-        this(ownerId, thingId, created.getTime());
+        this(ownerId, thingId, received.getTime());
     }
 
     /**
      * Creates an id for the specified card.
      */
-    public CardIdent (int ownerId, int thingId, long created)
+    public CardIdent (int ownerId, int thingId, long received)
     {
         this.ownerId = ownerId;
         this.thingId = thingId;
-        this.created = created;
+        this.received = received;
     }
 }
