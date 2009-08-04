@@ -39,6 +39,7 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
     protected void init (GameService.ShopResult data)
     {
         _ctx.getPupsModel().refresh(data.powerups);
+        _ctx.getCoins().update(data.coins);
 
         SmartTable table = new SmartTable(5, 0);
         table.setWidget(0, 0, Widgets.newRow("machine", Widgets.newLabel("You have:"),
@@ -66,7 +67,9 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
                 table.setText(row, 4, "for " + type.charges, 1, "nowrap");
             }
             final PushButton buy = new PushButton("Buy");
-            table.setWidget(row, 5, buy);
+            if (_ctx.getPupsModel().getCharges(type).get() == 0 || !type.isPermanent()) {
+                table.setWidget(row, 5, buy);
+            }
             new ClickCallback<Void>(buy) {
                 protected boolean callService () {
                     if (_ctx.getCoins().get() < type.cost) {
@@ -80,6 +83,9 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
                     _ctx.getCoins().update(_ctx.getCoins().get() - type.cost);
                     _ctx.getPupsModel().notePurchase(type);
                     Popups.infoNear("Powerup purchased!", buy);
+                    if (type.isPermanent()) {
+                        buy.setVisible(false);
+                    }
                     return true;
                 }
             };
