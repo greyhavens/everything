@@ -207,16 +207,6 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Returns the number of cards held by the specified owner with the specified thing on them.
-     */
-    public int countCardHoldings (int ownerId, int thingId)
-    {
-        return load(CountRecord.class, new FromOverride(CardRecord.class),
-                    new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
-                                      CardRecord.THING_ID.eq(thingId)))).count;
-    }
-
-    /**
      * Notes that the player in question has completed the specified series.
      *
      * @return true if this should be reported to the feed, false if they had already completed the
