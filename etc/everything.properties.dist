@@ -28,3 +28,6 @@ db.readwrite.maxconns = 1
 mediastore_id = S3ID
 mediastore_key = S3KEY
 mediastore_bucket = S3BUCKET
+
+# The URL of our billing site
+billing_url = https://billing.apps.threerings.net/billing/select_type.wm

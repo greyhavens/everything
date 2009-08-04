@@ -34,6 +34,7 @@ import client.game.AddAppPanel;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
 import client.game.FriendsPage;
+import client.game.GetCoinsPage;
 import client.game.GridPage;
 import client.game.LandingPage;
 import client.game.ShopPage;
@@ -92,7 +93,8 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddURL ()
     {
-        return "http://www.facebook.com/login.php?api_key=" + _data.facebookKey + "&canvas=1&v=1.0";
+        String key = Build.facebookKey(_data.candidate);
+        return "http://www.facebook.com/login.php?api_key=" + key + "&canvas=1&v=1.0";
     }
 
     // from interface Context
@@ -192,6 +194,9 @@ public class EverythingClient
         case SHOP:
             setContent(new ShopPage(this));
             return;
+        case GET_COINS:
+            setContent(new GetCoinsPage(this));
+            return;
         case FRIENDS:
             setContent(new FriendsPage(this));
             return;
@@ -233,9 +238,7 @@ public class EverythingClient
         _news = new Value<News>(data.news);
         _pupsmodel = new PowerupsModel(data.powerups);
         setContent(null);
-        if (data.facebookKey != null) {
-            initFacebook(data.facebookKey);
-        }
+        initFacebook(Build.facebookKey(data.candidate));
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
         History.fireCurrentHistoryState();
     }

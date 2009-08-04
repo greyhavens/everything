@@ -59,6 +59,7 @@
       </files>
     </gatherconfiguration>
     <property file="${deploy.dir}/build.properties"/>
+    <property file="${deploy.dir}/everything.properties"/>
 
     <!-- copy our build dependencies into place -->
     <mkdir dir="${deploy.dir}/lib"/>
@@ -93,6 +94,9 @@
       <filterset>
         <filter token="build_time" value="${build.time}"/>
         <filter token="build_version" value="${build.version}"/>
+        <filter token="facebook_key" value="${facebook_key}"/>
+        <filter token="candidate_facebook_key" value="${candidate_facebook_key}"/>
+        <filter token="billing_url" value="${billing_url}"/>
       </filterset>
     </copy>
     <echo>Assigned build version ${build.version}.</echo>

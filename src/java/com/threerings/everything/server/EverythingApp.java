@@ -111,6 +111,14 @@ public class EverythingApp extends App
         return _config.getValue("mediastore_bucket", (String)null);
     }
 
+    /**
+     * Returns our embedded billing page URL.
+     */
+    public String getBillingURL ()
+    {
+        return _config.getValue("billing_url", (String)null);
+    }
+
     @Override // from App
     public String getIdentifier ()
     {

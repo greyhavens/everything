@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -72,7 +73,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         SessionData data = new SessionData();
-        data.facebookKey = _app.getFacebookKey();
+        data.candidate = _appvers.equals(AppCodes.RELEASE_CANDIDATE);
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
             data.news = news;
         }
@@ -326,6 +327,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
     }
 
+    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected EverythingApp _app;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;

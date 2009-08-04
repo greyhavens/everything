@@ -37,6 +37,6 @@ public class SessionData
     /** The current game news, or null. */
     public News news;
 
-    /** Our Facebook API key. */
-    public String facebookKey;
+    /** Whether or not we're running in the candidate. */
+    public boolean candidate;
 }

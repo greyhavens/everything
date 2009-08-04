@@ -398,3 +398,10 @@
   width: 525px;
   margin: 0px auto;
 }
+
+/** GetCoinsPage styles */
+.getCoins iframe {
+  width: 100%;
+  height: 600px; /* TODO */
+  border: none;
+}

@@ -19,4 +19,16 @@ public class Build
     {
         return "@build_time@";
     }
+
+    /** Returns our Facebook API key. */
+    public static String facebookKey (boolean candidate) 
+    {
+        return candidate ? "@candidate_facebook_key@" : "@facebook_key@";
+    }
+
+    /** Returns our billing URL. */
+    public static String billingURL () 
+    {
+        return "@billing_url@";
+    }
 }

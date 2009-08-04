@@ -18,9 +18,11 @@ import com.threerings.everything.data.Powerup;
 
 import client.ui.DataPanel;
 import client.ui.PowerupUI;
+import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.Messages;
+import client.util.Page;
 
 /**
  * Displays the shop where a player can buy powerups.
@@ -40,7 +42,9 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
 
         SmartTable table = new SmartTable(5, 0);
         table.setWidget(0, 0, Widgets.newRow(Widgets.newLabel("You have:", "machine"),
-                                             new CoinLabel(_ctx.getCoins())), 5);
+                                             new CoinLabel(_ctx.getCoins()),
+                                             Widgets.newShim(25, 5),
+                                             Args.createLink("Get Coins!", Page.GET_COINS)), 5);
 
         table.setText(1, 0, "Powerup", 2, "Header");
         table.setText(1, 1, "Have", 1, "Header");
