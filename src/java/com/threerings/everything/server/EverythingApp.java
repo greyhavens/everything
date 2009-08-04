@@ -163,6 +163,13 @@ public class EverythingApp extends App
     }
 
     @Override // from App
+    public void coinsPurchased (int userId, int coins)
+    {
+        log.info("Player purchased coins, yay!", "user", userId, "coins", coins);
+        _playerRepo.grantCoins(userId, coins);
+    }
+
+    @Override // from App
     public void didInit ()
     {
         log.info("Everything app initialized.", "version", _appvers, "build", Build.version());
