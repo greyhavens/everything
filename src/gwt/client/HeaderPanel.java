@@ -9,8 +9,6 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
-import com.threerings.everything.data.Build;
-
 import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
@@ -32,24 +30,30 @@ public class HeaderPanel extends FlowPanel
         } else {
             bits.setText(0, col++, "Hello: " + ctx.getMe().name.toString(), 1, "machine");
         }
-        if (ctx.isAdmin()) {
-            bits.setWidget(0, col, Args.createLink("Dashboard", Page.DASHBOARD), 1, "machine");
-            bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_CENTER);
+
+        FlowPanel extras = Widgets.newFlowPanel("machine");
+        if (ctx.isEditor()) {
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Add Things", Page.EDIT_CATS));
         }
-        bits.setText(0, col, "Build: " + Build.time(), 1, "machine");
+        if (ctx.isAdmin()) {
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
+        }
+        bits.setWidget(0, col, extras);
         bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_RIGHT);
         add(bits);
 
-        SmartTable links = new SmartTable("Links", 5, 0);
+        SmartTable links = new SmartTable("Links", 8, 0);
         col = 0;
         links.setWidget(1, col++, Args.createLink("News", Page.LANDING), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Flip Cards", Page.FLIP), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Your Collection", Page.BROWSE), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Shop", Page.SHOP), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Friends", Page.FRIENDS), 1, "machine");
-        if (ctx.isEditor()) {
-            links.setWidget(1, col++, Args.createLink("Add Things", Page.EDIT_CATS), 1, "machine");
+        if (ctx.isAdmin()) {
+            links.setWidget(1, col++, Args.createLink("Get Coins", Page.GET_COINS), 1, "machine");
         }
+        links.setWidget(1, col++, Args.createLink("Friends", Page.FRIENDS), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Credits", Page.CREDITS), 1, "machine");
         add(links);
     }

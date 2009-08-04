@@ -177,7 +177,7 @@ fb\:profile-pic img {
 
 .header .Links {
   font-size: 17px;
-  padding: 5px 15px 0px;
+  margin: 0px auto;
 }
 
 /** Shared page styles */

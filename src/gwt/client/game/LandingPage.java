@@ -9,6 +9,7 @@ import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
 
+import com.threerings.everything.data.Build;
 import com.threerings.everything.data.News;
 
 import client.util.Context;
@@ -48,6 +49,8 @@ public class LandingPage extends FlowPanel
             add(Widgets.newLabel("Recent Happenings", "Title"));
             add(new FeedPanel(ctx));
         }
+
+        add(Widgets.newLabel("Build: " + Build.time(), "machine"));
     }
 
     protected static String formatNews (String text)
