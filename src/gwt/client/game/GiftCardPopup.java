@@ -115,7 +115,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         grid.addText(msg, 6);
 
         return Widgets.newFlowPanel(
-            Widgets.newLabel("Send it to an Everything friend:", "machine"),
+            Widgets.newLabel("Send " + _thing.name + " to an Everything friend:", "machine"),
             Widgets.newScrollPanelY(grid, 400),
             Widgets.newShim(10, 10),
             Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"),
