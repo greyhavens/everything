@@ -343,7 +343,7 @@ public class EverythingServlet extends EveryServiceServlet
     protected static SimpleDateFormat _bdfmt = new SimpleDateFormat("MMMM dd");
 
     /** The maximum number of recent feed items returned. */
-    protected static final int RECENT_FEED_ITEMS = 50;
+    protected static final int RECENT_FEED_ITEMS = 150;
 
     /** The number of days into the past we look for recent category comments. */
     protected static final int RECENT_COMMENT_DAYS = 3;
