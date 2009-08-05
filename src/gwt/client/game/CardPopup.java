@@ -18,6 +18,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.Category;
 
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
@@ -127,6 +128,8 @@ public class CardPopup extends DataPopup<Card>
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showThingDialog(message, card.thing.name, card.thing.descrip,
+                                Category.getHierarchy(card.categories),
+                                card.thing.rarity.toString(),
                                 ImageUtil.getImageURL(card.thing.image),
                                 "http://apps.facebook.com/everythinggame/?token=" +
                                 Args.createLinkToken(Page.BROWSE, card.owner.userId,
@@ -135,16 +138,19 @@ public class CardPopup extends DataPopup<Card>
         };
     }
 
-    protected static native void showThingDialog (
-        String message, String thing, String descrip, String image, String url) /*-{
+    protected static native void showThingDialog (String message, String thing, String descrip,
+                                                  String category, String rarity, String image,
+                                                  String url) /*-{
         var attachment = {
             'name': thing,
             'description': descrip,
             'href': url,
-            'media': [{'type': 'image',
-                       'src': image,
-                       'href': url }],
-            'properties': {'Play Everything': {'text': 'What will you get?',
+            'media': [{ 'type': 'image',
+                        'src': image,
+                        'href': url }],
+            'properties': {'Category': category,
+                           'Rarity': rarity,
+                           'Play Everything': {'text': 'What will you get?',
                                                'href': 'http://apps.facebook.com/everythinggame/'}},
         };
         $wnd.FB.Connect.streamPublish(message, attachment);
