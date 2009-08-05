@@ -50,9 +50,7 @@ public class HeaderPanel extends FlowPanel
         links.setWidget(1, col++, Args.createLink("Flip Cards", Page.FLIP), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Your Collection", Page.BROWSE), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Shop", Page.SHOP), 1, "machine");
-        if (ctx.isAdmin()) {
-            links.setWidget(1, col++, Args.createLink("Get Coins", Page.GET_COINS), 1, "machine");
-        }
+        links.setWidget(1, col++, Args.createLink("Get Coins", Page.GET_COINS), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Friends", Page.FRIENDS), 1, "machine");
         links.setWidget(1, col++, Args.createLink("Credits", Page.CREDITS), 1, "machine");
         add(links);

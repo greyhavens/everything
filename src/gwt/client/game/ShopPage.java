@@ -43,9 +43,9 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
 
         SmartTable table = new SmartTable(5, 0);
         table.setWidget(0, 0, Widgets.newRow("machine", Widgets.newLabel("You have:"),
-                                             new CoinLabel(_ctx.getCoins()) /*,
+                                             new CoinLabel(_ctx.getCoins()),
                                              Widgets.newShim(25, 5),
-                                             Args.createLink("Get Coins!", Page.GET_COINS)*/), 5);
+                                             Args.createLink("Get Coins!", Page.GET_COINS)), 5);
 
         table.setText(1, 0, "Powerup", 2, "Header");
         table.setText(1, 1, "Have", 1, "Header");
