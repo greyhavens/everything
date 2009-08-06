@@ -22,6 +22,9 @@ public class SessionData
     /** Whether or not this player is an admin. */
     public boolean isAdmin;
 
+    /** Whether or not this player is a maintainer. */
+    public boolean isMaintainer;
+
     /** Our coin balance at the time we validated our session. */
     public int coins;
 

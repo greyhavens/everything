@@ -9,26 +9,26 @@ package com.threerings.everything.data;
 public class Build
 {
     /** The version number assigned to this build. */
-    public static String version () 
+    public static String version ()
     {
 	return "@build_version@";
     }
 
     /** The time at which this build was made. */
-    public static String time () 
+    public static String time ()
     {
         return "@build_time@";
     }
 
     /** Returns our Facebook API key. */
-    public static String facebookKey (boolean candidate) 
+    public static String facebookKey (boolean candidate)
     {
         return candidate ? "@candidate_facebook_key@" : "@facebook_key@";
     }
 
     /** Returns our billing URL. */
-    public static String billingURL () 
+    public static String billingURL (String path)
     {
-        return "@billing_url@";
+        return "@billing_url@" + path;
     }
 }

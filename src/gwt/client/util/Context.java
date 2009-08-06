@@ -36,6 +36,9 @@ public interface Context
     /** Returns whether this player has admin privileges. */
     boolean isAdmin ();
 
+    /** Returns whether this player has maintainer privileges. */
+    boolean isMaintainer ();
+
     /** Returns the dynamic value that contains our current coin balance. */
     Value<Integer> getCoins ();
 

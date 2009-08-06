@@ -114,13 +114,19 @@ public class EverythingClient
     // from interface Context
     public boolean isEditor ()
     {
-        return _data.isEditor || _data.isAdmin;
+        return _data.isEditor || isAdmin();
     }
 
     // from interface Context
     public boolean isAdmin ()
     {
-        return _data.isAdmin;
+        return _data.isAdmin || isMaintainer();
+    }
+
+    // from interface Context
+    public boolean isMaintainer ()
+    {
+        return _data.isMaintainer;
     }
 
     // from interface Context
@@ -195,7 +201,7 @@ public class EverythingClient
             setContent(new ShopPage(this));
             return;
         case GET_COINS:
-            setContent(new GetCoinsPage(this));
+            setContent(new GetCoinsPage(this, args.get(0, "")));
             return;
         case FRIENDS:
             setContent(new FriendsPage(this));

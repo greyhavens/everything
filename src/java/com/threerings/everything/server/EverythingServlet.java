@@ -168,6 +168,7 @@ public class EverythingServlet extends EveryServiceServlet
         data.name = player.getName();
         data.isEditor = player.isEditor;
         data.isAdmin = user.isAdmin();
+        data.isMaintainer = user.holdsToken(OOOUser.MAINTAINER);
         data.coins = player.coins;
         data.powerups = _gameRepo.loadPowerups(player.userId);
         GridRecord grid = _gameRepo.loadGrid(player.userId);

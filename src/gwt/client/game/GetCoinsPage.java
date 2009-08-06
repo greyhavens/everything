@@ -15,9 +15,15 @@ import client.util.Context;
  */
 public class GetCoinsPage extends FlowPanel
 {
-    public GetCoinsPage (Context ctx)
+    public GetCoinsPage (Context ctx, String action)
     {
         addStyleName("getCoins");
-        add(new Frame(Build.billingURL()));
+        String path;
+        if (action.equals("admin")) {
+            path = Build.billingURL("admin/");
+        } else {
+            path = Build.billingURL("select_type.wm");
+        }
+        add(new Frame(path));
     }
 }

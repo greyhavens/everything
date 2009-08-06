@@ -38,6 +38,10 @@ public class HeaderPanel extends FlowPanel
         }
         if (ctx.isAdmin()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Bling!", Page.GET_COINS, "admin"));
+        }
+        if (ctx.isMaintainer()) {
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
         }
         bits.setWidget(0, col, extras);
