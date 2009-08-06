@@ -24,6 +24,7 @@ import com.threerings.gwt.ui.NumberTextBox;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.AdminService;
@@ -227,8 +228,9 @@ public class DashboardPage extends DataPanel<AdminService.DashboardResult>
         public PlayerDetailsPanel (final Player details) {
             super("Details", 2, 0);
             setText(0, 0, details.name.toString(), 2, "Header");
-            addDatum("Joined", _dfmt.format(details.joined));
-            addDatum("Last seen", _dfmt.format(details.lastSession));
+            addDatum("User ID", details.name.userId);
+            addDatum("Joined", DateUtil.formatDate(details.joined));
+            addDatum("Last seen", DateUtil.formatDateTime(details.lastSession));
             addDatum("Coins", details.coins);
             addDatum("Free flips", details.freeFlips);
             if (details.birthday != null) {
@@ -299,6 +301,5 @@ public class DashboardPage extends DataPanel<AdminService.DashboardResult>
     protected Value<News> _news;
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
-    protected static final DateTimeFormat _dfmt = DateTimeFormat.getMediumDateTimeFormat();
     protected static final DateTimeFormat _bfmt = DateTimeFormat.getMediumDateFormat();
 }
