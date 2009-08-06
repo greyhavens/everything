@@ -5,6 +5,7 @@ package client.util;
 
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Extends the stock click callback and provides proper error translation.
@@ -28,8 +29,8 @@ public abstract class ClickCallback<T> extends com.threerings.gwt.util.ClickCall
     }
 
     @Override // from ClickCallback<T>
-    protected String formatError (Throwable cause)
+    protected void showError (Throwable cause, Widget near)
     {
-        return Errors.xlate(cause);
+        Errors.showError(cause, near);
     }
 }
