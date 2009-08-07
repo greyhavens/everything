@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -47,7 +48,7 @@ public class GetCoinsPage extends FlowPanel
             Widget bucks = Widgets.newInlineLabel(" for $" + PRICES[ii], "machine");
             prices.setWidget(0, col++, Widgets.newFlowPanel(new CoinLabel(PRICES[ii+1]), bucks));
         }
-        prices.setText(0, col++, _msgs.selectYay(), 1, "handwriting");
+        prices.setText(0, col++, YAYS[Random.nextInt(YAYS.length)], 1, "handwriting");
         add(prices);
 
         SmartTable choices = new SmartTable("Methods", 5, 0);
@@ -103,10 +104,12 @@ public class GetCoinsPage extends FlowPanel
         }
     }
 
-    protected static final int[] PRICES = { 5, 5000, 10, 11000, 20, 24000 };
-
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
     protected static final BlingImages _images = GWT.create(BlingImages.class);
+
+    protected static final int[] PRICES = { 5, 5000, 10, 11000, 20, 24000 };
+    protected static final String[] YAYS = { _msgs.selectYay1(), _msgs.selectYay2(),
+                                             _msgs.selectYay3(), _msgs.selectYay4() };
 
     protected static final Method[] METHODS = {
         new Method(_images.cc_default(), _images.cc_over(), _images.cc_down(),
