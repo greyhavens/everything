@@ -128,6 +128,9 @@
 .cardView .Technology {
   background: url(images/category/technology.png) top center no-repeat;
 }
+.cardView .Religion {
+  background: url(images/category/religion.png) top center no-repeat;
+}
 
 .cardView .FactsTitle {
   font-weight: bold;
