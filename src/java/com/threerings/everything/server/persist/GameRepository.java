@@ -171,8 +171,8 @@ public class GameRepository extends DepotRepository
         erec.escrowed = new Timestamp(System.currentTimeMillis());
         insert(erec);
 
-        // gift the card to player 0 to remove it from the gifter's collection
-        giftCard(card, 0);
+        // gift the card to player -1 to remove it from the gifter's collection
+        giftCard(card, -1);
     }
 
     /**
@@ -185,8 +185,11 @@ public class GameRepository extends DepotRepository
             // transfer the card to the player
             log.info("Transfering escrowed card to new player", "card", card.thingId,
                      "player", player.who());
-            updatePartial(CardRecord.getKey(0, card.thingId, card.created),
-                          CardRecord.OWNER_ID, player.userId);
+            if (updatePartial(CardRecord.getKey(-1, card.thingId, card.created),
+                              CardRecord.OWNER_ID, player.userId) == 0) {
+                log.warning("Failed to transfer escrowed card?", "card", card.thingId,
+                            "created", card.created, "to", player.who());
+            }
             // delete the escrow record
             delete(card);
         }

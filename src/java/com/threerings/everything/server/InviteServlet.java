@@ -62,6 +62,7 @@ public class InviteServlet extends AppServlet
 
             targetFBId = req.getParameter("ids[]");
             if (targetFBId == null) { // they chose to skip
+                log.info("No targets, skipping", "who", player.who(), "from", from);
                 writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
                 return;
             }
