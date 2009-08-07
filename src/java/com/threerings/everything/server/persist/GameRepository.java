@@ -18,10 +18,12 @@ import com.samskivert.util.IntIntMap;
 import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
+import com.samskivert.depot.Exps;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
+import com.samskivert.depot.clause.FieldOverride;
 import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
@@ -198,6 +200,8 @@ public class GameRepository extends DepotRepository
     {
         IntIntMap data = new IntIntMap();
         for (OwnerRecord orec : findAll(OwnerRecord.class,
+                                        new FieldOverride(OwnerRecord.COUNT,
+                                                          Exps.countDistinct(CardRecord.THING_ID)),
                                         new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
                                                           CardRecord.THING_ID.in(thingIds))),
                                         new GroupBy(CardRecord.OWNER_ID))) {

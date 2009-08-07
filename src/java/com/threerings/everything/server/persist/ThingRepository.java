@@ -17,10 +17,12 @@ import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
+import com.samskivert.depot.Exps;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
+import com.samskivert.depot.clause.FieldOverride;
 import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.OrderBy;
@@ -310,6 +312,8 @@ public class ThingRepository extends DepotRepository
         for (OwnedRecord orec : findAll(OwnedRecord.class,
                                         CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
                                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
+                                        new FieldOverride(OwnedRecord.OWNED,
+                                                          Exps.countDistinct(CardRecord.THING_ID)),
                                         new GroupBy(CategoryRecord.CATEGORY_ID),
                                         new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
             owned.put(orec.categoryId, orec.owned);
