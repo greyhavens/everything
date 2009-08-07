@@ -3,8 +3,10 @@
 
 package client.game;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 
+import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
@@ -24,20 +26,9 @@ public class LandingPage extends FlowPanel
         setStyleName("landing");
         addStyleName("page"); // we're a top-level page
 
-        if (ctx.getMe().isGuest()) {
+        if (ctx.getMe().isGuest() || ctx.isNewbie()) {
             add(new AddAppPanel(ctx, false));
-        }
-
-        if (ctx.isNewbie()) {
-            add(Widgets.newLabel("Welcome to Everything!", "Title"));
-            FlowPanel intro = new FlowPanel();
-            for (String text : INTRO_HTML) {
-                intro.add(Widgets.newHTML(text, "Text"));
-            }
-            add(intro);
-        }
-
-        if (news.get() == null) {
+        } else if (news.get() == null) {
             add(Widgets.newLabel("Latest News", "Title"));
             add(Widgets.newLabel("No gnus is good gnus.", "Text"));
         } else {
@@ -45,12 +36,15 @@ public class LandingPage extends FlowPanel
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
         }
 
+        add(Widgets.newShim(15, 15));
         if (!ctx.getMe().isGuest()) {
             add(Widgets.newLabel("Recent Happenings", "Title"));
             add(new FeedPanel(ctx));
         }
 
-        add(Widgets.newLabel("Build: " + Build.time(), "machine"));
+        if (ctx.isEditor()) {
+            add(Widgets.newLabel("Build: " + Build.time(), "machine"));
+        }
     }
 
     protected static String formatNews (String text)
@@ -78,14 +72,5 @@ public class LandingPage extends FlowPanel
         return buf.toString();
     }
 
-    protected static final String[] INTRO_HTML = {
-        "Everything is a collecting game. Every day you get a new grid of cards and you " +
-        "flip them over to get new things to add to your collection. Some cards are rarer " +
-        "than others, so good luck.",
-        "You get five free flips every day, but you can buy more flips by spending coins " +
-        "you get from cashing in cards you don't want. Rarer cards are worth more coins when " +
-        "you cash them in. You can also give cards to your friends to help them complete their " +
-        "collections.",
-        "Enough jabber, click <b>Flip Cards</b> up above to get started!"
-    };
+    protected static final GameMessages _msgs = GWT.create(GameMessages.class);
 }

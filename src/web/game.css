@@ -199,9 +199,28 @@
 }
 
 /** AddAppPanel styles */
-.addApp {
+.addApp .Title, .addApp .Steps {
   font-size: 18px;
-  padding-bottom: 15px;
+}
+
+.addApp .Steps {
+  margin: 10px auto;
+  text-align: center;
+}
+
+.addApp .addApp .Arrow {
+  font-size: 45px;
+}
+
+.addApp .Text {
+  margin: 5px 0px;
+  font-family: Trebuchet MS, sans-serif;
+}
+
+.addApp .Text a {
+  font-size: 18px;
+  font-family: Machine Bold, Helvetia, Arial, sans-serif;
+  font-weight: bold;
 }
 
 /** LandingPage styles */
