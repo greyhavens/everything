@@ -481,6 +481,8 @@ public class GameLogic
 
         // and check whether they've completed this series
         checkCompletedSeries(user, thing);
+
+        log.info("Gave out a birthday present", "to", user.who(), "what", thing.name);
     }
 
     protected ThingIndex _index;

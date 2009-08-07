@@ -122,6 +122,7 @@ public class PlayerRepository extends DepotRepository
         int year = cal.get(Calendar.YEAR), today = toDateVal(cal.getTimeInMillis());
         // load up the keys for up to 1000 players whose birthday has arrived
         Where where = new Where(Ops.and(PlayerRecord.BIRTHDATE.lessEq(today),
+                                        PlayerRecord.BIRTHDATE.notEq(0),
                                         PlayerRecord.LAST_GIFT_YEAR.lessThan(year)));
         Collection<PlayerRecord> players = findAll(PlayerRecord.class, where, new Limit(0, 1000));
         List<Key<PlayerRecord>> keys = Lists.newArrayListWithCapacity(players.size());
