@@ -420,3 +420,18 @@
   height: 600px; /* TODO */
   border: none;
 }
+
+.getCoins .Header {
+  font-size: 18px;
+  text-align: center;
+  margin: 10px 0px;
+}
+
+.getCoins .Methods, .getCoins .Prices {
+  margin: 5px auto;
+  width: 600px;
+}
+
+.getCoins .Prices td {
+  text-align: center;
+}

@@ -3,6 +3,9 @@
 
 package client.util;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Hyperlink;
 
 import com.threerings.gwt.ui.Anchor;
@@ -61,6 +64,19 @@ public class Args
     {
         return new Anchor("http://www.facebook.com/message.php?id=" + name.facebookId,
                           "Send message", "_blank");
+    }
+
+    /**
+     * Creates a click handler that when triggered will traverse to the specified link.
+     */
+    public static ClickHandler createLinkHandler (Page page, Object... args)
+    {
+        final String token = Args.createLinkToken(page, args);
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                History.newItem(token);
+            }
+        };
     }
 
     /**

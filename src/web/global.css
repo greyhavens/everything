@@ -90,12 +90,12 @@ fb\:profile-pic img {
   z-index: 10;
 }
 
-.gwt-PushButton {
+.normalButton {
   color: #442D17;
   width: 81px;
   height: 46px;
 }
-.gwt-PushButton .html-face {
+.normalButton .html-face {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-size: 18px;
   padding: 11px 0px;
@@ -105,19 +105,19 @@ fb\:profile-pic img {
 .longButton .html-face {
   font-size: 12px;
 }
-.gwt-PushButton-up {
+.normalButton-up {
   background: url(images/button/up.png);
 }
-.gwt-PushButton-up-hovering {
+.normalButton-up-hovering {
   background: url(images/button/over.png);
 }
-.gwt-PushButton-down-hovering {
+.normalButton-down-hovering {
   background: url(images/button/down.png);
 }
-.gwt-PushButton-down-hovering .html-face {
+.normalButton-down-hovering .html-face {
   padding: 12px 0px 10px 2px;
 }
-.gwt-PushButton-up-disabled {
+.normalButton-up-disabled {
   background: url(images/button/up.png);
   color: #CCCCCC;
 }

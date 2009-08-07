@@ -29,6 +29,8 @@ public class ButtonUI
         PushButton button = new PushButton(text);
         if (text.length() > 5) {
             button.addStyleName("longButton");
+        } else {
+            button.addStyleName("normalButton");
         }
         if (onClick != null) {
             button.addClickHandler(onClick);
