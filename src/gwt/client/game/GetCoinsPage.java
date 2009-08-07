@@ -47,7 +47,7 @@ public class GetCoinsPage extends FlowPanel
             Widget bucks = Widgets.newInlineLabel(" for $" + PRICES[ii], "machine");
             prices.setWidget(0, col++, Widgets.newFlowPanel(new CoinLabel(PRICES[ii+1]), bucks));
         }
-        prices.setText(0, col++, "So cheap!", 1, "handwriting");
+        prices.setText(0, col++, _msgs.selectYay(), 1, "handwriting");
         add(prices);
 
         SmartTable choices = new SmartTable("Methods", 5, 0);
