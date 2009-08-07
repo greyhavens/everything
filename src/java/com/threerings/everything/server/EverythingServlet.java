@@ -132,9 +132,11 @@ public class EverythingServlet extends EveryServiceServlet
                         cal.setTime(_bfmt.parse(bdstr));
                     }
                     birthday = cal.getTimeInMillis();
+                    log.info("Parsed Facebook birthday", "bday", bdstr, "date", cal.getTime());
                 }
             } catch (Exception e) {
-                log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr);
+                log.info("Cannot parse Facebook birthday", "who", user.username, "bday", bdstr,
+                         "err", e.getMessage());
             }
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
@@ -151,8 +153,6 @@ public class EverythingServlet extends EveryServiceServlet
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
             _playerRepo.recordSession(player.userId, now);
             log.info("Welcome back", "who", player.who(), "gone", elapsed);
-
-            // TODO: update their birthday if that's not set
 
             // check to see if they made FB friends with any existing Everything players
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
@@ -302,6 +302,42 @@ public class EverythingServlet extends EveryServiceServlet
                     log.info("Failed to wire up Facebook friends", "who", prec.who(),
                              "error", e.getMessage());
                 }
+
+                // TEMP: update birthdays for people who started when there was a bug
+                if (prec.birthdate == 0) {
+                    Set<Long> ids = Collections.singleton(prec.facebookId);
+                    EnumSet<ProfileField> fields = EnumSet.of(ProfileField.BIRTHDAY);
+                    UsersGetInfoResponse uinfo;
+                    try {
+                        uinfo = (UsersGetInfoResponse)fbclient.users_getInfo(ids, fields);
+                    } catch (FacebookException fbe) {
+                        log.warning("Failed to load Facebook profile info", "who", prec.who(), fbe);
+                        return;
+                    }
+                    if (uinfo.getUser().size() == 0) {
+                        log.warning("User has no Facebook profile info?", "who", prec.who());
+                        return;
+                    }
+
+                    User fbuser = uinfo.getUser().get(0);
+                    String bdstr = fbuser.getBirthday();
+                    try {
+                        if (bdstr != null) {
+                            Calendar cal = Calendar.getInstance();
+                            if (bdstr.indexOf(",") == -1) {
+                                cal.setTime(_bdfmt.parse(bdstr));
+                            } else {
+                                cal.setTime(_bfmt.parse(bdstr));
+                            }
+                            log.info("Parsed birthday", "bday", bdstr, "date", cal.getTime());
+                            _playerRepo.updateBirthday(prec.userId, cal.getTimeInMillis());
+                        }
+                    } catch (Exception e) {
+                        log.info("Cannot parse birthday", "who", prec.who(), "bday", bdstr,
+                                 "err", e.getMessage());
+                    }
+                }
+                // END TEMP
             }
         });
     }

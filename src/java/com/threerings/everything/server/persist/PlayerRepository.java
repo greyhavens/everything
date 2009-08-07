@@ -157,7 +157,7 @@ public class PlayerRepository extends DepotRepository
         record.facebookId = facebookId;
         record.name = name;
         record.surname = surname;
-        if (birthday > 0L) {
+        if (birthday != 0L) {
             record.birthdate = toDateVal(birthday);
             Calendar cal = Calendar.getInstance();
             int year = cal.get(Calendar.YEAR);
@@ -183,6 +183,14 @@ public class PlayerRepository extends DepotRepository
     public void updateFacebookId (int userId, long facebookId)
     {
         updatePartial(PlayerRecord.getKey(userId), PlayerRecord.FACEBOOK_ID, facebookId);
+    }
+
+    /**
+     * TEMP: updates player's birthday.
+     */
+    public void updateBirthday (int userId, long birthday)
+    {
+        updatePartial(PlayerRecord.getKey(userId), PlayerRecord.BIRTHDATE, toDateVal(birthday));
     }
 
     /**
