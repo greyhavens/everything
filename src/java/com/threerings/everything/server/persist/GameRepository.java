@@ -163,16 +163,21 @@ public class GameRepository extends DepotRepository
      */
     public void escrowCard (CardRecord card, String externalId)
     {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         // create an escrow record for this card
         EscrowedCardRecord erec = new EscrowedCardRecord();
         erec.externalId = externalId;
         erec.thingId = card.thingId;
-        erec.created = card.received;
-        erec.escrowed = new Timestamp(System.currentTimeMillis());
+        erec.created = now;
+        erec.escrowed = now;
         insert(erec);
 
-        // gift the card to player -1 to remove it from the gifter's collection
-        giftCard(card, -1);
+        // gift the card to player -1 to remove it from the gifter's collection (we have to do this
+        // manually because we need to be sure that the timestamp is *exactly* the same)
+        updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.received),
+                      CardRecord.OWNER_ID, -1,
+                      CardRecord.GIVER_ID, card.ownerId,
+                      CardRecord.RECEIVED, now);
     }
 
     /**
