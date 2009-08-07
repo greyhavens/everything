@@ -227,7 +227,7 @@ public class DashboardPage extends DataPanel<AdminService.DashboardResult>
     {
         public PlayerDetailsPanel (final Player details) {
             super("Details", 2, 0);
-            setText(0, 0, details.name.toString(), 2, "Header");
+            setWidget(0, 0, Args.createInlink(details.name), 2, "Header");
             addDatum("User ID", details.name.userId);
             addDatum("Joined", DateUtil.formatDate(details.joined));
             addDatum("Last seen", DateUtil.formatDateTime(details.lastSession));
