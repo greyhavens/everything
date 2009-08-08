@@ -440,6 +440,10 @@
   border: none;
 }
 
+.getCoins {
+  background: url(images/page_get_coins.png) no-repeat;
+}
+
 .getCoins .Header {
   font-size: 18px;
   text-align: center;
