@@ -37,7 +37,7 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
         super(ctx, "feed");
     }
 
-    protected Widget formatItem (FeedItem item, List<FeedItem> items, boolean omitPhotos)
+    protected Widget formatItem (FeedItem item, List<FeedItem> items, Mode mode)
     {
         FlowPanel action = Widgets.newFlowPanel("Action");
         action.add(Args.createInlink(getName(item.actor, true),
@@ -88,9 +88,21 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
             action.add(Widgets.newInlineLabel(" did something mysterious."));
             break;
         }
-        action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
-        return omitPhotos ? Widgets.newSimplePanel("Photoless", action) : Widgets.newRow(
-            HasAlignment.ALIGN_TOP, null, XFBML.newProfilePic(item.actor.facebookId), action);
+
+        if (mode != Mode.HIGHLIGHT) {
+            action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
+        }
+
+        switch (mode) {
+        default:
+        case NORMAL:
+            return Widgets.newRow(HasAlignment.ALIGN_TOP, null,
+                                  XFBML.newProfilePic(item.actor.facebookId), action);
+        case USER:
+            return Widgets.newSimplePanel("Photoless", action);
+        case HIGHLIGHT:
+            return action;
+        }
     }
 
     protected void addGift (FlowPanel action, FeedItem item)
@@ -125,6 +137,8 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
         }
         return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
     }
+
+    protected enum Mode { NORMAL, USER, HIGHLIGHT };
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 }

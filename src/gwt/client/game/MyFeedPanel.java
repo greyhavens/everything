@@ -35,13 +35,13 @@ public class MyFeedPanel extends FeedPanel
         if (highlights.size() > 0) {
             add(Widgets.newLabel("Highlights", "Title"));
             while (highlights.size() > 0) {
-                add(formatItem(highlights.remove(0), highlights, true));
+                add(formatItem(highlights.remove(0), highlights, Mode.HIGHLIGHT));
             }
         }
 
         add(Widgets.newLabel("Recent Happenings", "Title"));
         while (items.size() > 0) {
-            add(formatItem(items.remove(0), items, false));
+            add(formatItem(items.remove(0), items, Mode.NORMAL));
         }
 
         XFBML.parse(this);

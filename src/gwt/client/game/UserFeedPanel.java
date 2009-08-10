@@ -24,7 +24,7 @@ public class UserFeedPanel extends FeedPanel
     protected void init (List<FeedItem> items)
     {
         while (items.size() > 0) {
-            add(formatItem(items.remove(0), items, true));
+            add(formatItem(items.remove(0), items, Mode.USER));
         }
     }
 }
