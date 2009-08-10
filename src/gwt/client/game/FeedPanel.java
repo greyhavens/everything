@@ -3,6 +3,7 @@
 
 package client.game;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,34 +28,16 @@ import client.util.Page;
 import client.util.PanelCallback;
 
 /**
- * Displays the player's recent feed.
+ * Displays a feed.
  */
-public class FeedPanel extends DataPanel<List<FeedItem>>
+public abstract class FeedPanel extends DataPanel<List<FeedItem>>
 {
-    public FeedPanel (Context ctx)
+    protected FeedPanel (Context ctx)
     {
         super(ctx, "feed");
-        _omitPhotos = false;
-        _everysvc.getRecentFeed(createCallback());
     }
 
-    public FeedPanel (Context ctx, int userId)
-    {
-        super(ctx, "feed");
-        _omitPhotos = true;
-        _everysvc.getUserFeed(userId, createCallback());
-    }
-
-    @Override // from DataPanel
-    protected void init (List<FeedItem> items)
-    {
-        while (items.size() > 0) {
-            add(formatItem(items.remove(0), items));
-        }
-        XFBML.parse(this);
-    }
-
-    protected Widget formatItem (FeedItem item, List<FeedItem> items)
+    protected Widget formatItem (FeedItem item, List<FeedItem> items, boolean omitPhotos)
     {
         FlowPanel action = Widgets.newFlowPanel("Action");
         action.add(Args.createInlink(getName(item.actor, true),
@@ -106,7 +89,7 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             break;
         }
         action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
-        return _omitPhotos ? Widgets.newSimplePanel("Photoless", action) : Widgets.newRow(
+        return omitPhotos ? Widgets.newSimplePanel("Photoless", action) : Widgets.newRow(
             HasAlignment.ALIGN_TOP, null, XFBML.newProfilePic(item.actor.facebookId), action);
     }
 
@@ -142,8 +125,6 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         }
         return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
     }
-
-    protected boolean _omitPhotos;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 }

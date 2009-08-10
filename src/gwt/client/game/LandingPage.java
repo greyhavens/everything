@@ -38,8 +38,7 @@ public class LandingPage extends FlowPanel
 
         add(Widgets.newShim(15, 15));
         if (!ctx.getMe().isGuest()) {
-            add(Widgets.newLabel("Recent Happenings", "Title"));
-            add(new FeedPanel(ctx));
+            add(new MyFeedPanel(ctx));
         }
 
         if (ctx.isEditor()) {

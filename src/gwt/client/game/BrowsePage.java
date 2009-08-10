@@ -69,7 +69,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         remove(_taxon);
                         feed.setText("View Collection");
                         if (_feed == null) {
-                            _feed = new FeedPanel(_ctx, _coll.owner.userId);
+                            _feed = new UserFeedPanel(_ctx, _coll.owner.userId);
                         }
                         add(_feed);
                     } else {
