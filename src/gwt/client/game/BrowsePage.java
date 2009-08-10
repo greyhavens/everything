@@ -78,6 +78,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         add(_taxon);
                     }
                 }
+                protected FeedPanel _feed;
             });
             Widget links = _ctx.getMe().equals(coll.owner) ? Widgets.newRow("Links", feed) :
                 Widgets.newRow("Links", feed, Args.createMessageAnchor(coll.owner));
@@ -142,7 +143,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected int _seriesId;
     protected PlayerCollection _coll;
     protected SmartTable _header, _taxon;
-    protected FeedPanel _feed;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
