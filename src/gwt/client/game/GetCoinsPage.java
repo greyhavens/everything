@@ -54,10 +54,11 @@ public class GetCoinsPage extends FlowPanel
         SmartTable choices = new SmartTable("Methods", 5, 0);
         choices.setText(0, 0, _msgs.selectSelect(), 2, "machine");
         for (final Method method : METHODS) {
-            int row = choices.addWidget(
-                Widgets.newPushButton(method.normal.createImage(), method.hover.createImage(),
-                                      method.down.createImage(),
-                                      Args.createLinkHandler(Page.GET_COINS, method.target)), 1);
+            PushButton button = Widgets.newPushButton(
+                method.normal.createImage(), method.hover.createImage(), method.down.createImage(),
+                Args.createLinkHandler(Page.GET_COINS, method.target));
+            button.setStyleName("BuyButton");
+            int row = choices.addWidget(button, 1);
             choices.setHTML(row, 1, method.tip, 1, "handwriting");
         }
         add(choices);
