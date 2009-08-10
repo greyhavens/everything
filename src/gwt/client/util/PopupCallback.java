@@ -19,9 +19,9 @@ public abstract class PopupCallback<T> extends com.threerings.gwt.util.PopupCall
         super(errorNear);
     }
 
-    @Override // from PopupCallback<T>
-    public void onFailure (Throwable cause)
+    @Override // from AbstractPopupCallback<T>
+    protected String formatError (Throwable cause)
     {
-        Errors.showError(cause, _errorNear);
+        return Errors.xlate(cause);
     }
 }

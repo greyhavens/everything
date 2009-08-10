@@ -237,6 +237,13 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     }
                 });
             }
+            public void onFailure (Throwable cause) {
+                if (cause.getMessage().equals("e.nsf_for_flip")) {
+                    _ctx.displayPopup(new NSFPopup());
+                } else {
+                    super.onFailure(cause);
+                }
+            }
         });
     }
 
@@ -267,6 +274,21 @@ public class GridPage extends DataPanel<GameService.GridResult>
             }
         });
         Popups.showOver(popup, trigger);
+    }
+
+    protected class NSFPopup extends PopupPanel
+    {
+        public NSFPopup () {
+            addStyleName("popup");
+            addStyleName("nsfPopup");
+            SmartTable table = new SmartTable(5, 0);
+            table.setText(0, 0, "Oops, you're out of coins. What to do?", 2, "machine");
+            table.setText(1, 0, "Wait 'til tomorrow and get more free flips.");
+            table.setText(1, 1, "Get more coins now and keep flipping!");
+            table.setWidget(2, 0, new PushButton("Wait", Popups.createHider(this)));
+            table.setWidget(2, 1, new PushButton("Coins", Args.createLinkHandler(Page.GET_COINS)));
+            setWidget(table);
+        }
     }
 
     protected abstract class PowerupsMenu extends FlowPanel

@@ -321,6 +321,15 @@
   background: url(images/powerup/button_over.png);
 }
 
+.nsfPopup {
+  max-width: 325px;
+  text-align: center;
+}
+
+.nsfPopup .gwt-PushButton {
+  margin: 0px auto;
+}
+
 .powerMenu .Top {
   background: url(images/powerup/menu_top.png);
   width: 201px;
