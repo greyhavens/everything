@@ -49,6 +49,9 @@ public interface Context
      * cleared). */
     void displayPopup (PopupPanel popup);
 
+    /** A value that reports whether or not a popup is showing. */
+    Value<Boolean> popupShowing ();
+
     /**
      * Returns the categories model.
      */

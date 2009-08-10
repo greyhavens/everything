@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Commands;
+import com.threerings.gwt.util.Value;
 
 /**
  * Image related utility methods.
@@ -29,7 +30,7 @@ public class ImageUtil
      */
     public static Widget getImageBox (String image)
     {
-        return getImageBox(image, "imageBox", null);
+        return getImageBox(image, "imageBox", null, null);
     }
 
     /**
@@ -38,25 +39,28 @@ public class ImageUtil
      */
     public static Widget getMiniImageBox (String image)
     {
-        return getImageBox(image, "miniImageBox", null);
+        return getImageBox(image, "miniImageBox", null, null);
     }
 
     /**
      * Returns a widget that will display the specified card image, scaled to mini-size, centered
      * within the box.
      */
-    public static Widget getMiniImageBox (String image, Command onClick)
+    public static Widget getMiniImageBox (String image, Command onClick, Value<Boolean> enabled)
     {
-        return getImageBox(image, "miniImageBox", onClick);
+        return getImageBox(image, "miniImageBox", onClick, enabled);
     }
 
-    protected static Widget getImageBox (String image, String styleName, Command onClick)
+    protected static Widget getImageBox (String image, String styleName, Command onClick,
+                                         Value<Boolean> enabled)
     {
         Widget clicky;
         if (image != null && image.length() > 0) {
-            clicky = Widgets.newActionImage(getImageURL(image), Commands.onClick(onClick));
+            clicky = Widgets.makeActionable(Widgets.newImage(getImageURL(image)),
+                                            Commands.onClick(onClick), enabled);
         } else {
-            clicky = Widgets.newActionLabel("", "Shim", Commands.onClick(onClick));
+            clicky = Widgets.makeActionable(Widgets.newLabel("", "Shim"),
+                                            Commands.onClick(onClick), enabled);
         }
         SmartTable wrap = new SmartTable(styleName, 0, 0);
         wrap.setWidget(0, 0, clicky);

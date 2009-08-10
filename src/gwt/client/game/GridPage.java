@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -28,6 +29,7 @@ import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
+import com.threerings.gwt.util.Functions;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -144,11 +146,13 @@ public class GridPage extends DataPanel<GameService.GridResult>
         clear();
 
         add(_info = new SmartTable("Info", 5, 0));
-        _info.setWidget(0, 2, hoverize(Widgets.newActionLabel("", "Powerups", new ClickHandler() {
+        Label pups = Widgets.newLabel("", "Powerups");
+        Value<Boolean> enabled = _ctx.popupShowing().map(Functions.NOT);
+        _info.setWidget(0, 2, hoverize(Widgets.makeActionable(pups, new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showPowerupsMenu((Widget)event.getSource());
             }
-        })), 1, "PupBox");
+        }, enabled), enabled), 1, "PupBox");
         _info.getFlexCellFormatter().setRowSpan(0, 2, 2);
         _info.setText(1, 0, "Unflipped cards:");
         updateRemaining(_data.grid.unflipped);
@@ -172,7 +176,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     flipCard(position);
                 }
             };
-            _cards.setWidget(row, col, ThingCardView.create(ii, card, onClick));
+            _cards.setWidget(row, col, new ThingCardView(_ctx, card, onClick));
         }
         _status.setText(0, 1, "Grid status: " + Messages.xlate(""+_data.grid.status), 1, "right");
     }
@@ -208,7 +212,6 @@ public class GridPage extends DataPanel<GameService.GridResult>
 
     protected void flipCard (final int position)
     {
-        // TODO: disable all click handlers
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
             public void onSuccess (GameService.FlipResult result) {
@@ -219,7 +222,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.image = result.card.thing.image;
                 card.rarity = result.card.thing.rarity;
                 final int row = position / COLUMNS, col = position % COLUMNS;
-                _cards.setWidget(row, col, ThingCardView.create(position, card, null));
+                _cards.setWidget(row, col, new ThingCardView(_ctx, card, null));
 
                 // update our status
                 _data.grid.unflipped[card.rarity.ordinal()]--;
@@ -335,19 +338,32 @@ public class GridPage extends DataPanel<GameService.GridResult>
         return DateUtil.formatDateTime(date).toLowerCase();
     }
 
-    protected static Label hoverize (final Label widget)
+    protected static Label hoverize (final Label target, Value<Boolean> enabled)
     {
-        widget.addMouseOverHandler(new MouseOverHandler() {
+        final MouseOverHandler onOver = new MouseOverHandler() {
             public void onMouseOver (MouseOverEvent event) {
-                widget.addStyleDependentName("up-hovering");
+                target.addStyleDependentName("up-hovering");
             }
-        });
-        widget.addMouseOutHandler(new MouseOutHandler() {
+        };
+        final MouseOutHandler onOut = new MouseOutHandler() {
             public void onMouseOut (MouseOutEvent event) {
-                widget.removeStyleDependentName("up-hovering");
+                target.removeStyleDependentName("up-hovering");
             }
+        };
+        enabled.addListenerAndTrigger(new Value.Listener<Boolean>() {
+            public void valueChanged (Boolean enabled) {
+                if (enabled && _over == null) {
+                    _over = target.addMouseOverHandler(onOver);
+                    _out = target.addMouseOutHandler(onOut);
+                } else if (!enabled && _over != null) {
+                    _over.removeHandler();
+                    _out.removeHandler();
+                    _over = _out = null;
+                }
+            }
+            protected HandlerRegistration _over, _out;
         });
-        return widget;
+        return target;
     }
 
     protected GameService.GridResult _data;

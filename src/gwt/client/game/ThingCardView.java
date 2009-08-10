@@ -8,9 +8,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Functions;
 
 import com.threerings.everything.data.ThingCard;
 
+import client.util.Context;
 import client.util.ImageUtil;
 
 /**
@@ -18,12 +20,7 @@ import client.util.ImageUtil;
  */
 public class ThingCardView extends FlowPanel
 {
-    public static Widget create (int pos, ThingCard card, Command onClick)
-    {
-        return new ThingCardView(card, onClick);
-    }
-
-    protected ThingCardView (ThingCard card, Command onClick)
+    public ThingCardView (Context ctx, ThingCard card, Command onClick)
     {
         setStyleName("thingCard");
         boolean back = (card == null || card.image == null);
@@ -32,7 +29,8 @@ public class ThingCardView extends FlowPanel
         String name = (card == null || card.name == null) ? "?" : card.name;
         String nameStyle = (name.length() > (back ? 12 : 15)) ? "LongName" : "NormalName";
         add(Widgets.newLabel(name, "Name", nameStyle, back ? "machine" : "handwriting"));
-        add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick));
+        add(ImageUtil.getMiniImageBox(card == null ? null : card.image, onClick,
+                                      ctx.popupShowing().map(Functions.NOT)));
         add(new RarityLabel(card == null ? null : card.rarity));
     }
 }

@@ -148,6 +148,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public Value<Boolean> popupShowing ()
+    {
+        return _pstack.popupShowing;
+    }
+
+    // from interface Context
     public CategoriesModel getCatsModel ()
     {
         return _catsmodel;
