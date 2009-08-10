@@ -36,8 +36,8 @@ public class LandingPage extends FlowPanel
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
         }
 
-        add(Widgets.newShim(15, 15));
         if (!ctx.getMe().isGuest()) {
+            add(Widgets.newShim(5, 5));
             add(new MyFeedPanel(ctx));
         }
 

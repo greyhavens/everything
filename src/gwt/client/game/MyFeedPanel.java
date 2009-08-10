@@ -37,6 +37,7 @@ public class MyFeedPanel extends FeedPanel
             while (highlights.size() > 0) {
                 add(formatItem(highlights.remove(0), highlights, Mode.HIGHLIGHT));
             }
+            add(Widgets.newShim(5, 5));
         }
 
         add(Widgets.newLabel("Recent Happenings", "Title"));
