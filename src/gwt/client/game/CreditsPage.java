@@ -47,7 +47,7 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
         peeps.setWidget(0, 0, labeled("Design:", personLink(data.design)));
         peeps.setWidget(0, 1, labeled("Art:", personLink(data.art)));
         peeps.setWidget(0, 2, labeled("Code:", personLink(data.code)));
-        FlowPanel editors = new FlowPanel();
+        FlowPanel editors = Widgets.newFlowPanel("Long");
         for (PlayerName editor : data.editors) {
             if (editors.getWidgetCount() > 0) {
                 editors.add(Widgets.newInlineLabel(", "));
@@ -56,7 +56,7 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
         }
         peeps.setWidget(1, 0, labeled("Series Editors:", editors), 3);
         peeps.setWidget(2, 0, labeled("Special Thanks:",
-                                      Widgets.newLabel(SPECIAL_THANKS, "handwriting")), 3);
+                                      Widgets.newLabel(SPECIAL_THANKS, "Long", "handwriting")), 3);
         add(peeps);
     }
 
