@@ -216,7 +216,7 @@ public class GameServlet extends EveryServiceServlet
         // load up the count of each card in this series held by the player
         IntIntMap holdings = new IntIntMap();
         for (CardRecord card : _gameRepo.loadCards(
-                 player.userId, Sets.newHashSet(Iterables.transform(things, Functions.THING_ID)))) {
+                 player.userId, Sets.newHashSet(Iterables.transform(things, EFuncs.THING_ID)))) {
             holdings.increment(card.thingId, 1);
         }
 

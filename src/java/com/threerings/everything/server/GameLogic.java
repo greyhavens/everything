@@ -414,7 +414,7 @@ public class GameLogic
     {
         // first create a mapping from thing to category
         IntMap<Category> cats = loadCategoryMap(
-            Sets.newHashSet(Iterables.transform(things, Functions.CATEGORY_ID)));
+            Sets.newHashSet(Iterables.transform(things, EFuncs.CATEGORY_ID)));
         Map<Integer, Category> thingcat = Maps.newHashMap();
         for (Thing thing : things) {
             thingcat.put(thing.thingId, cats.get(thing.categoryId));
@@ -423,7 +423,7 @@ public class GameLogic
         // now reduce the specified number of times
         while (reductions > 0) {
             cats = loadCategoryMap(
-                Sets.newHashSet(Iterables.transform(thingcat.values(), Functions.PARENT_ID)));
+                Sets.newHashSet(Iterables.transform(thingcat.values(), EFuncs.PARENT_ID)));
             for (Map.Entry<Integer, Category> entry : thingcat.entrySet()) {
                 entry.setValue(cats.get(entry.getValue().parentId));
             }
@@ -454,9 +454,9 @@ public class GameLogic
     protected void checkCompletedSeries (PlayerRecord user, Thing thing)
     {
         Set<Integer> things = Sets.newHashSet(
-            Iterables.transform(_thingRepo.loadThings(thing.categoryId), Functions.THING_ID));
+            Iterables.transform(_thingRepo.loadThings(thing.categoryId), EFuncs.THING_ID));
         Set<Integer> holdings = Sets.newHashSet(
-            Iterables.transform(_gameRepo.loadCards(user.userId, things), Functions.CARD_THING_ID));
+            Iterables.transform(_gameRepo.loadCards(user.userId, things), EFuncs.CARD_THING_ID));
         holdings.add(thing.thingId);
         if (things.size() - holdings.size() == 0) {
             maybeReportCompleted(user, _thingRepo.loadCategory(thing.categoryId), "gift");

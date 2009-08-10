@@ -12,7 +12,7 @@ import com.threerings.everything.server.persist.CardRecord;
 /**
  * Useful functions.
  */
-public class Functions
+public class EFuncs
 {
     /** Extracts the thing id from a thing. */
     public static final Function<Thing, Integer> THING_ID = new Function<Thing, Integer>() {
