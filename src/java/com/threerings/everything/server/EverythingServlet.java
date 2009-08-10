@@ -185,71 +185,40 @@ public class EverythingServlet extends EveryServiceServlet
         PlayerRecord player = requirePlayer();
         List<FeedItem> items = Lists.newArrayList(
             _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS));
-        Calendar cal = Calendar.getInstance();
 
-        // if this player is an editor, load up recent comments on their feed
+        // if this player is an editor, load up recent comments on their series
         if (player.isEditor) {
-            // load up their recent comments
-            cal.add(Calendar.DATE, -RECENT_COMMENT_DAYS);
-            CalendarUtil.zeroTime(cal);
-            Collection<CategoryComment> comments = _thingRepo.loadCommentsSince(
-                player.userId, cal.getTimeInMillis());
-
-            // load up the categories to which those comments apply
-            Set<Integer> catIds = Sets.newHashSet();
-            for (Iterator<CategoryComment> iter = comments.iterator(); iter.hasNext(); ) {
-                CategoryComment comment = iter.next();
-                if (comment.commentor.userId == player.userId) {
-                    iter.remove(); // prune comments by us, we know we wrote them
-                } else if (!catIds.add(comment.categoryId)) {
-                    iter.remove(); // prune any comments after the first about the same category
-                }
-            }
-            IntMap<Category> cats = IntMaps.newHashIntMap();
-            for (Category cat : _thingRepo.loadCategories(catIds)) {
-                cats.put(cat.categoryId, cat);
-            }
-
-            // create faux feed entries for each of these comments
-            for (CategoryComment comment : comments) {
-                FeedItem item = new FeedItem();
-                item.actor = comment.commentor;
-                item.when = comment.when;
-                item.type = FeedItem.Type.COMMENT;
-                item.target = player.getName();
-                item.objects = Lists.newArrayList(cats.get(comment.categoryId).name);
-                item.message = String.valueOf(comment.categoryId); // hax0rz!
-                items.add(item);
-            }
-            Collections.sort(items);
+            addSeriesComments(player, items);
         }
 
         // aggregate these results a bit
-        Map<ItemKey, FeedItem> imap = Maps.newHashMap();
-        for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
-            FeedItem item = iter.next();
-            if (item.message != null) {
-                // null out the message if we're not the sender or target
-                if (item.target != null && player.userId != item.target.userId &&
-                    player.userId != item.actor.userId) {
-                    item.message = null;
-                } else {
-                    // if we are the target, don't try to aggregate this message
-                    continue;
-                }
-            }
-            ItemKey key = new ItemKey(item, cal);
-            FeedItem oitem = imap.get(key);
-            if (oitem  != null) {
-                oitem.objects.addAll(item.objects);
-                iter.remove();
-            } else {
-                imap.put(key, item);
-            }
-        }
+        aggregateFeed(player.userId, items, true);
 
         // finally resolve the names in all the records that remain
         return _playerLogic.resolveNames(items, player.getName());
+    }
+
+    // from interface EverythingService
+    public List<FeedItem> getUserFeed (int userId) throws ServiceException
+    {
+        PlayerRecord target = _playerRepo.loadPlayer(userId);
+        if (target == null) {
+            throw new ServiceException(E_UNKNOWN_USER);
+        }
+        List<FeedItem> items = Lists.newArrayList(
+            _playerRepo.loadUserFeed(target.userId, USER_FEED_ITEMS));
+
+        // if they are looking at their own feed and are an editor, load up recent series comments
+        PlayerRecord caller = getPlayer();
+        if (caller != null && caller.userId == userId && caller.isEditor) {
+            addSeriesComments(target, items);
+        }
+
+        // aggregate these results a bit
+        aggregateFeed(caller == null ? 0 : caller.userId, items, false);
+
+        // finally resolve the names in all the records that remain
+        return _playerLogic.resolveNames(items, target.getName());
     }
 
     // from interface EverythingService
@@ -275,6 +244,76 @@ public class EverythingServlet extends EveryServiceServlet
             }
         });
         return result;
+    }
+
+    protected void addSeriesComments (PlayerRecord player, List<FeedItem> items)
+    {
+        // load up their recent comments
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -RECENT_COMMENT_DAYS);
+        CalendarUtil.zeroTime(cal);
+        Collection<CategoryComment> comments = _thingRepo.loadCommentsSince(
+            player.userId, cal.getTimeInMillis());
+
+        // load up the categories to which those comments apply
+        Set<Integer> catIds = Sets.newHashSet();
+        for (Iterator<CategoryComment> iter = comments.iterator(); iter.hasNext(); ) {
+            CategoryComment comment = iter.next();
+            if (comment.commentor.userId == player.userId) {
+                iter.remove(); // prune comments by us, we know we wrote them
+            } else if (!catIds.add(comment.categoryId)) {
+                iter.remove(); // prune any comments after the first about the same category
+            }
+        }
+        IntMap<Category> cats = IntMaps.newHashIntMap();
+        for (Category cat : _thingRepo.loadCategories(catIds)) {
+            cats.put(cat.categoryId, cat);
+        }
+
+        // create faux feed entries for each of these comments
+        for (CategoryComment comment : comments) {
+            FeedItem item = new FeedItem();
+            item.actor = comment.commentor;
+            item.when = comment.when;
+            item.type = FeedItem.Type.COMMENT;
+            item.target = player.getName();
+            item.objects = Lists.newArrayList(cats.get(comment.categoryId).name);
+            item.message = String.valueOf(comment.categoryId); // hax0rz!
+            items.add(item);
+        }
+        Collections.sort(items);
+    }
+
+    protected void aggregateFeed (int callerId, List<FeedItem> items, boolean mergeDays)
+    {
+        Map<ItemKey, FeedItem> imap = Maps.newHashMap();
+        Calendar cal = Calendar.getInstance();
+        for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
+            FeedItem item = iter.next();
+            if (item.message != null) {
+                // null out the message if we're not the sender or target
+                if (item.target != null && callerId != item.target.userId &&
+                    callerId != item.actor.userId) {
+                    item.message = null;
+                } else {
+                    // we have a message, don't try to aggregate this feed item
+                    continue;
+                }
+            }
+            int date = 0;
+            if (!mergeDays) {
+                cal.setTime(item.when);
+                date = cal.get(Calendar.DAY_OF_YEAR);
+            }
+            ItemKey key = new ItemKey(item, date);
+            FeedItem oitem = imap.get(key);
+            if (oitem  != null) {
+                oitem.objects.addAll(item.objects);
+                iter.remove();
+            } else {
+                imap.put(key, item);
+            }
+        }
     }
 
     protected void updateFacebookFriends (final PlayerRecord prec, String fbSessionKey)
@@ -346,21 +385,23 @@ public class EverythingServlet extends EveryServiceServlet
         public final int actorId;
         public final FeedItem.Type type;
         public final int targetId;
+        public final int date;
 
-        public ItemKey (FeedItem item, Calendar cal) {
+        public ItemKey (FeedItem item, int date) {
             this.actorId = item.actor.userId;
             this.type = item.type;
-            cal.setTime(item.when);
             this.targetId = (item.target == null) ? 0 : item.target.userId;
+            this.date = date;
         }
 
         public int hashCode () {
-            return actorId ^ type.hashCode() ^ targetId;
+            return actorId ^ type.hashCode() ^ targetId ^ date;
         }
 
         public boolean equals (Object other) {
             ItemKey okey = (ItemKey)other;
-            return actorId == okey.actorId && type == okey.type && targetId == okey.targetId;
+            return actorId == okey.actorId && type == okey.type && targetId == okey.targetId &&
+                date == okey.date;
         }
     }
 
@@ -381,6 +422,9 @@ public class EverythingServlet extends EveryServiceServlet
 
     /** The maximum number of recent feed items returned. */
     protected static final int RECENT_FEED_ITEMS = 150;
+
+    /** The maximum number of user feed items returned. */
+    protected static final int USER_FEED_ITEMS = 150;
 
     /** The number of days into the past we look for recent category comments. */
     protected static final int RECENT_COMMENT_DAYS = 3;

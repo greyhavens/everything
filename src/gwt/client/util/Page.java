@@ -8,5 +8,9 @@ package client.util;
  */
 public enum Page
 {
-    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS, EDIT_CATS, EDIT_SERIES, DASHBOARD;
+    // all-access pages
+    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS,
+
+    // editor and admin pages
+    EDIT_CATS, EDIT_SERIES, DASHBOARD;
 }

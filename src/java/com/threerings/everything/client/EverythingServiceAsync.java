@@ -27,6 +27,11 @@ public interface EverythingServiceAsync
     void getRecentFeed (AsyncCallback<List<FeedItem>> callback);
 
     /**
+     * The async version of {@link EverythingService#getUserFeed}.
+     */
+    void getUserFeed (int userId, AsyncCallback<List<FeedItem>> callback);
+
+    /**
      * The async version of {@link EverythingService#getFriends}.
      */
     void getFriends (AsyncCallback<List<FriendStatus>> callback);

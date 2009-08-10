@@ -243,19 +243,19 @@
 /** BrowsePage styles */
 .browse {
   background: url(images/page_browse.png) no-repeat;
-  font-size: 16px;
 }
 
 .browse .Header .Title {
-  font-weight: bold;
+  font-size: 16px;
 }
 
-.browse .Header a {
+.browse .Header .Links {
   font-size: 12px;
 }
 
 .browse .Taxonomy {
   min-width: 580px;
+  font-size: 16px;
 }
 
 .browse .Taxonomy .Complete {
@@ -272,10 +272,11 @@
   font-family: Trebuchet MS, sans-serif;
 }
 
-.feed .Item .Action {
+.feed .Photoless {
+  margin-bottom: 10px;
 }
 
-.feed .Item .When {
+.feed .Action .When {
   font-style: italic;
 }
 

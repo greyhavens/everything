@@ -349,8 +349,7 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Returns up to the specified maximum number of feed items for the specified player. Also
-     * resolves the names of all players in the feed in question.
+     * Returns up to the specified maximum number of feed items for the specified player.
      */
     public Collection<FeedItem> loadRecentFeed (int userId, int maxItems)
     {
@@ -359,6 +358,18 @@ public class PlayerRepository extends DepotRepository
         actorIds.add(userId);
         return findAll(FeedItemRecord.class,
                        new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
+                       OrderBy.descending(FeedItemRecord.WHEN),
+                       new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
+    }
+
+    /**
+     * Returns up to the specified maximum number of feed items for which the specified player is
+     * the actor.
+     */
+    public Collection<FeedItem> loadUserFeed (int userId, int maxItems)
+    {
+        return findAll(FeedItemRecord.class,
+                       new Where(FeedItemRecord.ACTOR_ID.eq(userId)),
                        OrderBy.descending(FeedItemRecord.WHEN),
                        new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
     }

@@ -43,6 +43,7 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Thing;
 
 import client.game.CardView;
+import client.ui.ButtonUI;
 import client.ui.DataPanel;
 import client.util.Args;
 import client.util.ClickCallback;
@@ -434,7 +435,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         }
 
         protected SmartTable _ctrl;
-        protected PushButton _edit = new PushButton("Edit", new ClickHandler() {
+        protected PushButton _edit = ButtonUI.newButton("Edit", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 setEditing(true);
             }

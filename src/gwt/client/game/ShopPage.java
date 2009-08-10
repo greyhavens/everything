@@ -16,6 +16,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Powerup;
 
+import client.ui.ButtonUI;
 import client.ui.DataPanel;
 import client.ui.PowerupUI;
 import client.util.Args;
@@ -66,7 +67,7 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
             if (type.charges > 1) {
                 table.setText(row, 4, "for " + type.charges, 1, "nowrap");
             }
-            final PushButton buy = new PushButton("Buy");
+            final PushButton buy = ButtonUI.newButton("Buy");
             if (_ctx.getPupsModel().getCharges(type).get() == 0 || !type.isPermanent()) {
                 table.setWidget(row, 5, buy);
             }

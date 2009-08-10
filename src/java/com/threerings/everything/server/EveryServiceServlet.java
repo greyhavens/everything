@@ -21,6 +21,8 @@ import com.threerings.everything.data.Build;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
+import static com.threerings.everything.Log.log;
+
 /**
  * Extends {@link AppServiceServlet} with some additional useful bits.
  */
@@ -30,6 +32,12 @@ public abstract class EveryServiceServlet extends AppServiceServlet
     public String processCall (String payload) throws SerializationException
     {
         return super.processCall(payload);
+    }
+
+    protected PlayerRecord getPlayer ()
+    {
+        OOOUser user = getUser();
+        return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
     }
 
     protected PlayerRecord requirePlayer ()
@@ -43,6 +51,7 @@ public abstract class EveryServiceServlet extends AppServiceServlet
     {
         PlayerRecord player = _playerRepo.loadPlayer(user.userId);
         if (player == null) {
+            log.warning("Missing player record for user in requirePlayer?", "who", user.userId);
             throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
         }
         return player;

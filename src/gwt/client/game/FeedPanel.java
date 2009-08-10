@@ -34,7 +34,15 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
     public FeedPanel (Context ctx)
     {
         super(ctx, "feed");
+        _omitPhotos = false;
         _everysvc.getRecentFeed(createCallback());
+    }
+
+    public FeedPanel (Context ctx, int userId)
+    {
+        super(ctx, "feed");
+        _omitPhotos = true;
+        _everysvc.getUserFeed(userId, createCallback());
     }
 
     @Override // from DataPanel
@@ -98,8 +106,8 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
             break;
         }
         action.add(Widgets.newLabel(DateUtil.formatDateTime(item.when), "When"));
-        return Widgets.newRow(HasAlignment.ALIGN_TOP, "Item",
-                              XFBML.newProfilePic(item.actor.facebookId), action);
+        return _omitPhotos ? Widgets.newSimplePanel("Photoless", action) : Widgets.newRow(
+            HasAlignment.ALIGN_TOP, null, XFBML.newProfilePic(item.actor.facebookId), action);
     }
 
     protected void addGift (FlowPanel action, FeedItem item)
@@ -134,6 +142,8 @@ public class FeedPanel extends DataPanel<List<FeedItem>>
         }
         return buf.append(" ").append(objects.size() > 1 ? pwhat : what).toString();
     }
+
+    protected boolean _omitPhotos;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 }

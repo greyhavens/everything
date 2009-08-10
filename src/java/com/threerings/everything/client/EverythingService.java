@@ -28,6 +28,9 @@ public interface EverythingService extends RemoteService
     /** Thrown by {@link #validateSession} if we can't communicate with Facebook. */
     public static final String E_FACEBOOK_DOWN = "e.facebook_down";
 
+    /** Thrown by {@link #getUserFeed} if the user in question does not exist. */
+    public static final String E_UNKNOWN_USER = "e.unknown_user";
+
     /** Provides results for {@link #getCredits}. */
     public static class CreditsResult implements IsSerializable
     {
@@ -46,6 +49,11 @@ public interface EverythingService extends RemoteService
      * Returns a list of recent activity for the calling user.
      */
     List<FeedItem> getRecentFeed () throws ServiceException;
+
+    /**
+     * Returns a list of recent activity for the specified user.
+     */
+    List<FeedItem> getUserFeed (int userId) throws ServiceException;
 
     /**
      * Returns the names of the caller's friends.
