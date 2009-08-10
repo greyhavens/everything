@@ -161,7 +161,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
         add(_cards = new SmartTable("Cards", 5, 0));
 
         add(_status = new SmartTable("Status", 5, 0));
-        _status.setText(0, 0, "New grid " + format(_data.grid.expires));
+        _status.setText(0, 0, "New grid " + DateUtil.formatDateTime(_data.grid.expires));
         updateGrid();
     }
 
@@ -331,11 +331,6 @@ public class GridPage extends DataPanel<GameService.GridResult>
         }
 
         protected abstract void activatePup (Label plabel, Powerup pup, Value<Integer> charges);
-    }
-
-    protected static String format (Date date)
-    {
-        return DateUtil.formatDateTime(date).toLowerCase();
     }
 
     protected static Label hoverize (final Label target, Value<Boolean> enabled)
