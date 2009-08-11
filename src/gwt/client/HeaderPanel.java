@@ -45,13 +45,12 @@ public class HeaderPanel extends FlowPanel
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
         }
-        if (!ctx.getMe().isGuest()) {
-            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(new CoinLabel("You have: ", ctx.getCoins()));
-        }
         // add our kontagent "page request" pixel to the extras
         extras.add(Widgets.newImage(kontagentHello));
         bits.setWidget(0, col, extras);
+        bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_CENTER);
+
+        bits.setWidget(0, col, new CoinLabel("You have: ", ctx.getCoins()));
         bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_RIGHT);
         add(bits);
 
