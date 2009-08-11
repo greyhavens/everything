@@ -5,6 +5,7 @@ package client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -17,11 +18,13 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.PopupStack;
+import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
@@ -43,6 +46,7 @@ import client.util.Args;
 import client.util.CategoriesModel;
 import client.util.Context;
 import client.util.Errors;
+import client.util.Page;
 import client.util.PowerupsModel;
 
 /**
@@ -91,17 +95,23 @@ public class EverythingClient
     }
 
     // from interface Context
-    public String getFacebookAddURL ()
+    public String getFacebookAddURL (String token, Kontagent type, String tracking)
     {
         String key = Build.facebookKey(_data.candidate);
-        return "http://www.facebook.com/login.php?api_key=" + key + "&canvas=1&v=1.0";
+        String url = "http://www.facebook.com/login.php?api_key=" + key + "&canvas=1&v=1.0";
+        url += "&next=" + URL.encodeComponent(_data.everythingURL + "?token=" + token +
+                                              "&kc=" + type.code + "&t=" + tracking);
+        return url;
     }
 
     // from interface Context
     public String getFacebookAddLink (String text)
     {
+        String token = Args.createLinkToken(Page.LANDING); // TODO?
+        String tracking = null; // TODO: pass along tracking code
+        String url = getFacebookAddURL(token, Kontagent.APP_ADDED, tracking);
         StringBuilder buf = new StringBuilder();
-        buf.append("<a target=\"_top\" href=\"").append(getFacebookAddURL()).append("\">");
+        buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();
     }
 

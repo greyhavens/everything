@@ -1,7 +1,7 @@
 //
 // $Id$
 
-package com.threerings.everything.server;
+package com.threerings.everything.client;
 
 /**
  * Represents the various Kontagent message types.

@@ -18,6 +18,8 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServlet;
 
+import com.threerings.everything.client.Kontagent;
+
 import static com.threerings.everything.Log.log;
 
 /**

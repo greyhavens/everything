@@ -25,6 +25,7 @@ import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Thing;
@@ -133,9 +134,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     protected PopupPanel makeInvitePopup ()
     {
         String tracking = generateUniqueId(_ctx.getMe().userId);
-        String url = _ctx.getFacebookAddURL() +
-            "&token=" + Args.createLinkToken(Page.BROWSE, "", _thing.categoryId) +
-            "&kc=ins&t=" + tracking; // kontagent tracking fiddly bits
+        String url = _ctx.getFacebookAddURL(
+            Args.createLinkToken(Page.BROWSE, "", _thing.categoryId), Kontagent.INVITE, tracking);
         String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
             "</b> card in The Everything Game." +
             "<fb:req-choice url='" + url + "' label='View the card!' />";

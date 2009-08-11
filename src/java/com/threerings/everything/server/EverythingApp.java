@@ -28,6 +28,7 @@ import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.App;
 import com.threerings.samsara.app.server.Binding;
 
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.server.persist.AdminRepository;
 import com.threerings.everything.server.persist.GameRepository;

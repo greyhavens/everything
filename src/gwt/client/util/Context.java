@@ -6,6 +6,7 @@ package client.util;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.PlayerName;
 
 import com.threerings.gwt.util.Value;
@@ -22,7 +23,7 @@ public interface Context
     PlayerName getMe ();
 
     /** Returns the URL to the page that will add our app. */
-    String getFacebookAddURL ();
+    String getFacebookAddURL (String token, Kontagent type, String tracking);
 
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text);

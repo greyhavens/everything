@@ -20,6 +20,7 @@ import com.google.code.facebookapi.schema.User;
 
 import com.samskivert.util.StringUtil;
 
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.samsara.app.server.AppLogic;
 

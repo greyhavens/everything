@@ -43,6 +43,7 @@ import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
@@ -78,6 +79,7 @@ public class EverythingServlet extends EveryServiceServlet
             data.news = news;
         }
         data.powerups = Maps.newHashMap();
+        data.everythingURL = _app.getFacebookAppURL();
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
 
         OOOUser user = getUser();

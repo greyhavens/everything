@@ -20,6 +20,7 @@ import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.server.AppServlet;
 import com.threerings.samsara.app.server.UserLogic;
 
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
