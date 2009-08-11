@@ -102,9 +102,15 @@ public class InviteServlet extends AppServlet
                 _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId), thing, null);
             }
 
-//             // report to kontagent that we sent an invite
-//             _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId, "r", targetFBId,
-//                                     "u", req.getParameter("uuid"));
+            // report to kontagent that we sent an invite
+            String tracking = req.getParameter("tracking");
+            if (StringUtil.isBlank(tracking)) {
+                log.warning("Missing Kontagent tracking id for invitation.", "who", player.who(),
+                            "from", from, "target", targetFBId);
+            } else {
+                _kontLogic.reportAction(
+                    Kontagent.INVITE, "s", player.facebookId, "r", targetFBId, "u", tracking);
+            }
 
         } catch (Exception e) {
             log.warning("Failed to process invite gift: " + e.getMessage(),

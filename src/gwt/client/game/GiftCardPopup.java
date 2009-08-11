@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -131,14 +132,16 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
 
     protected PopupPanel makeInvitePopup ()
     {
-        String url = _ctx.getFacebookAddURL() + "*token=" +
-            Args.createLinkToken(Page.BROWSE, "", _thing.categoryId);
+        String tracking = generateUniqueId(_ctx.getMe().userId);
+        String url = _ctx.getFacebookAddURL() +
+            "&token=" + Args.createLinkToken(Page.BROWSE, "", _thing.categoryId) +
+            "&kc=ins&t=" + tracking; // kontagent tracking fiddly bits
         String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
             "</b> card in The Everything Game." +
             "<fb:req-choice url='" + url + "' label='View the card!' />";
-        FlowPanel other = XFBML.newPanel("request-form", "action", getInviteURL(), "method", "POST",
-                                         "invite", "true", "type", "Everything Game",
-                                         "content", content);
+        FlowPanel other = XFBML.newPanel("request-form", "action", getNoteInviteURL(),
+                                         "method", "POST", "invite", "true",
+                                         "type", "Everything Game", "content", content);
         FlowPanel wrap = new FlowPanel();
         DOM.setStyleAttribute(wrap.getElement(), "width", "100%");
         DOM.setStyleAttribute(wrap.getElement(), "padding", "0px 50px");
@@ -150,16 +153,32 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         other.add(wrap);
         other.add(XFBML.newHiddenInput("thing", ""+_thing.thingId));
         other.add(XFBML.newHiddenInput("received", ""+_received));
+        other.add(XFBML.newHiddenInput("tracking", tracking));
         other.add(XFBML.newHiddenInput("from", History.getToken()));
         String style = "width: 586px; min-height: 400px";
         return Popups.newPopup("inviteCard", XFBML.serverize(other, "style", style));
     }
 
-    protected static String getInviteURL ()
+    protected static String getNoteInviteURL ()
     {
         String url = Window.Location.getHref();
         int eidx = url.indexOf("/everything");
         return url.substring(0, eidx + "/everything".length()) + "/invite";
+    }
+
+    protected static String generateUniqueId (int forUserId)
+    {
+        int stamp = (int)(System.currentTimeMillis() % Integer.MAX_VALUE);
+        return toHex(stamp ^ Random.nextInt()) + toHex(forUserId);
+    }
+
+    protected static String toHex (int value)
+    {
+        String text = Integer.toHexString(value);
+        while (text.length() < 8) {
+            text = "0" + text;
+        }
+        return text;
     }
 
     protected Thing _thing;
