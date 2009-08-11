@@ -20,10 +20,12 @@ import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.server.AppServlet;
 import com.threerings.samsara.app.server.UserLogic;
 
+import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -76,6 +78,10 @@ public class InviteServlet extends AppServlet
             if (card == null) {
                 throw new Exception("missing card");
             }
+            Thing thing = _thingRepo.loadThing(card.thingId);
+            if (thing == null) {
+                throw new Exception("missing thing");
+            }
 
             // see if the recipient in question is already a player
             Map<String, Integer> ids = _userLogic.mapFacebookIds(
@@ -86,10 +92,14 @@ public class InviteServlet extends AppServlet
                 log.info("Gifting card directly to player", "gifter", player.who(),
                          "thing", card.thingId, "recip", target.who());
                 _gameLogic.giftCard(player, card, target, null);
+
             } else {
                 log.info("Escrowing card for hopeful future player", "gifter", player.who(),
                          "thing", card.thingId, "recip", targetFBId);
                 _gameRepo.escrowCard(card, targetFBId);
+
+                // send them a Facebook notification as well as an invite
+                _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId), thing, null);
             }
 
 //             // report to kontagent that we sent an invite
@@ -121,6 +131,8 @@ public class InviteServlet extends AppServlet
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
     @Inject protected KontagentLogic _kontLogic;
+    @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
+    @Inject protected ThingRepository _thingRepo;
     @Inject protected UserLogic _userLogic;
 }
