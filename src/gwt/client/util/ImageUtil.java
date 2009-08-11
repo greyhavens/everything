@@ -3,13 +3,12 @@
 
 package client.util;
 
-import com.google.gwt.user.client.Command;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Commands;
 import com.threerings.gwt.util.Value;
 
 /**
@@ -46,21 +45,20 @@ public class ImageUtil
      * Returns a widget that will display the specified card image, scaled to mini-size, centered
      * within the box.
      */
-    public static Widget getMiniImageBox (String image, Command onClick, Value<Boolean> enabled)
+    public static Widget getMiniImageBox (
+        String image, ClickHandler onClick, Value<Boolean> enabled)
     {
         return getImageBox(image, "miniImageBox", onClick, enabled);
     }
 
-    protected static Widget getImageBox (String image, String styleName, Command onClick,
-                                         Value<Boolean> enabled)
+    protected static Widget getImageBox (
+        String image, String styleName, ClickHandler onClick, Value<Boolean> enabled)
     {
         Widget clicky;
         if (image != null && image.length() > 0) {
-            clicky = Widgets.makeActionable(Widgets.newImage(getImageURL(image)),
-                                            Commands.onClick(onClick), enabled);
+            clicky = Widgets.makeActionable(Widgets.newImage(getImageURL(image)), onClick, enabled);
         } else {
-            clicky = Widgets.makeActionable(Widgets.newLabel("", "Shim"),
-                                            Commands.onClick(onClick), enabled);
+            clicky = Widgets.makeActionable(Widgets.newLabel("", "Shim"), onClick, enabled);
         }
         SmartTable wrap = new SmartTable(styleName, 0, 0);
         wrap.setWidget(0, 0, clicky);

@@ -6,7 +6,6 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,12 +32,12 @@ import client.util.Page;
  */
 public class CardPopup extends DataPopup<Card>
 {
-    public static Command onClick (final Context ctx, final CardIdent ident,
-                                   final Value<String> status)
+    public static ClickHandler onClick (final Context ctx, final CardIdent ident,
+                                        final Value<String> status)
     {
-        return new Command() {
-            public void execute () {
-                ctx.displayPopup(new CardPopup(ctx, ident, status));
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                ctx.displayPopup(new CardPopup(ctx, ident, status), (Widget)event.getSource());
             }
         };
     }
@@ -93,7 +92,7 @@ public class CardPopup extends DataPopup<Card>
                 CardPopup.this.hide();
                 _status.update("Gifted!");
             }
-        }));
+        }, this));
         gift.setTitle("Give this card to a friend.");
 
         PushButton sell = ButtonUI.newButton("Sell");

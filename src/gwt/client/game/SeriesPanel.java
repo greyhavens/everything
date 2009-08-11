@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Command;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -61,7 +61,7 @@ public class SeriesPanel extends DataPanel<Series>
                     _count.update(ids.size());
                 }
             });
-            Command onClick = (card == null) ? null : CardPopup.onClick(
+            ClickHandler onClick = (card == null) ? null : CardPopup.onClick(
                 _ctx, new CardIdent(_ownerId, card.thingId, card.received), status);
             grid.setWidget(row, col, new ThingCardView(_ctx, card, onClick));
             grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);

@@ -42,12 +42,13 @@ import client.util.Page;
  */
 public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
 {
-    public static ClickHandler onClick (final Context ctx, final Card card, final Runnable onGifted)
+    public static ClickHandler onClick (final Context ctx, final Card card, final Runnable onGifted,
+                                        final Widget trigger)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 ctx.displayPopup(new GiftCardPopup(ctx, card.thing, card.received.getTime(),
-                                                   onGifted));
+                                                   onGifted), trigger);
             }
         };
     }
@@ -122,7 +123,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                            ButtonUI.newSmallButton("Pick", new ClickHandler() {
                                public void onClick (ClickEvent event) {
                                    GiftCardPopup.this.hide();
-                                   _ctx.displayPopup(makeInvitePopup());
+                                   _ctx.displayPopup(makeInvitePopup(), (Widget)event.getSource());
                                }
                            })),
             Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));

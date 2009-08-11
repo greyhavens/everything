@@ -13,7 +13,6 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -171,9 +170,9 @@ public class GridPage extends DataPanel<GameService.GridResult>
             int row = ii / COLUMNS, col = ii % COLUMNS;
             final int position = ii;
             ThingCard card = _data.grid.flipped[ii];
-            Command onClick = (card != null && card.thingId > 0) ? null : new Command() {
-                public void execute () {
-                    flipCard(position);
+            ClickHandler onClick = (card != null && card.thingId > 0) ? null : new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    flipCard(position, (Widget)event.getSource());
                 }
             };
             _cards.setWidget(row, col, new ThingCardView(_ctx, card, onClick));
@@ -210,7 +209,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
         _info.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()), 1, "right");
     }
 
-    protected void flipCard (final int position)
+    protected void flipCard (final int position, final Widget trigger)
     {
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
@@ -231,7 +230,6 @@ public class GridPage extends DataPanel<GameService.GridResult>
 
                 // display the card big and fancy and allow them to gift it or cash it in
                 Value<String> status = new Value<String>("");
-                _ctx.displayPopup(new CardPopup(_ctx, result, status));
                 status.addListener(new Value.Listener<String>() {
                     public void valueChanged (String status) {
                         _cards.setText(row, col, status);
@@ -239,10 +237,11 @@ public class GridPage extends DataPanel<GameService.GridResult>
                             row, col, HasAlignment.ALIGN_CENTER);
                     }
                 });
+                _ctx.displayPopup(new CardPopup(_ctx, result, status), trigger);
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {
-                    _ctx.displayPopup(new NSFPopup());
+                    _ctx.displayPopup(new NSFPopup(), trigger);
                 } else {
                     super.onFailure(cause);
                 }

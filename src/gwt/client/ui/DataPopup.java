@@ -11,7 +11,9 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.InfoPopup;
+import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 
 import client.util.Context;
 
@@ -41,13 +43,11 @@ public abstract class DataPopup<T> extends PopupPanel
     {
         return new AsyncCallback<T>() {
             public void onSuccess (T data) {
-                setWidget(createContents(data));
-                center();
+                recontent(createContents(data));
             }
             public void onFailure (Throwable t) {
-                setWidget(Widgets.newLabel(t.getMessage(), "errorLabel"));
+                recontent(Widgets.newLabel(t.getMessage(), "errorLabel"));
                 setAutoHideEnabled(true);
-                center();
                 new Timer() {
                     public void run () {
                         hide();
@@ -67,6 +67,13 @@ public abstract class DataPopup<T> extends PopupPanel
                 DataPopup.this.hide();
             }
         };
+    }
+
+    protected void recontent (Widget content)
+    {
+        int ypos = getAbsoluteTop() + getOffsetHeight()/2;
+        setWidget(content);
+        Popups.centerOn(this, ypos);
     }
 
     protected Context _ctx;

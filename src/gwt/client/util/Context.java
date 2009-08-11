@@ -46,8 +46,8 @@ public interface Context
     Value<Long> getGridExpiry ();
 
     /** Displays a popup, hiding any existing popup (which will be restored when this popup is
-     * cleared). */
-    void displayPopup (PopupPanel popup);
+     * cleared). The popup will be vertically centered on the supplied optional widget. */
+    void displayPopup (PopupPanel popup, Widget onCenter);
 
     /** A value that reports whether or not a popup is showing. */
     Value<Boolean> popupShowing ();

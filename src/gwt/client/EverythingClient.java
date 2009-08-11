@@ -142,9 +142,9 @@ public class EverythingClient
     }
 
     // from interface Context
-    public void displayPopup (PopupPanel popup)
+    public void displayPopup (PopupPanel popup, Widget onCenter)
     {
-        _pstack.show(popup);
+        _pstack.show(popup, onCenter);
     }
 
     // from interface Context

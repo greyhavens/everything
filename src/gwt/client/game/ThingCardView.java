@@ -3,7 +3,7 @@
 
 package client.game;
 
-import com.google.gwt.user.client.Command;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -20,7 +20,7 @@ import client.util.ImageUtil;
  */
 public class ThingCardView extends FlowPanel
 {
-    public ThingCardView (Context ctx, ThingCard card, Command onClick)
+    public ThingCardView (Context ctx, ThingCard card, ClickHandler onClick)
     {
         setStyleName("thingCard");
         boolean back = (card == null || card.image == null);
