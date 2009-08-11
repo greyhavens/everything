@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.HasAlignment;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 
+import client.game.CoinLabel;
 import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
@@ -43,6 +44,10 @@ public class HeaderPanel extends FlowPanel
         if (ctx.isMaintainer()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
+        }
+        if (!ctx.getMe().isGuest()) {
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(new CoinLabel("You have: ", ctx.getCoins()));
         }
         // add our kontagent "page request" pixel to the extras
         extras.add(Widgets.newImage(kontagentHello));
