@@ -42,4 +42,7 @@ public class SessionData
 
     /** Whether or not we're running in the candidate. */
     public boolean candidate;
+
+    /** A URL to request from Kontagent once we're loaded. */
+    public String kontagentHello;
 }

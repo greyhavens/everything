@@ -3,11 +3,13 @@
 
 package com.threerings.everything.server;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -18,6 +20,7 @@ import com.google.inject.name.Named;
 import com.samskivert.io.StreamUtil;
 import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
+import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
 import com.threerings.util.PostgresUtil;
 
@@ -74,17 +77,62 @@ public class EverythingApp extends App
     }
 
     /**
-     * Returns the URL we can send people to do access our Facebook app.
+     * Returns a URL to our Facebook app that we can put out in the wide world.
+     *
+     * @param type the vector in which this URL is being embedded, e.g. {@link Kontagent#INVITE}).
+     * @param the tracking code reported to Kontagent when the invite or notification in which this
+     * URL is being embedded was reported.
      */
-    public String getFacebookAppURL (Object... args)
+    public String getHelloURL (Kontagent type, String tracking, Object... args)
     {
         StringBuilder token = new StringBuilder();
         for (Object arg : args) {
             token.append((token.length() == 0) ? "?token=" : "~");
             token.append(arg);
         }
+        return getFacebookAppURL() + token + "&kc=" + type.code + "&t=" + tracking;
+    }
+
+    /**
+     * Returns the bare URL to our Facebook app. You probably want {@link #getHelloURL}.
+     */
+    public String getFacebookAppURL ()
+    {
         String appname = _config.getValue(getFacebookKey("facebook_appname"), "missing_appname");
-        return "http://apps.facebook.com/" + appname + "/" + token;
+        return "http://apps.facebook.com/" + appname + "/";
+    }
+
+    /**
+     * Constructs the Kontagent reporting URL for the supplied parameters.
+     */
+    public String getKontagentURL (Kontagent type, Object... keyVals)
+    {
+        long now = System.currentTimeMillis();
+
+        // first construct the data we need to compute the signature
+        List<String> args = Lists.newArrayList();
+        for (int ii = 0; ii < keyVals.length; ii += 2) {
+            if (keyVals[ii+1] != null) {
+                args.add(keyVals[ii] + "=" + keyVals[ii+1]); // TODO: URLEncode?
+            }
+        }
+        args.add("ts=" + now);
+        Collections.sort(args);
+        args.add(_config.getValue("kontagent_secret", "secret"));
+
+        // now construct the URL
+        StringBuffer buf = new StringBuffer(KONTAGENT_API_URL);
+        buf.append(_config.getValue("kontagent_key", "key")).append("/");
+        buf.append(type.code).append("/?ts=").append(now);
+        buf.append("&an_sig=").append(StringUtil.md5hex(Joiner.on("").join(args)));
+        for (int ii = 0; ii < keyVals.length; ii += 2) {
+            if (keyVals[ii+1] != null) {
+                // TODO: URLEncode?
+                buf.append("&").append(keyVals[ii]).append("=").append(keyVals[ii+1]);
+            }
+        }
+
+        return buf.toString();
     }
 
     /**
@@ -202,4 +250,6 @@ public class EverythingApp extends App
     @Inject protected GameRepository _gameRepo;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;
+
+    protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
 }

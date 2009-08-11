@@ -31,3 +31,7 @@ mediastore_bucket = S3BUCKET
 
 # The URL of our billing site
 billing_url = https://billing.apps.threerings.net/billing/select_type.wm
+
+# Kontagent configuration
+kontagent_key = API_KEY
+kontagent_secret = APP_SECRET

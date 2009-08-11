@@ -224,16 +224,8 @@ public class GameLogic
         _playerRepo.recordFeedItem(
             owner.userId, FeedItem.Type.GIFTED, targetId, thing.name, message);
 
-        // send a Facebook notification to the recipient (TODO: localization?)
-        String feedmsg = String.format(
-            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
-            _app.getFacebookAppURL("BROWSE", targetId, thing.categoryId),
-            thing.name, _app.getFacebookAppURL());
-        if (!StringUtil.isBlank(message)) {
-            // TODO: escape HTML
-            feedmsg += " They said '" + message + "'.";
-        }
-        _playerLogic.sendFacebookNotification(owner, target, feedmsg);
+        // send a Facebook notification to the recipient
+        _playerLogic.sendGiftNotification(owner, target.facebookId, thing, message);
 
         // check whether the recipient just completed a series
         checkCompletedSeries(target, thing);
@@ -491,6 +483,7 @@ public class GameLogic
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;

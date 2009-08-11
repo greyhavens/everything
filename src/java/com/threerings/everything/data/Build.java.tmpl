@@ -26,6 +26,12 @@ public class Build
         return candidate ? "@candidate_facebook_key@" : "@facebook_key@";
     }
 
+    /** Returns our Kontagent API key. */
+    public static String kontagentKey ()
+    {
+        return "@kontagent_key@";
+    }
+
     /** Returns our billing URL. */
     public static String billingURL (String path)
     {

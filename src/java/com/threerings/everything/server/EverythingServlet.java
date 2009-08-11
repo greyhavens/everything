@@ -78,6 +78,7 @@ public class EverythingServlet extends EveryServiceServlet
             data.news = news;
         }
         data.powerups = Maps.newHashMap();
+        data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
 
         OOOUser user = getUser();
         if (user == null) {
@@ -101,7 +102,8 @@ public class EverythingServlet extends EveryServiceServlet
             long facebookId = Long.parseLong(fbinfo.left);
             Set<Long> ids = Collections.singleton(facebookId);
             EnumSet<ProfileField> fields = EnumSet.of(
-                ProfileField.FIRST_NAME, ProfileField.LAST_NAME, ProfileField.BIRTHDAY);
+                ProfileField.FIRST_NAME, ProfileField.LAST_NAME, ProfileField.BIRTHDAY,
+                ProfileField.SEX, ProfileField.CURRENT_LOCATION);
             UsersGetInfoResponse uinfo;
             try {
                 uinfo = (UsersGetInfoResponse)fbclient.users_getInfo(ids, fields);
@@ -148,6 +150,9 @@ public class EverythingServlet extends EveryServiceServlet
             // look up their friends' facebook ids and make friend mappings for them
             updateFacebookFriends(player, fbinfo.right);
 
+            // note that a new user added our app
+            _kontLogic.reportNewUser(player, fbuser);
+
         } else {
             // if this is not their first session, update their last session timestamp
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
@@ -171,6 +176,7 @@ public class EverythingServlet extends EveryServiceServlet
         data.isMaintainer = user.holdsToken(OOOUser.MAINTAINER);
         data.coins = player.coins;
         data.powerups = _gameRepo.loadPowerups(player.userId);
+        data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST, "s", player.facebookId);
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid != null) {
             data.gridsConsumed = grid.gridId;
@@ -410,6 +416,7 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected ThingRepository _thingRepo;
     @Inject protected UserLogic _userLogic;

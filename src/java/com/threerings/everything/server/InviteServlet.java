@@ -43,7 +43,7 @@ public class InviteServlet extends AppServlet
         }
         String from = ParameterUtil.getParameter(req, "from", "LANDING");
         log.info("Processing skip", "from", from);
-        writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
+        writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
     }
 
     @Override // from HttpServlet
@@ -63,7 +63,7 @@ public class InviteServlet extends AppServlet
             targetFBId = req.getParameter("ids[]");
             if (targetFBId == null) { // they chose to skip
                 log.info("No targets, skipping", "who", player.who(), "from", from);
-                writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
+                writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
                 return;
             }
 
@@ -92,6 +92,10 @@ public class InviteServlet extends AppServlet
                 _gameRepo.escrowCard(card, targetFBId);
             }
 
+//             // report to kontagent that we sent an invite
+//             _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId, "r", targetFBId,
+//                                     "u", req.getParameter("uuid"));
+
         } catch (Exception e) {
             log.warning("Failed to process invite gift: " + e.getMessage(),
                         "who", (player == null) ? "null" : player.who(),
@@ -100,7 +104,7 @@ public class InviteServlet extends AppServlet
         }
 
         // one way or the other, send them back from whence they came
-        writeFrameRedirect(rsp, _app.getFacebookAppURL(from));
+        writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
     }
 
     protected String requireParameter (HttpServletRequest req, String name)
@@ -116,6 +120,7 @@ public class InviteServlet extends AppServlet
     @Inject protected EverythingApp _app;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected UserLogic _userLogic;
 }

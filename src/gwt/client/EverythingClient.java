@@ -251,7 +251,7 @@ public class EverythingClient
         _pupsmodel = new PowerupsModel(data.powerups);
         setContent(null);
         initFacebook(Build.facebookKey(data.candidate));
-        RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
+        RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
         History.fireCurrentHistoryState();
     }
 

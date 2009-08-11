@@ -19,7 +19,7 @@ import client.util.Page;
  */
 public class HeaderPanel extends FlowPanel
 {
-    public HeaderPanel (Context ctx)
+    public HeaderPanel (Context ctx, String kontagentHello)
     {
         setStyleName("header");
 
@@ -44,6 +44,8 @@ public class HeaderPanel extends FlowPanel
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
         }
+        // add our kontagent "page request" pixel to the extras
+        extras.add(Widgets.newImage(kontagentHello));
         bits.setWidget(0, col, extras);
         bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_RIGHT);
         add(bits);

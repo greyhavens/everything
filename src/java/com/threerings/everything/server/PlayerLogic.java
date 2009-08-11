@@ -17,9 +17,11 @@ import com.google.code.facebookapi.FacebookJaxbRestClient;
 
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.data.Thing;
 import com.threerings.samsara.app.server.UserLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
@@ -98,15 +100,32 @@ public class PlayerLogic
     }
 
     /**
+     * Sends a card gifting notification to the specified Facebook player.
+     */
+    public void sendGiftNotification (PlayerRecord sender, long toFBId, Thing thing, String message)
+    {
+        String tracking = _kontLogic.generateUniqueId(sender.userId);
+        String feedmsg = String.format( // TODO: localization?
+            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
+            _app.getHelloURL(Kontagent.NOTIFICATION, tracking, "BROWSE", "", thing.categoryId),
+            thing.name, _app.getHelloURL(Kontagent.NOTIFICATION, tracking));
+        if (!StringUtil.isBlank(message)) {
+            // TODO: escape HTML
+            feedmsg += " They said '" + message + "'.";
+        }
+        sendFacebookNotification(sender, toFBId, feedmsg, tracking);
+    }
+
+    /**
      * Delivers a notification to the specified Facebook user from the specified sender.
      */
-    public void sendFacebookNotification (PlayerRecord from, PlayerRecord to, final String fbml)
+    public void sendFacebookNotification (PlayerRecord from, final long toFBId,
+                                          final String fbml, final String tracking)
     {
         final Tuple<String, String> finfo = _userLogic.getFacebookAuthInfo(from.userId);
-        final Tuple<String, String> tinfo = _userLogic.getFacebookAuthInfo(to.userId);
-        if (finfo == null || finfo.right == null || tinfo == null) {
-            log.warning("Missing needed Facebook data for notification", "from", from.who(),
-                        "to", to.who(), "finfo", finfo, "tinfo", tinfo);
+        if (finfo == null || finfo.right == null) {
+            log.warning("Missing Facebook data for notification", "from", from.who(),
+                        "finfo", finfo);
             return;
         }
 
@@ -114,10 +133,13 @@ public class PlayerLogic
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 try {
-                    fbclient.notifications_send(
-                        Collections.singleton(Long.parseLong(tinfo.left)), fbml);
+                    // send the notification to Facebook
+                    fbclient.notifications_send(Collections.singleton(toFBId), fbml);
+                    // tell Kontagent that we sent a notification
+                    _kontLogic.reportAction(
+                        Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
                 } catch (Exception e) {
-                    log.info("Failed to send Facebook notification", "to", tinfo.left,
+                    log.info("Failed to send Facebook notification", "to", toFBId,
                              "fbml", fbml, "error", e.getMessage());
                 }
             }
@@ -146,6 +168,7 @@ public class PlayerLogic
 
     @Inject protected EverythingApp _app;
     @Inject protected FacebookLogic _faceLogic;
+    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected UserLogic _userLogic;
 }

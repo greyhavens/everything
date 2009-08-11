@@ -44,6 +44,28 @@ public class AuthServlet extends AppServlet
             }
         }
 
+        // we should get some sort of kontagent tracking data with this request
+        Kontagent type = Kontagent.fromCode(req.getParameter("kc"));
+        String tracking = req.getParameter("t");
+        switch (type) {
+        case NOOP: break; // nothing!
+        case INVITE:
+            reportResponse(req, Kontagent.INVITE_RESPONSE, tracking);
+            break;
+        case NOTIFICATION:
+            reportResponse(req, Kontagent.NOTIFICATION_RESPONSE, tracking);
+            break;
+        case NOTIFICATION_EMAIL:
+            reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
+            break;
+        case OTHER_RESPONSE:
+            reportLanding(req, Kontagent.OTHER_RESPONSE, "organic", null);
+            break;
+        default:
+            log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
+            break;
+        }
+
         // if we're the release candidate, use /candidate/everything/ otherwise use the versionless
         // URL and let GWT complain if someone makes an out of date service request (mostly things
         // are fine from version to version and not using the versioned URL means we don't start
@@ -57,6 +79,28 @@ public class AuthServlet extends AppServlet
         doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, indexPath);
     }
 
-    @Inject protected EverythingApp _app;
+    protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
+    {
+        if (StringUtil.isBlank(tracking)) {
+            log.warning("Missing tracking code for landing?", "uri", req.getRequestURI());
+            reportLanding(req, Kontagent.OTHER_RESPONSE, "no_tracking:" + type.code, null);
+            return;
+        }
+        reportLanding(req, type, type.code, tracking);
+    }
+
+    protected void reportLanding (
+        HttpServletRequest req, Kontagent mtype, String ltype, String tracking)
+    {
+        boolean appAdded =
+            ParameterUtil.isSet(req, "fb_sig") && ParameterUtil.isSet(req, "fb_sig_session_key");
+        String recipId = StringUtil.getOr(
+            req.getParameter("fb_sig_user"), req.getParameter("fb_sig_canvas_user"));
+        _kontLogic.reportAction(
+            mtype, "r", recipId, "i", appAdded ? "1" : "0", "u", tracking, "tu", ltype);
+    }
+
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+    @Inject protected EverythingApp _app;
+    @Inject protected KontagentLogic _kontLogic;
 }
