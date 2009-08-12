@@ -8,6 +8,18 @@ package com.threerings.everything.data;
  */
 public class Build
 {
+    /** Enumerates our Facebook template ids. */
+    public enum Template {
+        GOT_CARD("@facebook_got_tmpl@"),
+        WANT_CARD("@facebook_want_tmpl@");
+
+        public final String id;
+
+        Template (String id) {
+            this.id = id;
+        }
+    };
+
     /** The version number assigned to this build. */
     public static String version ()
     {

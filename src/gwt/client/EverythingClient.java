@@ -95,21 +95,32 @@ public class EverythingClient
     }
 
     // from interface Context
-    public String getFacebookAddURL (String token, Kontagent type, String tracking)
+    public String getEverythingURL (String vector, Page page, Object... args)
+    {
+        return _data.everythingURL + "?token=" + Args.createLinkToken(page, args) +
+            "&vec=" + vector;
+    }
+
+    // from interface Context
+    public String getEverythingURL (Kontagent type, String tracking, Page page, Object... args)
+    {
+        return _data.everythingURL + "?token=" + Args.createLinkToken(page, args) +
+            "&kc=" + type.code + "&t=" + tracking;
+    }
+
+    // from interface Context
+    public String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args)
     {
         String key = Build.facebookKey(_data.candidate);
         String url = "http://www.facebook.com/login.php?api_key=" + key + "&canvas=1&v=1.0";
-        url += "&next=" + URL.encodeComponent(_data.everythingURL + "?token=" + token +
-                                              "&kc=" + type.code + "&t=" + tracking);
+        url += "&next=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
         return url;
     }
 
     // from interface Context
     public String getFacebookAddLink (String text)
     {
-        String token = Args.createLinkToken(Page.LANDING); // TODO?
-        String tracking = null; // TODO: pass along tracking code
-        String url = getFacebookAddURL(token, Kontagent.APP_ADDED, tracking);
+        String url = getFacebookAddURL(Kontagent.APP_ADDED, _data.kontagentToken, Page.LANDING);
         StringBuilder buf = new StringBuilder();
         buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();

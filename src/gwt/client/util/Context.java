@@ -22,8 +22,14 @@ public interface Context
     /** Returns this player's name. */
     PlayerName getMe ();
 
+    /** Returns the URL that will navigate directly to Everything. */
+    String getEverythingURL (String vector, Page page, Object... args);
+
+    /** Returns the URL that will navigate directly to Everything. */
+    String getEverythingURL (Kontagent type, String tracking, Page page, Object... args);
+
     /** Returns the URL to the page that will add our app. */
-    String getFacebookAddURL (String token, Kontagent type, String tracking);
+    String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args);
 
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text);

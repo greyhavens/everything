@@ -1,0 +1,57 @@
+--------------------
+Sample Template Data
+--------------------
+
+{"images":[{"src":"http://pad.thedigitalmovement.com/_blaise/2007-06-15-dgen-breakfast.jpg", "href":"http://www.facebook.com"}],
+"thing": "Swedish Chef",
+"descrip": "The American Black Bear (Ursus americanus) is the most common bear species native to North America.",
+"category": "Animals ‣ Mammals ‣ Bears",
+"rarity": "IX",
+"cardURL": "http://apps.facebook.com/everythinggame/",
+"everyURL": "http://apps.facebook.com/everythinggame/"}
+
+-----------------
+Got Card Template
+-----------------
+
+One line and SS Title:
+
+{*actor*} got the <a href="{*cardURL*}">{*thing*}</a> card in <a href="{*everyURL*}">Everything</a>
+
+SS Body:
+
+{*descrip*}<br>
+Category: {*category*}<br>
+Rarity: {*rarity*}<br>
+<a href="{*everyURL*}">Start your own Everything collection!</a>
+
+Action Link text:
+
+Collect Everything
+
+Action link URL:
+
+{*everyURL*}
+
+------------------
+Want Card Template
+------------------
+
+One line and SS Title:
+
+{*actor*} wants the <a href="{*cardURL*}">{*thing*}</a> card in <a href="{*everyURL*}">Everything</a>
+
+SS Body:
+
+{*descrip*}<br>
+Category: {*category*}<br>
+Rarity: {*rarity*}<br>
+<a href="{*everyURL*}">Trade cards with friends in Everything!</a>
+
+Action Link text:
+
+Help {*actor*}
+
+Action link URL:
+
+{*everyURL*}

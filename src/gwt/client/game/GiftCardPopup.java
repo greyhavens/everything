@@ -10,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -33,9 +32,9 @@ import com.threerings.everything.data.Thing;
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
 import client.ui.XFBML;
-import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.KontagentUtil;
 import client.util.Page;
 
 /**
@@ -133,9 +132,9 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
 
     protected PopupPanel makeInvitePopup ()
     {
-        String tracking = generateUniqueId(_ctx.getMe().userId);
-        String url = _ctx.getFacebookAddURL(
-            Args.createLinkToken(Page.BROWSE, "", _thing.categoryId), Kontagent.INVITE, tracking);
+        String tracking = KontagentUtil.generateUniqueId(_ctx.getMe().userId);
+        String url = _ctx.getFacebookAddURL(Kontagent.INVITE, tracking,
+                                            Page.BROWSE, "", _thing.categoryId);
         String content = _ctx.getMe().name + " wants you to have the <b>" + _thing.name +
             "</b> card in The Everything Game." +
             "<fb:req-choice url='" + url + "' label='View the card!' />";
@@ -164,21 +163,6 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         String url = Window.Location.getHref();
         int eidx = url.indexOf("/everything");
         return url.substring(0, eidx + "/everything".length()) + "/invite";
-    }
-
-    protected static String generateUniqueId (int forUserId)
-    {
-        int stamp = (int)(System.currentTimeMillis() % Integer.MAX_VALUE);
-        return toHex(stamp ^ Random.nextInt()) + toHex(forUserId);
-    }
-
-    protected static String toHex (int value)
-    {
-        String text = Integer.toHexString(value);
-        while (text.length() < 8) {
-            text = "0" + text;
-        }
-        return text;
     }
 
     protected Thing _thing;

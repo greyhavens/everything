@@ -68,11 +68,6 @@ public class EverythingServlet extends EveryServiceServlet
     // from interface EverythingService
     public SessionData validateSession (String version, int tzOffset) throws ServiceException
     {
-//         if (!Build.version().equals(version)) {
-//             log.info("Rejecting stale client", "cversion", version, "sversion", Build.version());
-//             throw new ServiceException(EverythingCodes.E_STALE_APP);
-//         }
-
         SessionData data = new SessionData();
         data.candidate = _appvers.equals(AppCodes.RELEASE_CANDIDATE);
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
@@ -81,6 +76,7 @@ public class EverythingServlet extends EveryServiceServlet
         data.powerups = Maps.newHashMap();
         data.everythingURL = _app.getFacebookAppURL();
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
+        data.kontagentToken = ""; // TODO
 
         OOOUser user = getUser();
         if (user == null) {

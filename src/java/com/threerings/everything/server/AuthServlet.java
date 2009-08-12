@@ -4,6 +4,7 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +49,7 @@ public class AuthServlet extends AppServlet
 
         // we should get some sort of kontagent tracking data with this request
         Kontagent type = Kontagent.fromCode(req.getParameter("kc"));
+        String vector = ParameterUtil.getParameter(req, "vec", "organic");
         String tracking = req.getParameter("t");
         switch (type) {
         case NOOP: break; // nothing!
@@ -61,7 +63,10 @@ public class AuthServlet extends AppServlet
             reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
             break;
         case OTHER_RESPONSE:
-            reportLanding(req, Kontagent.OTHER_RESPONSE, "organic", null);
+            // we need to generate a short tracking code for this user
+            tracking = Integer.toHexString(_rando.nextInt());
+            tracking = StringUtil.fill('0', 8-tracking.length()) + tracking;
+            reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
             break;
         default:
             log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
@@ -98,9 +103,11 @@ public class AuthServlet extends AppServlet
             ParameterUtil.isSet(req, "fb_sig") && ParameterUtil.isSet(req, "fb_sig_session_key");
         String recipId = StringUtil.getOr(
             req.getParameter("fb_sig_user"), req.getParameter("fb_sig_canvas_user"));
-        _kontLogic.reportAction(
-            mtype, "r", recipId, "i", appAdded ? "1" : "0", "u", tracking, "tu", ltype);
+        _kontLogic.reportAction(mtype, "r", recipId, "i", appAdded ? "1" : "0", "tu", ltype,
+                                (tracking.length() == 8) ? "su" : "u", tracking);
     }
+
+    protected Random _rando = new Random();
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected EverythingApp _app;
