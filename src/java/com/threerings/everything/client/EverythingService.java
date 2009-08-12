@@ -43,7 +43,8 @@ public interface EverythingService extends RemoteService
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
-    SessionData validateSession (String version, int tzOffset) throws ServiceException;
+    SessionData validateSession (String version, int tzOffset, String kontagentToken)
+        throws ServiceException;
 
     /**
      * Returns a list of recent activity for the calling user.

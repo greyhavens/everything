@@ -68,6 +68,11 @@ public class AuthServlet extends AppServlet
             tracking = StringUtil.fill('0', 8-tracking.length()) + tracking;
             reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
             break;
+        case APP_ADDED:
+            // this is not a landing, the player has added the app after browsing something as a
+            // guest; we pass their token back through to the client and it will supply it when it
+            // refreshes its session
+            break;
         default:
             log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
             break;
@@ -80,6 +85,13 @@ public class AuthServlet extends AppServlet
         String indexPath = "/everything/";
         if (_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
             indexPath = "/" + AppCodes.RELEASE_CANDIDATE + indexPath;
+        }
+
+        // if we have a tracking token, we need to pass that down to the app so that it can pass it
+        // back up when it validates its session for the first time and we detect a new user and
+        // report that the app was added
+        if (tracking != null) {
+            indexPath = "?t=" + tracking;
         }
 
         // otherwise pass the buck to the app servlet, it may have to get jiggy

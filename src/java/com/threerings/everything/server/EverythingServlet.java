@@ -66,7 +66,8 @@ public class EverythingServlet extends EveryServiceServlet
     implements EverythingService
 {
     // from interface EverythingService
-    public SessionData validateSession (String version, int tzOffset) throws ServiceException
+    public SessionData validateSession (String version, int tzOffset, String kontagentToken)
+        throws ServiceException
     {
         SessionData data = new SessionData();
         data.candidate = _appvers.equals(AppCodes.RELEASE_CANDIDATE);
@@ -76,7 +77,6 @@ public class EverythingServlet extends EveryServiceServlet
         data.powerups = Maps.newHashMap();
         data.everythingURL = _app.getFacebookAppURL();
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
-        data.kontagentToken = ""; // TODO
 
         OOOUser user = getUser();
         if (user == null) {
@@ -149,7 +149,7 @@ public class EverythingServlet extends EveryServiceServlet
             updateFacebookFriends(player, fbinfo.right);
 
             // note that a new user added our app
-            _kontLogic.reportNewUser(player, fbuser);
+            _kontLogic.reportNewUser(player, fbuser, kontagentToken);
 
         } else {
             // if this is not their first session, update their last session timestamp

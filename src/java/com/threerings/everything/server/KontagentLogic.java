@@ -73,10 +73,11 @@ public class KontagentLogic
      * Reports data on a new app user to Kontagent. The supplied fbuser object should contain the
      * following profile fields: BIRTHDAY, SEX, CURRENT_LOCATION.
      */
-    public void reportNewUser (PlayerRecord user, User fbuser)
+    public void reportNewUser (PlayerRecord user, User fbuser, String tracking)
     {
         // report that this user added our app
-        reportAction(Kontagent.APP_ADDED, "s", user.facebookId); // TODO: tracking tags
+        reportAction(Kontagent.APP_ADDED, "s", user.facebookId,
+                     (tracking.length() == 8) ? "su" : "u", tracking);
 
         // report profile related information on this user to Kontagent
         List<Object> args = Lists.newArrayList();

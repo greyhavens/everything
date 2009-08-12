@@ -17,9 +17,11 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.PopupStack;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
+import com.threerings.gwt.util.WindowUtil;
 
 import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
@@ -60,6 +62,9 @@ public class EverythingClient
     {
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
+
+        // check to see if we have a ?t=XXX tracking token
+        _kontagentToken = WindowUtil.getQueryParams().get("t");
 
         // validate our session which will trigger the rest of our initialization
         _everysvc.validateSession(
@@ -120,7 +125,7 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddLink (String text)
     {
-        String url = getFacebookAddURL(Kontagent.APP_ADDED, _data.kontagentToken, Page.LANDING);
+        String url = getFacebookAddURL(Kontagent.APP_ADDED, _kontagentToken, Page.LANDING);
         StringBuilder buf = new StringBuilder();
         buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();
@@ -299,6 +304,7 @@ public class EverythingClient
     }-*/;
 
     protected SessionData _data;
+    protected String _kontagentToken;
     protected Value<Integer> _coins;
     protected Value<Long> _gridExpires;
     protected Value<News> _news;

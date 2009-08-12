@@ -48,7 +48,4 @@ public class SessionData
 
     /** A URL to request from Kontagent once we're loaded. */
     public String kontagentHello;
-
-    /** The Kontagent UUID associated with this session (for guests). */
-    public String kontagentToken;
 }
