@@ -90,7 +90,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 protected boolean callService () {
                     if (!message.isVisible()) {
                         message.setVisible(true);
-                        center(); // recenter the popup
+                        recontent(getWidget()); // recenter the popup
                         give.setText("Send");
                         return false;
                     }
@@ -116,17 +116,21 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             "Friends that already have this card are not shown.";
         grid.addText(msg, 6);
 
+        SmartTable facebook = new SmartTable(5, 0);
+        facebook.setText(0, 0, "More Everything players = more fun!");
+        facebook.setWidget(0, 1, ButtonUI.newSmallButton("Pick", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                GiftCardPopup.this.hide();
+                _ctx.displayPopup(makeInvitePopup(), (Widget)event.getSource());
+            }
+        }));
+
         return Widgets.newFlowPanel(
-            Widgets.newLabel("Send " + _thing.name + " to an Everything friend:", "machine"),
-            Widgets.newScrollPanelY(grid, 400),
+            Widgets.newLabel("Send " + _thing.name + " to a Facebook friend:", "machine"),
+            facebook,
             Widgets.newShim(10, 10),
-            Widgets.newRow(Widgets.newLabel("Send it to a Facebook friend:", "machine"),
-                           ButtonUI.newSmallButton("Pick", new ClickHandler() {
-                               public void onClick (ClickEvent event) {
-                                   GiftCardPopup.this.hide();
-                                   _ctx.displayPopup(makeInvitePopup(), (Widget)event.getSource());
-                               }
-                           })),
+            Widgets.newLabel("Send " + _thing.name + " to an Everything friend:", "machine"),
+            Widgets.newScrollPanelY(grid, 190),
             Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
     }
 
