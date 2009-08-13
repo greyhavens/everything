@@ -214,8 +214,9 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.name = result.card.thing.name;
                 card.image = result.card.thing.image;
                 card.rarity = result.card.thing.rarity;
-                final int row = position / COLUMNS, col = position % COLUMNS;
-                _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, null));
+                final FluentTable.Cell cell = _cards.at(position / COLUMNS, position % COLUMNS);
+                ThingCardView view = new ThingCardView(_ctx, card, null);
+                cell.setWidget(view);
 
                 // update our status
                 _data.grid.unflipped[card.rarity.ordinal()]--;
@@ -226,10 +227,10 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 Value<String> status = new Value<String>("");
                 status.addListener(new Value.Listener<String>() {
                     public void valueChanged (String status) {
-                        _cards.at(row, col).setText(status).alignCenter();
+                        cell.setText(status).alignCenter();
                     }
                 });
-                _ctx.displayPopup(new CardPopup(_ctx, result, status), trigger);
+                _ctx.displayPopup(new CardPopup(_ctx, result, status), view);
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {
