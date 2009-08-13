@@ -18,7 +18,6 @@ import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.annotation.Index;
 import com.samskivert.depot.expression.ColumnExp;
 
-import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Player;

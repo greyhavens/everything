@@ -16,7 +16,6 @@ import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.client.AdminService;
-import com.threerings.everything.data.News;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.GameRepository;

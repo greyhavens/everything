@@ -15,7 +15,6 @@ import com.google.inject.Singleton;
 
 import com.samskivert.util.IntIntMap;
 
-import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
 import com.samskivert.depot.Exps;
@@ -24,7 +23,6 @@ import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.FieldOverride;
-import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;

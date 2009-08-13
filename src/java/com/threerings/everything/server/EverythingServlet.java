@@ -26,8 +26,6 @@ import com.google.code.facebookapi.ProfileField;
 import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
-import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
-
 import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
@@ -41,10 +39,8 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.UserLogic;
 
-import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.Kontagent;
-import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;

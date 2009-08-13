@@ -29,9 +29,7 @@ import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
-import com.samskivert.util.StringUtil;
 
-import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;

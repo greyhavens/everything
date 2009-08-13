@@ -3,7 +3,6 @@
 
 package com.threerings.everything.server.persist;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -29,7 +27,6 @@ import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
-import com.samskivert.depot.expression.ValueExp;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.StringUtil;
@@ -39,7 +36,6 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
-import com.threerings.everything.util.GameUtil;
 
 /**
  * Manages player state for the Everything app.

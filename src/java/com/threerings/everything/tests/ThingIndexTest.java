@@ -16,7 +16,6 @@ import com.samskivert.util.IntMaps;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.ThingIndex;
 import com.threerings.everything.server.persist.ThingInfoRecord;

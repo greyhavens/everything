@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import com.samskivert.util.ArrayIntSet;
-import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Rarity;

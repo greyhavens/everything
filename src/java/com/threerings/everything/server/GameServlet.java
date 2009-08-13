@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
-import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;

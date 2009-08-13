@@ -3,8 +3,6 @@
 
 package com.threerings.everything.data;
 
-import java.util.EnumSet;
-
 import com.samskivert.depot.ByteEnum;
 
 /**
