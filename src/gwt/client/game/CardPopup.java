@@ -15,18 +15,14 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
-import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
-import com.threerings.everything.data.Category;
 
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
 import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
-import client.util.ImageUtil;
-import client.util.Page;
 
 /**
  * Displays a full-sized card in a nice looking popup.
@@ -68,7 +64,7 @@ public class CardPopup extends DataPopup<Card>
     {
         // if we're looking at someone else's card, we don't need any fancy stuff
         if (!_ctx.getMe().equals(card.owner)) {
-            PushButton want = ButtonUI.newButton("Want", makeWantHandler(card));
+            PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
             want.setTitle("Post to your Facebook feed that you want this card.");
             return CardView.create(card, _title, null, want, ButtonUI.newButton("Close", onHide()));
         }
@@ -114,7 +110,7 @@ public class CardPopup extends DataPopup<Card>
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
-        PushButton brag = ButtonUI.newButton("Brag", makeGotHandler(card));
+        PushButton brag = ButtonUI.newButton("Brag", ThingDialog.makeGotHandler(_ctx, card));
         brag.setTitle("Post this card to your Facebook feed.");
 
         PushButton done = ButtonUI.newButton("Keep", onHide());
@@ -122,75 +118,6 @@ public class CardPopup extends DataPopup<Card>
 
         return CardView.create(card, _title, status, sell, gift, brag, done);
     }
-
-    protected ClickHandler makeGotHandler (Card card)
-    {
-        return makeThingHandler("got_card", Build.Template.GOT_CARD.id, card,
-                                "Brag about your awesome card to your friends:", "Woo!");
-    }
-
-    protected ClickHandler makeWantHandler (Card card)
-    {
-        return makeThingHandler("want_card", Build.Template.WANT_CARD.id, card,
-                                "Let your friends know you want this card:", "I wants it!");
-    }
-
-    protected ClickHandler makeThingHandler (String vec, final String templateId, final Card card,
-                                             final String prompt, final String message)
-    {
-        final String cardURL = _ctx.getEverythingURL(
-            vec, Page.BROWSE, card.owner.userId, card.thing.categoryId);
-        final String everyURL = _ctx.getEverythingURL(vec, Page.LANDING);
-        return new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                showThingDialog(templateId, card.thing.name, card.thing.descrip,
-                                Category.getHierarchy(card.categories),
-                                card.thing.rarity.toString(),
-                                ImageUtil.getImageURL(card.thing.image),
-                                cardURL, everyURL, prompt, message);
-            }
-        };
-    }
-
-    protected static native void showThingDialog (String templateId, String thing, String descrip,
-                                                  String category, String rarity, String image,
-                                                  String cardURL, String everyURL,
-                                                  String prompt, String message) /*-{
-        var data = {
-            'thing': thing,
-            'descrip': descrip,
-            'category': category,
-            'rarity': rarity,
-            'cardURL': cardURL,
-            'everyURL': everyURL,
-            'images': [{ 'src': image, 'href': cardURL }],
-        };
-        $wnd.FB.Connect.showFeedDialog(templateId, data, null, null, null, null, null,
-                                       prompt, { value: message });
-    }-*/;
-
-// We used to use streamPublish, which is *way* simpler but does not allow us to highlight text in
-// the title which is critical for making our feed stories not look like random news articles
-//
-//     protected static native void showThingDialog (String message, String thing, String descrip,
-//                                                   String category, String rarity, String image,
-//                                                   String url) /*-{
-//         var attachment = {
-//             'name': thing,
-//             'href': url,
-//             'description': descrip,
-//             'media': [{ 'type': 'image',
-//                         'src': image,
-//                         'href': url }],
-//             'properties': {'Category': category,
-//                            'Rarity': rarity,
-//                            'Join the fun': {'text': 'Play Everything!',
-//                                             'href': 'http://apps.facebook.com/everythinggame/'}},
-//         };
-//         var actions = [{ "text": "Play Everything",
-//                          "href": "http://apps.facebook.com/everythinggame/"}];
-//         $wnd.FB.Connect.streamPublish(message, attachment, actions);
-//     }-*/;
 
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;

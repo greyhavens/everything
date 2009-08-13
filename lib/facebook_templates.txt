@@ -55,3 +55,26 @@ Help {*actor*}
 Action link URL:
 
 {*everyURL*}
+
+------------------
+Gave Card Template
+------------------
+
+One line and SS Title:
+
+{*actor*} gave the <a href="{*cardURL*}">{*thing*}</a> card to {*target*} in <a href="{*everyURL*}">Everything</a>
+
+SS Body:
+
+{*descrip*}<br>
+Category: {*category*}<br>
+Rarity: {*rarity*}<br>
+<a href="{*everyURL*}">Trade cards with friends in Everything!</a>
+
+Action Link text:
+
+Collect Everything
+
+Action link URL:
+
+{*everyURL*}

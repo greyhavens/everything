@@ -17,6 +17,7 @@ candidate_facebook_secret = APP_SECRET
 # Facebook template ids
 facebook_want_tmpl = TMPL_ID
 facebook_got_tmpl = TMPL_ID
+facebook_gave_tmpl = TMPL_ID
 
 # Our Postgres database configuration
 db.default.server = localhost
