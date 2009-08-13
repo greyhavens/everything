@@ -80,7 +80,8 @@ public class EverythingServlet extends EveryServiceServlet
 
         OOOUser user = getUser();
         if (user == null) {
-            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset);
+            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset,
+                     "tracking", kontagentToken);
             data.name = PlayerName.createGuest();
             return data; // allow the player to do some things anonymously
         }
@@ -140,7 +141,8 @@ public class EverythingServlet extends EveryServiceServlet
             }
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
-            log.info("Hello newbie!", "who", player.who(), "surname", player.surname, "tz", tz);
+            log.info("Hello newbie!", "who", player.who(), "surname", player.surname, "tz", tz,
+                     "tracking", kontagentToken);
 
             // transfer any escrowed cards into their collection
             _gameRepo.unescrowCards(fbinfo.left, player);
@@ -155,7 +157,8 @@ public class EverythingServlet extends EveryServiceServlet
             // if this is not their first session, update their last session timestamp
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
             _playerRepo.recordSession(player.userId, now);
-            log.info("Welcome back", "who", player.who(), "gone", elapsed);
+            log.info("Welcome back", "who", player.who(), "gone", elapsed,
+                     "tracking", kontagentToken);
 
             // check to see if they made FB friends with any existing Everything players
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
