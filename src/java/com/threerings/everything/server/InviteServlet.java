@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 
 import com.samskivert.servlet.util.ParameterUtil;
@@ -56,72 +57,78 @@ public class InviteServlet extends AppServlet
         OOOUser user = getUser(req);
         PlayerRecord player = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
         String from = ParameterUtil.getParameter(req, "from", "LANDING");
-        String thingId = null, received = null, targetFBId = null;
+        Set<String> targetFBIds = null;
 
         try {
             if (player == null) {
                 throw new Exception("missing inviter");
             }
 
-            targetFBId = req.getParameter("ids[]");
-            if (targetFBId == null) { // they chose to skip
+            targetFBIds = ParameterUtil.getParameters(req, "ids[]");
+            if (targetFBIds.size() == 0) { // they chose to skip
                 log.info("No targets, skipping", "who", player.who(), "from", from);
                 writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
                 return;
             }
 
-            thingId = requireParameter(req, "thing");
-            received = requireParameter(req, "received");
-
-            // make sure they own the thing in question
-            CardRecord card = _gameRepo.loadCard(
-                player.userId, Integer.parseInt(thingId), Long.parseLong(received));
-            if (card == null) {
-                throw new Exception("missing card");
-            }
-            Thing thing = _thingRepo.loadThing(card.thingId);
-            if (thing == null) {
-                throw new Exception("missing thing");
+            if (ParameterUtil.isSet(req, "thing")) {
+                processThingGift(req, player, targetFBIds.iterator().next());
             }
 
-            // see if the recipient in question is already a player
-            Map<String, Integer> ids = _userLogic.mapFacebookIds(
-                Collections.singletonList(targetFBId));
-            Integer targetId = ids.get(targetFBId);
-            PlayerRecord target;
-            if (targetId != null && (target = _playerRepo.loadPlayer(targetId)) != null) {
-                log.info("Gifting card directly to player", "gifter", player.who(),
-                         "thing", card.thingId, "recip", target.who());
-                _gameLogic.giftCard(player, card, target, null);
-
-            } else {
-                log.info("Escrowing card for hopeful future player", "gifter", player.who(),
-                         "thing", card.thingId, "recip", targetFBId);
-                _gameRepo.escrowCard(card, targetFBId);
-
-                // send them a Facebook notification as well as an invite
-                _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId), thing, null);
-            }
-
-            // report to kontagent that we sent an invite
+            // report to kontagent that we sent one or more invites
             String tracking = req.getParameter("tracking");
             if (StringUtil.isBlank(tracking)) {
                 log.warning("Missing Kontagent tracking id for invitation.", "who", player.who(),
-                            "from", from, "target", targetFBId);
+                            "from", from, "target", targetFBIds);
             } else {
-                _kontLogic.reportAction(
-                    Kontagent.INVITE, "s", player.facebookId, "r", targetFBId, "u", tracking);
+                _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId,
+                                        "r", Joiner.on(",").join(targetFBIds), "u", tracking);
             }
 
         } catch (Exception e) {
             log.warning("Failed to process invite gift: " + e.getMessage(),
                         "who", (player == null) ? "null" : player.who(),
-                        "agent", req.getHeader("User-agent"), "targetFBId", targetFBId,
-                        "thingId", thingId, "received", received);
+                        "agent", req.getHeader("User-agent"), "targetFBIds", targetFBIds);
         }
 
         // one way or the other, send them back from whence they came
         writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
+    }
+
+    protected void processThingGift (HttpServletRequest req, PlayerRecord player, String targetFBId)
+        throws Exception
+    {
+        String thingId = requireParameter(req, "thing");
+        String received = requireParameter(req, "received");
+
+        // make sure they own the thing in question
+        CardRecord card = _gameRepo.loadCard(
+            player.userId, Integer.parseInt(thingId), Long.parseLong(received));
+        if (card == null) {
+            throw new Exception("missing card");
+        }
+        Thing thing = _thingRepo.loadThing(card.thingId);
+        if (thing == null) {
+            throw new Exception("missing thing");
+        }
+
+        // see if the recipient in question is already a player
+        Map<String, Integer> ids = _userLogic.mapFacebookIds(Collections.singletonList(targetFBId));
+        Integer targetId = ids.get(targetFBId);
+        PlayerRecord target;
+        if (targetId != null && (target = _playerRepo.loadPlayer(targetId)) != null) {
+            log.info("Gifting card directly to player", "gifter", player.who(),
+                     "thing", card.thingId, "recip", target.who());
+            _gameLogic.giftCard(player, card, target, null);
+
+        } else {
+            log.info("Escrowing card for hopeful future player", "gifter", player.who(),
+                     "thing", card.thingId, "recip", targetFBId);
+            _gameRepo.escrowCard(card, targetFBId);
+
+            // send them a Facebook notification as well as an invite
+            _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId), thing, null);
+        }
     }
 
     protected String requireParameter (HttpServletRequest req, String name)
