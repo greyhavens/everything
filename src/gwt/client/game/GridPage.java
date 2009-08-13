@@ -203,8 +203,9 @@ public class GridPage extends DataPanel<GameService.GridResult>
         _info.at(0, 1).setWidget(new CoinLabel("You have ", _ctx.getCoins()), "right");
     }
 
-    protected void flipCard (final int position, final Widget trigger)
+    protected void flipCard (int position, final Widget trigger)
     {
+        final FluentTable.Cell cell = _cards.at(position / COLUMNS, position % COLUMNS);
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
             public void onSuccess (GameService.FlipResult result) {
@@ -214,7 +215,6 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.name = result.card.thing.name;
                 card.image = result.card.thing.image;
                 card.rarity = result.card.thing.rarity;
-                final FluentTable.Cell cell = _cards.at(position / COLUMNS, position % COLUMNS);
                 ThingCardView view = new ThingCardView(_ctx, card, null);
                 cell.setWidget(view);
 
