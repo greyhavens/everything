@@ -96,7 +96,7 @@ public class AuthServlet extends AppServlet
                 reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
                 break;
             case OTHER_RESPONSE:
-                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
+                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking, null);
                 break;
             case APP_ADDED:
                 // this is not a landing, the player has added the app after browsing something as
@@ -114,19 +114,19 @@ public class AuthServlet extends AppServlet
     {
         if (StringUtil.isBlank(tracking)) {
             log.warning("Missing tracking code for landing?", "uri", req.getRequestURI());
-            reportLanding(req, Kontagent.OTHER_RESPONSE, "no_tracking:" + type.code, null);
+            reportLanding(req, Kontagent.OTHER_RESPONSE, "no_tracking:" + type.code, null, null);
             return;
         }
-        reportLanding(req, type, type.code, tracking);
+        String recipId = StringUtil.getOr(req.getParameter("fb_sig_user"),
+                                          req.getParameter("fb_sig_canvas_user"));
+        reportLanding(req, type, type.code, tracking, recipId);
     }
 
     protected void reportLanding (
-        HttpServletRequest req, Kontagent mtype, String ltype, String tracking)
+        HttpServletRequest req, Kontagent mtype, String ltype, String tracking, String recipId)
     {
         boolean appAdded =
             ParameterUtil.isSet(req, "fb_sig") && ParameterUtil.isSet(req, "fb_sig_session_key");
-        String recipId = StringUtil.getOr(
-            req.getParameter("fb_sig_user"), req.getParameter("fb_sig_canvas_user"));
         _kontLogic.reportAction(mtype, "r", recipId, "i", appAdded ? "1" : "0", "tu", ltype,
                                 (tracking.length() == 8) ? "su" : "u", tracking);
     }
