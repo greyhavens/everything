@@ -3,6 +3,8 @@
 
 package com.threerings.everything.server;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -128,8 +130,13 @@ public class EverythingApp extends App
         buf.append("&an_sig=").append(StringUtil.md5hex(Joiner.on("").join(args)));
         for (int ii = 0; ii < keyVals.length; ii += 2) {
             if (keyVals[ii+1] != null) {
-                // TODO: URLEncode?
-                buf.append("&").append(keyVals[ii]).append("=").append(keyVals[ii+1]);
+                try {
+                    buf.append("&").append(keyVals[ii]).append("=").append(
+                        URLEncoder.encode(String.valueOf(keyVals[ii+1]), "UTF-8"));
+                } catch (UnsupportedEncodingException uee) {
+                    log.warning("Failed to encode parameter for Kontagent URL", "key", keyVals[ii],
+                                "val", keyVals[ii+1], "error", uee);
+                }
             }
         }
 
