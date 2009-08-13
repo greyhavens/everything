@@ -122,16 +122,25 @@ fb\:profile-pic img {
   color: #CCCCCC;
 }
 
-.smallButton {
+.smallButton, .smallWideButton {
   color: #442D17;
-  width: 50px;
-  height: 22px;
 }
-.smallButton .html-face {
+.smallButton .html-face, .smallWideButton .html-face {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-size: 14px;
   padding: 2px 0px;
   text-align: center;
+}
+.smallButton-down-hovering .html-face, .smallWideButton-down-hovering .html-face {
+  padding: 3px 0px 1px 2px;
+}
+.smallButton-up-disabled, .smallWideButton-up-disabled {
+  color: #CCCCCC;
+}
+
+.smallButton {
+  width: 50px;
+  height: 22px;
 }
 .smallButton-up {
   background: url(images/button/small_up.png);
@@ -142,12 +151,25 @@ fb\:profile-pic img {
 .smallButton-down-hovering {
   background: url(images/button/small_down.png);
 }
-.smallButton-down-hovering .html-face {
-  padding: 3px 0px 1px 2px;
-}
 .smallButton-up-disabled {
   background: url(images/button/small_up.png);
-  color: #CCCCCC;
+}
+
+.smallWideButton {
+  width: 80px;
+  height: 22px;
+}
+.smallWideButton-up {
+  background: url(images/button/small_wide_up.png);
+}
+.smallWideButton-up-hovering {
+  background: url(images/button/small_wide_over.png);
+}
+.smallWideButton-down-hovering {
+  background: url(images/button/small_wide_down.png);
+}
+.smallWideButton-up-disabled {
+  background: url(images/button/small_wide_up.png);
 }
 
 .popup, .gwt-ConfirmPopup, .infoPopup, .errorPopup {

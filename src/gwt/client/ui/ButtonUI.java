@@ -50,7 +50,7 @@ public class ButtonUI
     public static PushButton newSmallButton (String text, ClickHandler onClick)
     {
         PushButton button = new PushButton(text);
-        button.setStyleName("smallButton");
+        button.setStyleName((text.length() <= 4) ? "smallButton" : "smallWideButton");
         if (onClick != null) {
             button.addClickHandler(onClick);
         }
