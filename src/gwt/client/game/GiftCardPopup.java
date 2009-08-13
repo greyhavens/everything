@@ -8,6 +8,8 @@ import java.util.Collections;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -17,6 +19,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
+import com.threerings.gwt.ui.EscapeClickAdapter;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
@@ -113,12 +116,16 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     protected PopupPanel makeGiftPopup (final FriendCardInfo info)
     {
         final TextBox message = Widgets.newTextBox("", 255, 40);
-        final CheckBox post = new CheckBox("Also post gift to your Facebook feed");
+        final CheckBox post = new CheckBox("Also post this to your Facebook feed");
         SmartTable table = new SmartTable(5, 0) {
             protected void onLoad () {
                 super.onLoad();
-                message.setFocus(true);
                 XFBML.parse(this);
+                DeferredCommand.addCommand(new Command() {
+                    public void execute () {
+                        message.setFocus(true);
+                    }
+                });
             }
         };
         PopupPanel popup = Popups.newPopup("popup", table);
@@ -129,8 +136,9 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         post.setChecked(true);
         table.addWidget(post, 2);
         final ClickHandler hider = Popups.createHider(popup);
+        message.addKeyPressHandler(new EscapeClickAdapter(hider));
         final PushButton cancel = ButtonUI.newSmallButton("Cancel", hider);
-        final PushButton give = ButtonUI.newSmallButton("Give");
+        final PushButton give = ButtonUI.newSmallButton("Send It");
         new ClickCallback<Void>(give, message) {
             protected boolean callService () {
                 String msg = message.getText().trim();
@@ -151,7 +159,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 return false;
             }
         };
-        row = table.addWidget(Widgets.newRow(cancel, Widgets.newShim(25, 5), give), 2);
+        row = table.addWidget(Widgets.newRow(give, Widgets.newShim(25, 5), cancel), 2);
         table.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
         return popup;
     }
