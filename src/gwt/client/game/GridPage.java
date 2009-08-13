@@ -3,8 +3,6 @@
 
 package client.game;
 
-import java.util.Date;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,7 +12,6 @@ import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -23,8 +20,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.samskivert.depot.util.ByteEnumUtil;
 
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
-import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
@@ -35,7 +32,6 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
-import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.ThingCard;
@@ -48,7 +44,6 @@ import client.util.ClickCallback;
 import client.util.Context;
 import client.util.Messages;
 import client.util.Page;
-import client.util.PanelCallback;
 import client.util.PopupCallback;
 
 /**
@@ -101,10 +96,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
     {
         clear();
 
-        SmartTable contents = new SmartTable("PreGrid", 5, 0);
-        contents.setText(0, 0, "It's time for a new grid!", 3, "Title", "machine");
-        contents.setText(1, 0, "Click a powerup:", 1, "machine", "center");
-        contents.setWidget(2, 0, new PowerupsMenu(Powerup.PRE_GRID, null) {
+        PowerupsMenu menu = new PowerupsMenu(Powerup.PRE_GRID, null) {
             protected void activatePup (Label plabel, final Powerup pup,
                                         final Value<Integer> charges) {
                 new ClickCallback<GameService.GridResult>(plabel) {
@@ -119,9 +111,8 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     }
                 };
             }
-        });
+        };
 
-        contents.setText(1, 2, "Or get a stock grid:", 1, "machine");
         PushButton get = ButtonUI.newButton("Get!");
         new ClickCallback<GameService.GridResult>(get) {
             protected boolean callService () {
@@ -133,10 +124,14 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 return false;
             }
         };
-        contents.setWidget(2, 1, Widgets.newShim(50, 50));
-        contents.setWidget(2, 2, get);
-        contents.getFlexCellFormatter().setHorizontalAlignment(2, 2, HasAlignment.ALIGN_CENTER);
-        contents.getFlexCellFormatter().setVerticalAlignment(2, 2, HasAlignment.ALIGN_TOP);
+
+        FluentTable contents = new FluentTable(5, 0, "PreGrid");
+        contents.add().setText("It's time for a new grid!", "Title", "machine").setColSpan(3);
+        contents.add().setText("Click a powerup:", "machine", "center").
+            right().right().setText("Or get a stock grid:", "machine");
+        contents.add().setWidget(menu).
+            right().setWidget(Widgets.newShim(50, 50)).
+            right().setWidget(get).alignCenter().alignTop();
         add(contents);
     }
 
@@ -144,23 +139,22 @@ public class GridPage extends DataPanel<GameService.GridResult>
     {
         clear();
 
-        add(_info = new SmartTable("Info", 5, 0));
+        add(_info = new FluentTable(5, 0, "Info"));
         Label pups = Widgets.newLabel("", "Powerups");
         Value<Boolean> enabled = _ctx.popupShowing().map(Functions.NOT);
-        _info.setWidget(0, 2, hoverize(Widgets.makeActionable(pups, new ClickHandler() {
+        _info.at(0, 2).setWidget(hoverize(Widgets.makeActionable(pups, new ClickHandler() {
             public void onClick (ClickEvent event) {
                 showPowerupsMenu((Widget)event.getSource());
             }
-        }, enabled), enabled), 1, "PupBox");
-        _info.getFlexCellFormatter().setRowSpan(0, 2, 2);
-        _info.setText(1, 0, "Unflipped cards:");
+        }, enabled), enabled), "PupBox").setRowSpan(2);
+        _info.at(1, 0).setText("Unflipped cards:");
         updateRemaining(_data.grid.unflipped);
         updateGameStatus(_data.status);
 
-        add(_cards = new SmartTable("Cards", 5, 0));
+        add(_cards = new FluentTable(5, 0, "Cards"));
 
-        add(_status = new SmartTable("Status", 5, 0));
-        _status.setText(0, 0, "New grid " + DateUtil.formatDateTime(_data.grid.expires));
+        add(_status = new FluentTable(5, 0, "Status"));
+        _status.at(0, 0).setText("New grid " + DateUtil.formatDateTime(_data.grid.expires));
         updateGrid();
     }
 
@@ -175,9 +169,9 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     flipCard(position, (Widget)event.getSource());
                 }
             };
-            _cards.setWidget(row, col, new ThingCardView(_ctx, card, onClick));
+            _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, onClick));
         }
-        _status.setText(0, 1, "Grid status: " + Messages.xlate(""+_data.grid.status), 1, "right");
+        _status.at(0, 1).setText("Grid status: " + Messages.xlate(""+_data.grid.status), "right");
     }
 
     protected void updateRemaining (int[] unflipped)
@@ -191,7 +185,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
             Rarity rarity = ByteEnumUtil.fromByte(Rarity.class, (byte)ii);
             buf.append(rarity).append("-").append(unflipped[ii]);
         }
-        _info.setHTML(1, 1, buf.toString(), 1, "Bold");
+        _info.at(1, 1).setHTML(buf.toString(), "Bold");
     }
 
     protected void updateGameStatus (GameStatus status)
@@ -200,13 +194,13 @@ public class GridPage extends DataPanel<GameService.GridResult>
         _ctx.getCoins().update(status.coins);
 
         if (status.freeFlips > 0) {
-            _info.setText(0, 0, "Free flips left: " + status.freeFlips, 1);
+            _info.at(0, 0).setText("Free flips left: " + status.freeFlips);
         } else if (status.nextFlipCost > 0) {
-            _info.setWidget(0, 0, new CoinLabel("Next flip costs ", status.nextFlipCost), 1);
+            _info.at(0, 0).setWidget(new CoinLabel("Next flip costs ", status.nextFlipCost));
         } else {
-            _info.setText(0, 0, "No more flips.", 1);
+            _info.at(0, 0).setText("No more flips.");
         }
-        _info.setWidget(0, 1, new CoinLabel("You have ", _ctx.getCoins()), 1, "right");
+        _info.at(0, 1).setWidget(new CoinLabel("You have ", _ctx.getCoins()), "right");
     }
 
     protected void flipCard (final int position, final Widget trigger)
@@ -221,7 +215,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.image = result.card.thing.image;
                 card.rarity = result.card.thing.rarity;
                 final int row = position / COLUMNS, col = position % COLUMNS;
-                _cards.setWidget(row, col, new ThingCardView(_ctx, card, null));
+                _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, null));
 
                 // update our status
                 _data.grid.unflipped[card.rarity.ordinal()]--;
@@ -232,9 +226,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 Value<String> status = new Value<String>("");
                 status.addListener(new Value.Listener<String>() {
                     public void valueChanged (String status) {
-                        _cards.setText(row, col, status);
-                        _cards.getFlexCellFormatter().setHorizontalAlignment(
-                            row, col, HasAlignment.ALIGN_CENTER);
+                        _cards.at(row, col).setText(status).alignCenter();
                     }
                 });
                 _ctx.displayPopup(new CardPopup(_ctx, result, status), trigger);
@@ -283,12 +275,12 @@ public class GridPage extends DataPanel<GameService.GridResult>
         public NSFPopup () {
             addStyleName("popup");
             addStyleName("nsfPopup");
-            SmartTable table = new SmartTable(5, 0);
-            table.setText(0, 0, "Oops, you're out of coins. What to do?", 2, "machine");
-            table.setText(1, 0, "Wait 'til tomorrow and get more free flips.");
-            table.setText(1, 1, "Get more coins now and keep flipping!");
-            table.setWidget(2, 0, new PushButton("Wait", Popups.createHider(this)));
-            table.setWidget(2, 1, new PushButton("Coins", Args.createLinkHandler(Page.GET_COINS)));
+            FluentTable table = new FluentTable(5, 0);
+            table.add().setText("Oops, you're out of coins. What to do?", "machine").setColSpan(2);
+            table.add().setText("Wait 'til tomorrow and get more free flips.").
+                right().setText("Get more coins now and keep flipping!");
+            table.add().setWidget(new PushButton("Wait", Popups.createHider(this))).
+                right().setWidget(new PushButton("Coins", Args.createLinkHandler(Page.GET_COINS)));
             setWidget(table);
         }
     }
@@ -301,30 +293,29 @@ public class GridPage extends DataPanel<GameService.GridResult>
             ClickHandler hider = (popup == null) ? null : Popups.createHider(popup);
             add(Widgets.newActionLabel("", "Top", hider));
 
-            SmartTable items = new SmartTable("Items", 0, 0);
+            FluentTable items = new FluentTable(0, 0, "Items");
             add(items);
             for (final Powerup pup : pups) {
-                final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
-                int row = items.addWidget(PowerupUI.newIcon(pup), 1, "Icon");
-                items.getRowFormatter().setStyleName(row, "Item");
                 Label plabel = Widgets.newInlineLabel(" " + Messages.xlate(pup.toString()));
                 plabel.setTitle(Messages.xlate(pup + "_descrip"));
+                final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
+                int row = items.add().setWidget(PowerupUI.newIcon(pup), "Icon").
+                    right().setWidget(plabel).
+                    right().setWidget(ValueLabel.create("inline", charges), "Charges").row;
+                items.getRowFormatter().setStyleName(row, "Item");
                 if (charges.get() > 0) {
                     activatePup(plabel, pup, charges);
                 } else {
                     items.getRowFormatter().addStyleName(row, "Disabled");
                 }
-                items.setWidget(row, 1, plabel);
-                items.setWidget(row, 2, ValueLabel.create("inline", charges), 1, "Charges");
             }
 
-            int row = items.addText("", 1);
-            items.getRowFormatter().setStyleName(row, "Item");
             Hyperlink shop = Args.createLink("Buy Powerups", Page.SHOP);
             if (hider != null) {
                 shop.addClickHandler(hider);
             }
-            items.setWidget(row, 1, shop, 2);
+            int row = items.add().setText("").right().setWidget(shop).setColSpan(2).row;
+            items.getRowFormatter().setStyleName(row, "Item");
 
             add(Widgets.newLabel("", "Bottom"));
         }
@@ -361,7 +352,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
     }
 
     protected GameService.GridResult _data;
-    protected SmartTable _info, _cards, _status;
+    protected FluentTable _info, _cards, _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
     protected static final int COLUMNS = 4;

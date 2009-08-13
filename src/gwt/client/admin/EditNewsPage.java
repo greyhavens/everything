@@ -8,7 +8,6 @@ import java.util.Date;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;

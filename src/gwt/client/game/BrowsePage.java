@@ -10,11 +10,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
@@ -29,7 +28,6 @@ import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
-import client.util.PanelCallback;
 
 /**
  * Displays a player's collection.
@@ -55,7 +53,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected void init (final PlayerCollection coll)
     {
         if (_header == null) {
-            _header = new SmartTable("Header", 0, 0);
+            _header = new FluentTable(0, 0, "Header");
         }
         if (!_header.isAttached()) {
             add(_header);
@@ -86,17 +84,17 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             Widget links = _ctx.getMe().equals(coll.owner) ? Widgets.newRow("Links", feed) :
                 Widgets.newRow("Links", feed, Args.createMessageAnchor(coll.owner));
 
-            _header.setWidget(0, 0, XFBML.newProfilePic(coll.owner.facebookId), 1, "Padded");
-            _header.getFlexCellFormatter().setRowSpan(0, 0, 3);
-            _header.setText(0, 1, coll.owner.toString() + "'s Collection", 1, "Title", "machine");
-            _header.setWidget(1, 0, links, 1, "machine");
-            _header.setText(2, 0, "");
-            _header.setText(0, 2, "Total things:", 1, "Padded", "right", "handwriting");
-            _header.setText(1, 1, "Total series:", 1, "Padded", "right", "handwriting");
-            _header.setText(2, 1, "Completed:", 1, "Padded", "right", "handwriting");
-            _header.setWidget(0, 3, ValueLabel.create(_cards), 1, "right", "handwriting");
-            _header.setWidget(1, 2, ValueLabel.create(_series), 1, "right", "handwriting");
-            _header.setWidget(2, 2, ValueLabel.create(_completed), 1, "right", "handwriting");
+            _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded").
+                setRowSpan(3);
+            _header.at(0, 1).setText(coll.owner.toString() + "'s Collection", "Title", "machine");
+            _header.at(1, 0).setWidget(links, "machine");
+            _header.at(2, 0).setText("");
+            _header.at(0, 2).setText("Total things:", "Padded", "right", "handwriting").
+                right().setWidget(ValueLabel.create(_cards), "right", "handwriting");
+            _header.at(1, 1).setText("Total series:", "Padded", "right", "handwriting").
+                right().setWidget(ValueLabel.create(_series), "right", "handwriting");
+            _header.at(2, 1).setText("Completed:", "Padded", "right", "handwriting").
+                right().setWidget(ValueLabel.create(_completed), "right", "handwriting");
             XFBML.parse(this);
         }
         _coll = coll;
@@ -104,16 +102,12 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         if (_taxon != null) {
             remove(_taxon);
         }
-        _taxon = new SmartTable("Taxonomy", 5, 0);
-        _taxon.addStyleName("handwriting");
+        _taxon = new FluentTable(5, 0, "Taxonomy", "handwriting");
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
             String catname = cat.getKey();
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
-                String subcatname = subcat.getKey();
-                final int row = _taxon.addText(catname, 1);
-                catname = ""; // subsequent rows don't repeat the same category
-                _taxon.setText(row, 1, subcatname);
                 FlowPanel cards = new FlowPanel();
+                SeriesPanel panel = null;
                 for (final SeriesCard card : subcat.getValue()) {
                     if (cards.getWidgetCount() > 0) {
                         cards.add(Widgets.newInlineLabel(" "));
@@ -144,13 +138,16 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         }
                     });
                     if (_seriesId == card.categoryId) {
-                        _taxon.addWidget(new SeriesPanel(_ctx, coll.owner.userId,
-                                                         card.categoryId, owned), 3);
+                        panel = new SeriesPanel(_ctx, coll.owner.userId, card.categoryId, owned);
                     }
                 }
-                _taxon.setWidget(row, 2, cards);
-                _taxon.getFlexCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
-                _taxon.getFlexCellFormatter().setVerticalAlignment(row, 1, HasAlignment.ALIGN_TOP);
+                _taxon.add().setText(catname).alignTop().
+                    right().setText(subcat.getKey()).alignTop().
+                    right().setWidget(cards);
+                catname = ""; // subsequent rows don't repeat the same category
+                if (panel != null) {
+                    _taxon.add().setWidget(panel).setColSpan(3);
+                }
             }
         }
         add(_taxon);
@@ -158,7 +155,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected int _seriesId;
     protected PlayerCollection _coll;
-    protected SmartTable _header, _taxon;
+    protected FluentTable _header, _taxon;
     protected Value<Integer> _cards, _series, _completed;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

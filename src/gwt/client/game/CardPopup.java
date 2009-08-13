@@ -6,11 +6,9 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -20,7 +18,6 @@ import com.threerings.everything.data.CardIdent;
 
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
-import client.util.Args;
 import client.util.ClickCallback;
 import client.util.Context;
 

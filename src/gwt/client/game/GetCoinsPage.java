@@ -4,9 +4,6 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -15,7 +12,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.everything.data.Build;
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
 import client.ui.bling.BlingImages;
@@ -42,24 +39,23 @@ public class GetCoinsPage extends FlowPanel
         addStyleName("page");
         add(Widgets.newLabel(_msgs.selectHeader(), "Header", "machine"));
 
-        SmartTable prices = new SmartTable("Prices", 5, 0);
+        FluentTable prices = new FluentTable(5, 0, "Prices");
         int col = 0;
         for (int ii = 0; ii < PRICES.length; ii += 2) {
             Widget bucks = Widgets.newInlineLabel(" for $" + PRICES[ii], "machine");
-            prices.setWidget(0, col++, Widgets.newFlowPanel(new CoinLabel(PRICES[ii+1]), bucks));
+            prices.at(0, col++).setWidgets(new CoinLabel(PRICES[ii+1]), bucks);
         }
-        prices.setText(0, col++, YAYS[Random.nextInt(YAYS.length)], 1, "handwriting");
+        prices.at(0, col++).setText(YAYS[Random.nextInt(YAYS.length)], "handwriting");
         add(prices);
 
-        SmartTable choices = new SmartTable("Methods", 5, 0);
-        choices.setText(0, 0, _msgs.selectSelect(), 2, "machine");
+        FluentTable choices = new FluentTable(5, 0, "Methods");
+        choices.add().setText( _msgs.selectSelect(), "machine").setColSpan(2);
         for (final Method method : METHODS) {
             PushButton button = Widgets.newPushButton(
                 method.normal.createImage(), method.hover.createImage(), method.down.createImage(),
                 Args.createLinkHandler(Page.GET_COINS, method.target));
             button.setStyleName("BuyButton");
-            int row = choices.addWidget(button, 1);
-            choices.setHTML(row, 1, method.tip, 1, "handwriting");
+            choices.add().setWidget(button).right().setHTML(method.tip, "handwriting");
         }
         add(choices);
     }

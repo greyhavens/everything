@@ -3,7 +3,6 @@
 
 package client.game;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,7 +24,6 @@ import client.ui.DataPanel;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
-import client.util.PanelCallback;
 
 /**
  * Displays a feed.

@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Anchor;
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 
@@ -43,10 +43,11 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
                 "Subtitle", Widgets.newHTML("Copyright &copy; " + copy + " ", "inline"),
                 new Anchor("http://www.threerings.net/", "Three Rings", "_blank")));
 
-        SmartTable peeps = new SmartTable("Peeps", 10, 0);
-        peeps.setWidget(0, 0, labeled("Design:", personLink(data.design)));
-        peeps.setWidget(0, 1, labeled("Art:", personLink(data.art)));
-        peeps.setWidget(0, 2, labeled("Code:", personLink(data.code)));
+        FluentTable peeps = new FluentTable(10, 0, "Peeps");
+        peeps.add().setWidgets(Widgets.newLabel("Design:"), personLink(data.design)).
+            right().setWidgets(Widgets.newLabel("Art:"), personLink(data.art)).
+            right().setWidgets(Widgets.newLabel("Code:"), personLink(data.code));
+
         FlowPanel editors = Widgets.newFlowPanel("Long");
         for (PlayerName editor : data.editors) {
             if (editors.getWidgetCount() > 0) {
@@ -54,9 +55,9 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
             }
             editors.add(personLink(editor));
         }
-        peeps.setWidget(1, 0, labeled("Series Editors:", editors), 3);
-        peeps.setWidget(2, 0, labeled("Special Thanks:",
-                                      Widgets.newLabel(SPECIAL_THANKS, "Long", "handwriting")), 3);
+        peeps.add().setWidgets(Widgets.newLabel("Series Editors:"), editors).setColSpan(3);
+        Widget thanks = Widgets.newLabel(SPECIAL_THANKS, "Long", "handwriting");
+        peeps.add().setWidgets(Widgets.newLabel("Special Thanks:"), thanks).setColSpan(3);
         add(peeps);
     }
 

@@ -10,20 +10,15 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.PopupStack;
-import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 import com.threerings.gwt.util.WindowUtil;
 
-import com.threerings.everything.client.EverythingCodes;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.client.Kontagent;

@@ -13,7 +13,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.gwt.util.ChainedCallback;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Function;
 
 import com.threerings.everything.client.EditorService;

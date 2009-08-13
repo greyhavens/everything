@@ -13,7 +13,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.InfoPopup;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Console;
 
 import client.util.Context;
 

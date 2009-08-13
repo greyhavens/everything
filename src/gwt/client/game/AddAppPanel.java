@@ -6,7 +6,7 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
 import client.util.Args;
@@ -27,15 +27,14 @@ public class AddAppPanel extends FlowPanel
 
         add(Widgets.newLabel(_msgs.introTitle(), "Title", "machine"));
         add(Widgets.newLabel(_msgs.introIntro(), "Text"));
-        int col = 0;
-        SmartTable intro = new SmartTable("Steps", 5, 0);
-        intro.setText(0, col++, _msgs.introStepOne(), 1, "machine");
-        intro.setText(0, col++, "\u2023", 1, "Arrow");
-        intro.setText(0, col++, _msgs.introStepTwo(), 1, "machine");
-        intro.setText(0, col++, "\u2023", 1, "Arrow");
-        intro.setText(0, col++, _msgs.introStepThree(), 1, "machine");
-        intro.setText(0, col++, "\u2023", 1, "Arrow");
-        intro.setText(0, col++, _msgs.introStepFour(), 1, "machine");
+        FluentTable intro = new FluentTable(5, 0, "Steps");
+        intro.add().setText(_msgs.introStepOne(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepTwo(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepThree(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepFour(), "machine");
         add(intro);
 
         if (ctx.getMe().isGuest()) {

@@ -4,11 +4,10 @@
 package client.game;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.PushButton;
 
 import com.threerings.gwt.ui.Popups;
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 
@@ -42,35 +41,30 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
         _ctx.getPupsModel().refresh(data.powerups);
         _ctx.getCoins().update(data.coins);
 
-        SmartTable table = new SmartTable(5, 0);
-        table.setWidget(0, 0, Widgets.newRow("machine", Widgets.newLabel("You have:"),
-                                             new CoinLabel(_ctx.getCoins()),
-                                             Widgets.newShim(25, 5),
-                                             Args.createLink("Get Coins!", Page.GET_COINS)), 5);
+        FluentTable table = new FluentTable(5, 0);
+        table.add().setColSpan(5).setWidget(
+            Widgets.newRow("machine", Widgets.newLabel("You have:"),
+                           new CoinLabel(_ctx.getCoins()),
+                           Widgets.newShim(25, 5),
+                           Args.createLink("Get Coins!", Page.GET_COINS)));
 
-        table.setText(1, 0, "Powerup", 2, "Header");
-        table.setText(1, 1, "Have", 1, "Header");
-        table.setText(1, 2, "Cost", 2, "Header", "center");
+        table.add().setText("Powerup", "Header").setColSpan(2).
+            right().setText("Have", "Header").
+            right().setText("Cost", "Header", "center").setColSpan(2);
 
         for (final Powerup type : Powerup.values()) {
             if (type.cost <= 0) {
                 continue; // skip non-salable pups
             }
-            int row = table.addWidget(PowerupUI.newIcon(type), 1, "Icon");
-            table.setWidget(row, 1, Widgets.newFlowPanel(
-                                Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
-                                Widgets.newLabel(Messages.xlate(type + "_descrip"),
-                                                 "handwriting")), 1);
-            table.setWidget(row, 2, ValueLabel.create(_ctx.getPupsModel().getCharges(type)),
-                            1, "right");
-            table.setWidget(row, 3, new CoinLabel(type.cost), 1, "right");
-            if (type.charges > 1) {
-                table.setText(row, 4, "for " + type.charges, 1, "nowrap");
-            }
             final PushButton buy = ButtonUI.newButton("Buy");
-            if (_ctx.getPupsModel().getCharges(type).get() == 0 || !type.isPermanent()) {
-                table.setWidget(row, 5, buy);
-            }
+            table.add().setWidget(PowerupUI.newIcon(type), "Icon").
+                right().setWidgets(Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
+                                   Widgets.newLabel(Messages.xlate(type + "_descrip"),
+                                                    "handwriting")).
+                right().setWidget(ValueLabel.create(_ctx.getPupsModel().getCharges(type)), "right").
+                right().setWidget(new CoinLabel(type.cost), "right").
+                right().setText((type.charges > 1) ? ("for " + type.charges) : "", "nowrap").
+                right().setWidget(buy);
             new ClickCallback<Void>(buy) {
                 protected boolean callService () {
                     if (_ctx.getCoins().get() < type.cost) {
@@ -90,6 +84,7 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
                     return true;
                 }
             };
+            buy.setVisible(_ctx.getPupsModel().getCharges(type).get() == 0 || !type.isPermanent());
         }
         add(table);
     }

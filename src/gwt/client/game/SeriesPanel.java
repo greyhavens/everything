@@ -9,12 +9,8 @@ import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.SimplePanel;
 
-import com.threerings.gwt.ui.SmartTable;
-import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -42,15 +38,15 @@ public class SeriesPanel extends DataPanel<Series>
     @Override // from DataPanel
     protected void init (final Series series)
     {
-        final SmartTable grid = new SmartTable(5, 0);
-        grid.addText(series.name, COLUMNS, "Title");
+        final FluentTable grid = new FluentTable(5, 0);
+        grid.add().setText(series.name, "Title").setColSpan(COLUMNS);
         for (int ii = 0; ii < series.things.length; ii++) {
-            final int row = ii/COLUMNS+1, col = ii%COLUMNS;
+            final FluentTable.Cell cell = grid.at(ii/COLUMNS+1, ii%COLUMNS);
             final ThingCard card = series.things[ii];
             Value<String> status = new Value<String>("");
             status.addListener(new Value.Listener<String>() {
                 public void valueChanged (String status) {
-                    grid.setText(row, col, status);
+                    cell.setText(status);
                     // this card was sold or gifted, so update our count
                     Set<Integer> ids = new HashSet<Integer>();
                     for (ThingCard tcard : series.things) {
@@ -63,9 +59,7 @@ public class SeriesPanel extends DataPanel<Series>
             });
             ClickHandler onClick = (card == null) ? null : CardPopup.onClick(
                 _ctx, new CardIdent(_ownerId, card.thingId, card.received), status);
-            grid.setWidget(row, col, new ThingCardView(_ctx, card, onClick));
-            grid.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_CENTER);
-            grid.getFlexCellFormatter().setVerticalAlignment(row, col, HasAlignment.ALIGN_MIDDLE);
+            cell.setWidget(new ThingCardView(_ctx, card, onClick)).alignCenter().alignMiddle();
         }
         add(grid);
     }

@@ -4,9 +4,8 @@
 package client;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasAlignment;
 
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
 import client.game.CoinLabel;
@@ -25,11 +24,11 @@ public class HeaderPanel extends FlowPanel
         setStyleName("header");
 
         int col = 0;
-        SmartTable bits = new SmartTable("Bits", 0, 0);
+        FluentTable bits = new FluentTable(0, 0, "Bits");
         if (ctx.getMe().isGuest()) {
-            bits.setHTML(0, col++, ctx.getFacebookAddLink("Play Everything!"), 1, "machine");
+            bits.at(0, col++).setHTML(ctx.getFacebookAddLink("Play Everything!"), "machine");
         } else {
-            bits.setText(0, col++, "Hello: " + ctx.getMe().name.toString(), 1, "machine");
+            bits.at(0, col++).setText("Hello: " + ctx.getMe().name, "machine");
         }
 
         FlowPanel extras = Widgets.newFlowPanel("machine");
@@ -51,22 +50,19 @@ public class HeaderPanel extends FlowPanel
         }
         // add our kontagent "page request" pixel to the extras
         extras.add(Widgets.newImage(kontagentHello));
-        bits.setWidget(0, col, extras);
-        bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_CENTER);
+        bits.at(0, col++).setWidget(extras).alignCenter();
 
-        bits.setWidget(0, col, new CoinLabel("You have: ", ctx.getCoins()));
-        bits.getFlexCellFormatter().setHorizontalAlignment(0, col++, HasAlignment.ALIGN_RIGHT);
+        bits.at(0, col++).setWidget(new CoinLabel("You have: ", ctx.getCoins())).alignRight();
         add(bits);
 
-        SmartTable links = new SmartTable("Links", 8, 0);
-        col = 0;
-        links.setWidget(1, col++, Args.createLink("News", Page.LANDING), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Flip Cards", Page.FLIP), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Your Collection", Page.BROWSE), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Shop", Page.SHOP), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Get Coins", Page.GET_COINS), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Friends", Page.FRIENDS), 1, "machine");
-        links.setWidget(1, col++, Args.createLink("Credits", Page.CREDITS), 1, "machine");
+        FluentTable links = new FluentTable(8, 0, "Links");
+        links.add().setWidget(Args.createLink("News", Page.LANDING), "machine").
+            right().setWidget(Args.createLink("Flip Cards", Page.FLIP), "machine").
+            right().setWidget(Args.createLink("Your Collection", Page.BROWSE), "machine").
+            right().setWidget(Args.createLink("Shop", Page.SHOP), "machine").
+            right().setWidget(Args.createLink("Get Coins", Page.GET_COINS), "machine").
+            right().setWidget(Args.createLink("Friends", Page.FRIENDS), "machine").
+            right().setWidget(Args.createLink("Credits", Page.CREDITS), "machine");
         add(links);
     }
 

@@ -4,10 +4,9 @@
 package client.util;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
 
@@ -60,10 +59,8 @@ public class ImageUtil
         } else {
             clicky = Widgets.makeActionable(Widgets.newLabel("", "Shim"), onClick, enabled);
         }
-        SmartTable wrap = new SmartTable(styleName, 0, 0);
-        wrap.setWidget(0, 0, clicky);
-        wrap.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
-        wrap.getFlexCellFormatter().setVerticalAlignment(0, 0, HasAlignment.ALIGN_MIDDLE);
+        FluentTable wrap = new FluentTable(0, 0, styleName);
+        wrap.add().setWidget(clicky).alignCenter().alignMiddle();
         return wrap;
     }
 

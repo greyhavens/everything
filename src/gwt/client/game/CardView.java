@@ -4,12 +4,10 @@
 package client.game;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.StringUtil;
 
@@ -28,20 +26,17 @@ public abstract class CardView extends FlowPanel
      */
     public static Widget create (Card card, String header, String status, Widget... buttons)
     {
-        SmartTable box = new SmartTable("cardView", 0, 0);
-        box.addStyleName("handwriting");
-        int row = 0;
+        FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
         if (header != null) {
-            box.setHTML(row++, 0, header, 3, "Header", "machine");
+            box.add().setHTML(header, "Header", "machine").setColSpan(2);
             box.addStyleName("cardViewTall");
         }
-        box.setWidget(row, 0, new CardView.Left(card), 1, "Left");
-        box.setWidget(row++, 2, new CardView.Right(card), 1, "Right");
+        box.add().setWidget(new CardView.Left(card), "Left").
+            right().setWidget(new CardView.Right(card), "Right");
         if (header != null) { // if we have a header, we always need a status
-            box.setHTML(row++, 0, StringUtil.getOr(status, ""), 3, "Status", "machine");
+            box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
-        box.setWidget(row, 0, Widgets.newRow(buttons), 3, "Buttons");
-        box.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
+        box.add().setWidget(Widgets.newRow(buttons), "Buttons").setColSpan(2).alignCenter();
         return box;
     }
 
@@ -81,9 +76,8 @@ public abstract class CardView extends FlowPanel
     {
         public Left (Card card)
         {
-            SmartTable wrap = new SmartTable("Title", 0, 0);
-            wrap.setText(0, 0, card.thing.name, 1, getTitleSize(card.thing.name));
-            wrap.getFlexCellFormatter().setHorizontalAlignment(0, 0, HasAlignment.ALIGN_CENTER);
+            FluentTable wrap = new FluentTable(0, 0, "Title");
+            wrap.at(0, 0).setText(card.thing.name, getTitleSize(card.thing.name)).alignCenter();
             add(wrap);
             add(Widgets.newLabel((card.position+1) + " of " + card.things, "Position"));
             add(ImageUtil.getImageBox(card.thing.image));
