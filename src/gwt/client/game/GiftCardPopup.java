@@ -8,9 +8,6 @@ import java.util.Collections;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
@@ -26,7 +23,6 @@ import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
-import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.Thing;
@@ -36,7 +32,6 @@ import client.ui.DataPopup;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
-import client.util.KontagentUtil;
 import client.util.Page;
 
 /**
@@ -102,7 +97,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         facebook.setWidget(0, 1, ButtonUI.newSmallButton("Pick", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 GiftCardPopup.this.hide();
-                _ctx.displayPopup(makeInvitePopup(), (Widget)event.getSource());
+                _ctx.displayPopup(new InvitePopup(_ctx, _card), (Widget)event.getSource());
             }
         }));
 
@@ -159,41 +154,6 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         row = table.addWidget(Widgets.newRow(cancel, Widgets.newShim(25, 5), give), 2);
         table.getFlexCellFormatter().setHorizontalAlignment(row, 0, HasAlignment.ALIGN_CENTER);
         return popup;
-    }
-
-    protected PopupPanel makeInvitePopup ()
-    {
-        String tracking = KontagentUtil.generateUniqueId(_ctx.getMe().userId);
-        String url = _ctx.getFacebookAddURL(Kontagent.INVITE, tracking,
-                                            Page.BROWSE, "", _card.thing.categoryId);
-        String content = _ctx.getMe().name + " wants you to have the <b>" + _card.thing.name +
-            "</b> card in The Everything Game." +
-            "<fb:req-choice url='" + url + "' label='View the card!' />";
-        FlowPanel other = XFBML.newPanel("request-form", "action", getNoteInviteURL(),
-                                         "method", "POST", "invite", "true",
-                                         "type", "Everything Game", "content", content);
-        FlowPanel wrap = new FlowPanel();
-        DOM.setStyleAttribute(wrap.getElement(), "width", "100%");
-        DOM.setStyleAttribute(wrap.getElement(), "padding", "0px 50px");
-        DOM.setStyleAttribute(wrap.getElement(), "background", "#D2D9E6");
-        String action = "Who do you want to give the " + _card.thing.name + " card to?";
-        wrap.add(XFBML.newTag("multi-friend-selector", "actiontext", action, "max", "1",
-                              "email_invite", "false", "cols", "3", "rows", "3",
-                              "showborder", "true"));
-        other.add(wrap);
-        other.add(XFBML.newHiddenInput("thing", ""+_card.thing.thingId));
-        other.add(XFBML.newHiddenInput("received", ""+_card.received.getTime()));
-        other.add(XFBML.newHiddenInput("tracking", tracking));
-        other.add(XFBML.newHiddenInput("from", History.getToken()));
-        String style = "width: 586px; min-height: 400px";
-        return Popups.newPopup("inviteCard", XFBML.serverize(other, "style", style));
-    }
-
-    protected static String getNoteInviteURL ()
-    {
-        String url = Window.Location.getHref();
-        int eidx = url.indexOf("/everything");
-        return url.substring(0, eidx + "/everything".length()) + "/invite";
     }
 
     protected Card _card;

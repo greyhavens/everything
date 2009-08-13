@@ -6,7 +6,10 @@ package client.game;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.Label;
 
 import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
@@ -16,6 +19,7 @@ import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.data.FriendStatus;
 
+import client.ui.ButtonUI;
 import client.ui.DataPanel;
 import client.ui.XFBML;
 import client.util.Args;
@@ -37,16 +41,19 @@ public class FriendsPage extends DataPanel<List<FriendStatus>>
     {
         SmartTable table = new SmartTable("handwriting", 5, 0);
         table.setWidth("100%");
+
+        Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
+        table.addWidget(Widgets.newRow(label, ButtonUI.newSmallButton("Invite", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                _ctx.displayPopup(new InvitePopup(_ctx, null), null);
+            }
+        })), COLUMNS);
+
         if (friends.size() == 0) {
-            table.setText(0, 0, "You have no friends. This makes us sad.");
-            table.setText(1, 0, "Soon we'll provide a way to invite your Facebook friends " +
-                          "to come and play!");
             return;
         }
 
-        table.setText(0, 0, "Browse your friends' collections and see when they last played:",
-                      COLUMNS, "machine");
-        int row = 1, col = 0;
+        int col = 0, row = table.addText("Your Everything friends:", COLUMNS, "machine")+1;
         for (FriendStatus friend : friends) {
             table.getFlexCellFormatter().setHorizontalAlignment(row, col, HasAlignment.ALIGN_RIGHT);
             table.setWidget(row, col++, XFBML.newProfilePic(friend.name.facebookId));
