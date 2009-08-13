@@ -151,7 +151,11 @@ public class EverythingServlet extends EveryServiceServlet
             updateFacebookFriends(player, fbinfo.right);
 
             // note that a new user added our app
-            _kontLogic.reportNewUser(player, fbuser, kontagentToken);
+            try {
+                _kontLogic.reportNewUser(player, fbuser, kontagentToken);
+            } catch (Exception e) {
+                log.warning("Failed to report new user to Kontagent", "who", player.who(), e);
+            }
 
         } else {
             // if this is not their first session, update their last session timestamp

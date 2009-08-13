@@ -100,10 +100,12 @@ public class KontagentLogic
             // oh well
         }
 
-        add(args, "ly", fbuser.getCurrentLocation().getCity());
-        add(args, "ls", fbuser.getCurrentLocation().getState());
-        add(args, "lc", fbuser.getCurrentLocation().getCountry());
-        add(args, "lp", fbuser.getCurrentLocation().getZip());
+        if (fbuser.getCurrentLocation() != null) {
+            add(args, "ly", fbuser.getCurrentLocation().getCity());
+            add(args, "ls", fbuser.getCurrentLocation().getState());
+            add(args, "lc", fbuser.getCurrentLocation().getCountry());
+            add(args, "lp", fbuser.getCurrentLocation().getZip());
+        }
 
         // TODO: friend count?
 
