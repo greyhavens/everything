@@ -114,7 +114,8 @@ public class EverythingApp extends App
         List<String> args = Lists.newArrayList();
         for (int ii = 0; ii < keyVals.length; ii += 2) {
             if (keyVals[ii+1] != null) {
-                args.add(keyVals[ii] + "=" + keyVals[ii+1]); // TODO: URLEncode?
+                keyVals[ii+1] = StringUtil.encode(String.valueOf(keyVals[ii+1]));
+                args.add(keyVals[ii] + "=" + keyVals[ii+1]);
             }
         }
         args.add("ts=" + now);
@@ -128,8 +129,7 @@ public class EverythingApp extends App
         buf.append("&an_sig=").append(StringUtil.md5hex(Joiner.on("").join(args)));
         for (int ii = 0; ii < keyVals.length; ii += 2) {
             if (keyVals[ii+1] != null) {
-                buf.append("&").append(keyVals[ii]).append("=").append(
-                    StringUtil.encode(String.valueOf(keyVals[ii+1])));
+                buf.append("&").append(keyVals[ii]).append("=").append(keyVals[ii+1]);
             }
         }
 
