@@ -245,8 +245,17 @@
   background: url(images/page_browse.png) no-repeat;
 }
 
+.browse .Header {
+  margin: 5px 0px;
+}
+
+.browse .Header .Padded {
+  padding-right: 10px;
+}
+
 .browse .Header .Title {
   font-size: 16px;
+  width: 390px;
 }
 
 .browse .Header .Links {
