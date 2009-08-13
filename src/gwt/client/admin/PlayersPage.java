@@ -48,14 +48,17 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
         final FluentTable contents = new FluentTable(5, 0);
         add(contents);
 
+        // we'll display search results and player details here
+        final FluentTable.Cell target = contents.at(1, 0);
+
         // display our recent players in the left hand column
-        contents.setWidgets(0, 0, Widgets.newLabel("Recent Players", "machine"),
-                            makePlayerList(contents, recentPlayers)).setRowSpan(2).alignTop();
+        contents.at(0, 0).setRowSpan(2).alignTop().setWidgets(
+            Widgets.newLabel("Recent Players", "machine"), makePlayerList(target, recentPlayers));
 
         // display our find player interface
         final TextBox search = Widgets.newTextBox("", 128, 20);
         DefaultTextListener.configure(search, "<find player>");
-        contents.setWidgets(0, 1, Widgets.newLabel("Find Player", "machine"), search).alignTop();
+        contents.at(0, 1).alignTop().setWidgets(Widgets.newLabel("Find Player", "machine"), search);
         new ClickCallback<List<PlayerName>>(new Button("fake"), search) {
             protected boolean callService () {
                 String query = search.getText().trim();
@@ -67,31 +70,31 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
             }
             protected boolean gotResult (List<PlayerName> players) {
                 if (players.size() == 0) {
-                    contents.setText(1, 0, "No match.");
+                    target.setText("No match.");
                 } else {
-                    contents.setWidget(1, 0, makePlayerList(contents, players));
+                    target.setWidget(makePlayerList(target, players));
                 }
                 return true;
             }
         };
     }
 
-    protected FlowPanel makePlayerList (FluentTable contents, List<PlayerName> players)
+    protected FlowPanel makePlayerList (FluentTable.Cell cell, List<PlayerName> players)
     {
         FlowPanel list = new FlowPanel();
         for (PlayerName player : players) {
-            list.add(Widgets.newActionLabel(""+player, onPlayerClicked(contents, player.userId)));
+            list.add(Widgets.newActionLabel(""+player, onPlayerClicked(cell, player.userId)));
         }
         return list;
     }
 
-    protected ClickHandler onPlayerClicked (final FluentTable contents, final int userId)
+    protected ClickHandler onPlayerClicked (final FluentTable.Cell cell, final int userId)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 _adminsvc.getPlayerDetails(userId, new PopupCallback<Player>() {
                     public void onSuccess (Player deets) {
-                        contents.setWidget(1, 0, new PlayerDetailsPanel(deets));
+                        cell.setWidget(new PlayerDetailsPanel(deets));
                     }
                 });
             }
@@ -102,7 +105,7 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
     {
         public PlayerDetailsPanel (final Player details) {
             super(2, 0, "Details");
-            addWidget(Args.createInlink(details.name), "machine").setColSpan(2);
+            add().setWidget(Args.createInlink(details.name), "machine").setColSpan(2);
             addDatum("User ID", details.name.userId);
             addDatum("Joined", DateUtil.formatDate(details.joined));
             addDatum("Last seen", DateUtil.formatDateTime(details.lastSession));
@@ -125,8 +128,7 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
                     return true;
                 }
             };
-            int row = addText("Is editor:", "right").row;
-            setWidget(row, 1, isEditor);
+            add().setText("Is editor:", "right").right().setWidget(isEditor);
 
             addGrant(details, "Grant coins:", "Coins granted!", new Granter() {
                 public void callService (int userId, int amount, ClickCallback<Void> callback) {
@@ -141,8 +143,7 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
         }
 
         protected void addDatum (String name, Object value) {
-            int row = addText(name + ":", "right").row;
-            setText(row, 1, String.valueOf(value));
+            add().setText(name + ":", "right").right().setText(value);
         }
 
         protected void addGrant (final Player details, String label, final String onGranted,
@@ -150,8 +151,7 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
         {
             final NumberTextBox amount = NumberTextBox.newIntBox(4, 4);
             final Button grant = new Button("Grant");
-            int row = addText(label, "right").row;
-            setWidget(row, 1, Widgets.newRow(amount, grant));
+            add().setText(label, "right").right().setWidget(Widgets.newRow(amount, grant));
             new ClickCallback<Void>(grant, amount) {
                 protected boolean callService () {
                     int togrant = amount.getNumber().intValue();

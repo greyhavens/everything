@@ -26,9 +26,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.Bindings;
 import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.EnumListBox;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
-import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Function;
@@ -78,18 +78,14 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         // TODO: make this a ValueLabel
         add(Widgets.newLabel(Category.getHierarchy(result.categories), "Header", "handwriting"));
 
-        SmartTable info = new SmartTable("handwriting", 5, 0);
+        FluentTable info = new FluentTable(5, 0, "handwriting");
         add(info);
-        int row = 0;
-        info.setText(row, 0, "Creator:");
-        info.setWidget(row++, 1, Args.createInlink(series.get().creator));
+        info.add().setText("Creator:").right().setWidget(Args.createInlink(series.get().creator));
 
         if (_ctx.isAdmin() || _ctx.getMe().equals(series.get().creator)) {
             final TextBox name = Widgets.newTextBox(
                 series.get().name, Category.MAX_NAME_LENGTH, 15);
             Button update = new Button("Update");
-            info.setText(row, 0, "Name:");
-            info.setWidget(row++, 1, Widgets.newRow(name, update));
             Bindings.bindEnabled(editable, name, update);
             new ClickCallback<Void>(update, name) {
                 protected boolean callService () {
@@ -103,6 +99,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                     return true;
                 }
             };
+            info.add().setText("Name:").right().setWidget(Widgets.newRow(name, update));
         }
 
         final EnumListBox<Category.State> state =
@@ -155,16 +152,14 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 chstate.setVisible(_ctx.getMe().equals(series.creator) && !series.isActive());
             }
         });
-        info.setText(row, 0, "State:");
-        info.setWidget(row++, 1, Widgets.newRow(state, chstate));
+        info.add().setText("State:").right().setWidget(Widgets.newRow(state, chstate));
 
         final TextBox message = Widgets.newTextBox("", 255, 35);
         final Button post = new Button("Add");
-        info.setText(row, 0, "Comments:");
-        info.setWidget(row++, 1, Widgets.newRow(message, post));
+        info.add().setText("Comments:").right().setWidget(Widgets.newRow(message, post));
 
         final FlowPanel comments = new FlowPanel();
-        info.setWidget(row++, 0, comments, 2);
+        info.add().setWidget(comments).setColSpan(2);
         showComments(comments, result.comments, false);
 
         new ClickCallback<CategoryComment>(post, message) {
@@ -302,36 +297,29 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 }
             });
 
-            int row = 0;
-            _ctrl = new SmartTable(5, 0);
-            _ctrl.setText(row, 0, "Name", 1, "right");
+            _ctrl = new FluentTable(5, 0);
             final TextBox name = Widgets.newTextBox(card.thing.name, Thing.MAX_NAME_LENGTH, 15);
-            _ctrl.setWidget(row, 1, name);
+            _ctrl.add().setText("Name", "right").right().setWidget(name);
 
-            _ctrl.setText(row, 2, "Rarity", 1, "right");
             final EnumListBox<Rarity> rarity = new EnumListBox<Rarity>(Rarity.class);
             rarity.setSelectedValue(card.thing.rarity);
-            _ctrl.setWidget(row++, 3, rarity);
             rarity.addChangeHandler(new ChangeHandler() {
                 public void onChange (ChangeEvent event) {
                     card.thing.rarity = rarity.getSelectedValue();
                     updateCard(card);
                 }
             });
+            _ctrl.add().setText("Rarity", "right").right().setWidget(rarity).setColSpan(3);
 
-            _ctrl.setText(row, 0, "Image", 1, "right");
             MediaUploader uploader = new MediaUploader(new MediaUploader.Listener() {
                 public void mediaUploaded (String image) {
                     card.thing.image = image;
                     updateCard(card);
                 }
             });
-            Widget tip = Widgets.newLabel("Upload an image from your computer", "tipLabel");
-            _ctrl.setWidget(row, 1, Widgets.newFlowPanel(uploader, tip));
+            String uptip = "Upload an image from your computer";
             final TextBox imgurl = Widgets.newTextBox("", -1, 25);
             DefaultTextListener.configure(imgurl, "<paste image url, press enter>");
-            tip = Widgets.newLabel("Or slurp one directly from the Internets", "tipLabel");
-            _ctrl.setWidget(row++, 2, Widgets.newFlowPanel(imgurl, tip), 2);
             new ClickCallback<String>(new Button("dummy"), imgurl) {
                 protected boolean callService () {
                     _editorsvc.slurpImage(imgurl.getText().trim(), this);
@@ -345,22 +333,24 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                     return true;
                 }
             };
+            String imgtip = "Or slurp one directly from the Internets";
+            _ctrl.add().setText("Image", "right").right().
+                setWidgets(uploader, Widgets.newLabel(uptip, "tipLabel")).right().
+                setWidgets(imgurl, Widgets.newLabel(imgtip, "tipLabel")).setColSpan(2);
 
-            _ctrl.setText(row, 0, "Descrip", 1, "right");
             final LimitedTextArea descrip = Widgets.newTextArea(
                 card.thing.descrip, -1, 2, Thing.MAX_DESCRIP_LENGTH);
-            _ctrl.setWidget(row++, 1, descrip, 3, "Wide");
+            _ctrl.add().setText("Descrip", "right").right().
+                setWidget(descrip, "Wide").setColSpan(3);
 
-            _ctrl.setText(row, 0, "Facts", 1, "right");
             final LimitedTextArea facts = Widgets.newTextArea(
                 card.thing.facts, -1, 4, Thing.MAX_FACTS_LENGTH);
-            _ctrl.setWidget(row++, 1, facts, 3, "Wide");
+            _ctrl.add().setText("Facts", "right").right().setWidget(facts, "Wide").setColSpan(3);
 
-            _ctrl.setText(row, 0, "Source", 1, "right");
             final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
             final String defsource = "<source URL, e.g. http://en.wikipedia.org/wiki/Everything>";
             DefaultTextListener.configure(source, defsource);
-            _ctrl.setWidget(row++, 1, source, 3, "Wide");
+            _ctrl.add().setText("Source", "right").right().setWidget(source, "Wide").setColSpan(3);
 
             Button cancel = new Button("Cancel", new ClickHandler() {
                 public void onClick (ClickEvent event) {
@@ -391,8 +381,8 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                     return true;
                 }
             };
-            _ctrl.getFlexCellFormatter().setHorizontalAlignment(row, 1, HasAlignment.ALIGN_RIGHT);
-            _ctrl.setWidget(row++, 1, Widgets.newRow(cancel, delete, save), 3);
+            _ctrl.add().right().setWidget(Widgets.newRow(cancel, delete, save)).
+                setColSpan(3).alignRight();
                     
             final Timer updater = new Timer() {
                 @Override public void run () {
@@ -434,7 +424,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             insert(CardView.create(card, null, null, _edit), 0);
         }
 
-        protected SmartTable _ctrl;
+        protected FluentTable _ctrl;
         protected PushButton _edit = ButtonUI.newButton("Edit", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 setEditing(true);

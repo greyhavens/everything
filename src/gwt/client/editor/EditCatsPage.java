@@ -21,8 +21,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.DefaultTextListener;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
-import com.threerings.gwt.ui.SmartTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Function;
 
@@ -38,22 +38,18 @@ import client.util.PopupCallback;
 /**
  * Provides an interface for editing categories and things.
  */
-public class EditCatsPage extends SmartTable
+public class EditCatsPage extends FluentTable
 {
     public EditCatsPage (Context ctx)
     {
-        super("editCats", 5, 0);
-        addStyleName("page");
+        super(5, 0, "page", "editCats");
 
-        setWidget(0, 0, _cats);
-        setWidget(0, 1, _subcats);
-        setWidget(0, 2, _series);
-        for (int col = 0; col < getCellCount(0); col++) {
-            getFlexCellFormatter().setVerticalAlignment(0, col, HasAlignment.ALIGN_TOP);
-        }
+        at(0, 0).setWidget(_cats).alignTop();
+        at(0, 1).setWidget(_subcats).alignTop();
+        at(0, 2).setWidget(_series).alignTop();
 
-        setHTML(1, 0, "Click the <img src='images/folder.png'> icon to move or delete an entry.",
-                3, "handwriting");
+        at(1, 0).setHTML("Click the <img src='images/folder.png'> icon to move or delete an entry.",
+                         "handwriting").setColSpan(3);
 
         _ctx = ctx;
         _cats.setChild(_subcats);

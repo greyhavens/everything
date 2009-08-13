@@ -6,12 +6,11 @@ package client.admin;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.NumberTextBox;
 import com.threerings.gwt.ui.Popups;
-import com.threerings.gwt.ui.SmartTable;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.AdminService;
@@ -37,7 +36,7 @@ public class StatsPage extends DataPanel<AdminService.StatsResult>
 
     protected void init (final AdminService.StatsResult data)
     {
-        SmartTable contents = new SmartTable(5, 0);
+        FluentTable contents = new FluentTable(5, 0);
         add(contents);
 
         // set up our thing database stats
@@ -67,8 +66,7 @@ public class StatsPage extends DataPanel<AdminService.StatsResult>
         }.setConfirmText("Are you sure you want to grant free flips to every player in the " +
                          "entire game?");
 
-        contents.setWidget(0, 0, stats);
-        contents.getFlexCellFormatter().setVerticalAlignment(1, 0, HasAlignment.ALIGN_TOP);
+        contents.at(0, 0).setWidget(stats).alignTop();
 
         // display our pending categories
         FlowPanel cats = new FlowPanel();
@@ -82,10 +80,8 @@ public class StatsPage extends DataPanel<AdminService.StatsResult>
             }
             cats.add(link);
         }
-        contents.setWidget(0, 1, Widgets.newFlowPanel(
-                               Widgets.newLabel("Pending Categories", "machine"), cats));
-        contents.getFlexCellFormatter().setVerticalAlignment(0, 1, HasAlignment.ALIGN_TOP);
-        contents.getFlexCellFormatter().setRowSpan(0, 1, 2);
+        contents.at(0, 1).setWidgets(Widgets.newLabel("Pending Categories", "machine"), cats).
+            alignTop().setRowSpan(2);
     }
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
