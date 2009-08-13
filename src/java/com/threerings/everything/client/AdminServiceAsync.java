@@ -16,9 +16,14 @@ import com.threerings.everything.data.PlayerName;
 public interface AdminServiceAsync
 {
     /**
-     * The async version of {@link AdminService#getDashboard}.
+     * The async version of {@link AdminService#getStats}.
      */
-    void getDashboard (AsyncCallback<AdminService.DashboardResult> callback);
+    void getStats (AsyncCallback<AdminService.StatsResult> callback);
+
+    /**
+     * The async version of {@link AdminService#getRecentPlayers}.
+     */
+    void getRecentPlayers (AsyncCallback<List<PlayerName>> callback);
 
     /**
      * The async version of {@link AdminService#getPlayerDetails}.

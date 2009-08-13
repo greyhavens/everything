@@ -12,5 +12,5 @@ public enum Page
     LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS,
 
     // editor and admin pages
-    EDIT_CATS, EDIT_SERIES, DASHBOARD;
+    EDIT_CATS, EDIT_SERIES, STATS, PLAYERS, NEWS;
 }

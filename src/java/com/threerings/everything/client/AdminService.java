@@ -29,26 +29,25 @@ public interface AdminService extends RemoteService
     /** An error reported by {@link #updateIsEditor} and {@link #getPlayerDetails}. */
     public static final String E_UNKNOWN_USER = "e.unknown_user";
 
-    /** Provides results for {@link #getDashboard}. */
-    public static class DashboardResult implements IsSerializable
+    /** Provides results for {@link #getStats}. */
+    public static class StatsResult implements IsSerializable
     {
         /** The status of our thing database. */
         public ThingStats stats;
 
         /** Categories that have not been activated. */
         public List<Category> pendingCategories;
-
-        /** Players that have recently joined the game. */
-        public List<PlayerName> recentPlayers;
-
-        /** The latest news or null. */
-        public News latestNews;
     }
 
     /**
-     * Returns the current admin dashboard data.
+     * Returns the current admin stats data.
      */
-    DashboardResult getDashboard () throws ServiceException;
+    StatsResult getStats () throws ServiceException;
+
+    /**
+     * Returns data on recently registered players.
+     */
+    List<PlayerName> getRecentPlayers () throws ServiceException;
 
     /**
      * Returns details for the specified player.

@@ -39,11 +39,15 @@ public class HeaderPanel extends FlowPanel
         }
         if (ctx.isAdmin()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Bling!", Page.GET_COINS, "admin"));
+            extras.add(Args.createInlink("Bling", Page.GET_COINS, "admin"));
         }
         if (ctx.isMaintainer()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Dashboard", Page.DASHBOARD));
+            extras.add(Args.createInlink("Stats", Page.STATS));
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Players", Page.PLAYERS));
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("News", Page.NEWS));
         }
         // add our kontagent "page request" pixel to the extras
         extras.add(Widgets.newImage(kontagentHello));

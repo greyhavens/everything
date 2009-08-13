@@ -32,7 +32,9 @@ import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
-import client.admin.DashboardPage;
+import client.admin.EditNewsPage;
+import client.admin.PlayersPage;
+import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditSeriesPage;
 import client.game.AddAppPanel;
@@ -258,8 +260,14 @@ public class EverythingClient
         // these are OK for admins
         if (isAdmin()) {
             switch (args.page) {
-            case DASHBOARD:
-                setContent(new DashboardPage(this, _news));
+            case STATS:
+                setContent(new StatsPage(this));
+                return;
+            case PLAYERS:
+                setContent(new PlayersPage(this));
+                return;
+            case NEWS:
+                setContent(new EditNewsPage(this, _news));
                 return;
             }
         }

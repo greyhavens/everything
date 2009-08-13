@@ -31,19 +31,22 @@ public class AdminServlet extends EveryServiceServlet
     implements AdminService
 {
     // from interface AdminService
-    public DashboardResult getDashboard () throws ServiceException
+    public StatsResult getStats () throws ServiceException
     {
         requireAdmin();
 
-        DashboardResult result = new DashboardResult();
+        StatsResult result = new StatsResult();
         result.stats = _thingRepo.loadStats();
-        result.recentPlayers = Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
         result.pendingCategories = Lists.newArrayList(_thingRepo.loadPendingCategories());
         Collections.sort(result.pendingCategories);
-        for (News news : _gameRepo.loadLatestNews()) {
-            result.latestNews = news;
-        }
         return result;
+    }
+
+    // from interface AdminService
+    public List<PlayerName> getRecentPlayers () throws ServiceException
+    {
+        requireAdmin();
+        return Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
     }
 
     // from interface AdminService
@@ -125,5 +128,5 @@ public class AdminServlet extends EveryServiceServlet
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
 
-    protected static final int MAX_RECENTS = 10;
+    protected static final int MAX_RECENTS = 25;
 }

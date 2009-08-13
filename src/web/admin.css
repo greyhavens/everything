@@ -2,20 +2,7 @@
  * $Id$
  */
 
-/** DashboardPanel styles */
-.dashboard .Header {
-  font-family: Machine Bold, Helvetia, Arial, sans-serif;
-  font-weight: bold;
-}
-
-.dashboard .Label {
-  text-align: right;
-}
-
-.dashboard .Details {
-  margin-top: 5px;
-}
-
-.dashboard .Pending {
+/** StatsPage styles */
+.stats .Pending {
   font-weight: bold;
 }
