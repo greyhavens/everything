@@ -67,8 +67,8 @@ public class EverythingClient
         _kontagentToken = WindowUtil.getQueryParams().get("t");
 
         // validate our session which will trigger the rest of our initialization
-        _everysvc.validateSession(
-            Build.version(), getTimezoneOffset(), new AsyncCallback<SessionData>() {
+        _everysvc.validateSession(Build.version(), getTimezoneOffset(), _kontagentToken,
+                                  new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 gotSessionData(data);
             }

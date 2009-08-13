@@ -51,31 +51,16 @@ public class AuthServlet extends AppServlet
         Kontagent type = Kontagent.fromCode(req.getParameter("kc"));
         String vector = ParameterUtil.getParameter(req, "vec", "organic");
         String tracking = req.getParameter("t");
-        switch (type) {
-        case NOOP: break; // nothing!
-        case INVITE:
-            reportResponse(req, Kontagent.INVITE_RESPONSE, tracking);
-            break;
-        case NOTIFICATION:
-            reportResponse(req, Kontagent.NOTIFICATION_RESPONSE, tracking);
-            break;
-        case NOTIFICATION_EMAIL:
-            reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
-            break;
-        case OTHER_RESPONSE:
-            // we need to generate a short tracking code for this user
+
+        // if this is an undirected landing, we need to generate a short tracking code
+        if (type == Kontagent.OTHER_RESPONSE) {
+            if (tracking != null) {
+                log.warning("Got a tracking code but no Kontagent message type?",
+                            "req", req.getRequestURI());
+                // whatever, overwrite it with our short code
+            }
             tracking = Integer.toHexString(_rando.nextInt());
             tracking = StringUtil.fill('0', 8-tracking.length()) + tracking;
-            reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
-            break;
-        case APP_ADDED:
-            // this is not a landing, the player has added the app after browsing something as a
-            // guest; we pass their token back through to the client and it will supply it when it
-            // refreshes its session
-            break;
-        default:
-            log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
-            break;
         }
 
         // if we're the release candidate, use /candidate/everything/ otherwise use the versionless
@@ -95,7 +80,34 @@ public class AuthServlet extends AppServlet
         }
 
         // otherwise pass the buck to the app servlet, it may have to get jiggy
-        doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, indexPath);
+        if (doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, indexPath)) {
+            // if our authentication process actually directed the user to the app, we can emit our
+            // event to Kontagent, otherwise we're in the middle of swizzling them and need to hold
+            // off until the swizzling process is complete
+            switch (type) {
+            case NOOP: break; // nothing!
+            case INVITE:
+                reportResponse(req, Kontagent.INVITE_RESPONSE, tracking);
+                break;
+            case NOTIFICATION:
+                reportResponse(req, Kontagent.NOTIFICATION_RESPONSE, tracking);
+                break;
+            case NOTIFICATION_EMAIL:
+                reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
+                break;
+            case OTHER_RESPONSE:
+                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
+                break;
+            case APP_ADDED:
+                // this is not a landing, the player has added the app after browsing something as
+                // a guest; we pass their token back through to the client and it will supply it
+                // when it refreshes its session
+                break;
+            default:
+                log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
+                break;
+            }
+        }
     }
 
     protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
