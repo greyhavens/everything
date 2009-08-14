@@ -4,6 +4,7 @@
 package client;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
@@ -49,7 +50,10 @@ public class HeaderPanel extends FlowPanel
             extras.add(Args.createInlink("News", Page.NEWS));
         }
         // add our kontagent "page request" pixel to the extras
-        extras.add(Widgets.newImage(kontagentHello));
+        Image tracker = Widgets.newImage(kontagentHello);
+        tracker.setWidth("1px");
+        tracker.setHeight("1px");
+        extras.add(tracker);
         bits.at(0, col++).setWidget(extras).alignCenter();
 
         bits.at(0, col++).setWidget(new CoinLabel("You have: ", ctx.getCoins())).alignRight();
