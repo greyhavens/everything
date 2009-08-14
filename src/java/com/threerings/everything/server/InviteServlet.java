@@ -127,7 +127,8 @@ public class InviteServlet extends AppServlet
             _gameRepo.escrowCard(card, targetFBId);
 
             // send them a Facebook notification as well as an invite
-            _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId), thing, null);
+            _playerLogic.sendGiftNotification(
+                player, Long.parseLong(targetFBId), thing, null, false, null);
         }
     }
 

@@ -222,23 +222,28 @@ public class GameLogic
         _playerRepo.recordFeedItem(
             owner.userId, FeedItem.Type.GIFTED, targetId, thing.name, message);
 
-        // send a Facebook notification to the recipient
-        _playerLogic.sendGiftNotification(owner, target.facebookId, thing, message);
-
         // check whether the recipient just completed a series
-        checkCompletedSeries(target, thing);
+        boolean completed = checkCompletedSeries(target, thing);
+
+        // send a Facebook notification to the recipient
+        _playerLogic.sendGiftNotification(owner, target.facebookId, thing, _thingRepo.loadCategory(
+                                              thing.categoryId), completed, message);
     }
 
     /**
      * Records and reports that the specified player completed the specified series if they haven't
      * already completed the series.
+     *
+     * @return true if we reported the series completion, false if not.
      */
-    public void maybeReportCompleted (PlayerRecord user, Category series, String how)
+    public boolean maybeReportCompleted (PlayerRecord user, Category series, String how)
     {
         if (_gameRepo.noteCompletedSeries(user.userId, series.categoryId)) {
             log.info("Series completed!", "who", user.who(), "series", series.name, "how", how);
             _playerRepo.recordFeedItem(user.userId, FeedItem.Type.COMPLETED, 0, series.name, null);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -441,7 +446,7 @@ public class GameLogic
      * Checks whether the player has completed the specified series after receiving the specified
      * thing and reports it if appropriate.
      */
-    protected void checkCompletedSeries (PlayerRecord user, Thing thing)
+    protected boolean checkCompletedSeries (PlayerRecord user, Thing thing)
     {
         Set<Integer> things = Sets.newHashSet(
             Iterables.transform(_thingRepo.loadThings(thing.categoryId), EFuncs.THING_ID));
@@ -449,8 +454,9 @@ public class GameLogic
             Iterables.transform(_gameRepo.loadCards(user.userId, things), EFuncs.CARD_THING_ID));
         holdings.add(thing.thingId);
         if (things.size() - holdings.size() == 0) {
-            maybeReportCompleted(user, _thingRepo.loadCategory(thing.categoryId), "gift");
+            return maybeReportCompleted(user, _thingRepo.loadCategory(thing.categoryId), "gift");
         }
+        return false;
     }
 
     /**

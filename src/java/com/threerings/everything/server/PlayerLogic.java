@@ -15,6 +15,7 @@ import com.google.inject.Singleton;
 
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
+import com.samskivert.servlet.util.HTMLUtil;
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.StringUtil;
@@ -23,6 +24,7 @@ import com.samskivert.util.Tuple;
 import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.Kontagent;
+import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -104,16 +106,29 @@ public class PlayerLogic
     /**
      * Sends a card gifting notification to the specified Facebook player.
      */
-    public void sendGiftNotification (PlayerRecord sender, long toFBId, Thing thing, String message)
+    public void sendGiftNotification (PlayerRecord sender, long toFBId, Thing thing,
+                                      Category series, boolean completed, String message)
     {
         String tracking = _kontLogic.generateUniqueId(sender.userId);
-        String feedmsg = String.format( // TODO: localization?
-            "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
-            _app.getHelloURL(Kontagent.NOTIFICATION, tracking, "BROWSE", "", thing.categoryId),
-            thing.name, _app.getHelloURL(Kontagent.NOTIFICATION, tracking));
+        String browseURL = _app.getHelloURL(
+            Kontagent.NOTIFICATION, tracking, "BROWSE", "", thing.categoryId);
+        String everyURL = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
+
+        // TODO: localization?
+        String feedmsg;
+        if (completed) {
+            feedmsg = String.format(
+                "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a> and " +
+                "completed your <a href=\"%s\">%s</a> series!",
+                browseURL, thing.name, everyURL, browseURL, series.name);
+        } else {
+            feedmsg = String.format( // TODO: localization?
+                "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
+                browseURL, thing.name, everyURL);
+        }
+
         if (!StringUtil.isBlank(message)) {
-            // TODO: escape HTML
-            feedmsg += " They said '" + message + "'.";
+            feedmsg += " They said '" + HTMLUtil.entify(message) + "'.";
         }
         sendFacebookNotification(sender, toFBId, feedmsg, tracking);
     }
