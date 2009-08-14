@@ -28,12 +28,10 @@ public class InvitePopup extends PopupPanel
         addStyleName("inviteCard");
 
         String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
-        String url, title, button, action;
+        String title, button, action;
         int maxInvites;
 
         if (card != null) {
-            url = ctx.getFacebookAddURL(
-                Kontagent.INVITE, tracking, Page.BROWSE, "", card.thing.categoryId);
             title = ctx.getMe().name + " wants you to have the <b>" + card.thing.name +
                 "</b> card in The Everything Game.";
             button = "View the card!";
@@ -41,13 +39,13 @@ public class InvitePopup extends PopupPanel
             maxInvites = 1;
 
         } else {
-            url = ctx.getFacebookAddURL(Kontagent.INVITE, tracking, Page.LANDING);
             title = ctx.getMe().name + " wants you to play The Everything Game with them.";
             button = "Play Everything";
             action = "Who do you want to invite to play The Everything Game?";
             maxInvites = 4;
         }
 
+        String url = ctx.getFacebookAddURL(Kontagent.INVITE, tracking, Page.LANDING);
         String content = title + "<fb:req-choice url='" + url + "' label='" + button + "' />";
         FlowPanel contents = XFBML.newPanel("request-form", "action", getNoteInviteURL(),
                                             "method", "POST", "invite", "true",
