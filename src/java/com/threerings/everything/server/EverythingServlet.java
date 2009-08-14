@@ -137,8 +137,8 @@ public class EverythingServlet extends EveryServiceServlet
             }
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
-            log.info("Hello newbie!", "who", player.who(), "surname", player.surname, "tz", tz,
-                     "tracking", kontagentToken);
+            log.info("Hello newbie!", "who", player.who(), "surname", player.surname,
+                     "tz", tz, "fbid", player.facebookId, "tracking", kontagentToken);
 
             // transfer any escrowed cards into their collection
             _gameRepo.unescrowCards(fbinfo.left, player);
