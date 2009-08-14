@@ -73,7 +73,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             grid.at(row, col).setText(text, "nowrap");
             grid.at(row, col+1).setWidget(ButtonUI.newSmallButton("Give", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    _ctx.displayPopup(makeGiftPopup(info), (Widget)event.getSource());
+                    _ctx.displayPopup(makeGiftPopup(info), GiftCardPopup.this);
                 }
             }));
             col += 2;
@@ -94,8 +94,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         facebook.at(0, 0).setText("More Everything players = more fun!");
         facebook.at(0, 1).setWidget(ButtonUI.newSmallButton("Pick", new ClickHandler() {
             public void onClick (ClickEvent event) {
+                _ctx.displayPopup(new InvitePopup(_ctx, _card), GiftCardPopup.this);
                 GiftCardPopup.this.hide();
-                _ctx.displayPopup(new InvitePopup(_ctx, _card), (Widget)event.getSource());
             }
         }));
 
