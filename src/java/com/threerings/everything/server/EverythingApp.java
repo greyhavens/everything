@@ -179,6 +179,7 @@ public class EverythingApp extends App
         List<Binding> binds = Lists.newArrayList();
         binds.add(new Binding.Servlet("/auth", AuthServlet.class));
         binds.add(new Binding.Servlet("/invite", InviteServlet.class));
+        binds.add(new Binding.Servlet("/showinvite", ShowInviteServlet.class));
         binds.add(new Binding.Servlet("/upload", MediaUploadServlet.class));
         binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));

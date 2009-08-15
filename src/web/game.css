@@ -401,14 +401,19 @@
   font-weight: bold;
 }
 
-.giftCard .Buttons .gwt-PushButton, .inviteCard .Buttons .gwt-PushButton {
+.giftCard .Buttons .gwt-PushButton {
   margin: 0px 0px 0px auto;
 }
 
 .inviteCard {
-  min-width: 486px;
-  min-height: 413px;
   z-index: 5;
+  border: 1px solid;
+}
+
+.inviteCard iframe {
+  min-width: 606px;
+  min-height: 475px;
+  border: none;
 }
 
 /** ShopPage styles */

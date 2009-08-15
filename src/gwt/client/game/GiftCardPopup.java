@@ -48,11 +48,16 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         };
     }
 
-    public GiftCardPopup (Context ctx, Card card, Runnable onGifted)
+    public GiftCardPopup (Context ctx, Card card, final Runnable onGifted)
     {
         super("giftCard", ctx);
         _card = card;
-        _onGifted = onGifted;
+        _onGifted = new Runnable() {
+            public void run () {
+                hide();
+                onGifted.run();
+            }
+        };
         _gamesvc.getGiftCardInfo(card.thing.thingId, card.received.getTime(), createCallback());
     }
 
@@ -94,8 +99,12 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         facebook.at(0, 0).setText("More Everything players = more fun!");
         facebook.at(0, 1).setWidget(ButtonUI.newSmallButton("Pick", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                _ctx.displayPopup(new InvitePopup(_ctx, _card), GiftCardPopup.this);
-                GiftCardPopup.this.hide();
+                _ctx.displayPopup(new InvitePopup(_ctx, _card, new Runnable() {
+                    public void run () {
+                        Popups.info("Card sent! Thanks for sharing the Everything love.");
+                        _onGifted.run();
+                    }
+                }), GiftCardPopup.this);
             }
         }));
 
@@ -146,7 +155,6 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                     Popups.info("Card gifted. Your friend will be so happy!");
                 }
                 hider.onClick(null); // hide ourselves
-                GiftCardPopup.this.hide(); // then hide our parent
                 _onGifted.run();
                 if (post.getValue()) {
                     ThingDialog.showGifted(_ctx, _card, info.friend);

@@ -4,6 +4,8 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +49,7 @@ public class InviteServlet extends AppServlet
         }
         String from = ParameterUtil.getParameter(req, "from", "LANDING");
         log.info("Processing skip", "from", from);
-        writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
+        writeClose(rsp, false);
     }
 
     @Override // from HttpServlet
@@ -67,12 +69,13 @@ public class InviteServlet extends AppServlet
             targetFBIds = ParameterUtil.getParameters(req, "ids[]");
             if (targetFBIds.size() == 0) { // they chose to skip
                 log.info("No targets, skipping", "who", player.who(), "from", from);
-                writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
+                writeClose(rsp, true);
                 return;
             }
 
-            if (ParameterUtil.isSet(req, "thing")) {
-                processThingGift(req, player, targetFBIds.iterator().next());
+            int thingId = Integer.parseInt(ParameterUtil.getParameter(req, "thing", "0"));
+            if (thingId > 0) {
+                processThingGift(req, player, targetFBIds.iterator().next(), thingId);
             }
 
             // report to kontagent that we sent one or more invites
@@ -91,19 +94,17 @@ public class InviteServlet extends AppServlet
                         "agent", req.getHeader("User-agent"), "targetFBIds", targetFBIds);
         }
 
-        // one way or the other, send them back from whence they came
-        writeFrameRedirect(rsp, _app.getHelloURL(Kontagent.NOOP, "", from));
+        writeClose(rsp, true);
     }
 
-    protected void processThingGift (HttpServletRequest req, PlayerRecord player, String targetFBId)
+    protected void processThingGift (HttpServletRequest req, PlayerRecord player, String targetFBId,
+                                     int thingId)
         throws Exception
     {
-        String thingId = requireParameter(req, "thing");
         String received = requireParameter(req, "received");
 
         // make sure they own the thing in question
-        CardRecord card = _gameRepo.loadCard(
-            player.userId, Integer.parseInt(thingId), Long.parseLong(received));
+        CardRecord card = _gameRepo.loadCard(player.userId, thingId, Long.parseLong(received));
         if (card == null) {
             throw new Exception("missing card");
         }
@@ -140,6 +141,17 @@ public class InviteServlet extends AppServlet
             throw new Exception("missing param '" + name + "'");
         }
         return value;
+    }
+
+    protected static void writeClose (HttpServletResponse rsp, boolean completed)
+        throws IOException
+    {
+        // we're in an iframe so we have to send down some JavaScript that jimmies
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(rsp.getOutputStream()));
+        out.println("<html><head><script language=\"JavaScript\">");
+        out.println("window.parent.closePopup(" + completed + ");");
+        out.println("</script></head></html>");
+        out.close();
     }
 
     @Inject protected EverythingApp _app;

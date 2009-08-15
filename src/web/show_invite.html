@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head><title>Everything</title></head>
+<body bgcolor="#D2D9E6">
+  <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+          type="text/javascript"></script>
+  <fb:serverfbml style="background: #D2D9E6"><script type="text/fbml"><fb:fbml>
+  <fb:request-form action="ACTION_URL" method="POST" invite="true" type="Everything Game" 
+                   content="TITLE&lt;fb:req-choice url='URL' label='BUTTON'/&gt;">
+    <div style="width: 100%; height: 100%; padding: 0px 50px; background: #D2D9E6">
+      <fb:multi-friend-selector actiontext="ACTION" max="MAX_INVITES" email_invite="false"
+                                cols="3" rows="3" showborder="true"/>
+      <input type="hidden" name="thing" value="THING_ID"/>
+      <input type="hidden" name="received" value="RECEIVED"/>
+      <input type="hidden" name="tracking" value="TRACKING"/>
+    </div>
+  </fb:request-form>
+  </fb:fbml></script></fb:serverfbml>
+  <script type="text/javascript">
+     FB_RequireFeatures(["XFBML"], function () {
+        FB.init("eed6c8a8d9be1718c1a2922caa344ead", "xd_receiver.html");
+     });
+  </script>
+</body>
+</html>

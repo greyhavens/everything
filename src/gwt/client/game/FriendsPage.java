@@ -45,7 +45,7 @@ public class FriendsPage extends DataPanel<List<FriendStatus>>
         Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
         PushButton invite = ButtonUI.newSmallButton("Invite", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                _ctx.displayPopup(new InvitePopup(_ctx, null), null);
+                _ctx.displayPopup(new InvitePopup(_ctx, null, null), null);
             }
         });
         table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS);
