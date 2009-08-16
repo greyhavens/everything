@@ -313,6 +313,7 @@ public class GameLogic
             for (CardRecord card : _gameRepo.loadCards(player.userId)) {
                 excludeIds.add(card.thingId);
             }
+            log.info("Chose all new cards", "who", player.who(), "excluding", excludeIds);
         }
 
         // if we're not using a powerup, pick a bonus card for the grid
