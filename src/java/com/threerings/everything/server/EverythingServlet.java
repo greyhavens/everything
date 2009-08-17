@@ -140,6 +140,13 @@ public class EverythingServlet extends EveryServiceServlet
             log.info("Hello newbie!", "who", player.who(), "surname", player.surname,
                      "tz", tz, "fbid", player.facebookId, "tracking", kontagentToken);
 
+            try { // tell Samsara about the user's real name
+                _userLogic.updateUser(
+                    user.userId, null, null, player.name + " " + player.surname);
+            } catch (Exception e) {
+                log.warning("Failed to report real name to Samsara", "who", player.who(), e);
+            }
+
             // transfer any escrowed cards into their collection
             _gameRepo.unescrowCards(fbinfo.left, player);
 
@@ -164,10 +171,6 @@ public class EverythingServlet extends EveryServiceServlet
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
             if (fbinfo != null) {
                 updateFacebookFriends(player, fbinfo.right);
-                // TEMP: if they have no facebook id stored, update it now
-                if (player.facebookId == 0L) {
-                    _playerRepo.updateFacebookId(player.userId, Long.parseLong(fbinfo.left));
-                }
             }
         }
 
