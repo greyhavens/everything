@@ -47,8 +47,6 @@ public class InviteServlet extends AppServlet
             log.warning("Got a GET request on invite servlet with ids",
                         "ids", req.getParameter("ids[]"));
         }
-        String from = ParameterUtil.getParameter(req, "from", "LANDING");
-        log.info("Processing skip", "from", from);
         writeClose(rsp, false);
     }
 
@@ -58,7 +56,6 @@ public class InviteServlet extends AppServlet
     {
         OOOUser user = getUser(req);
         PlayerRecord player = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
-        String from = ParameterUtil.getParameter(req, "from", "LANDING");
         Set<String> targetFBIds = null;
 
         try {
@@ -68,7 +65,7 @@ public class InviteServlet extends AppServlet
 
             targetFBIds = ParameterUtil.getParameters(req, "ids[]");
             if (targetFBIds.size() == 0) { // they chose to skip
-                log.info("No targets, skipping", "who", player.who(), "from", from);
+                log.info("No targets, skipping", "who", player.who());
                 writeClose(rsp, true);
                 return;
             }
@@ -82,7 +79,7 @@ public class InviteServlet extends AppServlet
             String tracking = req.getParameter("tracking");
             if (StringUtil.isBlank(tracking)) {
                 log.warning("Missing Kontagent tracking id for invitation.", "who", player.who(),
-                            "from", from, "target", targetFBIds);
+                            "target", targetFBIds);
             } else {
                 _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId,
                                         "r", Joiner.on(",").join(targetFBIds), "u", tracking);
