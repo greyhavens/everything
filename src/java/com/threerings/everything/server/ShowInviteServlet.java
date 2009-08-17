@@ -67,6 +67,7 @@ public class ShowInviteServlet extends AppServlet
         String tracking = _kontLogic.generateUniqueId(player.userId);
         subs.put("URL", _app.getHelloURL(Kontagent.INVITE, tracking, "LANDING"));
         subs.put("TRACKING", tracking);
+        subs.put("FACEBOOK_KEY", _app.getFacebookKey());
 
         // if they specified a card, load that up
         CardRecord card = null;
