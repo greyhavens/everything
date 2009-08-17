@@ -56,7 +56,7 @@ public class KontagentLogic
                     BufferedReader ins = new BufferedReader(
                         new InputStreamReader(new URL(url).openStream()));
                     String rsp = ins.readLine();
-                    if (!"OK".equals(rsp)) {
+                    if (!"OK".equals(rsp) && !"1".equals(rsp)) {
                         log.warning("Kontagent rejected action", "rsp", rsp);
                     } else {
                         log.info("Kontagent action accepted", "url", url);

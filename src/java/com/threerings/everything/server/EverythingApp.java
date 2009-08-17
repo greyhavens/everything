@@ -122,8 +122,9 @@ public class EverythingApp extends App
         args.add(_config.getValue("kontagent_secret", "secret"));
 
         // now construct the URL
-        StringBuffer buf = new StringBuffer(KONTAGENT_API_URL);
-        buf.append(_config.getValue("kontagent_key", "key")).append("/");
+        StringBuffer buf = new StringBuffer();
+        buf.append("http://").append(_config.getValue("kontagent_server", "localhost"));
+        buf.append("/api/v1/").append(_config.getValue("kontagent_key", "key")).append("/");
         buf.append(type.code).append("/?ts=").append(now);
         buf.append("&an_sig=").append(StringUtil.md5hex(Joiner.on("").join(args)));
         for (int ii = 0; ii < keyVals.length; ii += 2) {
