@@ -40,6 +40,7 @@ import client.game.GetCoinsPage;
 import client.game.GridPage;
 import client.game.LandingPage;
 import client.game.ShopPage;
+import client.game.TermsPage;
 import client.ui.XFBML;
 import client.util.Args;
 import client.util.CategoriesModel;
@@ -203,6 +204,9 @@ public class EverythingClient
             return;
         case CREDITS:
             setContent(new CreditsPage(this));
+            return;
+        case TOS:
+            setContent(new TermsPage());
             return;
         case BROWSE:
             if (args.get(0, getMe().userId) != 0) {

@@ -9,7 +9,7 @@ package client.util;
 public enum Page
 {
     // all-access pages
-    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS,
+    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS, TOS,
 
     // editor and admin pages
     EDIT_CATS, EDIT_SERIES, STATS, PLAYERS, NEWS;
