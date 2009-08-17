@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
@@ -45,7 +46,7 @@ public class FriendsPage extends DataPanel<List<FriendStatus>>
         Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
         PushButton invite = ButtonUI.newSmallButton("Invite", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                _ctx.displayPopup(new InvitePopup(_ctx, null, null), null);
+                _ctx.displayPopup(new InvitePopup(_ctx, null, null), (Widget)event.getSource());
             }
         });
         table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS);
