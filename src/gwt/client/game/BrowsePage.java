@@ -135,35 +135,32 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
         // first render the categories and grab the target subcategory
         Map<String, List<SeriesCard>> subcats = null;
-        int catrow = -1, row = 0;
+        List<SeriesCard> series = null;
+        int catrow = -1, subcatrow = -1, row = 0;
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : _coll.series.entrySet()) {
             final String catname = cat.getKey();
-            if (catname.equals(selcat)) {
-                catrow = row;
-                subcats = cat.getValue();
-                _taxon.at(row++, 0).setText(catname, "Selected");
-            } else {
-                _taxon.setWidget(row++, 0, Widgets.newActionLabel(catname, new ClickHandler() {
+
+            // if it's not the selected category, render the subcategories in compact form
+            if (!catname.equals(selcat)) {
+                Widget catlink = Widgets.newActionLabel(catname, new ClickHandler() {
                     public void onClick (ClickEvent event) {
                         showTaxonomy(catname, null, null);
                     }
-                }));
-            }
-        }
-
-        List<SeriesCard> series = null;
-        int subcatrow = -1;
-        if (selsubcat != null) {
-            // render our connecting lines between category and subcategory
-            for (int lrow = 0, last = Math.max(catrow, subcats.size()-1); lrow <= last; lrow++) {
-                _taxon.setWidget(lrow, 1, createLine(lrow > 0, lrow < last,
-                                                     lrow == catrow, lrow < subcats.size()));
+                });
+                _taxon.at(row++, 0).setWidget(catlink).
+                    right().setWidget(createLine(false, false, true, true)).
+                    right().setWidget(createCatSum(cat.getKey(), cat.getValue())).setColSpan(3);
+                continue;
             }
 
-            // now render the subcategories and grab the target series
-            row = 0;
+            // if it is the selected category, render the subcats in expanded form
+            _taxon.at(row, 0).setText(catname, "Selected");
+            catrow = row;
+            subcats = cat.getValue();
             for (Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
                 final String subcatname = subcat.getKey();
+                _taxon.setWidget(row, 1, createLine(row > catrow, row < catrow+subcats.size()-1,
+                                                    row == catrow, true));
                 if (subcatname.equals(selsubcat)) {
                     subcatrow = row;
                     series = subcat.getValue();
@@ -177,37 +174,19 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 }
                 row++;
             }
-
-        } else {
-            row = 0;
-            for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : _coll.series.entrySet()) {
-                _taxon.setWidget(row, 1, createLine(false, false, true, true));
-                final String catname = cat.getKey();
-                FlowPanel scatrow = new FlowPanel();
-                for (final Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
-                    if (scatrow.getWidgetCount() > 0) {
-                        scatrow.add(Widgets.newHTML("&nbsp;&nbsp; ", "inline"));
-                    }
-                    scatrow.add(Widgets.newActionLabel(subcat.getKey(), "inline", new ClickHandler() {
-                        public void onClick (ClickEvent event) {
-                            showTaxonomy(catname, subcat.getKey(), null);
-                        }
-                    }));
-                }
-                _taxon.setWidget(row++, 2, scatrow);
-            }
         }
 
         SeriesPanel panel = null;
         if (series != null) {
             // render our connecting lines between subcategory and series
-            for (int lrow = 0, last = Math.max(subcatrow, series.size()-1); lrow <= last; lrow++) {
-                _taxon.setWidget(lrow, 3, createLine(lrow > 0, lrow < last,
-                                                     lrow == subcatrow, lrow < series.size()));
+            for (int lrow = catrow, last = Math.max(subcatrow, catrow+series.size()-1);
+                 lrow <= last; lrow++) {
+                _taxon.setWidget(lrow, 3, createLine(lrow > catrow, lrow < last, lrow == subcatrow,
+                                                     lrow < catrow+series.size()));
             }
 
             // finally render the series and grab the target series
-            row = 0;
+            row = catrow;
             for (final SeriesCard card : series) {
                 Widget name;
                 if (card.name.equals(selseries) ||
@@ -251,6 +230,22 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             insert(_spanel = new RevealPanel(panel), getWidgetIndex(_taxon));
             _spanel.reveal();
         }
+    }
+
+    protected FlowPanel createCatSum (final String catname, Map<String, List<SeriesCard>> subcats)
+    {
+        FlowPanel links = new FlowPanel();
+        for (final Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
+            if (links.getWidgetCount() > 0) {
+                links.add(Widgets.newHTML("&nbsp;&nbsp; ", "inline"));
+            }
+            links.add(Widgets.newActionLabel(subcat.getKey(), "inline", new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    showTaxonomy(catname, subcat.getKey(), null);
+                }
+            }));
+        }
+        return links;
     }
 
     protected Image createLine (boolean up, boolean down, boolean left, boolean right)
