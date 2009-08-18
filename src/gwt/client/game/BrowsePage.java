@@ -28,6 +28,7 @@ import com.threerings.gwt.util.Value;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.PlayerCollection;
+import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 
 import client.ui.DataPanel;
@@ -36,6 +37,7 @@ import client.ui.lines.LineImages;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
+import client.util.PopupCallback;
 
 /**
  * Displays a player's collection.
@@ -108,7 +110,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         _coll = coll;
 
         // determine which series is selected, if any
-        String catname = null, subcatname = null, seriesname = null;
+        String catname = null, subcatname = null;
         if (_seriesId > 0) {
             for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
                 for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
@@ -116,7 +118,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         if (_seriesId == card.categoryId) {
                             catname = cat.getKey();
                             subcatname = subcat.getKey();
-                            seriesname = card.name;
                             break;
                         }
                     }
@@ -125,10 +126,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
 
         // now generate our fancy display
-        showTaxonomy(catname, subcatname, seriesname);
+        showTaxonomy(catname, subcatname);
     }
 
-    protected void showTaxonomy (final String selcat, final String selsubcat, String selseries)
+    protected void showTaxonomy (final String selcat, final String selsubcat)
     {
         if (_taxon != null) {
             remove(_taxon);
@@ -146,7 +147,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             if (!catname.equals(selcat)) {
                 Widget catlink = Widgets.newActionLabel(catname, new ClickHandler() {
                     public void onClick (ClickEvent event) {
-                        showTaxonomy(catname, null, null);
+                        showTaxonomy(catname, null);
                     }
                 });
                 _taxon.at(row++, 0).setWidget(catlink).
@@ -170,7 +171,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 } else {
                     _taxon.setWidget(row, 2, Widgets.newActionLabel(subcatname, new ClickHandler() {
                         public void onClick (ClickEvent event) {
-                            showTaxonomy(selcat, subcatname, null);
+                            showTaxonomy(selcat, subcatname);
                         }
                     }));
                 }
@@ -184,8 +185,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
         }
 
-        SeriesPanel panel = null;
-        int animTime = 0;
         if (series != null) {
             // render our connecting lines between subcategory and series
             for (int lrow = catrow, last = Math.max(subcatrow, catrow+series.size()-1);
@@ -198,9 +197,9 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             row = catrow;
             for (final SeriesCard card : series) {
                 Widget name;
-                if (card.name.equals(selseries) ||
-                    (selseries == null && card.categoryId == _seriesId)) {
+                if (card.categoryId == _seriesId) {
                     name = Widgets.newInlineLabel(card.name, "Selected");
+                    displaySeries(card, owned);
                 } else {
                     name = Args.createInlink(
                         card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
@@ -224,31 +223,40 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
                 _taxon.at(row++, 4).setWidget(
                     Widgets.newFlowPanel(name, Widgets.newInlineLabel(" "), olabel));
-
-                if (card.name.equals(selseries)) {
-                    panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
-                    int rows = card.things / SeriesPanel.COLUMNS +
-                        ((card.things % SeriesPanel.COLUMNS == 0) ? 0 : 1);
-                    animTime = (26 + rows * 167);
-                }
             }
         }
 
-        int insidx = getWidgetIndex(_taxon);
-        if (_spanel != null && (panel != null || _seriesId == 0)) {
-            insidx = getWidgetIndex(_spanel);
-            final SimplePanel opanel = _spanel;
-            FX.unreveal(_spanel).onComplete(new Command() {
-                public void execute () {
-                    remove(opanel);
+        if (_seriesId == 0 && _clearSeries != null) {
+            _clearSeries.execute();
+            _clearSeries = null;
+        }
+    }
+
+    protected void displaySeries (SeriesCard card, final Value<Integer> owned)
+    {
+        int rows = card.things / SeriesPanel.COLUMNS +
+            ((card.things % SeriesPanel.COLUMNS == 0) ? 0 : 1);
+        final int animTime = (26 + rows * 167);
+        _gamesvc.getSeries(_coll.owner.userId, card.categoryId, new PopupCallback<Series>() {
+            public void onSuccess (Series series) {
+                final SeriesPanel panel = new SeriesPanel(_ctx, _coll.owner.userId, series, owned);
+                if (_clearSeries != null) {
+                    _clearSeries.execute();
                 }
-            }).run(_animTime);
-            _spanel = null;
-        }
-        if (panel != null) {
-            insert(_spanel = Widgets.newSimplePanel(null, panel), insidx);
-            FX.reveal(_spanel).fromBottom().run(_animTime = animTime);
-        }
+                final SimplePanel wrapper = Widgets.newSimplePanel(null, panel);
+                insert(wrapper, 1);
+                FX.reveal(wrapper).fromBottom().run(animTime);
+                _clearSeries = new Command() {
+                    public void execute () {
+                        FX.unreveal(wrapper).onComplete(new Command() {
+                            public void execute () {
+                                remove(wrapper);
+                            }
+                        }).run(animTime);
+                    }
+                };
+            }
+        });
     }
 
     protected FlowPanel createCatSum (final String catname, Map<String, List<SeriesCard>> subcats)
@@ -260,7 +268,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
             links.add(Widgets.newActionLabel(subcat.getKey(), "inline", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    showTaxonomy(catname, subcat.getKey(), null);
+                    showTaxonomy(catname, subcat.getKey());
                 }
             }));
         }
@@ -287,8 +295,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected FluentTable _header, _taxon;
     protected Value<Integer> _cards, _series, _completed;
 
-    protected SimplePanel _spanel;
-    protected int _animTime;
+    protected Command _clearSeries;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 
