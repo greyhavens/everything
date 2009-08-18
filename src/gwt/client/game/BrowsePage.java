@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
+import com.threerings.gwt.ui.RevealPanel;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
@@ -123,10 +124,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected void showTaxonomy (final String selcat, final String selsubcat, String selseries)
     {
-        if (_spanel != null) {
-            remove(_spanel);
-            _spanel = null;
-        }
         if (_taxon != null) {
             remove(_taxon);
         }
@@ -210,14 +207,18 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
 
         if (panel != null) {
-            insert(_spanel = panel, getWidgetIndex(_taxon));
+            if (_spanel != null) {
+                _spanel.hideAndRemove();
+            }
+            insert(_spanel = new RevealPanel(panel), getWidgetIndex(_taxon));
+            _spanel.reveal();
         }
     }
 
     protected int _seriesId;
     protected PlayerCollection _coll;
     protected FluentTable _header, _taxon;
-    protected Widget _spanel;
+    protected RevealPanel _spanel;
     protected Value<Integer> _cards, _series, _completed;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
