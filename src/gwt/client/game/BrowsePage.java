@@ -15,10 +15,11 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
-import com.threerings.gwt.ui.RevealPanel;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Console;
@@ -175,9 +176,16 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 }
                 row++;
             }
+
+            // if we have fewer subcats than our selected subcat has series, we need to skip some
+            // rows to make room for the subcats
+            if (series != null) {
+                row += Math.max(0, series.size() - subcats.size());
+            }
         }
 
         SeriesPanel panel = null;
+        int animTime = 0;
         if (series != null) {
             // render our connecting lines between subcategory and series
             for (int lrow = catrow, last = Math.max(subcatrow, catrow+series.size()-1);
@@ -219,26 +227,27 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
                 if (card.name.equals(selseries)) {
                     panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
+                    int rows = card.things / SeriesPanel.COLUMNS +
+                        ((card.things % SeriesPanel.COLUMNS == 0) ? 0 : 1);
+                    animTime = (26 + rows * 167);
                 }
             }
         }
 
-        Command onHidden = null;
-        if (panel != null) {
-            final RevealPanel spanel = new RevealPanel(panel);
-            onHidden = new Command() {
-                public void execute () {
-                    insert(spanel, getWidgetIndex(_taxon));
-                    spanel.reveal(null);
-                    _spanel = spanel;
-                }
-            };
-        }
+        int insidx = getWidgetIndex(_taxon);
         if (_spanel != null && (panel != null || _seriesId == 0)) {
-            _spanel.hideAndRemove(onHidden);
+            insidx = getWidgetIndex(_spanel);
+            final SimplePanel opanel = _spanel;
+            FX.unreveal(_spanel).onComplete(new Command() {
+                public void execute () {
+                    remove(opanel);
+                }
+            }).run(_animTime);
             _spanel = null;
-        } else if (onHidden != null) {
-            onHidden.execute();
+        }
+        if (panel != null) {
+            insert(_spanel = Widgets.newSimplePanel(null, panel), insidx);
+            FX.reveal(_spanel).fromBottom().run(_animTime = animTime);
         }
     }
 
@@ -276,8 +285,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected int _seriesId;
     protected PlayerCollection _coll;
     protected FluentTable _header, _taxon;
-    protected RevealPanel _spanel;
     protected Value<Integer> _cards, _series, _completed;
+
+    protected SimplePanel _spanel;
+    protected int _animTime;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 

@@ -27,6 +27,8 @@ import client.util.Context;
  */
 public class SeriesPanel extends DataPanel<Series>
 {
+    public static final int COLUMNS = 5;
+
     public SeriesPanel (Context ctx, int ownerId, int categoryId, Value<Integer> count)
     {
         super(ctx, "series");
@@ -68,5 +70,4 @@ public class SeriesPanel extends DataPanel<Series>
     protected Value<Integer> _count;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-    protected static final int COLUMNS = 5;
 }
