@@ -79,11 +79,13 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // finally load up the top-level categories and build everything back down
-        coll.series = Maps.newHashMap();
+        coll.series = Maps.newTreeMap();
         for (Category cat : _thingRepo.loadCategories(subcats.keySet())) {
-            Map<String, List<SeriesCard>> scats = Maps.newHashMap();
+            Map<String, List<SeriesCard>> scats = Maps.newTreeMap();
             for (Category scat : subcats.get(cat.categoryId)) {
-                scats.put(scat.name, Lists.newArrayList(series.get(scat.categoryId)));
+                List<SeriesCard> slist = Lists.newArrayList(series.get(scat.categoryId));
+                Collections.sort(slist);
+                scats.put(scat.name, slist);
             }
             coll.series.put(cat.name, scats);
         }

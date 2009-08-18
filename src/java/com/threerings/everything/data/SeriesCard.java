@@ -9,7 +9,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * Contains information on a player's series.
  */
 public class SeriesCard
-    implements IsSerializable
+    implements IsSerializable, Comparable<SeriesCard>
 {
     /** The category that identifies this series. */
     public int categoryId;
@@ -25,4 +25,10 @@ public class SeriesCard
 
     /** The number of cards in the series that the player owns .*/
     public int owned;
+
+    // from interface Comparable<SeriesCard>
+    public int compareTo (SeriesCard other)
+    {
+        return name.compareTo(other.name);
+    }
 }
