@@ -5,7 +5,7 @@ package com.threerings.everything.data;
 
 import java.util.EnumSet;
 
-import com.samskivert.depot.ByteEnum;
+import com.samskivert.util.ByteEnum;
 
 /**
  * Defines the various rarities of things.

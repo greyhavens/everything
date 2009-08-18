@@ -5,7 +5,7 @@ package com.threerings.everything.data;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import com.samskivert.depot.ByteEnum;
+import com.samskivert.util.ByteEnum;
 
 /**
  * Contains data for a category or sub-category.

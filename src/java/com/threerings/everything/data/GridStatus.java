@@ -3,7 +3,7 @@
 
 package com.threerings.everything.data;
 
-import com.samskivert.depot.ByteEnum;
+import com.samskivert.util.ByteEnum;
 
 /**
  * Tracks status attributes of a grid.

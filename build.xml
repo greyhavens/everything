@@ -73,7 +73,7 @@
     <artifact:dependencies filesetId="dependency.fileset">
       <remoteRepository refid="ooo.maven.depends.repo"/>
       <dependency groupId="com.samskivert" artifactId="depot" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.samskivert" artifactId="depot-gwt" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.samskivert" artifactId="samskivert-gwt" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
@@ -146,7 +146,6 @@
           <include name="gwt-user.jar"/>
           <include name="gwt-utils*.jar"/>
           <include name="samskivert-gwt*.jar"/>
-          <include name="depot-gwt*.jar"/>
           <include name="samsara-app*.jar"/>
         </fileset>
         <pathelement location="${src.dir}"/>
@@ -181,7 +180,6 @@
         <pathelement path="lib/gwt/gwt-dev-linux.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-user.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
-        <pathelement path="${deploy.dir}/lib/depot-gwt-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samsara-app-0.0-SNAPSHOT.jar"/>
         <pathelement path="${src.dir}"/>

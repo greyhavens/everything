@@ -7,7 +7,7 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import com.samskivert.depot.ByteEnum;
+import com.samskivert.util.ByteEnum;
 
 /**
  * Records an action taken by an editor or admin on the database.

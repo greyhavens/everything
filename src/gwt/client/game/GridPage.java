@@ -18,7 +18,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.samskivert.depot.util.ByteEnumUtil;
+import com.samskivert.util.ByteEnumUtil;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
