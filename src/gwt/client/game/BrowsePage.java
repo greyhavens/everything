@@ -3,13 +3,16 @@
 
 package client.game;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -17,6 +20,7 @@ import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.RevealPanel;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -26,6 +30,7 @@ import com.threerings.everything.data.SeriesCard;
 
 import client.ui.DataPanel;
 import client.ui.XFBML;
+import client.ui.lines.LineImages;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -115,7 +120,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     }
                 }
             }
-            _seriesId = 0;
         }
 
         // now generate our fancy display
@@ -137,7 +141,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             if (catname.equals(selcat)) {
                 catrow = row;
                 subcats = cat.getValue();
-                _taxon.setText(row++, 0, catname);
+                _taxon.at(row++, 0).setText(catname, "Selected");
             } else {
                 _taxon.setWidget(row++, 0, Widgets.newActionLabel(catname, new ClickHandler() {
                     public void onClick (ClickEvent event) {
@@ -150,6 +154,12 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             return;
         }
 
+        // render our connecting lines between category and subcategory
+        for (int lrow = 0, last = Math.max(catrow, subcats.size()-1); lrow <= last; lrow++) {
+            _taxon.setWidget(lrow, 1, createLine(lrow > 0, lrow < last,
+                                                 lrow == catrow, lrow < subcats.size()));
+        }
+
         // now render the subcategories and grab the target series
         List<SeriesCard> series = null;
         int subcatrow = -1;
@@ -159,32 +169,37 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             if (subcatname.equals(selsubcat)) {
                 subcatrow = row;
                 series = subcat.getValue();
-                _taxon.setText(row++, 1, subcatname);
+                _taxon.at(row, 2).setText(subcatname, "Selected");
             } else {
-                _taxon.setWidget(row++, 1, Widgets.newActionLabel(subcatname, new ClickHandler() {
+                _taxon.setWidget(row, 2, Widgets.newActionLabel(subcatname, new ClickHandler() {
                     public void onClick (ClickEvent event) {
                         showTaxonomy(selcat, subcatname, null);
                     }
                 }));
             }
+            row++;
         }
         if (series == null) {
             return;
+        }
+
+        // render our connecting lines between subcategory and series
+        for (int lrow = 0, last = Math.max(subcatrow, series.size()-1); lrow <= last; lrow++) {
+            _taxon.setWidget(lrow, 3, createLine(lrow > 0, lrow < last,
+                                                 lrow == subcatrow, lrow < series.size()));
         }
 
         // finally render the series and grab the target series
         row = 0;
         SeriesPanel panel = null;
         for (final SeriesCard card : series) {
-            Widget name;
-            if (card.name.equals(selseries)) {
-                //name = Args.createInlink(card.name, Page.BROWSE, coll.owner.userId);
-                name = Widgets.newLabel(card.name);
+            if (card.name.equals(selseries) ||
+                (selseries == null && card.categoryId == _seriesId)) {
+                _taxon.at(row, 4).setText(card.name, "Selected");
             } else {
-                name = Args.createInlink(
-                    card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
+                _taxon.at(row, 4).setWidget(
+                    Args.createInlink(card.name, Page.BROWSE, _coll.owner.userId, card.categoryId));
             }
-            _taxon.at(row, 2).setWidget(name);
 
             Value<Integer> owned = new Value<Integer>(card.owned) {
                 public void update (Integer value) {
@@ -195,7 +210,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     _completed.update(_coll.countCompletedSeries());
                 }
             };
-            _taxon.at(row++, 3).setWidget(new ValueLabel<Integer>("Held", owned) {
+            _taxon.at(row++, 5).setWidget(new ValueLabel<Integer>("Held", owned) {
                 protected String getText (Integer owned) {
                     return " " + owned + " of " + card.things;
                 }
@@ -215,6 +230,21 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
     }
 
+    protected Image createLine (boolean up, boolean down, boolean left, boolean right)
+    {
+        String key = "";
+        if (up) key += "U";
+        if (down) key += "D";
+        if (left) key += "L";
+        if (right) key += "R";
+        AbstractImagePrototype img = _linemap.get(key);
+        if (img == null) {
+            Console.log("Missing image " + key);
+            img = _linemap.get("UDLR");
+        }
+        return img.createImage();
+    }
+
     protected int _seriesId;
     protected PlayerCollection _coll;
     protected FluentTable _header, _taxon;
@@ -222,4 +252,21 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected Value<Integer> _cards, _series, _completed;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
+
+    protected static final LineImages _lines = GWT.create(LineImages.class);
+    protected static Map<String, AbstractImagePrototype> _linemap =
+        new HashMap<String, AbstractImagePrototype>();
+    static {
+        _linemap.put("DL", _lines.downleft());
+        _linemap.put("DR", _lines.downright());
+        _linemap.put("ULR", _lines.upleftright());
+        _linemap.put("DLR", _lines.downleftright());
+        _linemap.put("UDL", _lines.updownleft());
+        _linemap.put("UDR", _lines.updownright());
+        _linemap.put("UL", _lines.upleft());
+        _linemap.put("UR", _lines.upright());
+        _linemap.put("LR", _lines.leftright());
+        _linemap.put("UD", _lines.updown());
+        _linemap.put("UDLR", _lines.full());
+    };
 }
