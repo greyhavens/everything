@@ -26,7 +26,7 @@ public class ThingDialog
     public static ClickHandler makeGotHandler (Context ctx, Card card)
     {
         return makeHandler(ctx, "got_card", Build.Template.GOT_CARD.id, card,
-                           "Brag about your awesome card to your friends:", "Woo!");
+                           "Brag about this awesome card to your friends:", "Woo!");
     }
 
     /**
