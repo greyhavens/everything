@@ -123,14 +123,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected void showTaxonomy (final String selcat, final String selsubcat, String selseries)
     {
-        if (_taxon != null) {
-            remove(_taxon);
-        }
         if (_panel != null) {
             remove(_panel);
             _panel = null;
         }
-        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
 
         // first render the categories and grab the target subcategory
         Map<String, List<SeriesCard>> subcats = null;
@@ -206,14 +202,18 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 }
             });
 
-            if (_seriesId == card.categoryId) {
+            if (card.name.equals(selseries)) {
                 _panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
             }
         }
 
+        if (_taxon != null) {
+            remove(_taxon);
+        }
         if (_panel != null) {
             add(_panel);
         }
+        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
     }
 
     protected int _seriesId;
