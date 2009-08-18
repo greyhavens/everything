@@ -123,10 +123,14 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected void showTaxonomy (final String selcat, final String selsubcat, String selseries)
     {
-        if (_panel != null) {
-            remove(_panel);
-            _panel = null;
+        if (_spanel != null) {
+            remove(_spanel);
+            _spanel = null;
         }
+        if (_taxon != null) {
+            remove(_taxon);
+        }
+        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
 
         // first render the categories and grab the target subcategory
         Map<String, List<SeriesCard>> subcats = null;
@@ -173,6 +177,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
         // finally render the series and grab the target series
         row = 0;
+        SeriesPanel panel = null;
         for (final SeriesCard card : series) {
             Widget name;
             if (card.name.equals(selseries)) {
@@ -182,10 +187,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 name = Args.createInlink(
                     card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
             }
-            if (card.owned == card.things) {
-                name.addStyleName("Complete");
-            }
-            _taxon.setWidget(row, 2, name);
+            _taxon.at(row, 2).setWidget(name);
 
             Value<Integer> owned = new Value<Integer>(card.owned) {
                 public void update (Integer value) {
@@ -196,30 +198,26 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     _completed.update(_coll.countCompletedSeries());
                 }
             };
-            _taxon.setWidget(row++, 3, new ValueLabel<Integer>("Held", owned) {
+            _taxon.at(row++, 3).setWidget(new ValueLabel<Integer>("Held", owned) {
                 protected String getText (Integer owned) {
                     return " " + owned + " of " + card.things;
                 }
-            });
+            }).setStyles((card.owned == card.things) ? "Complete" : "Incomplete");
 
             if (card.name.equals(selseries)) {
-                _panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
+                panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
             }
         }
 
-        if (_taxon != null) {
-            remove(_taxon);
+        if (panel != null) {
+            insert(_spanel = panel, getWidgetIndex(_taxon));
         }
-        if (_panel != null) {
-            add(_panel);
-        }
-        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
     }
 
     protected int _seriesId;
     protected PlayerCollection _coll;
     protected FluentTable _header, _taxon;
-    protected SeriesPanel _panel;
+    protected Widget _spanel;
     protected Value<Integer> _cards, _series, _completed;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
