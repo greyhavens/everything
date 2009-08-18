@@ -114,6 +114,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     }
                 }
             }
+            _seriesId = 0;
         }
 
         // now generate our fancy display
@@ -129,7 +130,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             remove(_panel);
             _panel = null;
         }
-        add(_taxon = new FluentTable(5, 0, "Taxonomy", "handwriting"));
+        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
 
         // first render the categories and grab the target subcategory
         Map<String, List<SeriesCard>> subcats = null;
