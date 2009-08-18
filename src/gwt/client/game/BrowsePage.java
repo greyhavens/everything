@@ -150,81 +150,104 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 }));
             }
         }
-        if (subcats == null) {
-            return;
-        }
 
-        // render our connecting lines between category and subcategory
-        for (int lrow = 0, last = Math.max(catrow, subcats.size()-1); lrow <= last; lrow++) {
-            _taxon.setWidget(lrow, 1, createLine(lrow > 0, lrow < last,
-                                                 lrow == catrow, lrow < subcats.size()));
-        }
-
-        // now render the subcategories and grab the target series
         List<SeriesCard> series = null;
         int subcatrow = -1;
-        row = 0;
-        for (Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
-            final String subcatname = subcat.getKey();
-            if (subcatname.equals(selsubcat)) {
-                subcatrow = row;
-                series = subcat.getValue();
-                _taxon.at(row, 2).setText(subcatname, "Selected");
-            } else {
-                _taxon.setWidget(row, 2, Widgets.newActionLabel(subcatname, new ClickHandler() {
-                    public void onClick (ClickEvent event) {
-                        showTaxonomy(selcat, subcatname, null);
+        if (selsubcat != null) {
+            // render our connecting lines between category and subcategory
+            for (int lrow = 0, last = Math.max(catrow, subcats.size()-1); lrow <= last; lrow++) {
+                _taxon.setWidget(lrow, 1, createLine(lrow > 0, lrow < last,
+                                                     lrow == catrow, lrow < subcats.size()));
+            }
+
+            // now render the subcategories and grab the target series
+            row = 0;
+            for (Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
+                final String subcatname = subcat.getKey();
+                if (subcatname.equals(selsubcat)) {
+                    subcatrow = row;
+                    series = subcat.getValue();
+                    _taxon.at(row, 2).setText(subcatname, "Selected");
+                } else {
+                    _taxon.setWidget(row, 2, Widgets.newActionLabel(subcatname, new ClickHandler() {
+                        public void onClick (ClickEvent event) {
+                            showTaxonomy(selcat, subcatname, null);
+                        }
+                    }));
+                }
+                row++;
+            }
+
+        } else {
+            row = 0;
+            for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : _coll.series.entrySet()) {
+                _taxon.setWidget(row, 1, createLine(false, false, true, true));
+                final String catname = cat.getKey();
+                FlowPanel scatrow = new FlowPanel();
+                for (final Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
+                    if (scatrow.getWidgetCount() > 0) {
+                        scatrow.add(Widgets.newHTML("&nbsp;&nbsp; ", "inline"));
                     }
-                }));
+                    scatrow.add(Widgets.newActionLabel(subcat.getKey(), "inline", new ClickHandler() {
+                        public void onClick (ClickEvent event) {
+                            showTaxonomy(catname, subcat.getKey(), null);
+                        }
+                    }));
+                }
+                _taxon.setWidget(row++, 2, scatrow);
             }
-            row++;
-        }
-        if (series == null) {
-            return;
         }
 
-        // render our connecting lines between subcategory and series
-        for (int lrow = 0, last = Math.max(subcatrow, series.size()-1); lrow <= last; lrow++) {
-            _taxon.setWidget(lrow, 3, createLine(lrow > 0, lrow < last,
-                                                 lrow == subcatrow, lrow < series.size()));
-        }
-
-        // finally render the series and grab the target series
-        row = 0;
         SeriesPanel panel = null;
-        for (final SeriesCard card : series) {
-            if (card.name.equals(selseries) ||
-                (selseries == null && card.categoryId == _seriesId)) {
-                _taxon.at(row, 4).setText(card.name, "Selected");
-            } else {
-                _taxon.at(row, 4).setWidget(
-                    Args.createInlink(card.name, Page.BROWSE, _coll.owner.userId, card.categoryId));
+        if (series != null) {
+            // render our connecting lines between subcategory and series
+            for (int lrow = 0, last = Math.max(subcatrow, series.size()-1); lrow <= last; lrow++) {
+                _taxon.setWidget(lrow, 3, createLine(lrow > 0, lrow < last,
+                                                     lrow == subcatrow, lrow < series.size()));
             }
 
-            Value<Integer> owned = new Value<Integer>(card.owned) {
-                public void update (Integer value) {
-                    super.update(value);
-                    card.owned = value;
-                    _cards.update(_coll.countCards());
-                    _series.update(_coll.countSeries());
-                    _completed.update(_coll.countCompletedSeries());
+            // finally render the series and grab the target series
+            row = 0;
+            for (final SeriesCard card : series) {
+                Widget name;
+                if (card.name.equals(selseries) ||
+                    (selseries == null && card.categoryId == _seriesId)) {
+                    name = Widgets.newInlineLabel(card.name, "Selected");
+                } else {
+                    name = Args.createInlink(
+                        card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
                 }
-            };
-            _taxon.at(row++, 5).setWidget(new ValueLabel<Integer>("Held", owned) {
-                protected String getText (Integer owned) {
-                    return " " + owned + " of " + card.things;
-                }
-            }).setStyles((card.owned == card.things) ? "Complete" : "Incomplete");
 
-            if (card.name.equals(selseries)) {
-                panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
+                Value<Integer> owned = new Value<Integer>(card.owned) {
+                    public void update (Integer value) {
+                        super.update(value);
+                        card.owned = value;
+                        _cards.update(_coll.countCards());
+                        _series.update(_coll.countSeries());
+                        _completed.update(_coll.countCompletedSeries());
+                    }
+                };
+                ValueLabel<Integer> olabel = new ValueLabel<Integer>("Held", owned) {
+                    protected String getText (Integer owned) {
+                        return " " + owned + " of " + card.things;
+                    }
+                };
+                olabel.addStyleName((card.owned == card.things) ? "Complete" : "Incomplete");
+
+                _taxon.at(row++, 4).setWidget(
+                    Widgets.newFlowPanel(name, Widgets.newInlineLabel(" "), olabel));
+
+                if (card.name.equals(selseries)) {
+                    panel = new SeriesPanel(_ctx, _coll.owner.userId, card.categoryId, owned);
+                }
             }
         }
 
+        if (_spanel != null && (panel != null || _seriesId == 0)) {
+            _spanel.hideAndRemove();
+            _spanel = null;
+        }
         if (panel != null) {
-            if (_spanel != null) {
-                _spanel.hideAndRemove();
-            }
             insert(_spanel = new RevealPanel(panel), getWidgetIndex(_taxon));
             _spanel.reveal();
         }
