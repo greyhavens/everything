@@ -169,7 +169,8 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     series = subcat.getValue();
                     _taxon.at(row, 2).setText(subcatname, "Selected", "nowrap");
                 } else {
-                    _taxon.at(row, 2).setWidget(Widgets.newActionLabel(subcatname, new ClickHandler() {
+                    _taxon.at(row, 2).setWidget(
+                        Widgets.newActionLabel(subcatname, new ClickHandler() {
                         public void onClick (ClickEvent event) {
                             showTaxonomy(selcat, subcatname);
                         }
