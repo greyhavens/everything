@@ -150,14 +150,14 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         showTaxonomy(catname, null);
                     }
                 });
-                _taxon.at(row++, 0).setWidget(catlink).
+                _taxon.at(row++, 0).setWidget(catlink, "nowrap").
                     right().setWidget(createLine(false, false, true, true)).
                     right().setWidget(createCatSum(cat.getKey(), cat.getValue())).setColSpan(3);
                 continue;
             }
 
             // if it is the selected category, render the subcats in expanded form
-            _taxon.at(row, 0).setText(catname, "Selected");
+            _taxon.at(row, 0).setText(catname, "Selected", "nowrap");
             catrow = row;
             subcats = cat.getValue();
             for (Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
@@ -167,13 +167,13 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 if (subcatname.equals(selsubcat)) {
                     subcatrow = row;
                     series = subcat.getValue();
-                    _taxon.at(row, 2).setText(subcatname, "Selected");
+                    _taxon.at(row, 2).setText(subcatname, "Selected", "nowrap");
                 } else {
-                    _taxon.setWidget(row, 2, Widgets.newActionLabel(subcatname, new ClickHandler() {
+                    _taxon.at(row, 2).setWidget(Widgets.newActionLabel(subcatname, new ClickHandler() {
                         public void onClick (ClickEvent event) {
                             showTaxonomy(selcat, subcatname);
                         }
-                    }));
+                    }), "nowrap");
                 }
                 row++;
             }
@@ -220,7 +220,8 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     }
                 };
                 olabel.addStyleName((card.owned == card.things) ? "Complete" : "Incomplete");
-                _taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel);
+                _taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel).
+                    setStyles("Leaf");
             }
         }
 

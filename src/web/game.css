@@ -266,6 +266,10 @@
   font-size: 16px;
 }
 
+.browse .Taxonomy .Leaf {
+  width: 100%;
+}
+
 .browse .Taxonomy .Selected, .browse .Taxonomy .Complete {
   font-weight: bold;
 }
