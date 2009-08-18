@@ -10,6 +10,7 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -222,13 +223,22 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
         }
 
-        if (_spanel != null && (panel != null || _seriesId == 0)) {
-            _spanel.hideAndRemove();
-            _spanel = null;
-        }
+        Command onHidden = null;
         if (panel != null) {
-            insert(_spanel = new RevealPanel(panel), getWidgetIndex(_taxon));
-            _spanel.reveal();
+            final RevealPanel spanel = new RevealPanel(panel);
+            onHidden = new Command() {
+                public void execute () {
+                    insert(spanel, getWidgetIndex(_taxon));
+                    spanel.reveal(null);
+                    _spanel = spanel;
+                }
+            };
+        }
+        if (_spanel != null && (panel != null || _seriesId == 0)) {
+            _spanel.hideAndRemove(onHidden);
+            _spanel = null;
+        } else if (onHidden != null) {
+            onHidden.execute();
         }
     }
 
