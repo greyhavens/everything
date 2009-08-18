@@ -85,12 +85,11 @@ public class EverythingApp extends App
      */
     public String getHelloURL (Kontagent type, String tracking, Object... args)
     {
-        StringBuilder token = new StringBuilder();
-        for (Object arg : args) {
-            token.append((token.length() == 0) ? "?token=" : "~");
-            token.append(arg);
+        String url = getFacebookAppURL() + "?kc=" + type.code + "&t=" + tracking;
+        if (args.length > 0) {
+            url +=  "&token=" + Joiner.on("~").join(args);
         }
-        return getFacebookAppURL() + token + "&kc=" + type.code + "&t=" + tracking;
+        return url;
     }
 
     /**
