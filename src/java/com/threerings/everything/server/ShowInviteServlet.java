@@ -65,7 +65,7 @@ public class ShowInviteServlet extends AppServlet
         subs.put("ACTION_URL", req.getRequestURL().toString().replaceAll("showinvite", "invite"));
 
         String tracking = _kontLogic.generateUniqueId(player.userId);
-        subs.put("URL", _app.getHelloURL(Kontagent.INVITE, tracking, "LANDING"));
+        subs.put("URL", _app.getHelloURL(Kontagent.INVITE, tracking));
         subs.put("TRACKING", tracking);
         subs.put("FACEBOOK_KEY", _app.getFacebookKey());
 
