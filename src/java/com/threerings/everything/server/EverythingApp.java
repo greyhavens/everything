@@ -87,7 +87,7 @@ public class EverythingApp extends App
     {
         String url = getFacebookAppURL() + "?kc=" + type.code + "&t=" + tracking;
         if (args.length > 0) {
-            url +=  "&token=" + Joiner.on("~").join(args);
+            url += "&token=" + Joiner.on("~").join(args);
         }
         return url;
     }
