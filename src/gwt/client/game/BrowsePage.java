@@ -196,15 +196,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             // finally render the series and grab the target series
             row = catrow;
             for (final SeriesCard card : series) {
-                Widget name;
-                if (card.categoryId == _seriesId) {
-                    name = Widgets.newInlineLabel(card.name, "Selected");
-                    displaySeries(card, owned);
-                } else {
-                    name = Args.createInlink(
-                        card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
-                }
-
                 Value<Integer> owned = new Value<Integer>(card.owned) {
                     public void update (Integer value) {
                         super.update(value);
@@ -214,15 +205,22 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         _completed.update(_coll.countCompletedSeries());
                     }
                 };
+
+                Widget name;
+                if (card.categoryId == _seriesId) {
+                    name = Widgets.newInlineLabel(card.name, "Selected");
+                    displaySeries(card, owned);
+                } else {
+                    name = Args.createInlink(
+                        card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
+                }
                 ValueLabel<Integer> olabel = new ValueLabel<Integer>("Held", owned) {
                     protected String getText (Integer owned) {
                         return " " + owned + " of " + card.things;
                     }
                 };
                 olabel.addStyleName((card.owned == card.things) ? "Complete" : "Incomplete");
-
-                _taxon.at(row++, 4).setWidget(
-                    Widgets.newFlowPanel(name, Widgets.newInlineLabel(" "), olabel));
+                _taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel);
             }
         }
 
