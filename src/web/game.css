@@ -263,7 +263,7 @@
 }
 
 .browse .Taxonomy {
-  /*min-width: 580px;*/
+  min-width: 400px;
   font-size: 16px;
 }
 
