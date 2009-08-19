@@ -151,14 +151,15 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     {
         FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : _coll.series.entrySet()) {
-            int catrow = taxon.add().setText(cat.getKey(), "nowrap").alignRight().row, row = catrow;
+            int catrow = taxon.add().setText(cat.getKey(), "nowrap").alignTop().alignRight().row;
+            int row = catrow;
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
-                taxon.at(row, 1).setWidget(createLine(row > catrow,
-                                                      row < catrow+cat.getValue().size()-1,
-                                                      row == catrow, true)).
-                    right().setText(subcat.getKey(), "nowrap").
-                    right().setWidget(createLine(false, false, true, true)).
-                    right().setWidget(seriesLinks(subcat.getValue()));
+                Widget line = createLine(row > catrow, row < catrow+cat.getValue().size()-1,
+                                         row == catrow, true);
+                taxon.at(row, 1).setWidget(line).alignTop().
+                    right().setText(subcat.getKey(), "nowrap").alignTop().
+                    right().setWidget(createLine(false, false, true, true)).alignTop().
+                    right().setWidget(seriesLinks(subcat.getValue())); // might be tall!
                 row++;
             }
         }
