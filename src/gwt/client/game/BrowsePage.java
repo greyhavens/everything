@@ -198,37 +198,32 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
         // render the selected category and subcategories
         FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
-        addCategory(taxon, selcat, selsubcat);
-        return Widgets.newFlowPanel(cats, taxon);
-    }
+        Map<String, List<SeriesCard>> cat = _coll.series.get(selcat);
+        if (cat != null) {
+            int catrow = taxon.add().setText(selcat, "nowrap").row, row = catrow;
+            for (Map.Entry<String, List<SeriesCard>> subcat : cat.entrySet()) {
+                final String subcatname = subcat.getKey();
+                taxon.setWidget(row, 1, createLine(row > catrow, row < catrow+cat.size()-1,
+                                                   row == catrow, true));
+                if (selsubcat == null) {
+                    selsubcat = subcatname;
+                }
+                if (subcatname.equals(selsubcat)) {
+                    addSeries(taxon, catrow, row, subcat.getValue());
+                    taxon.at(row, 2).setText(subcatname, "nowrap");
+                } else {
+                    taxon.at(row, 2).setWidget(
+                        Widgets.newActionLabel(subcatname, new ClickHandler() {
+                            public void onClick (ClickEvent event) {
+                                setTaxonomy(createTaxonomy(selcat, subcatname));
+                            }
+                        }), "nowrap");
+                }
+                row++;
+            }
+        }
 
-    protected void addCategory (FluentTable taxon, final String catname, String selsubcat)
-    {
-        Map<String, List<SeriesCard>> cat = _coll.series.get(catname);
-        if (cat == null) {
-            return; // funny business!
-        }
-        int catrow = taxon.add().setText(catname, "nowrap").row, row = catrow;
-        for (Map.Entry<String, List<SeriesCard>> subcat : cat.entrySet()) {
-            final String subcatname = subcat.getKey();
-            taxon.setWidget(row, 1, createLine(row > catrow, row < catrow+cat.size()-1,
-                                               row == catrow, true));
-            if (selsubcat == null) {
-                selsubcat = subcatname;
-            }
-            if (subcatname.equals(selsubcat)) {
-                addSeries(taxon, catrow, row, subcat.getValue());
-                taxon.at(row, 2).setText(subcatname, "nowrap");
-            } else {
-                taxon.at(row, 2).setWidget(
-                    Widgets.newActionLabel(subcatname, new ClickHandler() {
-                        public void onClick (ClickEvent event) {
-                            setTaxonomy(createTaxonomy(catname, subcatname));
-                        }
-                    }), "nowrap");
-            }
-            row++;
-        }
+        return Widgets.newFlowPanel(cats, taxon);
     }
 
     protected void addSeries (FluentTable taxon, int catrow, int subcatrow, List<SeriesCard> series)
