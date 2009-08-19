@@ -41,7 +41,6 @@ import client.game.GridPage;
 import client.game.LandingPage;
 import client.game.ShopPage;
 import client.game.TermsPage;
-import client.ui.XFBML;
 import client.util.Args;
 import client.util.CategoriesModel;
 import client.util.Context;

@@ -137,7 +137,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             right().setHTML("Give " + _card.thing.name + "<br>to " + info.friend, "machine");
         table.add().setText("Enter an optional message:").setColSpan(2);
         table.add().setWidget(message).setColSpan(2);
-        post.setChecked(true);
+        post.setValue(true);
         table.add().setWidget(post).setColSpan(2);
         final ClickHandler hider = Popups.createHider(popup);
         message.addKeyPressHandler(new EscapeClickAdapter(hider));
