@@ -4,8 +4,10 @@
 package client.game;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,6 +25,7 @@ import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.ValueLabel;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Console;
+import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -49,9 +52,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         super(ctx, "page", "browse");
     }
 
-    public void setArgs (int ownerId, int seriesId)
+    public void setArgs (int ownerId, int seriesId, String selcat)
     {
         _seriesId = seriesId;
+        _selcat = selcat;
         if (_coll == null || _coll.owner.userId != ownerId) {
             _gamesvc.getCollection(ownerId, createCallback());
         } else {
@@ -110,7 +114,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         _coll = coll;
 
         // determine which series is selected, if any
-        String catname = null, subcatname = null;
+        String catname = _selcat, subcatname = null;
         if (_seriesId > 0) {
             for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
                 for (Map.Entry<String, List<SeriesCard>> subcat : cat.getValue().entrySet()) {
@@ -126,7 +130,8 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
 
         // now generate our fancy display
-        setTaxonomy((catname == null) ? createOverview() : createTaxonomy(catname, subcatname));
+        setTaxonomy(StringUtil.isBlank(catname) ?
+                    createOverview() : createTaxonomy(catname, subcatname));
     }
 
     protected void setTaxonomy (Widget taxon)
@@ -182,15 +187,11 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         // add the unselected categories
         FluentTable cats = new FluentTable(5, 0, "Codons", "machine");
         int col = 0;
-        cats.at(0, col++).setWidget(Args.createLink("All", Page.BROWSE));
+        cats.at(0, col++).setWidget(Args.createLink("All", Page.BROWSE, _coll.owner.userId));
+        Map<String, String> codons = toCodons(_coll.series.keySet());
         for (final String catname : _coll.series.keySet()) {
-            String code = (catname.equals("Culture") ? "Cl" : catname.substring(0, 2));
-            Widget name = catname.equals(selcat) ? Widgets.newLabel(code) :
-                Widgets.newActionLabel(code, new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    setTaxonomy(createTaxonomy(catname, null));
-                }
-            });
+            Widget name = catname.equals(selcat) ? Widgets.newLabel(codons.get(catname)) :
+                Args.createLink(codons.get(catname), Page.BROWSE, _coll.owner.userId, catname);
             name.setTitle(catname);
             cats.at(0, col++).setWidget(name);
         }
@@ -204,6 +205,9 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected void addCategory (FluentTable taxon, final String catname, String selsubcat)
     {
         Map<String, List<SeriesCard>> cat = _coll.series.get(catname);
+        if (cat == null) {
+            return; // funny business!
+        }
         int catrow = taxon.add().setText(catname, "nowrap").row, row = catrow;
         for (Map.Entry<String, List<SeriesCard>> subcat : cat.entrySet()) {
             final String subcatname = subcat.getKey();
@@ -229,16 +233,15 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected void addSeries (FluentTable taxon, int catrow, int subcatrow, List<SeriesCard> series)
     {
+        int row = Math.max(catrow, subcatrow-series.size()+1);
+
         // render our connecting lines between subcategory and series
-        int rows = rows = Math.max(subcatrow-catrow+1, series.size());
-        for (int lrow = catrow; lrow < catrow+rows; lrow++) {
-            taxon.setWidget(lrow, 3, createLine(lrow > catrow, lrow < catrow+rows-1,
-                                                lrow == subcatrow,
-                                                lrow < catrow+series.size()));
+        for (int lrow = row; lrow < row+series.size(); lrow++) {
+            taxon.setWidget(lrow, 3, createLine(lrow > row, lrow < row+series.size()-1,
+                                                lrow == subcatrow, true));
         }
 
         // finally render the series and grab the target series
-        int row = catrow;
         for (final SeriesCard card : series) {
             Value<Integer> owned = new Value<Integer>(card.owned) {
                 public void update (Integer value) {
@@ -295,7 +298,23 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         });
     }
 
-    protected Image createLine (boolean up, boolean down, boolean left, boolean right)
+    protected static Map<String, String> toCodons (Iterable<String> catnames)
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        Set<String> seen = new HashSet<String>();
+        for (String catname : catnames) {
+            String codon = catname.substring(0, 2);
+            // if we already have (0, 1) then fall back to (0, 2)
+            if (seen.contains(codon)) {
+                codon = catname.substring(0, 1) + catname.substring(2, 3);
+            }
+            map.put(catname, codon);
+            seen.add(codon);
+        }
+        return map;
+    }
+
+    protected static Image createLine (boolean up, boolean down, boolean left, boolean right)
     {
         String key = "";
         if (up) key += "U";
@@ -311,6 +330,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     }
 
     protected int _seriesId;
+    protected String _selcat;
     protected PlayerCollection _coll;
     protected FluentTable _header;
     protected Widget _taxon;

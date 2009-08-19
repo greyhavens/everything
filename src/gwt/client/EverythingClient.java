@@ -212,7 +212,8 @@ public class EverythingClient
                 if (!(_content instanceof BrowsePage)) {
                     setContent(new BrowsePage(this));
                 }
-                ((BrowsePage)_content).setArgs(args.get(0, getMe().userId), args.get(1, 0));
+                ((BrowsePage)_content).setArgs(args.get(0, getMe().userId),
+                                               args.get(1, 0), args.get(1, ""));
                 return;
             }
             break;
