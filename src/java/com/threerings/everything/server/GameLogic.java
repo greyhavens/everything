@@ -471,7 +471,7 @@ public class GameLogic
         Thing thing = _thingRepo.loadThing(thingId);
 
         // grant this card to the player
-        CardRecord card = _gameRepo.createCard(user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
+        _gameRepo.createCard(user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
 
         // record a notice in their feed
         _playerRepo.recordFeedItem(user.userId, FeedItem.Type.BIRTHDAY, 0, thing.name, null);

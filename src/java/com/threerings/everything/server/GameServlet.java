@@ -278,7 +278,7 @@ public class GameServlet extends EveryServiceServlet
     public GiftInfoResult getGiftCardInfo (int thingId, long received) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        CardRecord card = requireCard(player.userId, thingId, received);
+        requireCard(player.userId, thingId, received);
 
         // load up data on the things in this set
         Set<Integer> thingIds = Sets.newHashSet();
