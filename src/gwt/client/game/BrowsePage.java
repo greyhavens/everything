@@ -126,76 +126,87 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
 
         // now generate our fancy display
-        showTaxonomy(catname, subcatname);
+        setTaxonomy((catname == null) ? createOverview() : createTaxonomy(catname, subcatname));
     }
 
-    protected void showTaxonomy (final String selcat, final String selsubcat)
+    protected void setTaxonomy (Widget taxon)
     {
         if (_taxon != null) {
             remove(_taxon);
         }
-        add(_taxon = new FluentTable(0, 0, "Taxonomy", "handwriting"));
+        insert(_taxon = taxon, 1);
 
-        // first render the categories and grab the target subcategory
-        Map<String, List<SeriesCard>> subcats = null;
-        List<SeriesCard> series = null;
-        int catrow = -1, subcatrow = -1, row = 0;
+        if (_seriesId == 0 && _clearSeries != null) {
+            _clearSeries.execute();
+            _clearSeries = null;
+        }
+    }
+
+    protected Widget createOverview ()
+    {
+        FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
         for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : _coll.series.entrySet()) {
-            final String catname = cat.getKey();
+            taxon.add().setText(cat.getKey(), "nowrap").alignRight().
+                right().setWidget(createLine(false, false, true, true)).
+                right().setWidget(createCatSum(cat.getKey(), cat.getValue()));
+        }
+        return taxon;
+    }
 
-            // if it's not the selected category, render the subcategories in compact form
-            if (!catname.equals(selcat)) {
-                Widget catlink = Widgets.newActionLabel(catname, new ClickHandler() {
-                    public void onClick (ClickEvent event) {
-                        showTaxonomy(catname, null);
-                    }
-                });
-                _taxon.at(row++, 0).setWidget(catlink, "nowrap").
-                    right().setWidget(createLine(false, false, true, true)).
-                    right().setWidget(createCatSum(cat.getKey(), cat.getValue())).setColSpan(3);
-                continue;
-            }
-
-            // if it is the selected category, render the subcats in expanded form
-            _taxon.at(row, 0).setText(catname, "Selected", "nowrap");
-            catrow = row;
-            subcats = cat.getValue();
-            for (Map.Entry<String, List<SeriesCard>> subcat : subcats.entrySet()) {
-                final String subcatname = subcat.getKey();
-                _taxon.setWidget(row, 1, createLine(row > catrow, row < catrow+subcats.size()-1,
-                                                    row == catrow, true));
-                if (subcatname.equals(selsubcat)) {
-                    subcatrow = row;
-                    series = subcat.getValue();
-                    _taxon.at(row, 2).setText(subcatname, "Selected", "nowrap");
-                } else {
-                    _taxon.at(row, 2).setWidget(
-                        Widgets.newActionLabel(subcatname, new ClickHandler() {
-                        public void onClick (ClickEvent event) {
-                            showTaxonomy(selcat, subcatname);
-                        }
-                    }), "nowrap");
+    protected Widget createTaxonomy (final String selcat, String selsubcat)
+    {
+        // add the unselected categories
+        FluentTable cats = new FluentTable(5, 0, "handwriting");
+        int row = 0, col = 0;
+        for (final String catname : _coll.series.keySet()) {
+            cats.at(row, col).setWidget(Widgets.newActionLabel(catname, new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    setTaxonomy(createTaxonomy(catname, null));
                 }
+            }));
+            if (++col == 10) {
+                col = 0;
                 row++;
             }
+        }
 
-            // if we have fewer subcats than our selected subcat has series, we need to skip some
-            // rows to make room for the subcats
-            if (series != null) {
-                row += Math.max(0, series.size() - subcats.size());
+        // render the selected category and subcategories
+        Map<String, List<SeriesCard>> selected = _coll.series.get(selcat);
+        List<SeriesCard> series = null;
+        int subcatrow = -1;
+
+        FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
+        row = taxon.add().setText(selcat, "nowrap").row;
+        for (Map.Entry<String, List<SeriesCard>> subcat : selected.entrySet()) {
+            final String subcatname = subcat.getKey();
+            taxon.setWidget(row, 1, createLine(row > 0, row < selected.size()-1, row == 0, true));
+            if (selsubcat == null) {
+                selsubcat = subcatname;
             }
+            if (subcatname.equals(selsubcat)) {
+                subcatrow = row;
+                series = subcat.getValue();
+                taxon.at(row, 2).setText(subcatname, "nowrap");
+            } else {
+                taxon.at(row, 2).setWidget(
+                    Widgets.newActionLabel(subcatname, new ClickHandler() {
+                        public void onClick (ClickEvent event) {
+                            setTaxonomy(createTaxonomy(selcat, subcatname));
+                        }
+                    }), "nowrap");
+            }
+            row++;
         }
 
         if (series != null) {
             // render our connecting lines between subcategory and series
-            for (int lrow = catrow, last = Math.max(subcatrow, catrow+series.size()-1);
-                 lrow <= last; lrow++) {
-                _taxon.setWidget(lrow, 3, createLine(lrow > catrow, lrow < last, lrow == subcatrow,
-                                                     lrow < catrow+series.size()));
+            for (int lrow = 0, rows = Math.max(subcatrow+1, series.size()); lrow < rows; lrow++) {
+                taxon.setWidget(lrow, 3, createLine(lrow > 0, lrow < rows-1, lrow == subcatrow,
+                                                    lrow < series.size()));
             }
 
             // finally render the series and grab the target series
-            row = catrow;
+            row = 0;
             for (final SeriesCard card : series) {
                 Value<Integer> owned = new Value<Integer>(card.owned) {
                     public void update (Integer value) {
@@ -209,7 +220,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
                 Widget name;
                 if (card.categoryId == _seriesId) {
-                    name = Widgets.newInlineLabel(card.name, "Selected");
+                    name = Widgets.newInlineLabel(card.name);
                     displaySeries(card, owned);
                 } else {
                     name = Args.createInlink(
@@ -220,16 +231,12 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                         return " " + owned + " of " + card.things;
                     }
                 };
-                olabel.addStyleName((card.owned == card.things) ? "Complete" : "Incomplete");
-                _taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel).
-                    setStyles("Leaf");
+                taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel).
+                    setStyles("Leaf", (card.owned == card.things) ? "Complete" : "Incomplete");
             }
         }
 
-        if (_seriesId == 0 && _clearSeries != null) {
-            _clearSeries.execute();
-            _clearSeries = null;
-        }
+        return Widgets.newFlowPanel(cats, taxon);
     }
 
     protected void displaySeries (SeriesCard card, final Value<Integer> owned)
@@ -244,11 +251,11 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     _clearSeries.execute();
                 }
                 final SimplePanel wrapper = Widgets.newSimplePanel(null, panel);
-                insert(wrapper, 1);
-                FX.reveal(wrapper).fromBottom().run(animTime);
+                add(wrapper);
+                FX.reveal(wrapper).fromTop().run(animTime);
                 _clearSeries = new Command() {
                     public void execute () {
-                        FX.unreveal(wrapper).onComplete(new Command() {
+                        FX.unreveal(wrapper).fromBottom().onComplete(new Command() {
                             public void execute () {
                                 remove(wrapper);
                             }
@@ -268,7 +275,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
             links.add(Widgets.newActionLabel(subcat.getKey(), "inline", new ClickHandler() {
                 public void onClick (ClickEvent event) {
-                    showTaxonomy(catname, subcat.getKey());
+                    setTaxonomy(createTaxonomy(catname, subcat.getKey()));
                 }
             }));
         }
@@ -292,9 +299,9 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected int _seriesId;
     protected PlayerCollection _coll;
-    protected FluentTable _header, _taxon;
+    protected FluentTable _header;
+    protected Widget _taxon;
     protected Value<Integer> _cards, _series, _completed;
-
     protected Command _clearSeries;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
