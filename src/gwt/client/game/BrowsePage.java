@@ -159,11 +159,13 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         FluentTable cats = new FluentTable(5, 0, "handwriting");
         int row = 0, col = 0;
         for (final String catname : _coll.series.keySet()) {
-            cats.at(row, col).setWidget(Widgets.newActionLabel(catname, new ClickHandler() {
+            Widget name = catname.equals(selcat) ? Widgets.newLabel(catname) :
+                Widgets.newActionLabel(catname, new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     setTaxonomy(createTaxonomy(catname, null));
                 }
-            }));
+            });
+            cats.at(row, col).setWidget(name);
             if (++col == 10) {
                 col = 0;
                 row++;
