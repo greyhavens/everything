@@ -6,9 +6,13 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -17,32 +21,43 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 
 import client.ui.ButtonUI;
-import client.ui.DataPopup;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.PopupCallback;
 
 /**
  * Displays a full-sized card in a nice looking popup.
  */
-public class CardPopup extends DataPopup<Card>
+public class CardPopup extends PopupPanel
 {
     public static ClickHandler onClick (final Context ctx, final CardIdent ident,
                                         final Value<String> status)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new CardPopup(ctx, ident, status), (Widget)event.getSource());
+                final Widget centerOn = (Widget)event.getSource();
+                _gamesvc.getCard(ident, new PopupCallback<Card>() {
+                    public void onSuccess (Card card) {
+                        display(ctx, new CardPopup(ctx, card, status), centerOn);
+                    }
+                });
             }
         };
     }
 
-    public CardPopup (Context ctx, CardIdent ident, Value<String> status)
+    public static void display (Context ctx, GameService.FlipResult result, Value<String> status,
+                                Widget centerOn)
     {
-        this(ctx, status);
-        _gamesvc.getCard(ident, createCallback());
+        display(ctx, new CardPopup(ctx, result, status), centerOn);
     }
 
-    public CardPopup (Context ctx, GameService.FlipResult result, Value<String> status)
+    protected CardPopup (Context ctx, Card card, Value<String> status)
+    {
+        this(ctx, status);
+        setWidget(createContents(card));
+    }
+
+    protected CardPopup (Context ctx, GameService.FlipResult result, Value<String> status)
     {
         this(ctx, status);
         _title = "You got the <b>" + result.card.thing.name + "</b> card!";
@@ -53,7 +68,9 @@ public class CardPopup extends DataPopup<Card>
 
     protected CardPopup (Context ctx, Value<String> status)
     {
-        super("card", ctx);
+        setStyleName("popup");
+        addStyleName("card");
+        _ctx = ctx;
         _status = status;
     }
 
@@ -83,7 +100,7 @@ public class CardPopup extends DataPopup<Card>
         PushButton gift = ButtonUI.newButton(
             "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
-                CardPopup.this.hide();
+                onHide().onClick(null);
                 _status.update("Gifted!");
             }
         }, this));
@@ -99,7 +116,7 @@ public class CardPopup extends DataPopup<Card>
             protected boolean gotResult (Integer result) {
                 // let the client know we have an updated coins value
                 _ctx.getCoins().update(result);
-                CardPopup.this.hide();
+                onHide().onClick(null);
                 _status.update("Sold!");
                 return false;
             }
@@ -116,6 +133,28 @@ public class CardPopup extends DataPopup<Card>
         return CardView.create(card, _title, status, sell, gift, brag, done);
     }
 
+    protected ClickHandler onHide ()
+    {
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                int tx = -getOffsetWidth(), ty = getAbsoluteTop();
+                FX.move(CardPopup.this).to(tx, ty).onComplete(new Command() {
+                    public void execute () {
+                        hide();
+                    }
+                }).run(500);
+            }
+        };
+    }
+
+    protected static void display (Context ctx, CardPopup popup, Widget centerOn)
+    {
+        popup.setVisible(false);
+        ctx.displayPopup(popup, centerOn);
+        FX.move(popup).from(-popup.getOffsetWidth(), popup.getAbsoluteTop()).run(500);
+    }
+
+    protected Context _ctx;
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
     protected Value<String> _status;

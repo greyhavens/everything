@@ -230,7 +230,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                         cell.setText(status).alignCenter();
                     }
                 });
-                _ctx.displayPopup(new CardPopup(_ctx, result, status), view);
+                CardPopup.display(_ctx, result, status, view);
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {
