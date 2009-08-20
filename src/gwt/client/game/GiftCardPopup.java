@@ -31,6 +31,7 @@ import client.ui.DataPopup;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
+import client.util.Prefs;
 
 /**
  * Displays information on which of a player's friends has a particular card and allows them to
@@ -137,7 +138,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             right().setHTML("Give " + _card.thing.name + "<br>to " + info.friend, "machine");
         table.add().setText("Enter an optional message:").setColSpan(2);
         table.add().setWidget(message).setColSpan(2);
-        post.setValue(true);
+        post.setValue(Prefs.get(Prefs.GIFT_POST, true));
         table.add().setWidget(post).setColSpan(2);
         final ClickHandler hider = Popups.createHider(popup);
         message.addKeyPressHandler(new EscapeClickAdapter(hider));
@@ -151,6 +152,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 return true;
             }
             protected boolean gotResult (Void result) {
+                Prefs.set(Prefs.GIFT_POST, post.getValue());
                 if (!post.getValue()) {
                     Popups.info("Card gifted. Your friend will be so happy!");
                 }
