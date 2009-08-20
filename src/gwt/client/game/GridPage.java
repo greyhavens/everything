@@ -216,7 +216,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.image = result.card.thing.image;
                 card.rarity = result.card.thing.rarity;
                 ThingCardView view = new ThingCardView(_ctx, card, null);
-                cell.setWidget(view);
+                cell.setWidget(view).setStyles("Cell");
 
                 // update our status
                 _data.grid.unflipped[card.rarity.ordinal()]--;
