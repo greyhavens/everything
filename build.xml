@@ -19,12 +19,16 @@
     <file name="extlibs/java/google-collect.jar"/>
     <file name="extlibs/java/guice.jar"/>
     <file name="extlibs/java/gwt-user.jar"/>
-    <file name="extlibs/java/junit4.jar"/>
     <file name="extlibs/java/servlet-api.jar"/>
     <file name="extlibs/java/velocity-1.5-dev.jar"/>
     <file name="extlibs/flash/corelib.swc"/>
     <file name="extlibs/flash/flexlib.swc"/>
     <file name="extlibs/flash/tweener.swc"/>
+    <!-- these are for unit tests and mocking -->
+    <file name="extlibs/java/aopalliance.jar"/>
+    <file name="extlibs/java/easymock/easymock.jar"/>
+    <file name="extlibs/java/junit4.jar"/>
+    <file name="extlibs/java/postgresql-jdbc4.jar"/>
   </filelist>
 
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->

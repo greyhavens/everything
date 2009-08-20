@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ROOT=`dirname $0`
+ROOT=`cd $ROOT/.. ; pwd`
+
+# Add all necessary JAR files to the CLASSPATH
+CLASSPATH=$ROOT/dist:$ROOT/dist/classes
+for JAR in $ROOT/dist/lib/*.jar; do
+    if [ -e $JAR ]; then
+        CLASSPATH=$CLASSPATH:$JAR
+    fi
+done
+export CLASSPATH
+
+exec java "$@"
