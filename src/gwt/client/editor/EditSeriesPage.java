@@ -6,6 +6,7 @@ package client.editor;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.base.Function;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -29,7 +30,6 @@ import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
-import com.threerings.gwt.util.Function;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.EditorService;

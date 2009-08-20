@@ -5,6 +5,7 @@ package client.editor;
 
 import java.util.List;
 
+import com.google.common.base.Function;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -22,7 +23,6 @@ import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Function;
 
 import com.threerings.everything.data.Category;
 

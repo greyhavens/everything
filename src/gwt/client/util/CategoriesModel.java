@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.gwt.util.ChainedCallback;
-import com.threerings.gwt.util.Function;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.client.EditorServiceAsync;
