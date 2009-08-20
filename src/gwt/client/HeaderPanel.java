@@ -3,6 +3,7 @@
 
 package client;
 
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 
@@ -29,7 +30,7 @@ public class HeaderPanel extends FlowPanel
         if (ctx.getMe().isGuest()) {
             bits.at(0, col++).setHTML(ctx.getFacebookAddLink("Play Everything!"), "machine");
         } else {
-            bits.at(0, col++).setText("Hello: " + ctx.getMe().name, "machine");
+            bits.at(0, col++).setText(getHello(ctx.getMe().name), "machine");
         }
 
         FlowPanel extras = Widgets.newFlowPanel("machine");
@@ -75,5 +76,22 @@ public class HeaderPanel extends FlowPanel
     {
         super.onLoad();
         XFBML.parse(this);
+    }
+
+    protected static String getHello (String name)
+    {
+        switch (Random.nextInt(10)) {
+        default:
+        case 0: return "Hello: " + name;
+        case 1: return "Hello, " + name + "!";
+        case 2: return "Hi there, " + name;
+        case 3: return "Howdy " + name + "!";
+        case 4: return "Ahoy " + name;
+        case 5: return "Greetings " + name;
+        case 6: return "Yo " + name + "!";
+        case 7: return "Hey " + name;
+        case 8: return "You are: " + name;
+        case 9: return "Huh? What?";
+        }
     }
 }
