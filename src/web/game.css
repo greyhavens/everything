@@ -263,7 +263,9 @@
 }
 
 .browse .Codons {
-  font-size: 18px;
+  font-size: 13px;
+  letter-spacing: -1px;
+  margin-bottom: 3px;
 }
 
 .browse .Taxonomy {

@@ -11,7 +11,6 @@
 @font-face {  
   font-family: "Machine Bold";
   src: local("Copperplate Gothic Bold"), url(copper.ttf);  
-  font-weight: bold;  
 }  
 
 .machine {

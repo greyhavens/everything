@@ -3,6 +3,7 @@
 
 package client.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,6 +148,27 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
     }
 
+    protected Widget createIndex (String selcat)
+    {
+        FluentTable cats = new FluentTable(5, 0, "Codons", "machine");
+        int col = 0;
+        if (selcat == null) {
+            cats.at(0, col++).setText("ALL");
+        } else {
+            cats.at(0, col++).setWidget(Args.createLink("ALL", Page.BROWSE, _coll.owner.userId));
+        }
+
+        int ccount = _coll.series.size(), codonLength = Math.max((75 - ccount) / ccount, 3);
+        for (final String catname : _coll.series.keySet()) {
+            String codon = catname.substring(0, Math.min(codonLength, catname.length()));
+            Widget name = catname.equals(selcat) ? Widgets.newLabel(codon) :
+                Args.createLink(codon, Page.BROWSE, _coll.owner.userId, catname);
+            name.setTitle(catname);
+            cats.at(0, col++).setWidget(name);
+        }
+        return cats;
+    }
+
     protected Widget createOverview ()
     {
         FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
@@ -163,7 +185,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 row++;
             }
         }
-        return taxon;
+        return Widgets.newFlowPanel(createIndex(null), taxon);
     }
 
     protected FlowPanel seriesLinks (List<SeriesCard> cards)
@@ -173,35 +195,19 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             if (links.getWidgetCount() > 0) {
                 links.add(Widgets.newHTML("&nbsp; ", "inline"));
             }
-            Widget link = Args.createInlink(
-                card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
-            if (card.owned == card.things) {
-                link.addStyleName("Complete");
-            }
-            links.add(link);
+            String text = card.name + ((card.owned == card.things) ? " \u2714" : "");
+            links.add(Args.createInlink(text, Page.BROWSE, _coll.owner.userId, card.categoryId));
         }
         return links;
     }
 
     protected Widget createTaxonomy (final String selcat, String selsubcat)
     {
-        // add the unselected categories
-        FluentTable cats = new FluentTable(5, 0, "Codons", "machine");
-        int col = 0;
-        cats.at(0, col++).setWidget(Args.createLink("All", Page.BROWSE, _coll.owner.userId));
-        Map<String, String> codons = toCodons(_coll.series.keySet());
-        for (final String catname : _coll.series.keySet()) {
-            Widget name = catname.equals(selcat) ? Widgets.newLabel(codons.get(catname)) :
-                Args.createLink(codons.get(catname), Page.BROWSE, _coll.owner.userId, catname);
-            name.setTitle(catname);
-            cats.at(0, col++).setWidget(name);
-        }
-
         // render the selected category and subcategories
         FluentTable taxon = new FluentTable(0, 0, "Taxonomy", "handwriting");
         Map<String, List<SeriesCard>> cat = _coll.series.get(selcat);
         if (cat != null) {
-            int catrow = taxon.add().setText(selcat, "nowrap").row, row = catrow;
+            int catrow = taxon.add().setText(selcat, "Selected", "nowrap").row, row = catrow;
             for (Map.Entry<String, List<SeriesCard>> subcat : cat.entrySet()) {
                 final String subcatname = subcat.getKey();
                 taxon.setWidget(row, 1, createLine(row > catrow, row < catrow+cat.size()-1,
@@ -211,7 +217,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 }
                 if (subcatname.equals(selsubcat)) {
                     addSeries(taxon, catrow, row, subcat.getValue());
-                    taxon.at(row, 2).setText(subcatname, "nowrap");
+                    taxon.at(row, 2).setText(subcatname, "Selected", "nowrap");
                 } else {
                     taxon.at(row, 2).setWidget(
                         Widgets.newActionLabel(subcatname, new ClickHandler() {
@@ -224,7 +230,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
         }
 
-        return Widgets.newFlowPanel(cats, taxon);
+        return Widgets.newFlowPanel(createIndex(selcat), taxon);
     }
 
     protected void addSeries (FluentTable taxon, int catrow, int subcatrow, List<SeriesCard> series)
@@ -251,7 +257,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
             Widget name;
             if (card.categoryId == _seriesId) {
-                name = Widgets.newInlineLabel(card.name);
+                name = Widgets.newInlineLabel(card.name, "Selected");
                 displaySeries(card, owned);
             } else {
                 name = Args.createInlink(
@@ -259,11 +265,15 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
             ValueLabel<Integer> olabel = new ValueLabel<Integer>("Held", owned) {
                 protected String getText (Integer owned) {
-                    return " " + owned + " of " + card.things;
+                    String text = "";
+                    if (owned == card.things) {
+                        text += " \u2714";
+                    }
+                    text += " " + owned + " of " + card.things;
+                    return text;
                 }
             };
-            taxon.at(row++, 4).setWidgets(name, Widgets.newInlineLabel(" "), olabel).
-                setStyles("Leaf", (card.owned == card.things) ? "Complete" : "Incomplete");
+            taxon.at(row++, 4).setWidgets(name, olabel).setStyles("Leaf");
         }
     }
 
@@ -292,22 +302,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 };
             }
         });
-    }
-
-    protected static Map<String, String> toCodons (Iterable<String> catnames)
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        Set<String> seen = new HashSet<String>();
-        for (String catname : catnames) {
-            String codon = catname.substring(0, 2);
-            // if we already have (0, 1) then fall back to (0, 2)
-            if (seen.contains(codon)) {
-                codon = catname.substring(0, 1) + catname.substring(2, 3);
-            }
-            map.put(catname, codon);
-            seen.add(codon);
-        }
-        return map;
     }
 
     protected static Image createLine (boolean up, boolean down, boolean left, boolean right)
