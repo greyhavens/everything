@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,7 +29,9 @@ import com.samskivert.depot.clause.FromOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
+import com.samskivert.util.IntSet;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
@@ -291,11 +295,22 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
+     * Returns the ids of all things in a player's collection.
+     */
+    public IntSet loadPlayerThings (int ownerId)
+    {
+        return new ArrayIntSet(
+            findAllKeys(CardRecord.class, false,
+                        new Where(CardRecord.OWNER_ID.eq(ownerId))).
+            map(Key.<CardRecord,Integer>extract(1)));
+    }
+
+    /**
      * Loads the thing ids of this player's things that are the specified rarity or higher.
      */
-    public Set<Integer> loadPlayerThings (int ownerId, Rarity minRarity)
+    public IntSet loadPlayerThings (int ownerId, Rarity minRarity)
     {
-        return Sets.newHashSet(
+        return new ArrayIntSet(
             findAllKeys(ThingRecord.class, false,
                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
                         new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),

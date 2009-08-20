@@ -57,9 +57,6 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public PlayerCollection getCollection (int ownerId) throws ServiceException
     {
-//         PlayerRecord player = requirePlayer();
-//         // TODO: require that the caller be a friend of owner?
-
         PlayerCollection coll = new PlayerCollection();
         coll.owner = _playerRepo.loadPlayerName(ownerId);
         if (coll.owner == null) {
@@ -68,6 +65,7 @@ public class GameServlet extends EveryServiceServlet
 
         // first load up all of the series
         Multimap<Integer, SeriesCard> series = HashMultimap.create();
+        // TODO: use loadPlayerThings and resolve category data from memory
         for (SeriesCard card : _thingRepo.loadPlayerSeries(ownerId)) {
             series.put(card.parentId, card);
         }
@@ -96,9 +94,6 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public Series getSeries (int ownerId, int categoryId) throws ServiceException
     {
-//         PlayerRecord player = requirePlayer();
-//         // TODO: require that the caller be a friend of owner?
-
         Category category = _thingRepo.loadCategory(categoryId);
         if (category == null) {
             throw new ServiceException(E_UNKNOWN_SERIES);
@@ -134,7 +129,6 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public Card getCard (CardIdent ident) throws ServiceException
     {
-        // TODO: show less info if the caller is not the owner?
         CardRecord card = requireCard(ident.ownerId, ident.thingId, ident.received);
         Thing thing = _thingRepo.loadThing(card.thingId);
         return _gameLogic.resolveCard(

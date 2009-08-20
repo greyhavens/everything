@@ -4,14 +4,14 @@
 package com.threerings.everything.tests;
 
 import java.util.List;
-import java.util.Set;
 
-import com.google.common.collect.Sets;
 import com.google.common.collect.Lists;
 
+import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.IntSet;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -29,7 +29,9 @@ public class ThingIndexTest
     {
         ThingIndex index = createTestIndex();
         for (Rarity rarity : Rarity.BONUS) {
-            assertTrue(index.pickThingOf(rarity) != 0);
+            IntSet into = new ArrayIntSet();
+            index.pickThingOf(rarity, new ArrayIntSet(), into);
+            assertTrue(into.size() > 0);
         }
     }
 
@@ -38,10 +40,10 @@ public class ThingIndexTest
         IntMap<ThingInfoRecord> things = createThings();
         ThingIndex index = new ThingIndex(mapCategories(things), things.values());
         // create a random collection
-        Set<Integer> ids = Sets.newHashSet(), exclude = Sets.newHashSet();
+        IntSet ids = new ArrayIntSet(), exclude = new ArrayIntSet();
         index.selectThings(25, ids, exclude);
         // compute owned categories and held rares
-        Set<Integer> ownedCats = Sets.newHashSet(), heldRares = Sets.newHashSet();
+        IntSet ownedCats = new ArrayIntSet(), heldRares = new ArrayIntSet();
         for (int thingId : ids) {
             ThingInfoRecord info = things.get(thingId);
             ownedCats.add(info.categoryId);
