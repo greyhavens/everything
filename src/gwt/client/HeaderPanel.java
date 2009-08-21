@@ -91,7 +91,7 @@ public class HeaderPanel extends FlowPanel
         case 6: return "Yo " + name + "!";
         case 7: return "Hey " + name;
         case 8: return "You are: " + name;
-        case 9: return "Huh? What?";
+        case 9: return "Mmm... pie.";
         }
     }
 }
