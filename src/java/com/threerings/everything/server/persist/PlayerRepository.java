@@ -377,7 +377,7 @@ public class PlayerRepository extends DepotRepository
     {
         long cutoff = System.currentTimeMillis() - days * 24*60*60*1000L;
         return deleteAll(FeedItemRecord.class,
-                         new Where(FeedItemRecord.WHEN.lessThan(cutoff)), null);
+                         new Where(FeedItemRecord.WHEN.lessThan(new Timestamp(cutoff))), null);
     }
 
     @Override // from DepotRepository
