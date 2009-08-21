@@ -78,31 +78,9 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _series = Value.create(coll.countSeries());
             _completed = Value.create(coll.countCompletedSeries());
 
-            final Label feed = Widgets.newLabel("View Feed");
-            Widgets.makeActionLabel(feed, new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    if (_taxon.isAttached()) {
-                        remove(_taxon);
-                        feed.setText("View Collection");
-                        if (_feed == null) {
-                            _feed = new UserFeedPanel(_ctx, _coll.owner.userId);
-                        }
-                        add(_feed);
-                    } else {
-                        remove(_feed);
-                        feed.setText("View Feed");
-                        add(_taxon);
-                    }
-                }
-                protected FeedPanel _feed;
-            });
-            Widget links = _ctx.getMe().equals(coll.owner) ? Widgets.newRow("Links", feed) :
-                Widgets.newRow("Links", feed, Args.createMessageAnchor(coll.owner));
-
             _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded").
                 setRowSpan(3);
             _header.at(0, 1).setText(coll.owner.toString() + "'s Collection", "Title", "machine");
-            _header.at(1, 0).setWidget(links, "machine");
             _header.at(2, 0).setText("");
             _header.at(0, 2).setText("Total things:", "Padded", "right", "handwriting").
                 right().setWidget(ValueLabel.create(_cards), "right", "handwriting");
@@ -114,7 +92,24 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
         _coll = coll;
 
-        // determine which series is selected, if any
+        // update our links every time as we may have switched between feed and collection
+        Widget view;
+        if (FEED_CAT.equals(_selcat)) {
+            view = Args.createLink("View Collection", Page.BROWSE, coll.owner.userId);
+        } else {
+            view = Args.createLink("View Feed", Page.BROWSE, coll.owner.userId, FEED_CAT);
+        }
+        Widget links = _ctx.getMe().equals(coll.owner) ? Widgets.newRow("Links", view) :
+            Widgets.newRow("Links", view, Args.createMessageAnchor(coll.owner));
+        _header.at(1, 0).setWidget(links, "machine");
+
+        // if we're viewing the feed, show that
+        if (FEED_CAT.equals(_selcat)) {
+            setContents(new UserFeedPanel(_ctx, _coll.owner.userId));
+            return;
+        }
+
+        // otherwise determine which series is selected, if any
         String catname = _selcat, subcatname = null;
         if (_seriesId > 0) {
             for (Map.Entry<String, Map<String, List<SeriesCard>>> cat : coll.series.entrySet()) {
@@ -131,16 +126,16 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         }
 
         // now generate our fancy display
-        setTaxonomy(StringUtil.isBlank(catname) ?
+        setContents(StringUtil.isBlank(catname) ?
                     createOverview() : createTaxonomy(catname, subcatname));
     }
 
-    protected void setTaxonomy (Widget taxon)
+    protected void setContents (Widget taxon)
     {
-        if (_taxon != null) {
-            remove(_taxon);
+        if (_contents != null) {
+            remove(_contents);
         }
-        insert(_taxon = taxon, 1);
+        insert(_contents = taxon, 1);
 
         if (_seriesId == 0 && _clearSeries != null) {
             _clearSeries.execute();
@@ -222,7 +217,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                     taxon.at(row, 2).setWidget(
                         Widgets.newActionLabel(subcatname, new ClickHandler() {
                             public void onClick (ClickEvent event) {
-                                setTaxonomy(createTaxonomy(selcat, subcatname));
+                                setContents(createTaxonomy(selcat, subcatname));
                             }
                         }), "nowrap");
                 }
@@ -323,7 +318,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected String _selcat;
     protected PlayerCollection _coll;
     protected FluentTable _header;
-    protected Widget _taxon;
+    protected Widget _contents;
     protected Value<Integer> _cards, _series, _completed;
     protected Command _clearSeries;
 
@@ -345,4 +340,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         _linemap.put("UD", _lines.updown());
         _linemap.put("UDLR", _lines.full());
     };
+
+    protected static final String FEED_CAT = "Feed";
 }
