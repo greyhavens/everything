@@ -42,4 +42,10 @@ public class Card
     {
         return categories[categories.length-1];
     }
+
+    /** Returns an identifier for this card. */
+    public CardIdent getIdent ()
+    {
+        return new CardIdent(owner.userId, thing.thingId, received);
+    }
 }

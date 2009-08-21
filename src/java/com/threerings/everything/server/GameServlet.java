@@ -209,10 +209,8 @@ public class GameServlet extends EveryServiceServlet
             throw se;
         }
 
-        // reload the player record to obtain an update coin count if we paid for this flip
-        if (expectedCost > 0) {
-            player = _playerRepo.loadPlayer(player.userId);
-        }
+        // reload the player record to obtain an updated coin and free flip count
+        player = _playerRepo.loadPlayer(player.userId);
 
         // load up the thing going on the card they just flipped and its whole series
         Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
