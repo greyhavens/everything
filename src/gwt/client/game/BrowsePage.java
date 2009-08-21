@@ -190,8 +190,9 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             if (links.getWidgetCount() > 0) {
                 links.add(Widgets.newHTML("&nbsp; ", "inline"));
             }
-            String text = card.name + ((card.owned == card.things) ? " \u2714" : "");
-            links.add(Args.createInlink(text, Page.BROWSE, _coll.owner.userId, card.categoryId));
+            links.add(Widgets.newLabel(card.glyph(), "Glyph", "inline"));
+            links.add(Args.createInlink(card.name, Page.BROWSE,
+                                        _coll.owner.userId, card.categoryId));
         }
         return links;
     }
@@ -260,12 +261,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             }
             ValueLabel<Integer> olabel = new ValueLabel<Integer>("Held", owned) {
                 protected String getText (Integer owned) {
-                    String text = "";
-                    if (owned == card.things) {
-                        text += " \u2714";
-                    }
-                    text += " " + owned + " of " + card.things;
-                    return text;
+                    return " " + owned + " of " + card.things;
                 }
             };
             taxon.at(row++, 4).setWidgets(name, olabel).setStyles("Leaf");
