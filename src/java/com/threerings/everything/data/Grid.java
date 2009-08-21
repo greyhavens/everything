@@ -22,6 +22,9 @@ public class Grid
     /** The current status of this grid. */
     public GridStatus status;
 
+    /** Info on the flipped status of each slot. */
+    public SlotStatus[] slots;
+
     /** Info on the flipped cards in each position (null or partial card at unflipped positions). */
     public ThingCard[] flipped;
 

@@ -17,6 +17,7 @@ import com.samskivert.depot.util.RuntimeUtil;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.ThingCard;
 
 /**
@@ -57,16 +58,22 @@ public class GridRecord extends PersistentRecord
     /** The time at which this grid expires. */
     public Timestamp expires;
 
-    /** Generates {@link Grid#unflipped}. */
-    public int[] getUnflipped ()
+    /** Generates {@link Grid#slots}. */
+    public SlotStatus[] getSlots ()
     {
-        return new int[EnumSet.allOf(Rarity.class).size()]; // the caller will fill this in
+        return new SlotStatus[thingIds.length]; // the caller will fill this in
     }
 
     /** Generates {@link Grid#flipped}. */
     public ThingCard[] getFlipped ()
     {
         return new ThingCard[thingIds.length]; // the caller will fill this in
+    }
+
+    /** Generates {@link Grid#unflipped}. */
+    public int[] getUnflipped ()
+    {
+        return new int[EnumSet.allOf(Rarity.class).size()]; // the caller will fill this in
     }
 
     // AUTO-GENERATED: METHODS START

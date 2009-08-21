@@ -41,6 +41,7 @@ import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.samsara.app.client.ServiceException;
@@ -51,6 +52,7 @@ import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.SlotStatusRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -121,7 +123,9 @@ public class GameLogic
         }
 
         // load up the flipped status for the player's current grid
-        boolean[] flipped = _gameRepo.loadFlipped(record.userId);
+        SlotStatusRecord slots = _gameRepo.loadSlotStatus(record.userId);
+        grid.slots = slots.toStatuses();
+        long[] stamps = slots.toStamps();
 
         // if our grid status is non-normal, we need to resolve category data
         IntMap<String> reveal = null;
@@ -137,13 +141,21 @@ public class GameLogic
             if (thing == null) {
                 log.warning("Missing thing for grid?", "userId", record.userId,
                             "gridId", record.gridId, "thingId", record.thingIds[ii]);
-            } else if (flipped[ii]) {
+                continue;
+            }
+            switch (grid.slots[ii]) {
+            case FLIPPED:
                 grid.flipped[ii] = thing.toCard();
-            } else {
+                grid.flipped[ii].received = stamps[ii];
+                break;
+            case UNFLIPPED:
                 grid.unflipped[thing.rarity.toByte()]++;
                 if (reveal != null) {
                     grid.flipped[ii] = ThingCard.newPartial(reveal.get(thing.thingId));
                 }
+                break;
+            default:
+                break; // we do nada for GIFTED and SOLD
             }
         }
 
@@ -230,6 +242,9 @@ public class GameLogic
         // send a Facebook notification to the recipient
         _playerLogic.sendGiftNotification(owner, target.facebookId, thing, _thingRepo.loadCategory(
                                               thing.categoryId), completed, message);
+
+        // this card may be on their grid, in which case we need to update its status
+        noteCardStatus(card, SlotStatus.GIFTED);
     }
 
     /**
@@ -246,6 +261,23 @@ public class GameLogic
             return true;
         }
         return false;
+    }
+
+    /**
+     * Potentially updates a player's grid when they sell or gift a card. If the card is on their
+     * current grid, the slot for the card is updated.
+     */
+    public void noteCardStatus (CardRecord card, SlotStatus status)
+    {
+        if (card.giverId == 0 && (System.currentTimeMillis() - card.received.getTime()) < 24*HOUR) {
+            GridRecord grid = _gameRepo.loadGrid(card.ownerId);
+            for (int ii = 0; ii < grid.thingIds.length; ii++) {
+                if (grid.thingIds[ii] == card.thingId) {
+                    _gameRepo.updateSlot(card.ownerId, ii, SlotStatus.FLIPPED, status);
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -531,4 +563,7 @@ public class GameLogic
 
     /** We'll try 10 times to pick a bonus card before giving up. */
     protected static final int MAX_BONUS_ATTEMPTS = 10;
+
+    /** One hour in milliseconds. */
+    protected static final long HOUR = 60*60*1000L;
 }

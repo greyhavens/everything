@@ -30,10 +30,12 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.ThingCard;
 
 import client.ui.ButtonUI;
@@ -162,13 +164,25 @@ public class GridPage extends DataPanel<GameService.GridResult>
     {
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
             int row = ii / COLUMNS, col = ii % COLUMNS;
+            String text = getStatusText(_data.grid.slots[ii]);
+            if (text != null) {
+                _cards.at(row, col).setText(text).alignCenter();
+                continue;
+            }
+
             final int position = ii;
             ThingCard card = _data.grid.flipped[ii];
-            ClickHandler onClick = (card != null && card.thingId > 0) ? null : new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    flipCard(position, (Widget)event.getSource());
-                }
-            };
+            ClickHandler onClick;
+            if (card != null && card.thingId > 0) {
+                onClick = CardPopup.onClick(_ctx, new CardIdent(_ctx.getMe().userId, card.thingId,
+                                                                card.received), createStatus(ii));
+            } else {
+                onClick = new ClickHandler() {
+                    public void onClick (ClickEvent event) {
+                        flipCard(position, (Widget)event.getSource());
+                    }
+                };
+            }
             _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, onClick));
         }
         _status.at(0, 1).setText("Grid status: " + Messages.xlate(""+_data.grid.status), "right");
@@ -203,7 +217,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
         _info.at(0, 1).setWidget(new CoinLabel("You have ", _ctx.getCoins()), "right");
     }
 
-    protected void flipCard (int position, final Widget trigger)
+    protected void flipCard (final int position, final Widget trigger)
     {
         final FluentTable.Cell cell = _cards.at(position / COLUMNS, position % COLUMNS);
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
@@ -219,18 +233,13 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 cell.setWidget(view).setStyles("Cell");
 
                 // update our status
+                _data.grid.slots[position] = SlotStatus.FLIPPED;
                 _data.grid.unflipped[card.rarity.ordinal()]--;
                 updateRemaining(_data.grid.unflipped);
                 updateGameStatus(_data.status = result.status);
 
                 // display the card big and fancy and allow them to gift it or cash it in
-                Value<String> status = new Value<String>("");
-                status.addListener(new Value.Listener<String>() {
-                    public void valueChanged (String status) {
-                        cell.setText(status).alignCenter();
-                    }
-                });
-                CardPopup.display(_ctx, result, status, view);
+                CardPopup.display(_ctx, result, createStatus(position), view);
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {
@@ -240,6 +249,19 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 }
             }
         });
+    }
+
+    protected Value<SlotStatus> createStatus (final int position)
+    {
+        Value<SlotStatus> status = new Value<SlotStatus>(_data.grid.slots[position]);
+        status.addListener(new Value.Listener<SlotStatus>() {
+            public void valueChanged (SlotStatus status) {
+                _data.grid.slots[position] = status;
+                _cards.at(position / COLUMNS, position % COLUMNS).setText(
+                    getStatusText(status)).alignCenter();
+            }
+        });
+        return status;
     }
 
     protected void showPowerupsMenu (final Widget trigger)
@@ -269,6 +291,15 @@ public class GridPage extends DataPanel<GameService.GridResult>
             }
         });
         Popups.showOver(popup, trigger);
+    }
+
+    protected static String getStatusText (SlotStatus status)
+    {
+        switch (status) {
+        case GIFTED: return "Gifted!";
+        case SOLD: return "Sold!";
+        default: return null; // others not used
+        }
     }
 
     protected class NSFPopup extends PopupPanel

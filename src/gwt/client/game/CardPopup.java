@@ -19,6 +19,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
 import client.util.ClickCallback;
@@ -31,7 +32,7 @@ import client.util.PopupCallback;
 public class CardPopup extends PopupPanel
 {
     public static ClickHandler onClick (final Context ctx, final CardIdent ident,
-                                        final Value<String> status)
+                                        final Value<SlotStatus> status)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
@@ -45,19 +46,19 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    public static void display (Context ctx, GameService.FlipResult result, Value<String> status,
-                                Widget centerOn)
+    public static void display (Context ctx, GameService.FlipResult result,
+                                Value<SlotStatus> status, Widget centerOn)
     {
         display(ctx, new CardPopup(ctx, result, status), centerOn);
     }
 
-    protected CardPopup (Context ctx, Card card, Value<String> status)
+    protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
         this(ctx, status);
         setWidget(createContents(card));
     }
 
-    protected CardPopup (Context ctx, GameService.FlipResult result, Value<String> status)
+    protected CardPopup (Context ctx, GameService.FlipResult result, Value<SlotStatus> status)
     {
         this(ctx, status);
         _title = "You got the <b>" + result.card.thing.name + "</b> card!";
@@ -66,7 +67,7 @@ public class CardPopup extends PopupPanel
         setWidget(createContents(result.card));
     }
 
-    protected CardPopup (Context ctx, Value<String> status)
+    protected CardPopup (Context ctx, Value<SlotStatus> status)
     {
         setStyleName("popup");
         addStyleName("card");
@@ -101,7 +102,7 @@ public class CardPopup extends PopupPanel
             "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
             public void run () {
                 onHide().onClick(null);
-                _status.update("Gifted!");
+                _status.update(SlotStatus.GIFTED);
             }
         }, this));
         gift.setTitle("Give this card to a friend.");
@@ -117,7 +118,7 @@ public class CardPopup extends PopupPanel
                 // let the client know we have an updated coins value
                 _ctx.getCoins().update(result);
                 onHide().onClick(null);
-                _status.update("Sold!");
+                _status.update(SlotStatus.SOLD);
                 return false;
             }
         }.setConfirmHTML("You can sell the <b>" + card.thing.name + "</b> card for <b>" +
@@ -157,7 +158,7 @@ public class CardPopup extends PopupPanel
     protected Context _ctx;
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
-    protected Value<String> _status;
+    protected Value<SlotStatus> _status;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }

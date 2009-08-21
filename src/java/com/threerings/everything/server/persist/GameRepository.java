@@ -31,6 +31,7 @@ import com.samskivert.depot.clause.Where;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.Powerup;
+import com.threerings.everything.data.SlotStatus;
 
 import static com.threerings.everything.Log.log;
 
@@ -272,13 +273,55 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Resets the flipped status for a user's grid to all unflipped. Used when creating a new grid
-     * for the user.
+     * Loads up the slot status for the specified user's current grid.
      */
-    public void resetFlipped (int userId)
+    public SlotStatusRecord loadSlotStatus (int userId)
     {
-        FlippedRecord record = new FlippedRecord();
+        SlotStatusRecord slots = load(SlotStatusRecord.getKey(userId));
+        // TEMP
+        if (slots == null) {
+            // migrate from the old flipped data to the new slot status data
+            resetSlotStatus(userId);
+            boolean[] flipped = loadFlipped(userId);
+            for (int ii = 0; ii < flipped.length; ii++) {
+                if (flipped[ii]) {
+                    updateSlot(userId, ii, SlotStatus.UNFLIPPED, SlotStatus.FLIPPED);
+                }
+            }
+            slots = load(SlotStatusRecord.getKey(userId));
+            if (slots == null) {
+                slots = new SlotStatusRecord(); // WTF?
+            }
+            log.info("Migrated slot status", "for", userId, "flipped", flipped,
+                     "status", slots.toStatuses(), "stamps", slots.toStamps());
+        }
+        // END TEMP
+        return slots;
+    }
+
+    /**
+     * Resets the slot status for a user's grid. Used when creating a new grid for the user.
+     */
+    public void resetSlotStatus (int userId)
+    {
+        SlotStatusRecord record = new SlotStatusRecord();
         record.userId = userId;
+        record.status0 = SlotStatus.UNFLIPPED;
+        record.status1 = SlotStatus.UNFLIPPED;
+        record.status2 = SlotStatus.UNFLIPPED;
+        record.status3 = SlotStatus.UNFLIPPED;
+        record.status4 = SlotStatus.UNFLIPPED;
+        record.status5 = SlotStatus.UNFLIPPED;
+        record.status6 = SlotStatus.UNFLIPPED;
+        record.status7 = SlotStatus.UNFLIPPED;
+        record.status8 = SlotStatus.UNFLIPPED;
+        record.status9 = SlotStatus.UNFLIPPED;
+        record.status10 = SlotStatus.UNFLIPPED;
+        record.status11 = SlotStatus.UNFLIPPED;
+        record.status12 = SlotStatus.UNFLIPPED;
+        record.status13 = SlotStatus.UNFLIPPED;
+        record.status14 = SlotStatus.UNFLIPPED;
+        record.status15 = SlotStatus.UNFLIPPED;
         store(record);
     }
 
@@ -288,21 +331,46 @@ public class GameRepository extends DepotRepository
      * @return true if the position was successfully transitioned from unflipped to flipped, false
      * if it was already flipped (or the user didn't exist).
      */
-    public boolean flipPosition (int userId, int position)
+    public boolean flipSlot (int userId, int position)
     {
-        return updatePartial(FlippedRecord.class,
-                             new Where(Ops.and(FlippedRecord.USER_ID.eq(userId),
-                                               FlippedRecord.SLOTS[position].eq(false))),
-                             FlippedRecord.getKey(userId),
-                             FlippedRecord.SLOTS[position], true) == 1;
+        return updatePartial(SlotStatusRecord.class,
+                             new Where(Ops.and(SlotStatusRecord.USER_ID.eq(userId),
+                                               SlotStatusRecord.STATUSES[position].eq(
+                                                   SlotStatus.UNFLIPPED))),
+                             SlotStatusRecord.getKey(userId),
+                             SlotStatusRecord.STATUSES[position], SlotStatus.FLIPPED) == 1;
     }
 
     /**
      * Resets the specified flip position for the specified user to unflipped.
      */
-    public void resetPosition (int userId, int position)
+    public void resetSlot (int userId, int position)
     {
-        updatePartial(FlippedRecord.getKey(userId), FlippedRecord.SLOTS[position], false);
+        updatePartial(SlotStatusRecord.getKey(userId),
+                      SlotStatusRecord.STATUSES[position], SlotStatus.UNFLIPPED,
+                      SlotStatusRecord.STAMPS[position], 0L);
+    }
+
+    /**
+     * Updates the flipped stamp for the specified slot.
+     */
+    public void updateSlot (int userId, int position, long stamp)
+    {
+        updatePartial(SlotStatusRecord.getKey(userId),
+                      SlotStatusRecord.STAMPS[position], stamp);
+    }
+
+    /**
+     * Updates the status for the specified slot. Requires that the old status match the specified
+     * "from" status otherwise no change will be made.
+     */
+    public void updateSlot (int userId, int position, SlotStatus from, SlotStatus to)
+    {
+        updatePartial(SlotStatusRecord.class,
+                      new Where(Ops.and(SlotStatusRecord.USER_ID.eq(userId),
+                                        SlotStatusRecord.STATUSES[position].eq(from))),
+                      SlotStatusRecord.getKey(userId),
+                      SlotStatusRecord.STATUSES[position], to);
     }
 
     /**
@@ -370,11 +438,12 @@ public class GameRepository extends DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
         classes.add(CardRecord.class);
+        classes.add(EscrowedCardRecord.class);
         classes.add(FlippedRecord.class);
         classes.add(GridRecord.class);
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
         classes.add(SeriesRecord.class);
-        classes.add(EscrowedCardRecord.class);
+        classes.add(SlotStatusRecord.class);
     }
 }

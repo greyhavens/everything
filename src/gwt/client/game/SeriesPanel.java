@@ -13,6 +13,7 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Series;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.ThingCard;
 
 import client.util.Context;
@@ -31,10 +32,10 @@ public class SeriesPanel extends FluentTable
         for (int ii = 0; ii < series.things.length; ii++) {
             final FluentTable.Cell cell = at(ii/COLUMNS+1, ii%COLUMNS);
             final ThingCard card = series.things[ii];
-            Value<String> status = new Value<String>("");
-            status.addListener(new Value.Listener<String>() {
-                public void valueChanged (String status) {
-                    cell.setText(status);
+            Value<SlotStatus> status = new Value<SlotStatus>(SlotStatus.FLIPPED);
+            status.addListener(new Value.Listener<SlotStatus>() {
+                public void valueChanged (SlotStatus status) {
+                    cell.setText(GridPage.getStatusText(status));
                     // this card was sold or gifted, so update our owned count
                     Set<Integer> ids = new HashSet<Integer>();
                     for (ThingCard tcard : series.things) {

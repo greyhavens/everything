@@ -37,6 +37,7 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
@@ -154,7 +155,7 @@ public class GameServlet extends EveryServiceServlet
 
             // store the new grid in ze database and reset the player's flipped status
             _gameRepo.storeGrid(grid);
-            _gameRepo.resetFlipped(player.userId);
+            _gameRepo.resetSlotStatus(player.userId);
 
             // based on the time that has elapsed between grid expirations, grant them free flips
             long elapsed = grid.expires.getTime() - oexpires;
@@ -191,8 +192,12 @@ public class GameServlet extends EveryServiceServlet
         // make sure they look like they can afford it (or have a freebie)
         checkCanPayForFlip(player, flipCost, expectedCost);
 
+        // TEMP: make sure their grid status is migrated
+        _gameRepo.loadSlotStatus(player.userId);
+        // END TEMP
+
         // mark this position as flipped in the player's grid
-        if (!_gameRepo.flipPosition(player.userId, position)) {
+        if (!_gameRepo.flipSlot(player.userId, position)) {
             throw new ServiceException(E_ALREADY_FLIPPED);
         }
 
@@ -200,8 +205,13 @@ public class GameServlet extends EveryServiceServlet
         try {
             payForFlip(player, flipCost, expectedCost);
         } catch (ServiceException se) {
-            _gameRepo.resetPosition(player.userId, position);
+            _gameRepo.resetSlot(player.userId, position);
             throw se;
+        }
+
+        // reload the player record to obtain an update coin count if we paid for this flip
+        if (expectedCost > 0) {
+            player = _playerRepo.loadPlayer(player.userId);
         }
 
         // load up the thing going on the card they just flipped and its whole series
@@ -227,11 +237,13 @@ public class GameServlet extends EveryServiceServlet
         CardRecord card = _gameRepo.createCard(player.userId, thing.thingId, 0);
         result.card = _gameLogic.resolveCard(card, thing, things);
 
+        // note the received timestamp of the created card in this position
+        _gameRepo.updateSlot(player.userId, position, card.received.getTime());
+
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost
         grid.unflipped[thing.rarity.ordinal()]--;
-        result.status = _gameLogic.getGameStatus(
-            _playerRepo.loadPlayer(player.userId), grid.unflipped);
+        result.status = _gameLogic.getGameStatus(player, grid.unflipped);
 
         // record that this player flipped this card
         _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name, null);
@@ -263,6 +275,9 @@ public class GameServlet extends EveryServiceServlet
         _playerRepo.grantCoins(player.userId, coins);
         _gameRepo.deleteCard(card);
         log.info("Player sold card", "who", player.who(), "thing", thing.name, "coins", coins);
+
+        // this card may be on their grid, in which case we need to update its status
+        _gameLogic.noteCardStatus(card, SlotStatus.SOLD);
 
         // return their new coin balance (this doesn't have to be absolutely correct)
         return player.coins + coins;
