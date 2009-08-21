@@ -48,6 +48,7 @@ public class FeedItemRecord extends PersistentRecord
 
     /** The time at which the action was taken. */
     @Id public Timestamp when;
+    // TODO: we may need a separate index on this column to make feed pruning not slow
 
     /** The type of action taken. */
     public FeedItem.Type type;
