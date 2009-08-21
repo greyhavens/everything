@@ -166,7 +166,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
             int row = ii / COLUMNS, col = ii % COLUMNS;
             String text = getStatusText(_data.grid.slots[ii]);
             if (text != null) {
-                _cards.at(row, col).setText(text).alignCenter();
+                _cards.at(row, col).setText(text, "Cell").alignCenter();
                 continue;
             }
 
@@ -183,7 +183,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     }
                 };
             }
-            _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, onClick));
+            _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, onClick), "Cell");
         }
         _status.at(0, 1).setText("Grid status: " + Messages.xlate(""+_data.grid.status), "right");
     }
@@ -231,7 +231,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.rarity = result.card.thing.rarity;
                 ThingCardView view = new ThingCardView(_ctx, card, CardPopup.onClick(
                     _ctx, result.card.getIdent(), createStatus(position)));
-                cell.setWidget(view).setStyles("Cell");
+                cell.setWidget(view);
 
                 // update our status
                 _data.grid.slots[position] = SlotStatus.FLIPPED;
@@ -258,8 +258,8 @@ public class GridPage extends DataPanel<GameService.GridResult>
         status.addListener(new Value.Listener<SlotStatus>() {
             public void valueChanged (SlotStatus status) {
                 _data.grid.slots[position] = status;
-                _cards.at(position / COLUMNS, position % COLUMNS).setText(
-                    getStatusText(status)).alignCenter();
+                _cards.at(position / COLUMNS, position % COLUMNS).
+                    setText(getStatusText(status)).alignCenter();
             }
         });
         return status;
