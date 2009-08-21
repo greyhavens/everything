@@ -370,6 +370,16 @@ public class PlayerRepository extends DepotRepository
                        new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
     }
 
+    /**
+     * Prunes items in the feed older than the specified number of days.
+     */
+    public int pruneFeed (int days)
+    {
+        long cutoff = System.currentTimeMillis() - days * 24*60*60*1000L;
+        return deleteAll(FeedItemRecord.class,
+                         new Where(FeedItemRecord.WHEN.lessThan(cutoff)), null);
+    }
+
     @Override // from DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {

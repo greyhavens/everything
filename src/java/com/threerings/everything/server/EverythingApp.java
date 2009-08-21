@@ -189,6 +189,14 @@ public class EverythingApp extends App
                 _gameLogic.processBirthdays();
             }
         }));
+        binds.add(Binding.Job.every(1, new Runnable() {
+            public void run () {
+                int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+                if (deleted > 0) {
+                    log.info("Pruned " + deleted + " old feed items.");
+                }
+            }
+        }));
         return binds.toArray(new Binding[binds.size()]);
     }
 
@@ -252,4 +260,5 @@ public class EverythingApp extends App
     @Inject protected ThingRepository _thingRepo;
 
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
+    protected static final int FEED_PRUNE_DAYS = 5;
 }
