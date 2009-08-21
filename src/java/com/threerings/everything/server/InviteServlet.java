@@ -24,6 +24,7 @@ import com.threerings.samsara.app.server.AppServlet;
 import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.Kontagent;
+import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
@@ -123,6 +124,7 @@ public class InviteServlet extends AppServlet
             log.info("Escrowing card for hopeful future player", "gifter", player.who(),
                      "thing", card.thingId, "recip", targetFBId);
             _gameRepo.escrowCard(card, targetFBId);
+            _gameLogic.noteCardStatus(card, SlotStatus.GIFTED);
 
             // send them a Facebook notification as well as an invite
             _playerLogic.sendGiftNotification(
