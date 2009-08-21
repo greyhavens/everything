@@ -189,7 +189,7 @@ public class EverythingApp extends App
                 _gameLogic.processBirthdays();
             }
         }));
-        binds.add(Binding.Job.every(1, new Runnable() {
+        binds.add(Binding.Job.at(1, new Runnable() {
             public void run () {
                 int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
                 if (deleted > 0) {
