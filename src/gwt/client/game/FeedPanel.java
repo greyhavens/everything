@@ -50,10 +50,11 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
             action.add(Widgets.newInlineLabel(" gave "));
             addGift(action, item);
             if (item.message == null) {
+                int idate = DateUtil.getDayOfMonth(item.when);
                 for (int ii = 0; ii < items.size(); ii++) {
                     FeedItem eitem = items.get(ii);
                     if (eitem.actor.equals(item.actor) && eitem.type == item.type &&
-                        eitem.message == null) {
+                        eitem.message == null && DateUtil.getDayOfMonth(eitem.when) == idate) {
                         action.add(Widgets.newInlineLabel(", "));
                         addGift(action, eitem);
                         items.remove(ii--);
