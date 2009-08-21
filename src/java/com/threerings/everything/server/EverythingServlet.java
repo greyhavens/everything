@@ -202,7 +202,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         // aggregate these results a bit
-        aggregateFeed(player.userId, items, true);
+        aggregateFeed(player.userId, items);
 
         // finally resolve the names in all the records that remain
         return _playerLogic.resolveNames(items, player.getName());
@@ -225,7 +225,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         // aggregate these results a bit
-        aggregateFeed(caller == null ? 0 : caller.userId, items, false);
+        aggregateFeed(caller == null ? 0 : caller.userId, items);
 
         // finally resolve the names in all the records that remain
         return _playerLogic.resolveNames(items, target.getName());
@@ -294,7 +294,7 @@ public class EverythingServlet extends EveryServiceServlet
         Collections.sort(items);
     }
 
-    protected void aggregateFeed (int callerId, List<FeedItem> items, boolean mergeDays)
+    protected void aggregateFeed (int callerId, List<FeedItem> items)
     {
         Map<ItemKey, FeedItem> imap = Maps.newHashMap();
         Calendar cal = Calendar.getInstance();
@@ -310,11 +310,8 @@ public class EverythingServlet extends EveryServiceServlet
                     continue;
                 }
             }
-            int date = 0;
-            if (!mergeDays) {
-                cal.setTime(item.when);
-                date = cal.get(Calendar.DAY_OF_YEAR);
-            }
+            cal.setTime(item.when);
+            int date = cal.get(Calendar.DAY_OF_YEAR);
             ItemKey key = new ItemKey(item, date);
             FeedItem oitem = imap.get(key);
             if (oitem  != null) {
