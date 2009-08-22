@@ -141,7 +141,8 @@ public class GridPage extends DataPanel<GameService.GridResult>
     {
         clear();
 
-        add(_info = new FluentTable(5, 0, "Info"));
+        _info = new FluentTable(5, 0, "Info");
+//         add(_info = new FluentTable(5, 0, "Info"));
         Label pups = Widgets.newLabel("", "Powerups");
         Value<Boolean> enabled = _ctx.popupShowing().map(Functions.NOT);
         _info.at(0, 2).setWidget(hoverize(Widgets.makeActionable(pups, new ClickHandler() {
@@ -334,7 +335,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 final Value<Integer> charges = _ctx.getPupsModel().getCharges(pup);
                 int row = items.add().setWidget(PowerupUI.newIcon(pup), "Icon").
                     right().setWidget(plabel).
-                    right().setWidget(ValueLabel.create("inline", charges), "Charges").row;
+                    right().setWidget(ValueLabel.create(charges, "inline"), "Charges").row;
                 items.getRowFormatter().setStyleName(row, "Item");
                 if (charges.get() > 0) {
                     activatePup(plabel, pup, charges);

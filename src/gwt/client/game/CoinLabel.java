@@ -49,9 +49,7 @@ public class CoinLabel extends ValueHTML<Integer>
      */
     public CoinLabel (String label, Value<Integer> coins)
     {
-        super(coins);
-        addStyleName("inline");
-        addStyleName("machine");
+        super(coins, "machine", "inline");
         _label = label;
     }
 

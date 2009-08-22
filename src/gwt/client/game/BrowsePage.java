@@ -259,12 +259,17 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 name = Args.createInlink(
                     card.name, Page.BROWSE, _coll.owner.userId, card.categoryId);
             }
-            ValueLabel<Integer> olabel = new ValueLabel<Integer>("Held", owned) {
+            ValueLabel<Integer> glabel = new ValueLabel<Integer>(owned, "Glyph", "inline") {
+                protected String getText (Integer owned) {
+                    return card.glyph();
+                }
+            };
+            ValueLabel<Integer> olabel = new ValueLabel<Integer>(owned, "Held") {
                 protected String getText (Integer owned) {
                     return " " + owned + " of " + card.things;
                 }
             };
-            taxon.at(row++, 4).setWidgets(name, olabel).setStyles("Leaf");
+            taxon.at(row++, 4).setWidgets(glabel, name, olabel).setStyles("Leaf");
         }
     }
 
