@@ -35,7 +35,7 @@ public class SeriesPanel extends FluentTable
             Value<SlotStatus> status = new Value<SlotStatus>(SlotStatus.FLIPPED);
             status.addListener(new Value.Listener<SlotStatus>() {
                 public void valueChanged (SlotStatus status) {
-                    cell.setText(GridPage.getStatusText(status));
+                    cell.setText(FlipPage.getStatusText(status));
                     // this card was sold or gifted, so update our owned count
                     Set<Integer> ids = new HashSet<Integer>();
                     for (ThingCard tcard : series.things) {

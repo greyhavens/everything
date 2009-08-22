@@ -11,11 +11,13 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.samskivert.util.ByteEnumUtil;
@@ -51,11 +53,11 @@ import client.util.PopupCallback;
 /**
  * Displays a player's grid, allows flipping of cards.
  */
-public class GridPage extends DataPanel<GameService.GridResult>
+public class FlipPage extends DataPanel<GameService.GridResult>
 {
-    public GridPage (Context ctx)
+    public FlipPage (Context ctx)
     {
-        super(ctx, "page", "grid");
+        super(ctx, "page", "flip");
         addStyleName("machine");
 
         // if we expect that we've already got a grid, request that
@@ -153,7 +155,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
         updateRemaining(_data.grid.unflipped);
         updateGameStatus(_data.status);
 
-        add(_cards = new FluentTable(5, 0, "Cards"));
+        add(_cards = Widgets.newAbsolutePanel("Cards"));
 
         add(_status = new FluentTable(5, 0, "Status"));
         _status.at(0, 0).setText("New grid " + DateUtil.formatDateTime(_data.grid.expires));
@@ -162,11 +164,20 @@ public class GridPage extends DataPanel<GameService.GridResult>
 
     protected void updateGrid ()
     {
+        if (_slots == null) {
+            _slots = new SimplePanel[_data.grid.flipped.length];
+            for (int ii = 0; ii < _slots.length; ii++) {
+                int row = ii / COLUMNS, col = ii % COLUMNS;
+                _slots[ii] = Widgets.newSimplePanel("Cell", null);
+                _cards.add(_slots[ii], col * 142, row * 167);
+            }
+        }
+
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
             int row = ii / COLUMNS, col = ii % COLUMNS;
             String text = getStatusText(_data.grid.slots[ii]);
             if (text != null) {
-                _cards.at(row, col).setText(text, "Cell").alignCenter();
+                _slots[ii].setWidget(Widgets.newLabel(text, "SlotStatus"));
                 continue;
             }
 
@@ -183,7 +194,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                     }
                 };
             }
-            _cards.at(row, col).setWidget(new ThingCardView(_ctx, card, onClick), "Cell");
+            _slots[ii].setWidget(new ThingCardView(_ctx, card, onClick));
         }
         _status.at(0, 1).setText("Grid status: " + Messages.xlate(""+_data.grid.status), "right");
     }
@@ -219,7 +230,6 @@ public class GridPage extends DataPanel<GameService.GridResult>
 
     protected void flipCard (final int position, final Widget trigger)
     {
-        final FluentTable.Cell cell = _cards.at(position / COLUMNS, position % COLUMNS);
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>() {
             public void onSuccess (GameService.FlipResult result) {
@@ -231,7 +241,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
                 card.rarity = result.card.thing.rarity;
                 ThingCardView view = new ThingCardView(_ctx, card, CardPopup.onClick(
                     _ctx, result.card.getIdent(), createStatus(position)));
-                cell.setWidget(view);
+                _slots[position].setWidget(view);
 
                 // update our status
                 _data.grid.slots[position] = SlotStatus.FLIPPED;
@@ -258,8 +268,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
         status.addListener(new Value.Listener<SlotStatus>() {
             public void valueChanged (SlotStatus status) {
                 _data.grid.slots[position] = status;
-                _cards.at(position / COLUMNS, position % COLUMNS).
-                    setText(getStatusText(status)).alignCenter();
+                _slots[position].setWidget(Widgets.newLabel(getStatusText(status), "SlotStatus"));
             }
         });
         return status;
@@ -385,7 +394,10 @@ public class GridPage extends DataPanel<GameService.GridResult>
     }
 
     protected GameService.GridResult _data;
-    protected FluentTable _info, _cards, _status;
+    protected FluentTable _info, _status;
+
+    protected AbsolutePanel _cards;
+    protected SimplePanel[] _slots;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
     protected static final int COLUMNS = 4;

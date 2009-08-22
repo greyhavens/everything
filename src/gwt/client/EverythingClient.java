@@ -35,9 +35,9 @@ import client.editor.EditSeriesPage;
 import client.game.AddAppPanel;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
+import client.game.FlipPage;
 import client.game.FriendsPage;
 import client.game.GetCoinsPage;
-import client.game.GridPage;
 import client.game.LandingPage;
 import client.game.ShopPage;
 import client.game.TermsPage;
@@ -228,7 +228,7 @@ public class EverythingClient
         // these are OK as a regular player
         switch (args.page) {
         case FLIP:
-            setContent(new GridPage(this));
+            setContent(new FlipPage(this));
             return;
         case SHOP:
             setContent(new ShopPage(this));

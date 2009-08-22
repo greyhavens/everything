@@ -311,48 +311,60 @@
 }
 
 /** GridPage styles */
-.grid {
+.flip {
   background: url(images/page_flip.png) no-repeat;
 }
 
-.grid .PreGrid {
+.flip .PreGrid {
   margin: 0px auto;
 }
 
-.grid .PreGrid .Title {
+.flip .PreGrid .Title {
   font-size: 18px;
   text-align: center;
 }
 
-.grid .Info {
+.flip .Info {
   margin: 0px auto;
 }
 
-.grid .Cards, .grid .Status {
-  width: 555px;
+.flip .Cards, .flip .Status {
+  width: 568px;
   margin: 0px auto;
 }
 
-.grid .Cards .Cell {
-  width: 142px;
-  height: 167px;
+.flip .Cards {
+  height: 668px;
 }
 
-.grid .Bold {
+.flip .Cards .Cell {
+  width: 132px;
+  height: 157px;
+  padding: 5px;
+}
+
+.flip .Cards .SlotStatus {
+  width: 132px;
+  padding-top: 70px;
+  height: 82px;
+  text-align: center;
+}
+
+.flip .Bold {
   font-weight: bold;
 }
 
-.grid .PupBox {
+.flip .PupBox {
   padding-left: 20px;
 }
 
-.grid .Powerups {
+.flip .Powerups {
   background: url(images/powerup/button_up.png);
   width: 201px;
   height: 50px;
   margin-left: auto;
 }
-.grid .Powerups-up-hovering {
+.flip .Powerups-up-hovering {
   background: url(images/powerup/button_over.png);
 }
 
