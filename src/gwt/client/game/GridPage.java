@@ -141,8 +141,7 @@ public class GridPage extends DataPanel<GameService.GridResult>
     {
         clear();
 
-        _info = new FluentTable(5, 0, "Info");
-//         add(_info = new FluentTable(5, 0, "Info"));
+        add(_info = new FluentTable(5, 0, "Info"));
         Label pups = Widgets.newLabel("", "Powerups");
         Value<Boolean> enabled = _ctx.popupShowing().map(Functions.NOT);
         _info.at(0, 2).setWidget(hoverize(Widgets.makeActionable(pups, new ClickHandler() {
