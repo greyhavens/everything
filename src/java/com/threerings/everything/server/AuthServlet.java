@@ -125,10 +125,11 @@ public class AuthServlet extends AppServlet
     protected void reportLanding (
         HttpServletRequest req, Kontagent mtype, String ltype, String tracking, String recipId)
     {
-        boolean appAdded =
-            ParameterUtil.isSet(req, "fb_sig") && ParameterUtil.isSet(req, "fb_sig_session_key");
+        boolean appAdded = (ParameterUtil.isSet(req, "fb_sig") &&
+                            ParameterUtil.isSet(req, "fb_sig_session_key"));
+        boolean isShortUID = (tracking != null && tracking.length() == 8);
         _kontLogic.reportAction(mtype, "r", recipId, "i", appAdded ? "1" : "0", "tu", ltype,
-                                (tracking.length() == 8) ? "su" : "u", tracking);
+                                isShortUID ? "su" : "u", tracking);
     }
 
     protected Random _rando = new Random();
