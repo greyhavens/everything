@@ -53,7 +53,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
         add(contents);
 
         // we'll display search results and player details here
-        final FluentTable.Cell target = contents.at(1, 0);
+        final FluentTable.Cell target = contents.at(1, 0).alignTop();
 
         // display our recent registration stats in the left hand column
         contents.at(0, 0).setRowSpan(2).alignTop().setWidgets(
