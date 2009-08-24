@@ -27,12 +27,12 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
-import com.samskivert.depot.expression.FunctionExp;
-import com.samskivert.depot.clause.FieldOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.depot.expression.FunctionExp;
+import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.StringUtil;
@@ -121,17 +121,14 @@ public class PlayerRepository extends DepotRepository
      */
     public SortedMap<Date, Integer> summarizeRegis (int sinceDays)
     {
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = CalendarUtil.zeroTime(Calendar.getInstance());
         cal.add(Calendar.DATE, -sinceDays);
         Timestamp since = new Timestamp(cal.getTimeInMillis());
         SortedMap<Date, Integer> regis = Maps.newTreeMap();
         for (RegiSummaryRecord rec : findAll(RegiSummaryRecord.class,
                                              new Where(PlayerRecord.JOINED.greaterEq(since)),
-                                             new FieldOverride(
-                                                 RegiSummaryRecord.JOINED,
-                                                 new FunctionExp("date", PlayerRecord.JOINED)),
-                                             new GroupBy(RegiSummaryRecord.JOINED))) {
-            regis.put(new Date(rec.joined.getTime()), rec.count);
+                                             new GroupBy(RegiSummaryRecord.WHEN))) {
+            regis.put(new Date(rec.when.getTime()), rec.count);
         }
         return regis;
     }

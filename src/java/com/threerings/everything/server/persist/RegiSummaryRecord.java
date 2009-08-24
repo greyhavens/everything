@@ -17,12 +17,13 @@ public class RegiSummaryRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<RegiSummaryRecord> _R = RegiSummaryRecord.class;
-    public static final ColumnExp JOINED = colexp(_R, "joined");
+    public static final ColumnExp WHEN = colexp(_R, "when");
     public static final ColumnExp COUNT = colexp(_R, "count");
     // AUTO-GENERATED: FIELDS END
 
     /** The date for which we're summarizing. */
-    public Date joined;
+    @Computed(fieldDefinition="date(\"joined\")")
+    public Date when;
 
     /** The number of players that joined on this date. */
     @Computed(fieldDefinition="count(*)")
