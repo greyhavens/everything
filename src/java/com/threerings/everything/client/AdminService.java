@@ -3,7 +3,9 @@
 
 package com.threerings.everything.client;
 
+import java.util.Date;
 import java.util.List;
+import java.util.SortedMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -38,15 +40,25 @@ public interface AdminService extends RemoteService
         public List<Category> pendingCategories;
     }
 
+    /** Provides results for {@link #getRegiStats}. */
+    public static class RegiStatsResult implements IsSerializable
+    {
+        /** A map of registrations per day. */
+        public SortedMap<Date, Integer> regcounts;
+
+        /** Recent registrants. */
+        public List<PlayerName> players;
+    }
+
     /**
      * Returns the current admin stats data.
      */
     StatsResult getStats () throws ServiceException;
 
     /**
-     * Returns data on recently registered players.
+     * Returns data on recent registration activity.
      */
-    List<PlayerName> getRecentPlayers () throws ServiceException;
+    RegiStatsResult getRegiStats () throws ServiceException;
 
     /**
      * Returns details for the specified player.

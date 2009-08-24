@@ -6,14 +6,17 @@ package com.threerings.everything.server.persist;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.internal.Maps;
 
 import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
@@ -24,6 +27,9 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.SchemaMigration;
+import com.samskivert.depot.expression.FunctionExp;
+import com.samskivert.depot.clause.FieldOverride;
+import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -105,6 +111,25 @@ public class PlayerRepository extends DepotRepository
     {
         return findAll(PlayerRecord.class, OrderBy.descending(PlayerRecord.USER_ID),
                        new Limit(0, count)).map(PlayerRecord.TO_NAME);
+    }
+
+    /**
+     * Summarizes the number of registrations per day for the specified number of days into the
+     * past.
+     *
+     * @return a map from date to number of players that registered on that date.
+     */
+    public SortedMap<Date, Integer> summarizeRegis (int sinceDays)
+    {
+        SortedMap<Date, Integer> regis = Maps.newTreeMap();
+        for (RegiSummaryRecord rec : findAll(RegiSummaryRecord.class,
+                                             new FieldOverride(
+                                                 RegiSummaryRecord.JOINED,
+                                                 new FunctionExp("date", PlayerRecord.JOINED)),
+                                             new GroupBy(RegiSummaryRecord.JOINED))) {
+            regis.put(new Date(rec.joined.getTime()), rec.count);
+        }
+        return regis;
     }
 
     /**

@@ -42,6 +42,16 @@ public class AdminServlet extends EveryServiceServlet
     }
 
     // from interface AdminService
+    public RegiStatsResult getRegiStats () throws ServiceException
+    {
+        requireAdmin();
+        RegiStatsResult result = new RegiStatsResult();
+        result.regcounts = _playerRepo.summarizeRegis(REG_COUNT_DAYS);
+        result.players = Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
+        return result;
+    }
+
+    // from interface AdminService
     public List<PlayerName> getRecentPlayers () throws ServiceException
     {
         requireAdmin();
@@ -127,5 +137,6 @@ public class AdminServlet extends EveryServiceServlet
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingRepository _thingRepo;
 
-    protected static final int MAX_RECENTS = 25;
+    protected static final int REG_COUNT_DAYS = 21;
+    protected static final int MAX_RECENTS = 21;
 }

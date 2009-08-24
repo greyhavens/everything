@@ -21,9 +21,9 @@ public interface AdminServiceAsync
     void getStats (AsyncCallback<AdminService.StatsResult> callback);
 
     /**
-     * The async version of {@link AdminService#getRecentPlayers}.
+     * The async version of {@link AdminService#getRegiStats}.
      */
-    void getRecentPlayers (AsyncCallback<List<PlayerName>> callback);
+    void getRegiStats (AsyncCallback<AdminService.RegiStatsResult> callback);
 
     /**
      * The async version of {@link AdminService#getPlayerDetails}.

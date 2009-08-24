@@ -3,7 +3,11 @@
 
 package client.admin;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -35,15 +39,15 @@ import client.util.PopupCallback;
 /**
  * An admin page for viewing and editing players.
  */
-public class PlayersPage extends DataPanel<List<PlayerName>>
+public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
 {
     public PlayersPage (Context ctx)
     {
         super(ctx, "page", "players");
-        _adminsvc.getRecentPlayers(createCallback());
+        _adminsvc.getRegiStats(createCallback());
     }
 
-    protected void init (final List<PlayerName> recentPlayers)
+    protected void init (final AdminService.RegiStatsResult result)
     {
         final FluentTable contents = new FluentTable(5, 0);
         add(contents);
@@ -51,14 +55,18 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
         // we'll display search results and player details here
         final FluentTable.Cell target = contents.at(1, 0);
 
-        // display our recent players in the left hand column
+        // display our recent registration stats in the left hand column
         contents.at(0, 0).setRowSpan(2).alignTop().setWidgets(
-            Widgets.newLabel("Recent Players", "machine"), makePlayerList(target, recentPlayers));
+            Widgets.newLabel("Recent Regs", "machine"), makeRegisTable(result.regcounts));
+
+        // display our recent players in the next column
+        contents.at(0, 1).setRowSpan(2).alignTop().setWidgets(
+            Widgets.newLabel("Recent Players", "machine"), makePlayerList(target, result.players));
 
         // display our find player interface
         final TextBox search = Widgets.newTextBox("", 128, 20);
         DefaultTextListener.configure(search, "<find player>");
-        contents.at(0, 1).alignTop().setWidgets(Widgets.newLabel("Find Player", "machine"), search);
+        contents.at(0, 2).alignTop().setWidgets(Widgets.newLabel("Find Player", "machine"), search);
         new ClickCallback<List<PlayerName>>(new Button("fake"), search) {
             protected boolean callService () {
                 String query = search.getText().trim();
@@ -77,6 +85,22 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
                 return true;
             }
         };
+    }
+
+    protected FluentTable makeRegisTable (Map<Date, Integer> regicounts)
+    {
+        // the map is sorted from earliest to latest and we need to reverse that
+        List<Map.Entry<Date, Integer>> entries = new ArrayList<Map.Entry<Date, Integer>>();
+        entries.addAll(regicounts.entrySet());
+        Collections.reverse(entries);
+
+        FluentTable regis = new FluentTable(0, 0);
+        regis.setWidth("100%");
+        for (Map.Entry<Date, Integer> entry : entries) {
+            regis.add().setText(_dfmt.format(entry.getKey())).
+                right().setText(entry.getValue(), "right");
+        }
+        return regis;
     }
 
     protected FlowPanel makePlayerList (FluentTable.Cell cell, List<PlayerName> players)
@@ -175,4 +199,5 @@ public class PlayersPage extends DataPanel<List<PlayerName>>
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
     protected static final DateTimeFormat _bfmt = DateTimeFormat.getMediumDateFormat();
+    protected static final DateTimeFormat _dfmt = DateTimeFormat.getFormat("MMM dd");
 }
