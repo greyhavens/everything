@@ -121,8 +121,12 @@ public class PlayerRepository extends DepotRepository
      */
     public SortedMap<Date, Integer> summarizeRegis (int sinceDays)
     {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -sinceDays);
+        Timestamp since = new Timestamp(cal.getTimeInMillis());
         SortedMap<Date, Integer> regis = Maps.newTreeMap();
         for (RegiSummaryRecord rec : findAll(RegiSummaryRecord.class,
+                                             new Where(PlayerRecord.JOINED.greaterEq(since)),
                                              new FieldOverride(
                                                  RegiSummaryRecord.JOINED,
                                                  new FunctionExp("date", PlayerRecord.JOINED)),
