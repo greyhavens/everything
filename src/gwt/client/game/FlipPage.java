@@ -165,16 +165,19 @@ public class FlipPage extends DataPanel<GameService.GridResult>
     protected void updateGrid ()
     {
         if (_slots == null) {
+            // if we have no flipped cards, then animate the slots into position
+            Table.Animator anim = Table.pickAnimation(!_data.grid.haveFlipped());
             _slots = new SimplePanel[_data.grid.flipped.length];
             for (int ii = 0; ii < _slots.length; ii++) {
-                int row = ii / COLUMNS, col = ii % COLUMNS;
+                int row = ii / Table.COLUMNS, col = ii % Table.COLUMNS;
                 _slots[ii] = Widgets.newSimplePanel("Cell", null);
-                _cards.add(_slots[ii], col * 142, row * 167);
+                _cards.add(_slots[ii], anim.startx.apply(col, row), anim.starty.apply(col, row));
+                anim.animate(_cards, _slots[ii], col, row);
             }
         }
 
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
-            int row = ii / COLUMNS, col = ii % COLUMNS;
+            int row = ii / Table.COLUMNS, col = ii % Table.COLUMNS;
             String text = getStatusText(_data.grid.slots[ii]);
             if (text != null) {
                 _slots[ii].setWidget(Widgets.newLabel(text, "SlotStatus"));
@@ -400,5 +403,4 @@ public class FlipPage extends DataPanel<GameService.GridResult>
     protected SimplePanel[] _slots;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-    protected static final int COLUMNS = 4;
 }

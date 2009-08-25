@@ -33,4 +33,14 @@ public class Grid
 
     /** The time at which this grid expires and will be replaced. */
     public Date expires;
+
+    /** Returns true if we've flipped any of our cards. */
+    public boolean haveFlipped () {
+        for (SlotStatus slot : slots) {
+            if (slot != SlotStatus.UNFLIPPED) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
