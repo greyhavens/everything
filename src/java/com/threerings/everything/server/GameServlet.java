@@ -285,7 +285,10 @@ public class GameServlet extends EveryServiceServlet
     public GiftInfoResult getGiftCardInfo (int thingId, long received) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        requireCard(player.userId, thingId, received);
+        CardRecord card = requireCard(player.userId, thingId, received);
+        if (card.giverId != 0) {
+            throw new ServiceException(E_NO_REGIFTING);
+        }
 
         // load up data on the things in this set
         Set<Integer> thingIds = Sets.newHashSet();
@@ -336,6 +339,9 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
         CardRecord card = requireCard(player.userId, thingId, received);
+        if (card.giverId != 0) {
+            throw new ServiceException(E_NO_REGIFTING);
+        }
         _gameLogic.giftCard(player, card, friend, message);
     }
 

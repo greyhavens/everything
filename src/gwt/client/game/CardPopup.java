@@ -97,14 +97,17 @@ public class CardPopup extends PopupPanel
             status = "You have " + have + " of " + total + " " + card.getSeries().name + ".";
         }
 
-        PushButton gift = ButtonUI.newButton(
-            "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
-            public void run () {
-                onHide().onClick(null);
-                _status.update(SlotStatus.GIFTED);
-            }
-        }, this));
-        gift.setTitle("Give this card to a friend.");
+        PushButton gift = null;
+        if (card.giver == null) {
+            gift = ButtonUI.newButton(
+                "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+                    public void run () {
+                        onHide().onClick(null);
+                        _status.update(SlotStatus.GIFTED);
+                    }
+                }, this));
+            gift.setTitle("Give this card to a friend.");
+        }
 
         PushButton sell = ButtonUI.newButton("Sell");
         sell.setTitle("Sell this card back for half its value.");

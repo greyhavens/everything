@@ -58,6 +58,9 @@ public interface GameService extends RemoteService
     /** Thrown by various card-related methods if the card in question does not exist. */
     public static final String E_UNKNOWN_CARD = "e.unknown_card";
 
+    /** Thrown by various gifting-related methods if the card in question is already a gift. */
+    public static final String E_NO_REGIFTING = "e.no_regifting";
+
     /** Thrown by {@link #buyPowerup} if the powerup is permanent and the player already owns it. */
     public static final String E_ALREADY_OWN_POWERUP = "e.already_own_powerup";
 
