@@ -53,25 +53,7 @@ public class TestSelectGridThings
             return;
         }
 
-        Injector injector = Guice.createInjector(new AbstractModule() {
-            protected void configure() {
-//                 bind(File.class).annotatedWith(Names.named(AppCodes.APPROOT)).
-//                     toInstance(new File());
-                bind(String.class).annotatedWith(Names.named(AppCodes.APPVERS)).
-                    toInstance(AppCodes.RELEASE_CANDIDATE);
-                bind(PersistenceContext.class).toInstance(new PersistenceContext());
-            }
-            @Provides protected AppLogic getAppLogic () {
-                return EasyMock.createMock(AppLogic.class);
-            }
-            @Provides protected UserLogic getUserLogic () {
-                return EasyMock.createMock(UserLogic.class);
-            }
-            @Provides protected ServletLogic getServletLogic () {
-                return EasyMock.createMock(ServletLogic.class);
-            }
-        });
-
+        Injector injector = Guice.createInjector(new TestModule());
         EverythingApp app = injector.getInstance(EverythingApp.class);
         ConnectionProvider conprov = app.createConnectionProvider(app.getIdentifier());
         PersistenceContext perCtx = injector.getInstance(PersistenceContext.class);
@@ -104,6 +86,24 @@ public class TestSelectGridThings
             System.err.println(errmsg);
         }
         System.exit(255);
+    }
+
+    protected static class TestModule extends AbstractModule
+    {
+        protected void configure() {
+            bind(String.class).annotatedWith(Names.named(AppCodes.APPVERS)).
+                toInstance(AppCodes.RELEASE_CANDIDATE);
+            bind(PersistenceContext.class).toInstance(new PersistenceContext());
+        }
+        @Provides protected AppLogic getAppLogic () {
+            return EasyMock.createMock(AppLogic.class);
+        }
+        @Provides protected UserLogic getUserLogic () {
+            return EasyMock.createMock(UserLogic.class);
+        }
+        @Provides protected ServletLogic getServletLogic () {
+            return EasyMock.createMock(ServletLogic.class);
+        }
     }
 
     @Inject protected GameLogic _gameLogic;
