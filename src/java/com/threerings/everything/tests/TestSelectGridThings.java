@@ -3,8 +3,6 @@
 
 package com.threerings.everything.tests;
 
-import java.io.File;
-
 import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;

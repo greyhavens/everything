@@ -31,7 +31,6 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
-import com.samskivert.depot.expression.FunctionExp;
 import com.samskivert.util.CalendarUtil;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;

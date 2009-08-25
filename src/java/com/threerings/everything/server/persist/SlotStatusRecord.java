@@ -3,8 +3,6 @@
 
 package com.threerings.everything.server.persist;
 
-import com.samskivert.util.ByteEnum;
-
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
