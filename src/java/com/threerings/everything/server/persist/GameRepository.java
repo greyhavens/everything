@@ -21,7 +21,6 @@ import com.samskivert.depot.Exps;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
-import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.FieldOverride;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
@@ -44,14 +43,6 @@ public class GameRepository extends DepotRepository
     @Inject public GameRepository (PersistenceContext ctx)
     {
         super(ctx);
-
-        // TODO: remove a week or two after 07-17-2009
-        _ctx.registerMigration(PowerupRecord.class,
-                               new SchemaMigration.Rename(2, "count", PowerupRecord.CHARGES));
-
-        // TODO: remove a week or two after 08-03-2009
-        _ctx.registerMigration(CardRecord.class,
-                               new SchemaMigration.Rename(4, "created", CardRecord.RECEIVED));
     }
 
     /**
@@ -264,39 +255,11 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Loads up the flipped status for the specified user's current grid.
-     */
-    public boolean[] loadFlipped (int userId)
-    {
-        FlippedRecord record = load(FlippedRecord.getKey(userId));
-        return (record == null) ? null : record.toFlipped();
-    }
-
-    /**
      * Loads up the slot status for the specified user's current grid.
      */
     public SlotStatusRecord loadSlotStatus (int userId)
     {
-        SlotStatusRecord slots = load(SlotStatusRecord.getKey(userId));
-        // TEMP
-        if (slots == null) {
-            // migrate from the old flipped data to the new slot status data
-            resetSlotStatus(userId);
-            boolean[] flipped = loadFlipped(userId);
-            for (int ii = 0; ii < flipped.length; ii++) {
-                if (flipped[ii]) {
-                    updateSlot(userId, ii, SlotStatus.UNFLIPPED, SlotStatus.FLIPPED);
-                }
-            }
-            slots = load(SlotStatusRecord.getKey(userId));
-            if (slots == null) {
-                slots = new SlotStatusRecord(); // WTF?
-            }
-            log.info("Migrated slot status", "for", userId, "flipped", flipped,
-                     "status", slots.toStatuses(), "stamps", slots.toStamps());
-        }
-        // END TEMP
-        return slots;
+        return load(SlotStatusRecord.getKey(userId));
     }
 
     /**
@@ -438,8 +401,8 @@ public class GameRepository extends DepotRepository
     protected void getManagedRecords (Set<Class<? extends PersistentRecord>> classes)
     {
         classes.add(CardRecord.class);
+        classes.add(CollectionRecord.class);
         classes.add(EscrowedCardRecord.class);
-        classes.add(FlippedRecord.class);
         classes.add(GridRecord.class);
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);

@@ -192,10 +192,6 @@ public class GameServlet extends EveryServiceServlet
         // make sure they look like they can afford it (or have a freebie)
         checkCanPayForFlip(player, flipCost, expectedCost);
 
-        // TEMP: make sure their grid status is migrated
-        _gameRepo.loadSlotStatus(player.userId);
-        // END TEMP
-
         // mark this position as flipped in the player's grid
         if (!_gameRepo.flipSlot(player.userId, position)) {
             throw new ServiceException(E_ALREADY_FLIPPED);
