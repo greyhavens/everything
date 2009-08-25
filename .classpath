@@ -3,10 +3,11 @@
 	<classpathentry kind="src" path="src/gwt"/>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="dist/eclipse"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/samsara"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/s3lib.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-fileupload.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api-schema.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/easymock/easymock.jar"/>
+	<classpathentry kind="output" path="dist/eclipse"/>
 </classpath>
