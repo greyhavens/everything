@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.samskivert.util.ByteEnumUtil;
 
+import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.ValueLabel;
@@ -304,6 +305,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
             }
         });
         Popups.showOver(popup, trigger);
+        FX.reveal(popup).fromTop().run(500);
     }
 
     protected static String getStatusText (SlotStatus status)
