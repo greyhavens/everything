@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +27,7 @@ import com.google.code.facebookapi.ProfileField;
 import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
-import com.samskivert.util.CalendarUtil;
+import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
@@ -259,11 +260,8 @@ public class EverythingServlet extends EveryServiceServlet
     protected void addSeriesComments (PlayerRecord player, List<FeedItem> items)
     {
         // load up their recent comments
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -RECENT_COMMENT_DAYS);
-        CalendarUtil.zeroTime(cal);
         Collection<CategoryComment> comments = _thingRepo.loadCommentsSince(
-            player.userId, cal.getTimeInMillis());
+            player.userId, Calendars.now().zeroTime().addDays(-RECENT_COMMENT_DAYS).toTime());
 
         // load up the categories to which those comments apply
         Set<Integer> catIds = Sets.newHashSet();
@@ -369,14 +367,10 @@ public class EverythingServlet extends EveryServiceServlet
                     String bdstr = fbuser.getBirthday();
                     try {
                         if (bdstr != null) {
-                            Calendar cal = Calendar.getInstance();
-                            if (bdstr.indexOf(",") == -1) {
-                                cal.setTime(_bdfmt.parse(bdstr));
-                            } else {
-                                cal.setTime(_bfmt.parse(bdstr));
-                            }
-                            log.info("Parsed birthday", "bday", bdstr, "date", cal.getTime());
-                            _playerRepo.updateBirthday(prec.userId, cal.getTimeInMillis());
+                            Date born = (bdstr.indexOf(",") == -1) ?
+                                _bdfmt.parse(bdstr) : _bfmt.parse(bdstr);
+                            log.info("Parsed birthday", "bday", bdstr, "date", born);
+                            _playerRepo.updateBirthday(prec.userId, born.getTime());
                         }
                     } catch (Exception e) {
                         log.info("Cannot parse birthday", "who", prec.who(), "bday", bdstr,

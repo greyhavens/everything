@@ -31,7 +31,7 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
-import com.samskivert.util.CalendarUtil;
+import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.StringUtil;
@@ -120,9 +120,7 @@ public class PlayerRepository extends DepotRepository
      */
     public SortedMap<Date, Integer> summarizeRegis (int sinceDays)
     {
-        Calendar cal = CalendarUtil.zeroTime(Calendar.getInstance());
-        cal.add(Calendar.DATE, -sinceDays);
-        Timestamp since = new Timestamp(cal.getTimeInMillis());
+        Timestamp since = Calendars.now().zeroTime().addDays(-sinceDays).toTimestamp();
         SortedMap<Date, Integer> regis = Maps.newTreeMap();
         for (RegiSummaryRecord rec : findAll(RegiSummaryRecord.class,
                                              new Where(PlayerRecord.JOINED.greaterEq(since)),
@@ -419,8 +417,7 @@ public class PlayerRepository extends DepotRepository
      */
     protected static int toDateVal (long when)
     {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(when);
+        Calendar cal = Calendars.at(when).asCalendar();
         return (cal.get(Calendar.MONTH)+1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
     }
 }

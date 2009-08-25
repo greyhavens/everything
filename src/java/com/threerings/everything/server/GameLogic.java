@@ -3,8 +3,6 @@
 
 package com.threerings.everything.server;
 
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +24,7 @@ import com.google.inject.name.Named;
 
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
-import com.samskivert.util.CalendarUtil;
+import com.samskivert.util.Calendars;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
@@ -93,17 +91,15 @@ public class GameLogic
         }
 
         // grids generally expire at midnight in the player's timezone
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(player.timezone));
-        CalendarUtil.zeroTime(cal);
-        cal.add(Calendar.DATE, 1);
+        TimeZone zone = TimeZone.getTimeZone(player.timezone);
+        grid.expires = Calendars.in(zone).zeroTime().addDays(1).toTimestamp();
         // if the grid generated won't live for at least two hours, push its expiry out a day
-        long duration = cal.getTimeInMillis() - System.currentTimeMillis();
+        long duration = grid.expires.getTime() - System.currentTimeMillis();
         if (duration < MIN_GRID_DURATION) {
             log.info("Rolling grid forward an extra day", "who", player.who(),
-                     "zone", player.timezone, "had", duration, "odate", cal.getTime());
-            cal.add(Calendar.DATE, 1);
+                     "zone", player.timezone, "had", duration, "odate", grid.expires);
+            grid.expires = Calendars.in(zone).zeroTime().addDays(2).toTimestamp();
         }
-        grid.expires = new Timestamp(cal.getTimeInMillis());
 
         return grid;
     }
