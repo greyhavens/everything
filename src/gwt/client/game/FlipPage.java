@@ -178,7 +178,6 @@ public class FlipPage extends DataPanel<GameService.GridResult>
         }
 
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
-            int row = ii / Table.COLUMNS, col = ii % Table.COLUMNS;
             String text = getStatusText(_data.grid.slots[ii]);
             if (text != null) {
                 _slots[ii].setWidget(Widgets.newLabel(text, "SlotStatus"));
