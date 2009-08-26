@@ -63,7 +63,7 @@ Got Completing Card Template
 
 One line and SS Title:
 
-{*actor*} got the <a href="{*cardURL*}">{*thing*}</a> card and completed the <a href="{*cardURL*}">{*series*}</a> series in <a href="{*everyURL*}">Everything</a>!
+{*actor*} got the <a href="{*cardURL*}">{*thing*}</a> card and completed the <a href="{*cardURL*}">{*category*}</a> series in <a href="{*everyURL*}">Everything</a>!
 
 SS Body:
 
