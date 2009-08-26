@@ -8,7 +8,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.data.FeedItem;
-import com.threerings.everything.data.FriendStatus;
+import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -35,7 +35,7 @@ public interface EverythingServiceAsync
     /**
      * The async version of {@link EverythingService#getFriends}.
      */
-    void getFriends (AsyncCallback<List<FriendStatus>> callback);
+    void getFriends (AsyncCallback<List<PlayerStats>> callback);
 
     /**
      * The async version of {@link EverythingService#getCredits}.

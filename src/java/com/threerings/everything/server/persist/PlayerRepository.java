@@ -93,11 +93,18 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads and returns the names for the supplied set of players, mapped by user id.
      */
+    public List<PlayerRecord> loadPlayers (Collection<Integer> userIds)
+    {
+        return findAll(PlayerRecord.class, new Where(PlayerRecord.USER_ID.in(userIds)));
+    }
+
+    /**
+     * Loads and returns the names for the supplied set of players, mapped by user id.
+     */
     public IntMap<PlayerName> loadPlayerNames (Collection<Integer> userIds)
     {
         IntMap<PlayerName> names = IntMaps.newHashIntMap();
-        for (PlayerRecord prec : findAll(PlayerRecord.class,
-                                         new Where(PlayerRecord.USER_ID.in(userIds)))) {
+        for (PlayerRecord prec : loadPlayers(userIds)) {
             names.put(prec.userId, PlayerRecord.TO_NAME.apply(prec));
         }
         return names;

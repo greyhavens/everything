@@ -45,9 +45,9 @@ import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
-import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -233,10 +233,21 @@ public class EverythingServlet extends EveryServiceServlet
     }
 
     // from interface EverythingService
-    public List<FriendStatus> getFriends () throws ServiceException
+    public List<PlayerStats> getFriends () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        return Lists.newArrayList(_playerRepo.loadFriendStatus(player.userId));
+        Set<Integer> ids = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
+        ids.add(player.userId);
+        IntMap<PlayerStats> stats = IntMaps.newHashIntMap();
+        for (PlayerStats pstat : _gameRepo.loadCollectionStats(ids, _thingLogic.getThingIndex())) {
+            stats.put(pstat.name.userId, pstat);
+        }
+        for (PlayerRecord prec : _playerRepo.loadPlayers(stats.keySet())) {
+            PlayerStats pstat = stats.get(prec.userId);
+            pstat.name = prec.getName();
+            pstat.lastSession = new Date(prec.lastSession.getTime());
+        }
+        return Lists.newArrayList(stats.values());
     }
 
     // from interface EverythingService
@@ -413,6 +424,7 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected GameRepository _gameRepo;
     @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
+    @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
     @Inject protected UserLogic _userLogic;
 

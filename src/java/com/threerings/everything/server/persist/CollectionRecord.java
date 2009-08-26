@@ -3,6 +3,8 @@
 
 package com.threerings.everything.server.persist;
 
+import java.util.Date;
+
 import com.google.common.base.Function;
 
 import com.samskivert.depot.Key;
@@ -11,8 +13,8 @@ import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.util.RuntimeUtil;
 
-import com.threerings.everything.data.CollectionStats;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.data.PlayerStats;
 
 /**
  * Contains a summary of a player's collection. Updated periodically.
@@ -29,9 +31,9 @@ public class CollectionRecord extends PersistentRecord
     public static final ColumnExp NEEDS_UPDATE = colexp(_R, "needsUpdate");
     // AUTO-GENERATED: FIELDS END
 
-    /** A function for converting this record to a {@link CollectionStats}. */
-    public static Function<CollectionRecord, CollectionStats> TO_STATS =
-        RuntimeUtil.makeToRuntime(CollectionRecord.class, CollectionStats.class);
+    /** A function for converting this record to a {@link PlayerStats}. */
+    public static Function<CollectionRecord, PlayerStats> TO_STATS =
+        RuntimeUtil.makeToRuntime(CollectionRecord.class, PlayerStats.class);
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
@@ -55,10 +57,16 @@ public class CollectionRecord extends PersistentRecord
     /** Marks this collection record as needing to be recomputed. */
     public boolean needsUpdate;
 
-    /** Initializes the {@link CollectionStats#owner} field. */
-    public PlayerName getOwner ()
+    /** Initializes the {@link PlayerStats#name} field. */
+    public PlayerName getName ()
     {
         return PlayerName.create(userId); // caller will fill in the rest
+    }
+
+    /** Initializes the {@link PlayerStats#lastSession} field. */
+    public Date getLastSession ()
+    {
+        return null; // caller will fill in the rest
     }
 
     // AUTO-GENERATED: METHODS START

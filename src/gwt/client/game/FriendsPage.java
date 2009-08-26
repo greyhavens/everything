@@ -18,7 +18,7 @@ import com.threerings.gwt.util.DateUtil;
 
 import com.threerings.everything.client.EverythingServiceAsync;
 import com.threerings.everything.client.EverythingService;
-import com.threerings.everything.data.FriendStatus;
+import com.threerings.everything.data.PlayerStats;
 
 import client.ui.ButtonUI;
 import client.ui.DataPanel;
@@ -29,7 +29,7 @@ import client.util.Context;
 /**
  * Displays all of a player's friends and allows them to browse their collections.
  */
-public class FriendsPage extends DataPanel<List<FriendStatus>>
+public class FriendsPage extends DataPanel<List<PlayerStats>>
 {
     public FriendsPage (Context ctx)
     {
@@ -38,10 +38,10 @@ public class FriendsPage extends DataPanel<List<FriendStatus>>
     }
 
     @Override // from DataPanel
-    protected void init (List<FriendStatus> friends)
+    protected void init (List<PlayerStats> friends)
     {
         FluentTable table = new FluentTable(5, 0, "handwriting");
-        table.setWidth("100%");
+        // table.setWidth("100%");
 
         Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
         PushButton invite = ButtonUI.newSmallButton("Invite", new ClickHandler() {
@@ -49,28 +49,28 @@ public class FriendsPage extends DataPanel<List<FriendStatus>>
                 _ctx.displayPopup(new InvitePopup(_ctx, null, null), (Widget)event.getSource());
             }
         });
-        table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS);
+        table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS).alignCenter();
 
         if (friends.size() == 0) {
             return;
         }
 
-        table.add().setText("Your Everything friends:", "machine").setColSpan(COLUMNS);
-        int col = 0, row = table.getRowCount();
-        for (FriendStatus friend : friends) {
-            String lastOnline = DateUtil.formatDateTime(friend.lastSession);
-            table.at(row, col).setWidget(XFBML.newProfilePic(friend.name.facebookId)).alignRight().
-                right().setWidgets(Args.createInlink(friend.name), Widgets.newLabel(lastOnline));
-            col += 2;
-            if (col == COLUMNS) {
-                row++;
-                col = 0;
-            }
+        table.add().setText("Collector", "machine").right().setText("Things", "machine").
+            right().setText("Series", "machine").
+            right().setText("Completed", "machine").
+            right().setText("Last online", "machine");
+        for (PlayerStats ps : friends) {
+            table.add().setWidget(Args.createInlink(ps.name)).
+                right().setText(ps.things, "right").
+                right().setText(ps.series, "right").
+                right().setText(ps.completeSeries, "right").
+                right().setText(DateUtil.formatDateTime(ps.lastSession));
         }
+
         add(table);
         XFBML.parse(this);
     }
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
-    protected static final int COLUMNS = 6;
+    protected static final int COLUMNS = 5;
 }

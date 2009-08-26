@@ -33,9 +33,9 @@ import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 
-import com.threerings.everything.data.CollectionStats;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
+import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.server.ThingIndex;
@@ -148,6 +148,7 @@ public class GameRepository extends DepotRepository
         card.received = new Timestamp(System.currentTimeMillis());
         card.giverId = giverId;
         insert(card);
+        markCollectionDirty(ownerId);
         return card;
     }
 
@@ -157,6 +158,7 @@ public class GameRepository extends DepotRepository
     public void deleteCard (CardRecord card)
     {
         delete(card);
+        markCollectionDirty(card.ownerId);
     }
 
     /**
@@ -465,7 +467,7 @@ public class GameRepository extends DepotRepository
      * collection summaries to be updated for any player that needs it. The names in the resulting
      * records will need to be resolved by the caller.
      */
-    public List<CollectionStats> loadCollectionStats (Set<Integer> owners, ThingIndex index)
+    public List<PlayerStats> loadCollectionStats (Set<Integer> owners, ThingIndex index)
     {
         Map<Integer, CollectionRecord> stats = Maps.newHashMap();
         Set<Integer> updates = Sets.newHashSet();
@@ -476,6 +478,7 @@ public class GameRepository extends DepotRepository
             }
             stats.put(record.userId, record);
         }
+        updates.addAll(Sets.difference(owners, stats.keySet()));
         for (Integer updaterId : updates) {
             stats.put(updaterId, updateCollectionStats(updaterId, index));
         }

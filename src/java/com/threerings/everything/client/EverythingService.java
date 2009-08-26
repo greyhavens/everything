@@ -12,8 +12,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.FeedItem;
-import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
 
 /**
@@ -57,9 +57,9 @@ public interface EverythingService extends RemoteService
     List<FeedItem> getUserFeed (int userId) throws ServiceException;
 
     /**
-     * Returns the names of the caller's friends.
+     * Returns stats on the caller's friends (the caller is included in this set).
      */
-    List<FriendStatus> getFriends () throws ServiceException;
+    List<PlayerStats> getFriends () throws ServiceException;
 
     /**
      * Returns the data needed for the credits page.

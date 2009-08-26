@@ -3,13 +3,18 @@
 
 package com.threerings.everything.data;
 
+import java.util.Date;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
- * Reports summary statistics on a player's collection.
+ * Reports summary statistics on a player.
  */
-public class CollectionStats
+public class PlayerStats
+    implements IsSerializable
 {
-    /** The owner of this collection. */
-    public PlayerName owner;
+    /** The player in question. */
+    public PlayerName name;
 
     /** The total number of (unique) things in this user's collection. */
     public int things;
@@ -22,4 +27,7 @@ public class CollectionStats
 
     /** The number of times this player has gifted cards. */
     public int gifts;
+
+    /** The time at which this player was last online. */
+    public Date lastSession;
 }
