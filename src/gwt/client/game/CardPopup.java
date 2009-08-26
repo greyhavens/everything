@@ -124,7 +124,9 @@ public class CardPopup extends PopupPanel
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
-        PushButton brag = ButtonUI.newButton("Brag", ThingDialog.makeGotHandler(_ctx, card));
+        boolean completed = (_haveCount == 0 && _thingsRemaining == 0);
+        PushButton brag = ButtonUI.newButton(
+            "Brag", ThingDialog.makeGotHandler(_ctx, card, completed));
         brag.setTitle("Post this card to your Facebook feed.");
 
         PushButton done = ButtonUI.newButton("Keep", onHide());

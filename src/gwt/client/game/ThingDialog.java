@@ -23,10 +23,18 @@ public class ThingDialog
     /**
      * Creates a click handler that displays a "I got this card" dialog.
      */
-    public static ClickHandler makeGotHandler (Context ctx, Card card)
+    public static ClickHandler makeGotHandler (Context ctx, Card card, boolean completed)
     {
-        return makeHandler(ctx, "got_card", Build.Template.GOT_CARD.id, card,
-                           "Brag about this awesome card to your friends:", "Woo!");
+        if (completed) {
+            return makeHandler(ctx, "got_comp", Build.Template.GOT_COMP.id, card,
+                               "Brag about your completed series to your friends:", "Woo hoo!");
+        } else if (card.giver != null) {
+            return makeHandler(ctx, "got_gift", Build.Template.GOT_GIFT.id, card,
+                               "Brag about your awesome gift to your friends:", "Thanks!");
+        } else {
+            return makeHandler(ctx, "got_card", Build.Template.GOT_CARD.id, card,
+                               "Brag about this awesome card to your friends:", "Woo!");
+        }
     }
 
     /**
@@ -53,7 +61,8 @@ public class ThingDialog
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                showDialog(ctx, vec, templateId, null, card, card.owner, prompt, message);
+                String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
+                showDialog(ctx, vec, templateId, targetId, card, card.owner, prompt, message);
             }
         };
     }
