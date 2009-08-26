@@ -58,7 +58,7 @@ public class GameRepository extends DepotRepository
         registerMigration(new DataMigration("2009_08_25_compute_gifts") {
             public void invoke () throws DatabaseException {
                 IntIntMap gifts = new IntIntMap();
-                for (CardRecord crec : findAll(CardRecord.class)) {
+                for (CardRecord crec : findAll(CardRecord.class, CacheStrategy.NONE)) {
                     if (crec.giverId != 0) {
                         gifts.increment(crec.giverId, 1);
                     }
