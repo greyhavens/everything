@@ -74,18 +74,20 @@ public class ThingDialog
             vec, Page.BROWSE, owner.userId, card.thing.categoryId);
         String everyURL = ctx.getEverythingURL(vec, Page.LANDING);
         showDialog(templateId, targetId, card.thing.name, card.thing.descrip,
-                   Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   ImageUtil.getImageURL(card.thing.image), cardURL, everyURL, prompt, message);
+                   Category.getHierarchy(card.categories), card.getSeries().name,
+                   card.thing.rarity.toString(), ImageUtil.getImageURL(card.thing.image),
+                   cardURL, everyURL, prompt, message);
     }
 
     protected static native void showDialog (String templateId, String targetId, String thing,
-                                             String descrip, String category, String rarity,
-                                             String image, String cardURL, String everyURL,
-                                             String prompt, String message) /*-{
+                                             String descrip, String categories, String series,
+                                             String rarity, String image, String cardURL,
+                                             String everyURL, String prompt, String message) /*-{
         var data = {
             'thing': thing,
             'descrip': descrip,
-            'category': category,
+            'category': categories,
+            'series': series,
             'rarity': rarity,
             'cardURL': cardURL,
             'everyURL': everyURL,
