@@ -73,6 +73,28 @@ public class GameRepository extends DepotRepository
             }
         });
         // end temp
+
+        // temp: populate collection records
+        registerMigration(new DataMigration("2009_08_26_create_collrecs") {
+            public void invoke () throws DatabaseException {
+                Set<Integer> ids = Sets.newHashSet(findAllKeys(PlayerRecord.class, false).
+                                                   map(Key.<PlayerRecord>toInt()));
+                for (CollectionRecord rec : findAll(CollectionRecord.class, CacheStrategy.NONE)) {
+                    ids.remove(rec.userId);
+                }
+                log.info("Creating collection records for " + ids);
+                for (int userId : ids) {
+                    try {
+                        CollectionRecord crec = new CollectionRecord();
+                        crec.userId = userId;
+                        insert(crec);
+                    } catch (DatabaseException de) {
+                        log.warning("Failed to create collection record", "userId", userId, de);
+                    }
+                }
+            }
+        });
+        // end temp
     }
 
     /**
@@ -156,6 +178,16 @@ public class GameRepository extends DepotRepository
             collection.put(index.getCategory(thingId), thingId);
         }
         return collection;
+    }
+
+    /**
+     * Creates needed records for a new player starting the game.
+     */
+    public void startCollection (int userId)
+    {
+        CollectionRecord record = new CollectionRecord();
+        record.userId = userId;
+        insert(record);
     }
 
     /**
@@ -460,17 +492,11 @@ public class GameRepository extends DepotRepository
      */
     public void markCollectionDirty (int userId)
     {
-        int mods = updatePartial(CollectionRecord.class,
-                                 new Where(Ops.and(CollectionRecord.USER_ID.eq(userId),
-                                                   CollectionRecord.NEEDS_UPDATE.eq(true))),
-                                 CollectionRecord.getKey(userId),
-                                 CollectionRecord.NEEDS_UPDATE, true);
-        if (mods == 0) {
-            CollectionRecord record = new CollectionRecord();
-            record.userId = userId;
-            record.needsUpdate = true;
-            insert(record);
-        }
+        updatePartial(CollectionRecord.class,
+                      new Where(Ops.and(CollectionRecord.USER_ID.eq(userId),
+                                        CollectionRecord.NEEDS_UPDATE.eq(true))),
+                      CollectionRecord.getKey(userId),
+                      CollectionRecord.NEEDS_UPDATE, true);
     }
 
     /**
