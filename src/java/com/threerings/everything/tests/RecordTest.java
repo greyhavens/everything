@@ -18,6 +18,7 @@ public class RecordTest
         // RuntimeUtil.makeToRuntime
         new CardRecord();
         new CategoryRecord();
+        new CollectionRecord();
         new GridRecord();
         new PlayerRecord();
         new PowerupRecord();

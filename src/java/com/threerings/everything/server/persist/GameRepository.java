@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -18,6 +23,7 @@ import com.samskivert.util.IntIntMap;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
 import com.samskivert.depot.Exps;
+import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
@@ -27,10 +33,12 @@ import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 
+import com.threerings.everything.data.CollectionStats;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.SlotStatus;
+import com.threerings.everything.server.ThingIndex;
 
 import static com.threerings.everything.Log.log;
 
@@ -114,6 +122,21 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Loads and returns a mapping from category id to the id of all things held in that category
+     * for the specified player.
+     */
+    public Multimap<Integer, Integer> loadCollection (int userId, ThingIndex index)
+    {
+        TreeMultimap<Integer, Integer> collection = TreeMultimap.create();
+        for (Integer thingId : findAllKeys(CardRecord.class, false,
+                                           new Where(CardRecord.OWNER_ID.eq(userId))).
+                 map(Key.<CardRecord,Integer>extract(1))) {
+            collection.put(index.getCategory(thingId), thingId);
+        }
+        return collection;
+    }
+
+    /**
      * Creates a new card for the specified player for the specified thing. Returns the newly
      * created card record.
      */
@@ -145,6 +168,14 @@ public class GameRepository extends DepotRepository
                       CardRecord.OWNER_ID, toUserId,
                       CardRecord.GIVER_ID, card.ownerId,
                       CardRecord.RECEIVED, new Timestamp(System.currentTimeMillis()));
+
+        // update collection dirtiness and gift stats
+        if (card.giverId == 0) {
+            noteCardGifted(card.ownerId);
+        } else {
+            markCollectionDirty(card.ownerId);
+        }
+        markCollectionDirty(toUserId);
     }
 
     /**
@@ -168,6 +199,9 @@ public class GameRepository extends DepotRepository
                       CardRecord.OWNER_ID, -1,
                       CardRecord.GIVER_ID, card.ownerId,
                       CardRecord.RECEIVED, now);
+
+        // note that their collection status changed
+        markCollectionDirty(card.ownerId);
     }
 
     /**
@@ -395,6 +429,85 @@ public class GameRepository extends DepotRepository
                                                PowerupRecord.CHARGES.greaterEq(1))),
                              PowerupRecord.getKey(userId, type),
                              PowerupRecord.CHARGES, PowerupRecord.CHARGES.minus(1)) == 1;
+    }
+
+    /**
+     * Notes that the collection of the specified user needs to be updated.
+     */
+    public void markCollectionDirty (int userId)
+    {
+        int mods = updatePartial(CollectionRecord.class,
+                                 new Where(Ops.and(CollectionRecord.USER_ID.eq(userId),
+                                                   CollectionRecord.NEEDS_UPDATE.eq(true))),
+                                 CollectionRecord.getKey(userId),
+                                 CollectionRecord.NEEDS_UPDATE, true);
+        if (mods == 0) {
+            CollectionRecord record = new CollectionRecord();
+            record.userId = userId;
+            record.needsUpdate = true;
+            insert(record);
+        }
+    }
+
+    /**
+     * Notes that the user in question gifted a flipped card. Also marks their collection as
+     * needing resummarizing.
+     */
+    public void noteCardGifted (int userId)
+    {
+        updatePartial(CollectionRecord.getKey(userId),
+                      CollectionRecord.GIFTS, CollectionRecord.GIFTS.plus(1),
+                      CollectionRecord.NEEDS_UPDATE, true);
+    }
+
+    /**
+     * Returns stats on the collections of the specified set of players. This will cause the
+     * collection summaries to be updated for any player that needs it. The names in the resulting
+     * records will need to be resolved by the caller.
+     */
+    public List<CollectionStats> loadCollectionStats (Set<Integer> owners, ThingIndex index)
+    {
+        Map<Integer, CollectionRecord> stats = Maps.newHashMap();
+        Set<Integer> updates = Sets.newHashSet();
+        for (CollectionRecord record : findAll(CollectionRecord.class,
+                                               new Where(CollectionRecord.USER_ID.in(owners)))) {
+            if (record.needsUpdate) {
+                updates.add(record.userId);
+            }
+            stats.put(record.userId, record);
+        }
+        for (Integer updaterId : updates) {
+            stats.put(updaterId, updateCollectionStats(updaterId, index));
+        }
+        return Lists.newArrayList(Iterables.transform(stats.values(), CollectionRecord.TO_STATS));
+    }
+
+    /**
+     * Updates the collection summary stats for the specified user.
+     */
+    protected CollectionRecord updateCollectionStats (int userId, ThingIndex index)
+    {
+        // compute their updated data
+        CollectionRecord record = new CollectionRecord();
+        Multimap<Integer, Integer> coll = loadCollection(userId, index);
+        for (Map.Entry<Integer, Collection<Integer>> entry : coll.asMap().entrySet()) {
+            record.things += entry.getValue().size();
+            record.series++;
+            if (index.getCategorySize(entry.getKey()) == entry.getValue().size()) {
+                record.completeSeries++;
+            }
+        }
+
+        int mods = updatePartial(CollectionRecord.getKey(userId),
+                                 CollectionRecord.THINGS, record.things,
+                                 CollectionRecord.SERIES, record.series,
+                                 CollectionRecord.COMPLETE_SERIES, record.completeSeries,
+                                 CollectionRecord.NEEDS_UPDATE, false);
+        if (mods == 0) {
+            record.userId = userId;
+            store(record);
+        }
+        return load(CollectionRecord.getKey(userId));
     }
 
     @Override // from DepotRepository

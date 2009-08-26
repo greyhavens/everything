@@ -239,7 +239,7 @@ public class GameLogic
         _playerLogic.sendGiftNotification(owner, target.facebookId, thing, _thingRepo.loadCategory(
                                               thing.categoryId), completed, message);
 
-        // this card may be on their grid, in which case we need to update its status
+        // it may be on their grid, in which case we need to update its status
         noteCardStatus(card, SlotStatus.GIFTED);
     }
 
@@ -306,11 +306,11 @@ public class GameLogic
     public int[] selectGridThings (PlayerRecord player, Powerup pup)
         throws ServiceException
     {
-        ThingIndex index = getThingIndex();
+        ThingIndex index = _thingLogic.getThingIndex();
         IntSet thingIds = new ArrayIntSet();
 
         // load up this player's collection summary, identify incomplete series
-        Multimap<Integer, Integer> collection = resolveCollection(player.userId, index);
+        Multimap<Integer, Integer> collection = _gameRepo.loadCollection(player.userId, index);
         IntSet haveIds = new ArrayIntSet(collection.values());
         IntSet haveCats = new ArrayIntSet();
         for (int categoryId : collection.keySet()) {
@@ -393,19 +393,6 @@ public class GameLogic
     }
 
     /**
-     * Loads and returns a mapping from category id to the id of all things held in that category
-     * for the specified player.
-     */
-    protected Multimap<Integer, Integer> resolveCollection (int userId, ThingIndex index)
-    {
-        TreeMultimap<Integer, Integer> collection = TreeMultimap.create();
-        for (Integer thingId : _thingRepo.loadPlayerThings(userId)) {
-            collection.put(index.getCategory(thingId), thingId);
-        }
-        return collection;
-    }
-
-    /**
      * Returns a set of categories the player is collecting (ie. they have at least one card in the
      * category but have not completed it).
      */
@@ -419,45 +406,6 @@ public class GameLogic
             }
         }
         return ownedCats;
-    }
-
-    /**
-     * Returns a recently computed thing index. May block if the index needs updating.
-     */
-    protected ThingIndex getThingIndex ()
-    {
-        long now = System.currentTimeMillis();
-        synchronized (this) {
-            if (_index != null && now < _nextIndexUpdate) {
-                return _index;
-            }
-            _nextIndexUpdate = now + THING_INDEX_UPDATE_INTERVAL;
-            // before the first thing index is generated, all callers must block
-            if (_index == null) {
-                return (_index = createThingIndex());
-            }
-            // otherwise other callers can use the old index until we've generated the new one
-        }
-
-        ThingIndex index = createThingIndex();
-        synchronized (this) {
-            _index = index;
-        }
-        return index;
-    }
-
-    /**
-     * Creates a new thing index by scanning the entire thing database. This is expensive.
-     */
-    protected ThingIndex createThingIndex ()
-    {
-        IntIntMap catmap = new IntIntMap();
-        for (Category cat : _thingRepo.loadAllCategories()) {
-            if (cat.parentId != 0) {
-                catmap.put(cat.categoryId, cat.parentId);
-            }
-        }
-        return new ThingIndex(catmap, _thingRepo.loadActiveThings());
     }
 
     /**
@@ -523,7 +471,7 @@ public class GameLogic
      */
     protected void processBirthday (PlayerRecord user)
     {
-        ThingIndex index = getThingIndex();
+        ThingIndex index = _thingLogic.getThingIndex();
         IntSet heldRares = _thingRepo.loadPlayerThings(user.userId, Rarity.MIN_GIFT_RARITY);
         int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index), heldRares);
         Thing thing = _thingRepo.loadThing(thingId);
@@ -540,22 +488,17 @@ public class GameLogic
         log.info("Gave out a birthday present", "to", user.who(), "what", thing.name);
     }
 
-    protected ThingIndex _index;
-    protected long _nextIndexUpdate;
-
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
     @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
+    @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 
     /** The minimum allowed lifespan for a grid. */
     protected static final long MIN_GRID_DURATION = 2 * 60 * 60 * 1000L;
-
-    /** Recompute our thing index every five minutes. */
-    protected static final long THING_INDEX_UPDATE_INTERVAL = 5 * 60 * 1000L;
 
     /** We'll try 10 times to pick a bonus card before giving up. */
     protected static final int MAX_BONUS_ATTEMPTS = 10;

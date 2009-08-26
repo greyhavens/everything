@@ -3,10 +3,16 @@
 
 package com.threerings.everything.server.persist;
 
+import com.google.common.base.Function;
+
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
+import com.samskivert.depot.util.RuntimeUtil;
+
+import com.threerings.everything.data.CollectionStats;
+import com.threerings.everything.data.PlayerName;
 
 /**
  * Contains a summary of a player's collection. Updated periodically.
@@ -22,6 +28,14 @@ public class CollectionRecord extends PersistentRecord
     public static final ColumnExp GIFTS = colexp(_R, "gifts");
     public static final ColumnExp NEEDS_UPDATE = colexp(_R, "needsUpdate");
     // AUTO-GENERATED: FIELDS END
+
+    /** A function for converting this record to a {@link CollectionStats}. */
+    public static Function<CollectionRecord, CollectionStats> TO_STATS =
+        RuntimeUtil.makeToRuntime(CollectionRecord.class, CollectionStats.class);
+
+    /** Increment this value if you modify the definition of this persistent object in a way that
+     * will result in a change to its SQL counterpart. */
+    public static final int SCHEMA_VERSION = 1;
 
     /** The id of the user whose collection is summarized. */
     @Id public int userId;
@@ -40,6 +54,12 @@ public class CollectionRecord extends PersistentRecord
 
     /** Marks this collection record as needing to be recomputed. */
     public boolean needsUpdate;
+
+    /** Initializes the {@link CollectionStats#owner} field. */
+    public PlayerName getOwner ()
+    {
+        return PlayerName.create(userId); // caller will fill in the rest
+    }
 
     // AUTO-GENERATED: METHODS START
     /**

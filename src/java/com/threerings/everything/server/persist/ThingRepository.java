@@ -292,17 +292,6 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Returns the ids of all things in a player's collection.
-     */
-    public IntSet loadPlayerThings (int ownerId)
-    {
-        return new ArrayIntSet(
-            findAllKeys(CardRecord.class, false,
-                        new Where(CardRecord.OWNER_ID.eq(ownerId))).
-            map(Key.<CardRecord,Integer>extract(1)));
-    }
-
-    /**
      * Loads the thing ids of this player's things that are the specified rarity or higher.
      */
     public IntSet loadPlayerThings (int ownerId, Rarity minRarity)
