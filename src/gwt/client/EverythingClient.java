@@ -237,7 +237,10 @@ public class EverythingClient
             setContent(new GetCoinsPage(this, args.get(0, "")));
             return;
         case FRIENDS:
-            setContent(new FriendsPage(this));
+            if (!(_content instanceof FriendsPage)) {
+                setContent(new FriendsPage(this));
+            }
+            ((FriendsPage)_content).setMode(args.get(0, ""));
             return;
         }
 
