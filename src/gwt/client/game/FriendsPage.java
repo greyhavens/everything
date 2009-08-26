@@ -56,12 +56,14 @@ public class FriendsPage extends DataPanel<List<PlayerStats>>
         }
 
         table.add().setText("Collector", "machine").right().setText("Things", "machine").
+            right().setText("Gifted", "machine").
             right().setText("Series", "machine").
             right().setText("Completed", "machine").
             right().setText("Last online", "machine");
         for (PlayerStats ps : friends) {
             table.add().setWidget(Args.createInlink(ps.name)).
                 right().setText(ps.things, "right").
+                right().setText(ps.gifts, "right").
                 right().setText(ps.series, "right").
                 right().setText(ps.completeSeries, "right").
                 right().setText(DateUtil.formatDateTime(ps.lastSession));

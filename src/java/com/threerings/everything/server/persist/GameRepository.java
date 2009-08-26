@@ -20,6 +20,8 @@ import com.google.inject.Singleton;
 
 import com.samskivert.util.IntIntMap;
 
+import com.samskivert.depot.DataMigration;
+import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
 import com.samskivert.depot.Exps;
@@ -51,6 +53,26 @@ public class GameRepository extends DepotRepository
     @Inject public GameRepository (PersistenceContext ctx)
     {
         super(ctx);
+
+        // temp: populate "gifts"
+        registerMigration(new DataMigration("2009_08_25_compute_gifts") {
+            public void invoke () throws DatabaseException {
+                IntIntMap gifts = new IntIntMap();
+                for (CardRecord crec : findAll(CardRecord.class)) {
+                    if (crec.giverId != 0) {
+                        gifts.increment(crec.giverId, 1);
+                    }
+                }
+                for (IntIntMap.IntIntEntry entry : gifts.entrySet()) {
+                    CollectionRecord crec = new CollectionRecord();
+                    crec.userId = entry.getIntKey();
+                    crec.gifts = entry.getIntValue();
+                    crec.needsUpdate = true;
+                    store(crec);
+                }
+            }
+        });
+        // end temp
     }
 
     /**
