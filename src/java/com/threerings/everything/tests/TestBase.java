@@ -13,7 +13,6 @@ import org.easymock.EasyMock;
 
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.jdbc.ConnectionProvider;
-import com.samskivert.util.Lifecycle;
 
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppLogic;

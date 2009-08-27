@@ -115,10 +115,8 @@ public class AuthServlet extends AppServlet
 
     protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
     {
-        String ltype = type.code;
         if (type != Kontagent.OTHER_RESPONSE && StringUtil.isBlank(tracking)) {
             log.warning("Missing tracking code for landing?", "uri", req.getRequestURI());
-            ltype = "no_tracking:" + type.code;
             type = Kontagent.OTHER_RESPONSE;
         }
         reportLanding(req, type, type.code, tracking);
