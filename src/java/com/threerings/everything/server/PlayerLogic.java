@@ -186,32 +186,36 @@ public class PlayerLogic
                 two.add(prec.facebookId);
             }
         }            
+        sendReminderNotifications(two, 2);
+        sendReminderNotifications(four, 4);
+        sendReminderNotifications(six, 6);
+    }
+
+    /**
+     * Sends reminder notifications to the specified set of Facebook ids who have been idle for the
+     * specified number of days. This is only broken out for testing.
+     */
+    public void sendReminderNotifications (final Set<Long> fbids, int idleDays)
+    {
+        if (fbids.isEmpty()) {
+            return; // noop!
+        }
+
+        String everyURL = _app.getHelloURL("reminder" + idleDays);
+        int flips = GameCodes.DAILY_FREE_FLIPS + idleDays - 1; // reasonable estimate
+        final String fbml = String.format(
+            "You have <a href=\"%s\">%d free flips</a> waiting for you in " +
+            "<a href=\"%s\">The Everything Game</a>.", everyURL, flips, everyURL);
 
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
         _app.getExecutor().execute(new Runnable() {
             public void run () {
-                sendNotifications(two, 2);
-                sendNotifications(four, 4);
-                sendNotifications(six, 6);
-                log.info("Send reminder notifications", "twos", two.size(), "fours", four.size(),
-                         "sixes", six.size());
-            }
-            protected void sendNotifications (Set<Long> recips, int days) {
-                String fbml = getReminderFBML(days);
                 try {
-                    if (!recips.isEmpty()) {
-                        fbclient.notifications_send(recips, fbml);
-                    }
+                    fbclient.notifications_send(fbids, fbml, true);
                 } catch (Exception e) {
                     log.info("Failed to send Facebook reminder notification", "fbml", fbml,
                              "error", e.getMessage());
                 }
-            }
-            protected String getReminderFBML (int days) {
-                String everyURL = _app.getHelloURL("reminder" + days);
-                return String.format("You have <a href=\"%s\">%d free flips</a> waiting for you " +
-                                     "in <a href=\"%s\">The Everything Game</a>.", everyURL,
-                                     GameCodes.DAILY_FREE_FLIPS+days-1, everyURL);
             }
         });
     }

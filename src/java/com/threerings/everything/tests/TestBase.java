@@ -13,6 +13,7 @@ import org.easymock.EasyMock;
 
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.jdbc.ConnectionProvider;
+import com.samskivert.util.Lifecycle;
 
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppLogic;
@@ -36,7 +37,9 @@ public abstract class TestBase
         PersistenceContext perCtx = injector.getInstance(PersistenceContext.class);
         perCtx.init(app.getIdentifier(), conprov, null);
         perCtx.initializeRepositories(true);
+        app.didInit();
         injector.getInstance(testClass).run(args);
+        app.didDetach();
     }
 
     protected static void usage (String usage, String errmsg)
