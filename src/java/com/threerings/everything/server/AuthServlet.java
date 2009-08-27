@@ -95,8 +95,11 @@ public class AuthServlet extends AppServlet
             case NOTIFICATION_EMAIL:
                 reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
                 break;
+            case POST:
+                reportLanding(req, Kontagent.POST_RESPONSE, "stream", tracking);
+                break;
             case OTHER_RESPONSE:
-                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking, null);
+                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
                 break;
             case APP_ADDED:
                 // this is not a landing, the player has added the app after browsing something as
@@ -112,24 +115,25 @@ public class AuthServlet extends AppServlet
 
     protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
     {
-        if (StringUtil.isBlank(tracking)) {
+        String ltype = type.code;
+        if (type != Kontagent.OTHER_RESPONSE && StringUtil.isBlank(tracking)) {
             log.warning("Missing tracking code for landing?", "uri", req.getRequestURI());
-            reportLanding(req, Kontagent.OTHER_RESPONSE, "no_tracking:" + type.code, null, null);
-            return;
+            ltype = "no_tracking:" + type.code;
+            type = Kontagent.OTHER_RESPONSE;
         }
-        String recipId = StringUtil.getOr(req.getParameter("fb_sig_user"),
-                                          req.getParameter("fb_sig_canvas_user"));
-        reportLanding(req, type, type.code, tracking, recipId);
+        reportLanding(req, type, type.code, tracking);
     }
 
     protected void reportLanding (
-        HttpServletRequest req, Kontagent mtype, String ltype, String tracking, String recipId)
+        HttpServletRequest req, Kontagent type, String ltype, String tracking)
     {
-        boolean appAdded = (ParameterUtil.isSet(req, "fb_sig") &&
-                            ParameterUtil.isSet(req, "fb_sig_session_key"));
-        boolean isShortUID = (tracking != null && tracking.length() == 8);
-        _kontLogic.reportAction(mtype, "r", recipId, "i", appAdded ? "1" : "0", "tu", ltype,
-                                isShortUID ? "su" : "u", tracking);
+        String appAdded = (ParameterUtil.isSet(req, "fb_sig") &&
+                           ParameterUtil.isSet(req, "fb_sig_session_key")) ? "1" : "0";
+        String rkey = (type == Kontagent.OTHER_RESPONSE) ? "s" : "r"; // retarded
+        String recipId = StringUtil.getOr(req.getParameter("fb_sig_user"),
+                                          req.getParameter("fb_sig_canvas_user"));
+        String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
+        _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
     }
 
     protected Random _rando = new Random();

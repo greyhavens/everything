@@ -41,4 +41,9 @@ public interface EverythingServiceAsync
      * The async version of {@link EverythingService#getCredits}.
      */
     void getCredits (AsyncCallback<EverythingService.CreditsResult> callback);
+
+    /**
+     * The async version of {@link EverythingService#storyPosted}.
+     */
+    void storyPosted (String tracking, AsyncCallback<Void> callback);
 }

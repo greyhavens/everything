@@ -3,16 +3,24 @@
 
 package client.game;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import com.threerings.everything.client.EverythingService;
+import com.threerings.everything.client.EverythingServiceAsync;
+import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.gwt.util.Console;
 
 import client.util.Context;
 import client.util.ImageUtil;
+import client.util.KontagentUtil;
 import client.util.Page;
 
 /**
@@ -70,19 +78,30 @@ public class ThingDialog
     protected static void showDialog (Context ctx, String vec, String templateId, String targetId,
                                       Card card, PlayerName owner, String prompt, String message)
     {
+        final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
         String cardURL = ctx.getEverythingURL(
-            vec, Page.BROWSE, owner.userId, card.thing.categoryId);
-        String everyURL = ctx.getEverythingURL(vec, Page.LANDING);
+            Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
+        String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
         showDialog(templateId, targetId, card.thing.name, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.getSeries().name,
                    card.thing.rarity.toString(), ImageUtil.getImageURL(card.thing.image),
-                   cardURL, everyURL, prompt, message);
+                   cardURL, everyURL, prompt, message, new Command() {
+            public void execute () {
+                _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
+                    public void onSuccess (Void result) { /* nada */ }
+                    public void onFailure (Throwable cause) {
+                        Console.log("Failed to report story post", "tracking", tracking, cause);
+                    }
+                });
+            }
+        });
     }
 
     protected static native void showDialog (String templateId, String targetId, String thing,
                                              String descrip, String categories, String series,
                                              String rarity, String image, String cardURL,
-                                             String everyURL, String prompt, String message) /*-{
+                                             String everyURL, String prompt, String message,
+                                             Command onComplete) /*-{
         var data = {
             'thing': thing,
             'descrip': descrip,
@@ -94,8 +113,15 @@ public class ThingDialog
             'images': [{ 'src': image, 'href': cardURL }],
         };
         var target = (targetId == null) ? null : [ targetId ];
-        $wnd.FB.Connect.showFeedDialog(templateId, data, target, null, null, null, null,
-                                       prompt, { value: message });
+        var msg = { value: message };
+        $wnd.FB.Connect.showFeedDialog(templateId, data, target, null, null, null, function () {
+            // we used to try to send msg.value to this method but Facebook doesn't actually update
+            // it with the changed text, at least not in any of the numerous tests I did; awesome!
+            // not that it would matter because we still don't know for sure one way or the other
+            // if the user clicked Post or Skip because Facebook won't tell us that information,
+            // because we "can't be trusted with it"
+            onComplete.@com.google.gwt.user.client.Command::execute()();
+        }, prompt, msg);
     }-*/;
 
 // We used to use streamPublish, which is *way* simpler but does not allow us to highlight text in
@@ -120,4 +146,6 @@ public class ThingDialog
 //                          "href": "http://apps.facebook.com/everythinggame/"}];
 //         $wnd.FB.Connect.streamPublish(message, attachment, actions);
 //     }-*/;
+
+    protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
 }

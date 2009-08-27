@@ -65,4 +65,9 @@ public interface EverythingService extends RemoteService
      * Returns the data needed for the credits page.
      */
     CreditsResult getCredits () throws ServiceException;
+
+    /**
+     * Reports that the user posted a story to their Facebook feed.
+     */
+    void storyPosted (String tracking) throws ServiceException;
 }
