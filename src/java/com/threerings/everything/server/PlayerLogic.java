@@ -4,12 +4,15 @@
 package com.threerings.everything.server;
 
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -17,12 +20,14 @@ import com.google.code.facebookapi.FacebookJaxbRestClient;
 
 import com.samskivert.servlet.util.HTMLUtil;
 import com.samskivert.util.ArrayIntSet;
+import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.app.server.UserLogic;
 
+import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
@@ -159,6 +164,54 @@ public class PlayerLogic
                     log.info("Failed to send Facebook notification", "to", toFBId,
                              "fbml", fbml, "error", e.getMessage());
                 }
+            }
+        });
+    }
+
+    /**
+     * Sends notifications to all players whose last session fell during the current hour exactly
+     * two, four or six days ago. This is called from an hourly cronjob.
+     */
+    public void sendReminderNotifications ()
+    {
+        final Set<Long> two = Sets.newHashSet(), four = Sets.newHashSet(), six = Sets.newHashSet();
+        Calendars.Builder cal = Calendars.now().set(Calendar.MINUTE, 0).set(Calendar.SECOND, 0);
+        long threeDays = cal.addDays(-3).toTime(), fiveDays = cal.addDays(-2).toTime();
+        for (PlayerRecord prec : _playerRepo.loadIdlePlayers()) {
+            if (prec.lastSession.getTime() < fiveDays) {
+                six.add(prec.facebookId);
+            } else if (prec.lastSession.getTime() < threeDays) {
+                four.add(prec.facebookId);
+            } else {
+                two.add(prec.facebookId);
+            }
+        }            
+
+        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
+        _app.getExecutor().execute(new Runnable() {
+            public void run () {
+                sendNotifications(two, 2);
+                sendNotifications(four, 4);
+                sendNotifications(six, 6);
+                log.info("Send reminder notifications", "twos", two.size(), "fours", four.size(),
+                         "sixes", six.size());
+            }
+            protected void sendNotifications (Set<Long> recips, int days) {
+                String fbml = getReminderFBML(days);
+                try {
+                    if (!recips.isEmpty()) {
+                        fbclient.notifications_send(recips, fbml);
+                    }
+                } catch (Exception e) {
+                    log.info("Failed to send Facebook reminder notification", "fbml", fbml,
+                             "error", e.getMessage());
+                }
+            }
+            protected String getReminderFBML (int days) {
+                String everyURL = _app.getHelloURL("reminder" + days);
+                return String.format("You have <a href=\"%s\">%d free flips</a> waiting for you " +
+                                     "in <a href=\"%s\">The Everything Game</a>.", everyURL,
+                                     GameCodes.DAILY_FREE_FLIPS+days-1, everyURL);
             }
         });
     }

@@ -31,6 +31,7 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
@@ -96,6 +97,17 @@ public class PlayerRepository extends DepotRepository
     public List<PlayerRecord> loadPlayers (Collection<Integer> userIds)
     {
         return findAll(PlayerRecord.class, new Where(PlayerRecord.USER_ID.in(userIds)));
+    }
+
+    /**
+     * Loads and returns records for players whose last session falls during the current hour
+     * precisely two, four or six days in the past.
+     */
+    public List<PlayerRecord> loadIdlePlayers ()
+    {
+        int hour = Calendars.now().get(Calendar.HOUR_OF_DAY);
+        return findAll(PlayerRecord.class,
+                       new Where(Ops.or(fromTo(2, hour), fromTo(4, hour), fromTo(6, hour))));
     }
 
     /**
@@ -408,6 +420,15 @@ public class PlayerRepository extends DepotRepository
         long cutoff = System.currentTimeMillis() - days * 24*60*60*1000L;
         return deleteAll(FeedItemRecord.class,
                          new Where(FeedItemRecord.WHEN.lessThan(new Timestamp(cutoff))), null);
+    }
+
+    /** Helper for {@link #loadIdlePlayers}. */
+    protected SQLExpression fromTo (int daysAgo, int hour)
+    {
+        Timestamp from = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour).toTimestamp();
+        Timestamp to = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour+1).toTimestamp();
+        return Ops.and(PlayerRecord.LAST_SESSION.greaterEq(from),
+                       PlayerRecord.LAST_SESSION.lessThan(to));
     }
 
     @Override // from DepotRepository

@@ -92,6 +92,20 @@ public class EverythingApp extends App
     }
 
     /**
+     * Returns a URL to our Facebook app that we can put out in the wide world.
+     *
+     * @param vector an identifier used to track this URL, e.g. "reminder_2".
+     */
+    public String getHelloURL (String vector, Object... args)
+    {
+        String url = getFacebookAppURL() + "?vec=" + vector;
+        if (args.length > 0) {
+            url += "&token=" + Joiner.on("~").join(args);
+        }
+        return url;
+    }
+
+    /**
      * Returns the bare URL to our Facebook app. You probably want {@link #getHelloURL}.
      */
     public String getFacebookAppURL ()
@@ -176,6 +190,8 @@ public class EverythingApp extends App
     public Binding[] getBindings ()
     {
         List<Binding> binds = Lists.newArrayList();
+
+        // bind our various servlets
         binds.add(new Binding.Servlet("/auth", AuthServlet.class));
         binds.add(new Binding.Servlet("/invite", InviteServlet.class));
         binds.add(new Binding.Servlet("/showinvite", ShowInviteServlet.class));
@@ -184,19 +200,29 @@ public class EverythingApp extends App
         binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
         binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
         binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
-        binds.add(Binding.Job.every(1, new Runnable() {
-            public void run () {
-                _gameLogic.processBirthdays();
-            }
-        }));
-        binds.add(Binding.Job.at(1, new Runnable() {
-            public void run () {
-                int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-                if (deleted > 0) {
-                    log.info("Pruned " + deleted + " old feed items.");
+
+        // only bind our cron jobs in the production instance
+        if (!_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+            binds.add(Binding.Job.every(1, new Runnable() {
+                public void run () {
+                    _gameLogic.processBirthdays();
                 }
-            }
-        }));
+            }));
+            binds.add(Binding.Job.every(1, new Runnable() {
+                public void run () {
+                    _playerLogic.sendReminderNotifications();
+                }
+            }));
+            binds.add(Binding.Job.at(1, new Runnable() {
+                public void run () {
+                    int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+                    if (deleted > 0) {
+                        log.info("Pruned " + deleted + " old feed items.");
+                    }
+                }
+            }));
+        }
+
         return binds.toArray(new Binding[binds.size()]);
     }
 
@@ -251,6 +277,7 @@ public class EverythingApp extends App
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected GameLogic _gameLogic;
+    @Inject protected PlayerLogic _playerLogic;
 
     // we need to inject all repositories here to ensure that they are resolved when our app is
     // resolved so that everything is registered and ready to go when Samsara initializes Depot
