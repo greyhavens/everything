@@ -210,6 +210,7 @@ public class PlayerLogic
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
         _app.getExecutor().execute(new Runnable() {
             public void run () {
+                // TODO: break fbids up if it's larger than 50 ids
                 try {
                     fbclient.notifications_send(fbids, fbml, true);
                 } catch (Exception e) {
