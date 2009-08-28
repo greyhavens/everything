@@ -189,8 +189,10 @@ public class PlayerLogic
         sendReminderNotifications(two, 2);
         sendReminderNotifications(four, 4);
         sendReminderNotifications(six, 6);
-        log.info("Send Facebook reminder notifications", "two", two.size(), "four", four.size(),
-                 "six", six.size());
+        if (two.size() > 0 || four.size() > 0 || six.size() > 0) {
+            log.info("Send Facebook reminder notifications", "two", two.size(), "four", four.size(),
+                     "six", six.size());
+        }
     }
 
     /**
