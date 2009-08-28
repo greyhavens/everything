@@ -139,6 +139,7 @@ public class EverythingServlet extends EveryServiceServlet
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             _gameRepo.startCollection(user.userId);
+            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.JOINED, 0, "", null);
             log.info("Hello newbie!", "who", player.who(), "surname", player.surname,
                      "tz", tz, "fbid", player.facebookId, "tracking", kontagentToken);
 
