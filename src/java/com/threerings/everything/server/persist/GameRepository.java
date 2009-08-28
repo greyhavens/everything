@@ -494,7 +494,7 @@ public class GameRepository extends DepotRepository
     {
         updatePartial(CollectionRecord.class,
                       new Where(Ops.and(CollectionRecord.USER_ID.eq(userId),
-                                        CollectionRecord.NEEDS_UPDATE.eq(true))),
+                                        CollectionRecord.NEEDS_UPDATE.eq(false))),
                       CollectionRecord.getKey(userId),
                       CollectionRecord.NEEDS_UPDATE, true);
     }
