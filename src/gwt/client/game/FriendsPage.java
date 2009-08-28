@@ -91,6 +91,9 @@ public class FriendsPage extends DataPanel<List<PlayerStats>>
         }
 
         add(table);
+
+        add(Widgets.newLabel("This summary data may be slightly out of date. Computing it is " +
+                             "hard on the databases so we can't do it too often.", "tipLabel"));
         XFBML.parse(this);
     }
 
