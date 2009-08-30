@@ -203,17 +203,17 @@ public class EverythingApp extends App
 
         // only bind our cron jobs in the production instance
         if (!_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
-            binds.add(Binding.Job.every(1, new Runnable() {
+            binds.add(Binding.Job.every(1, "process_birthdays", new Runnable() {
                 public void run () {
                     _gameLogic.processBirthdays();
                 }
             }));
-            binds.add(Binding.Job.every(1, new Runnable() {
+            binds.add(Binding.Job.every(1, "send_reminders", new Runnable() {
                 public void run () {
                     _playerLogic.sendReminderNotifications();
                 }
             }));
-            binds.add(Binding.Job.at(1, new Runnable() {
+            binds.add(Binding.Job.at(1, "prune_feed", new Runnable() {
                 public void run () {
                     int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
                     if (deleted > 0) {
