@@ -76,10 +76,12 @@ public class CardPopup extends PopupPanel
     protected CardPopup (Context ctx, GameService.CardResult result, Value<SlotStatus> status)
     {
         this(ctx, status);
-        if (result.card.giver != null) {
-            _title = "A gift from " + result.card.giver;
-        } else {
+        if (result.card.giver == null) {
             _title = "You got the <b>" + result.card.thing.name + "</b> card!";
+        } else if (result.card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
+            _title = "Happy birthday!";
+        } else {
+            _title = "A gift from " + result.card.giver;
         }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;

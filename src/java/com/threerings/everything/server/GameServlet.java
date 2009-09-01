@@ -338,8 +338,13 @@ public class GameServlet extends EveryServiceServlet
             }
         });
 
-        // record that this player received this gifted card
-        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.GOTGIFT, card.giverId, thing.name);
+        // record a notice in their feed
+        if (card.giverId == Card.BIRTHDAY_GIVER_ID) {
+            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.BIRTHDAY, 0, thing.name);
+        } else {
+            _playerRepo.recordFeedItem(
+                player.userId, FeedItem.Type.GOTGIFT, card.giverId, thing.name);
+        }
 
         return result;
     }

@@ -35,6 +35,7 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SlotStatus;
@@ -164,8 +165,10 @@ public class GameLogic
         card.thing = thing;
         card.categories = resolveCategories(card.thing.categoryId);
         card.received = new Date(record.received.getTime());
-        if (record.giverId != 0) {
+        if (record.giverId > 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
+        } else if (record.giverId == Card.BIRTHDAY_GIVER_ID) {
+            card.giver = PlayerName.create(Card.BIRTHDAY_GIVER_ID);
         }
         // we have to load all the things in this category for this bit
         // (TODO: get series size and card position from the ThingIndex)
@@ -433,23 +436,6 @@ public class GameLogic
     }
 
     /**
-     * Checks whether the player has completed the specified series after receiving the specified
-     * thing and reports it if appropriate.
-     */
-    protected boolean checkCompletedSeries (PlayerRecord user, Thing thing)
-    {
-        Set<Integer> things = Sets.newHashSet(
-            Iterables.transform(_thingRepo.loadThings(thing.categoryId), EFuncs.THING_ID));
-        Set<Integer> holdings = Sets.newHashSet(
-            Iterables.transform(_gameRepo.loadCards(user.userId, things), EFuncs.CARD_THING_ID));
-        holdings.add(thing.thingId);
-        if (things.size() - holdings.size() == 0) {
-            return maybeReportCompleted(user, _thingRepo.loadCategory(thing.categoryId), "gift");
-        }
-        return false;
-    }
-
-    /**
      * Selects and gifts a card to the specified player for their birthday.
      */
     protected void processBirthday (PlayerRecord user)
@@ -459,14 +445,8 @@ public class GameLogic
         int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index), heldRares);
         Thing thing = _thingRepo.loadThing(thingId);
 
-        // grant this card to the player
-        _gameRepo.createCard(user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
-
-        // record a notice in their feed
-        _playerRepo.recordFeedItem(user.userId, FeedItem.Type.BIRTHDAY, 0, thing.name);
-
-        // and check whether they've completed this series
-        checkCompletedSeries(user, thing);
+        // grant this card to the player (in "wrapped" state)
+        _gameRepo.createCard(-user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
 
         log.info("Gave out a birthday present", "to", user.who(), "what", thing.name);
     }
