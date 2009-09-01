@@ -49,6 +49,8 @@ import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
+import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -139,7 +141,7 @@ public class EverythingServlet extends EveryServiceServlet
             player = _playerRepo.createPlayer(
                 user.userId, facebookId, fbuser.getFirstName(), fbuser.getLastName(), birthday, tz);
             _gameRepo.startCollection(user.userId);
-            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.JOINED, 0, "", null);
+            _playerRepo.recordFeedItem(player.userId, FeedItem.Type.JOINED, 0, "");
             log.info("Hello newbie!", "who", player.who(), "surname", player.surname,
                      "tz", tz, "fbid", player.facebookId, "tracking", kontagentToken);
 
@@ -193,44 +195,59 @@ public class EverythingServlet extends EveryServiceServlet
     }
 
     // from interface EverythingService
-    public List<FeedItem> getRecentFeed () throws ServiceException
+    public FeedResult getRecentFeed () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
+        FeedResult result = new FeedResult();
+
+        // load up their friends' recent activiteis
         List<FeedItem> items = Lists.newArrayList(
             _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS));
+        aggregateFeed(player.userId, items);
+        result.items = _playerLogic.resolveNames(items, player.getName());
 
         // if this player is an editor, load up recent comments on their series
         if (player.isEditor) {
-            addSeriesComments(player, items);
+            result.comments = Lists.newArrayList();
+            long since = Calendars.now().zeroTime().addDays(-RECENT_COMMENT_DAYS).toTime();
+            Set<Integer> catIds = Sets.newHashSet();
+            for (CategoryComment comment : _thingRepo.loadCommentsSince(player.userId, since)) {
+                if (comment.commentor.userId != player.userId) {
+                    if (catIds.add(comment.categoryId)) { // only add one comment per-category
+                        result.comments.add(comment);
+                    }
+                }
+            }
+            _playerLogic.resolveNames(result.comments, player.getName());
+// TODO: resolve names, where do we put them?
+//             IntMap<Category> cats = IntMaps.newHashIntMap();
+//             for (Category cat : _thingRepo.loadCategories(catIds)) {
+//                 cats.put(cat.categoryId, cat);
+//             }
         }
 
-        // aggregate these results a bit
-        aggregateFeed(player.userId, items);
+        // load up their pending gifts
+        result.gifts = Lists.newArrayList();
+        for (CardRecord gift : _gameRepo.loadGifts(player.userId)) {
+            ThingCard card = new ThingCard();
+            card.thingId = gift.thingId;
+            card.received = gift.received.getTime();
+            result.gifts.add(card);
+        }
 
-        // finally resolve the names in all the records that remain
-        return _playerLogic.resolveNames(items, player.getName());
+        return result;
     }
 
     // from interface EverythingService
     public List<FeedItem> getUserFeed (int userId) throws ServiceException
     {
-        PlayerRecord target = _playerRepo.loadPlayer(userId);
+        PlayerRecord caller = getPlayer(), target = _playerRepo.loadPlayer(userId);
         if (target == null) {
             throw new ServiceException(E_UNKNOWN_USER);
         }
         List<FeedItem> items = Lists.newArrayList(
             _playerRepo.loadUserFeed(target.userId, USER_FEED_ITEMS));
-
-        // if they are looking at their own feed and are an editor, load up recent series comments
-        PlayerRecord caller = getPlayer();
-        if (caller != null && caller.userId == userId && caller.isEditor) {
-            addSeriesComments(target, items);
-        }
-
-        // aggregate these results a bit
         aggregateFeed(caller == null ? 0 : caller.userId, items);
-
-        // finally resolve the names in all the records that remain
         return _playerLogic.resolveNames(items, target.getName());
     }
 
@@ -277,57 +294,12 @@ public class EverythingServlet extends EveryServiceServlet
             Kontagent.POST, "s", requirePlayer().facebookId, "tu", "stream", "u", tracking);
     }
 
-    protected void addSeriesComments (PlayerRecord player, List<FeedItem> items)
-    {
-        // load up their recent comments
-        Collection<CategoryComment> comments = _thingRepo.loadCommentsSince(
-            player.userId, Calendars.now().zeroTime().addDays(-RECENT_COMMENT_DAYS).toTime());
-
-        // load up the categories to which those comments apply
-        Set<Integer> catIds = Sets.newHashSet();
-        for (Iterator<CategoryComment> iter = comments.iterator(); iter.hasNext(); ) {
-            CategoryComment comment = iter.next();
-            if (comment.commentor.userId == player.userId) {
-                iter.remove(); // prune comments by us, we know we wrote them
-            } else if (!catIds.add(comment.categoryId)) {
-                iter.remove(); // prune any comments after the first about the same category
-            }
-        }
-        IntMap<Category> cats = IntMaps.newHashIntMap();
-        for (Category cat : _thingRepo.loadCategories(catIds)) {
-            cats.put(cat.categoryId, cat);
-        }
-
-        // create faux feed entries for each of these comments
-        for (CategoryComment comment : comments) {
-            FeedItem item = new FeedItem();
-            item.actor = comment.commentor;
-            item.when = comment.when;
-            item.type = FeedItem.Type.COMMENT;
-            item.target = player.getName();
-            item.objects = Lists.newArrayList(cats.get(comment.categoryId).name);
-            item.message = String.valueOf(comment.categoryId); // hax0rz!
-            items.add(item);
-        }
-        Collections.sort(items);
-    }
-
     protected void aggregateFeed (int callerId, List<FeedItem> items)
     {
         Map<ItemKey, FeedItem> imap = Maps.newHashMap();
         Calendar cal = Calendar.getInstance();
         for (Iterator<FeedItem> iter = items.iterator(); iter.hasNext(); ) {
             FeedItem item = iter.next();
-            if (item.message != null) {
-                // null out the message if we're not the sender or target
-                if (item.target != null && callerId != item.target.userId &&
-                    callerId != item.actor.userId) {
-                    item.message = null;
-                } else {
-                    // we have a message, don't try to aggregate this feed item
-                    continue;
-                }
-            }
             cal.setTime(item.when);
             int date = cal.get(Calendar.DAY_OF_YEAR);
             ItemKey key = new ItemKey(item, date);

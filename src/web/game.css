@@ -198,6 +198,20 @@
   top: 128px;
 }
 
+/** SlotView styles */
+.slot {
+  width: 132px;
+  height: 157px;
+  padding: 5px;
+}
+
+.slot .SlotStatus {
+  width: 132px;
+  padding-top: 70px;
+  height: 82px;
+  text-align: center;
+}
+
 /** AddAppPanel styles */
 .addApp .Title, .addApp .Steps {
   font-size: 18px;
@@ -208,7 +222,7 @@
   text-align: center;
 }
 
-.addApp .addApp .Arrow {
+.addApp .Arrow {
   font-size: 45px;
 }
 
@@ -335,19 +349,6 @@
 
 .flip .Cards {
   height: 668px;
-}
-
-.flip .Cards .Cell {
-  width: 132px;
-  height: 157px;
-  padding: 5px;
-}
-
-.flip .Cards .SlotStatus {
-  width: 132px;
-  padding-top: 70px;
-  height: 82px;
-  text-align: center;
 }
 
 .flip .Bold {

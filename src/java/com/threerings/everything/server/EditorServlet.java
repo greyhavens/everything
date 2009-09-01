@@ -74,7 +74,7 @@ public class EditorServlet extends EveryServiceServlet
             if (ocategory.paid == 0) {
                 Category[] cats = _gameLogic.resolveCategories(category.categoryId);
                 _playerRepo.recordFeedItem(category.creator.userId, FeedItem.Type.NEW_SERIES, 0,
-                                           Category.getHierarchy(cats), null);
+                                           Category.getHierarchy(cats));
             }
             // and check to see if the creator has been paid for all of its things
             int things = _thingRepo.getThingCount(ocategory.categoryId);

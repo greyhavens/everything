@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.Callable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -208,48 +209,31 @@ public class GameServlet extends EveryServiceServlet
         // reload the player record to obtain an updated coin and free flip count
         player = _playerRepo.loadPlayer(player.userId);
 
-        // load up the thing going on the card they just flipped and its whole series
-        Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
-        SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
+        // load up the thing going on the card they just flipped
+        final Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
 
-        // load up the count of each card in this series held by the player
-        IntIntMap holdings = new IntIntMap();
-        for (CardRecord card : _gameRepo.loadCards(
-                 player.userId, Sets.newHashSet(Iterables.transform(things, EFuncs.THING_ID)))) {
-            holdings.increment(card.thingId, 1);
-        }
+        log.info("Yay! Card flipped", "who", player.who(), "thing", thing.name,
+                 "rarity", thing.rarity, "paid", expectedCost);
 
-        // include the number of cards we already have with this thing
+        // create the card, add it to their collection and resolve associated bits
+        final int userId = player.userId;
         FlipResult result = new FlipResult();
-        result.haveCount = holdings.getOrElse(thing.thingId, 0);
-
-        // now note this holding in our mapping and determine how many things remain
-        holdings.increment(thing.thingId, 1);
-        result.thingsRemaining = things.size() - holdings.size();
-
-        // create the card and add it to the player's collection, then resolve it
-        CardRecord card = _gameRepo.createCard(player.userId, thing.thingId, 0);
-        result.card = _gameLogic.resolveCard(card, thing, things);
-
-        // note the received timestamp of the created card in this position
-        _gameRepo.updateSlot(player.userId, position, card.received.getTime());
+        CardRecord card = prepareCard(player, thing, result, new Callable<CardRecord>() {
+            public CardRecord call () throws Exception {
+                return _gameRepo.createCard(userId, thing.thingId, 0);
+            }
+        });
 
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost
         grid.unflipped[thing.rarity.ordinal()]--;
         result.status = _gameLogic.getGameStatus(player, grid.unflipped);
 
+        // note the received timestamp of the created card in this position
+        _gameRepo.updateSlot(player.userId, position, card.received.getTime());
+
         // record that this player flipped this card
-        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name, null);
-
-        log.info("Yay! Card flipped", "who", player.who(), "thing", thing.name,
-                 "rarity", thing.rarity, "paid", expectedCost);
-
-        // note that this player completed this series and if appropriate report to their feed
-        if (result.thingsRemaining == 0) {
-            _gameLogic.maybeReportCompleted(player, result.card.getSeries(), "flip");
-        }
-
+        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name);
         return result;
     }
 
@@ -333,6 +317,31 @@ public class GameServlet extends EveryServiceServlet
         }
         CardRecord card = requireCard(player.userId, thingId, received);
         _gameLogic.giftCard(player, card, friend, message);
+    }
+
+    // from interface GameService
+    public GiftResult openGift (int thingId, long created) throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        final CardRecord card = _gameRepo.loadCard(-player.userId, thingId, created);
+        if (card == null) {
+            throw new ServiceException(E_UNKNOWN_CARD);
+        }
+        Thing thing = _thingRepo.loadThing(card.thingId);
+
+        GiftResult result = new GiftResult();
+        result.message = _gameRepo.loadGiftMessage(card); // must happen before prepareCard()
+        prepareCard(player, thing, result, new Callable<CardRecord>() {
+            public CardRecord call () throws Exception {
+                _gameRepo.unwrapGift(card); // unwrap the card, adding it to our collection
+                return card;
+            }
+        });
+
+        // record that this player received this gifted card
+        _playerRepo.recordFeedItem(player.userId, FeedItem.Type.GOTGIFT, card.giverId, thing.name);
+
+        return result;
     }
 
     // from interface GameService
@@ -457,6 +466,46 @@ public class GameServlet extends EveryServiceServlet
         if (!_playerRepo.consumeCoins(player.userId, expectedCost)) {
             throw new ServiceException(E_NSF_FOR_FLIP);
         }
+    }
+
+    protected CardRecord prepareCard (PlayerRecord player, Thing thing, CardResult result,
+                                      Callable<CardRecord> creator)
+    {
+        // TODO: get this info from the ThingIndex, optimize this whole process
+        SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
+
+        // load up the count of each card in this series held by the player
+        IntIntMap holdings = new IntIntMap();
+        for (CardRecord crec : _gameRepo.loadCards(
+                 player.userId, Sets.newHashSet(Iterables.transform(things, EFuncs.THING_ID)))) {
+            holdings.increment(crec.thingId, 1);
+        }
+
+        // include the number of cards we already have with this thing
+        result.haveCount = holdings.getOrElse(thing.thingId, 0);
+
+        // now note this holding in our mapping and determine how many things remain
+        holdings.increment(thing.thingId, 1);
+        result.thingsRemaining = things.size() - holdings.size();
+
+        CardRecord card;
+        try {
+            // create the card (which adds it to the player's collection), then resolve it
+            card = creator.call();
+            result.card = _gameLogic.resolveCard(card, thing, things);
+        } catch (RuntimeException rte) {
+            throw rte;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // note that this player completed this series and if appropriate report to their feed
+        if (result.thingsRemaining == 0) {
+            _gameLogic.maybeReportCompleted(player, result.card.getSeries(),
+                                            result.getClass().getSimpleName());
+        }
+
+        return card;
     }
 
     protected CardRecord requireCard (int ownerId, int thingId, long received)

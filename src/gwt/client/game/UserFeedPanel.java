@@ -12,7 +12,7 @@ import client.util.Context;
 /**
  * Displays a particular user's recent activities.
  */
-public class UserFeedPanel extends FeedPanel
+public class UserFeedPanel extends FeedPanel<List<FeedItem>>
 {
     public UserFeedPanel (Context ctx, int userId)
     {
@@ -20,7 +20,7 @@ public class UserFeedPanel extends FeedPanel
         _everysvc.getUserFeed(userId, createCallback());
     }
 
-    @Override // from FeedPanel
+    @Override // from DataPanel
     protected void init (List<FeedItem> items)
     {
         while (items.size() > 0) {

@@ -111,30 +111,12 @@ public class PlayerLogic
     /**
      * Sends a card gifting notification to the specified Facebook player.
      */
-    public void sendGiftNotification (PlayerRecord sender, long toFBId, Thing thing,
-                                      Category series, boolean completed, String message)
+    public void sendGiftNotification (PlayerRecord sender, long toFBId, Category series)
     {
         String tracking = _kontLogic.generateUniqueId(sender.userId);
-        String browseURL = _app.getHelloURL(
-            Kontagent.NOTIFICATION, tracking, "BROWSE", "", thing.categoryId);
-        String everyURL = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
-
-        // TODO: localization?
-        String feedmsg;
-        if (completed) {
-            feedmsg = String.format(
-                "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a> and " +
-                "completed your <a href=\"%s\">%s</a> series!",
-                browseURL, thing.name, everyURL, browseURL, series.name);
-        } else {
-            feedmsg = String.format( // TODO: localization?
-                "gave you the <a href=\"%s\">%s</a> card in <a href=\"%s\">Everything</a>.",
-                browseURL, thing.name, everyURL);
-        }
-
-        if (!StringUtil.isBlank(message)) {
-            feedmsg += " They said '" + HTMLUtil.entify(message) + "'.";
-        }
+        String feedmsg = String.format( // TODO: localization?
+            "gave you a card in the <a href=\"%s\">%s</a> series.",
+            _app.getHelloURL(Kontagent.NOTIFICATION, tracking), series.name);
         sendFacebookNotification(sender, toFBId, feedmsg, tracking);
     }
 

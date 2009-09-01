@@ -28,7 +28,7 @@ import client.util.Page;
 /**
  * Displays a feed.
  */
-public abstract class FeedPanel extends DataPanel<List<FeedItem>>
+public abstract class FeedPanel<T> extends DataPanel<T>
 {
     protected FeedPanel (Context ctx)
     {
@@ -46,31 +46,25 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
             objmsg = format(item.objects, "card", "cards");
             action.add(Widgets.newHTML(" flipped the " + objmsg + ".", "inline"));
             break;
-        case GIFTED:
-            action.add(Widgets.newInlineLabel(" gave "));
+        case GOTGIFT:
+            action.add(Widgets.newInlineLabel(" got "));
             addGift(action, item);
-            if (item.message == null) {
-                int idate = DateUtil.getDayOfMonth(item.when);
-                for (int ii = 0; ii < items.size(); ii++) {
-                    FeedItem eitem = items.get(ii);
-                    if (eitem.actor.equals(item.actor) && eitem.type == item.type &&
-                        eitem.message == null && DateUtil.getDayOfMonth(eitem.when) == idate) {
-                        action.add(Widgets.newInlineLabel(", "));
-                        addGift(action, eitem);
-                        items.remove(ii--);
-                    }
+            int idate = DateUtil.getDayOfMonth(item.when);
+            for (int ii = 0; ii < items.size(); ii++) {
+                FeedItem eitem = items.get(ii);
+                if (eitem.actor.equals(item.actor) && eitem.type == item.type &&
+                    DateUtil.getDayOfMonth(eitem.when) == idate) {
+                    action.add(Widgets.newInlineLabel(", "));
+                    addGift(action, eitem);
+                    items.remove(ii--);
                 }
             }
             action.add(Widgets.newInlineLabel("."));
-            if (item.message != null) {
-                String msg = " " + getFirstName(item.actor) + " said \"" + item.message + "\"";
-                action.add(Widgets.newInlineLabel(msg));
-            }
             break;
-        case COMMENT:
-            action.add(Widgets.newInlineLabel(" commented on your category "));
-            action.add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, item.message));
-            break;
+//         case COMMENT:
+//             action.add(Widgets.newInlineLabel(" commented on your category "));
+//             action.add(Args.createInlink(item.objects.get(0), Page.EDIT_SERIES, 0 /*TODO:objId*/));
+//             break;
         case COMPLETED:
             objmsg = format(item.objects, "series", "series");
             action.add(Widgets.newHTML(" completed the " + objmsg + "!", "inline"));
@@ -110,7 +104,7 @@ public abstract class FeedPanel extends DataPanel<List<FeedItem>>
     protected void addGift (FlowPanel action, FeedItem item)
     {
         String objmsg = format(item.objects, "card", "cards");
-        action.add(Widgets.newHTML("the " + objmsg + " to ", "inline"));
+        action.add(Widgets.newHTML("the " + objmsg + " from ", "inline"));
         action.add(Args.createInlink(getName(item.target, false), Page.BROWSE, item.target.userId));
     }
 

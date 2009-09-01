@@ -48,4 +48,10 @@ public class Card
     {
         return new CardIdent(owner.userId, thing.thingId, received);
     }
+
+    /** Converts this Card to a ThingCard. */
+    public ThingCard toThingCard ()
+    {
+        return thing.toCard(received.getTime());
+    }
 }

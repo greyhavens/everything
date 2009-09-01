@@ -11,10 +11,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.threerings.samsara.app.client.ServiceException;
 
+import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
+import com.threerings.everything.data.ThingCard;
 
 /**
  * Defines the services available to the Everything client.
@@ -40,6 +42,19 @@ public interface EverythingService extends RemoteService
         public List<PlayerName> editors;
     }
 
+    /** Provides results for {@link #getRecentFeed}. */
+    public static class FeedResult implements IsSerializable
+    {
+        /** Gifts awaiting this player, if any. */
+        public List<ThingCard> gifts;
+
+        /** Comments on this user's series. */
+        public List<CategoryComment> comments;
+
+        /** This user's recent feed. */
+        public List<FeedItem> items;
+    }
+
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
@@ -47,9 +62,9 @@ public interface EverythingService extends RemoteService
         throws ServiceException;
 
     /**
-     * Returns a list of recent activity for the calling user.
+     * Returns the calling user's pending gifts and data on their friends' activities.
      */
-    List<FeedItem> getRecentFeed () throws ServiceException;
+    FeedResult getRecentFeed () throws ServiceException;
 
     /**
      * Returns a list of recent activity for the specified user.

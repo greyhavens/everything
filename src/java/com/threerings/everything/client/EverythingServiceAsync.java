@@ -25,7 +25,7 @@ public interface EverythingServiceAsync
     /**
      * The async version of {@link EverythingService#getRecentFeed}.
      */
-    void getRecentFeed (AsyncCallback<List<FeedItem>> callback);
+    void getRecentFeed (AsyncCallback<EverythingService.FeedResult> callback);
 
     /**
      * The async version of {@link EverythingService#getUserFeed}.

@@ -18,7 +18,7 @@ public class FeedItem
 {
     /** Identifies the different types of feed items. */
     public enum Type implements ByteEnum {
-        FLIPPED(0), GIFTED(1), COMMENT(2), COMPLETED(3), NEW_SERIES(4), BIRTHDAY(5), JOINED(6);
+        FLIPPED(0), NOTUSED(1), GOTGIFT(2), COMPLETED(3), NEW_SERIES(4), BIRTHDAY(5), JOINED(6);
 
         // from ByteEnum
         public byte toByte () {
@@ -32,7 +32,7 @@ public class FeedItem
         protected byte _code;
     };
 
-    /** The user that took the action. */
+    /** The subject of the feed item. */
     public PlayerName actor;
 
     /** The time at which the action was taken. */
@@ -41,14 +41,11 @@ public class FeedItem
     /** The type of action taken. */
     public Type type;
 
-    /** The the player toward whom this action was targeted (or null). */
+    /** The indirect object of the action (e.g. a player from whom a gift was received) or null. */
     public PlayerName target;
 
     /** A textual description of the object(s) of the action. */
     public List<String> objects;
-
-    /** An optional message that goes along with the action that's only shown to the target. */
-    public String message;
 
     // from interface Comparable<FeedItem>
     public int compareTo (FeedItem other)

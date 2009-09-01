@@ -168,36 +168,34 @@ public class FlipPage extends DataPanel<GameService.GridResult>
         if (_slots == null) {
             // if we have no flipped cards, then animate the slots into position
             Table.Animator anim = Table.pickAnimation(!_data.grid.haveFlipped());
-            _slots = new SimplePanel[_data.grid.flipped.length];
+            _slots = new SlotView[_data.grid.flipped.length];
             for (int ii = 0; ii < _slots.length; ii++) {
                 int row = ii / Table.COLUMNS, col = ii % Table.COLUMNS;
-                _slots[ii] = Widgets.newSimplePanel("Cell", null);
+                final int pos = ii;
+                _slots[ii] = new SlotView();
+                _slots[ii].status.addListener(new Value.Listener<SlotStatus>() {
+                    public void valueChanged (SlotStatus status) {
+                        _data.grid.slots[pos] = status;
+                    }
+                });
                 _cards.add(_slots[ii], anim.startx.apply(col, row), anim.starty.apply(col, row));
                 anim.animate(_cards, _slots[ii], col, row);
             }
         }
 
         for (int ii = 0; ii < _data.grid.flipped.length; ii++) {
-            String text = getStatusText(_data.grid.slots[ii]);
-            if (text != null) {
-                _slots[ii].setWidget(Widgets.newLabel(text, "SlotStatus"));
+            if (_slots[ii].setStatus(_data.grid.slots[ii])) {
                 continue;
             }
 
             final int position = ii;
             ThingCard card = _data.grid.flipped[ii];
-            ClickHandler onClick;
-            if (card != null && card.thingId > 0) {
-                onClick = CardPopup.onClick(_ctx, new CardIdent(_ctx.getMe().userId, card.thingId,
-                                                                card.received), createStatus(ii));
-            } else {
-                onClick = new ClickHandler() {
-                    public void onClick (ClickEvent event) {
-                        flipCard(position, (Widget)event.getSource());
-                    }
-                };
-            }
-            _slots[ii].setWidget(new ThingCardView(_ctx, card, onClick));
+            boolean flipped = (card != null && card.thingId > 0);
+            _slots[ii].setCard(_ctx, card, flipped ? null : new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    flipCard(position);
+                }
+            });
         }
         _status.at(0, 1).setText("Grid status: " + Messages.xlate(""+_data.grid.status), "right");
     }
@@ -231,50 +229,31 @@ public class FlipPage extends DataPanel<GameService.GridResult>
         _info.at(0, 1).setWidget(new CoinLabel("You have ", _ctx.getCoins()), "right");
     }
 
-    protected void flipCard (final int position, final Widget trigger)
+    protected void flipCard (final int position)
     {
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
-                          new PopupCallback<GameService.FlipResult>() {
+                          new PopupCallback<GameService.FlipResult>(_slots[position]) {
             public void onSuccess (GameService.FlipResult result) {
-                // convert the card to a thing card and display it in the grid
-                ThingCard card = new ThingCard();
-                card.thingId = result.card.thing.thingId;
-                card.name = result.card.thing.name;
-                card.image = result.card.thing.image;
-                card.rarity = result.card.thing.rarity;
-                ThingCardView view = new ThingCardView(_ctx, card, CardPopup.onClick(
-                    _ctx, result.card.getIdent(), createStatus(position)));
-                _slots[position].setWidget(view);
-
                 // update our status
                 _data.grid.slots[position] = SlotStatus.FLIPPED;
-                _data.grid.unflipped[card.rarity.ordinal()]--;
+                _data.grid.unflipped[result.card.thing.rarity.ordinal()]--;
                 updateRemaining(_data.grid.unflipped);
                 updateGameStatus(_data.status = result.status);
 
+                // display the flipped card in the grid
+                _slots[position].setCard(_ctx, result.card.toThingCard(), null);
+
                 // display the card big and fancy and allow them to gift it or cash it in
-                CardPopup.display(_ctx, result, createStatus(position), view);
+                CardPopup.display(_ctx, result, _slots[position].status, _slots[position], null);
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {
-                    _ctx.displayPopup(new NSFPopup(), trigger);
+                    _ctx.displayPopup(new NSFPopup(), _slots[position]);
                 } else {
                     super.onFailure(cause);
                 }
             }
         });
-    }
-
-    protected Value<SlotStatus> createStatus (final int position)
-    {
-        Value<SlotStatus> status = new Value<SlotStatus>(_data.grid.slots[position]);
-        status.addListener(new Value.Listener<SlotStatus>() {
-            public void valueChanged (SlotStatus status) {
-                _data.grid.slots[position] = status;
-                _slots[position].setWidget(Widgets.newLabel(getStatusText(status), "SlotStatus"));
-            }
-        });
-        return status;
     }
 
     protected void showPowerupsMenu (final Widget trigger)
@@ -305,15 +284,6 @@ public class FlipPage extends DataPanel<GameService.GridResult>
         });
         Popups.showOver(popup, trigger);
         FX.reveal(popup).fromTop().run(500);
-    }
-
-    protected static String getStatusText (SlotStatus status)
-    {
-        switch (status) {
-        case GIFTED: return "Gifted!";
-        case SOLD: return "Sold!";
-        default: return null; // others not used
-        }
     }
 
     protected class NSFPopup extends PopupPanel
@@ -401,7 +371,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
     protected FluentTable _info, _status;
 
     protected AbsolutePanel _cards;
-    protected SimplePanel[] _slots;
+    protected SlotView[] _slots;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }

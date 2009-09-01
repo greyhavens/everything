@@ -54,13 +54,14 @@ public class Thing
     public PlayerName creator;
 
     /** Converts this Thing to a ThingCard. */
-    public ThingCard toCard ()
+    public ThingCard toCard (long received)
     {
         ThingCard card = new ThingCard();
         card.thingId = thingId;
         card.name = name;
         card.image = image;
         card.rarity = rarity;
+        card.received = received;
         return card;
     }
 

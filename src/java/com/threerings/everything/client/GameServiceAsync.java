@@ -61,6 +61,11 @@ public interface GameServiceAsync
                    AsyncCallback<Void> callback);
 
     /**
+     * The async version of {@link GameService#openGift}.
+     */
+    void openGift (int thingId, long created, AsyncCallback<GameService.GiftResult> callback);
+
+    /**
      * The async version of {@link GameService#getShopInfo}.
      */
     void getShopInfo (AsyncCallback<GameService.ShopResult> callback);

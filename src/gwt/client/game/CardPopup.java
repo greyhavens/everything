@@ -7,11 +7,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FX;
+import com.threerings.gwt.ui.InfoPopup;
+import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
@@ -38,17 +41,30 @@ public class CardPopup extends PopupPanel
                 final Widget centerOn = (Widget)event.getSource();
                 _gamesvc.getCard(ident, new PopupCallback<Card>() {
                     public void onSuccess (Card card) {
-                        display(ctx, new CardPopup(ctx, card, status), centerOn);
+                        display(ctx, new CardPopup(ctx, card, status), centerOn, null);
                     }
                 });
             }
         };
     }
 
-    public static void display (Context ctx, GameService.FlipResult result,
-                                Value<SlotStatus> status, Widget centerOn)
+    public static void display (Context ctx, GameService.CardResult result, Value<SlotStatus> status,
+                                Widget centerOn, final String message)
     {
-        display(ctx, new CardPopup(ctx, result, status), centerOn);
+        final CardPopup popup = new CardPopup(ctx, result, status);
+        Command onComplete = StringUtil.isBlank(message) ? null : new Command() {
+            public void execute () {
+                // TODO: this sucks, display the message better...
+                int top = popup.getAbsoluteTop();
+                InfoPopup info = new InfoPopup("They said '" + message + "'");
+                info.setVisible(false);
+                info.show();
+                int left = (Window.getClientWidth() - info.getOffsetWidth())/2;
+                info.setPopupPosition(left, top - info.getOffsetHeight());
+                info.setVisible(true);
+            }
+        };
+        display(ctx, popup, centerOn, onComplete);
     }
 
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
@@ -57,10 +73,14 @@ public class CardPopup extends PopupPanel
         setWidget(createContents(card));
     }
 
-    protected CardPopup (Context ctx, GameService.FlipResult result, Value<SlotStatus> status)
+    protected CardPopup (Context ctx, GameService.CardResult result, Value<SlotStatus> status)
     {
         this(ctx, status);
-        _title = "You got the <b>" + result.card.thing.name + "</b> card!";
+        if (result.card.giver != null) {
+            _title = "A gift from " + result.card.giver;
+        } else {
+            _title = "You got the <b>" + result.card.thing.name + "</b> card!";
+        }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
         setWidget(createContents(result.card));
@@ -149,11 +169,12 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    protected static void display (Context ctx, CardPopup popup, Widget centerOn)
+    protected static void display (Context ctx, CardPopup popup, Widget centerOn, Command onComplete)
     {
         popup.setVisible(false);
         ctx.displayPopup(popup, centerOn);
-        FX.move(popup).from(-popup.getOffsetWidth(), popup.getAbsoluteTop()).run(500);
+        FX.move(popup).from(-popup.getOffsetWidth(), popup.getAbsoluteTop()).
+            onComplete(onComplete).run(500);
     }
 
     protected Context _ctx;

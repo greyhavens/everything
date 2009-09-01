@@ -138,8 +138,7 @@ public class GameLogic
             }
             switch (grid.slots[ii]) {
             case FLIPPED:
-                grid.flipped[ii] = thing.toCard();
-                grid.flipped[ii].received = stamps[ii];
+                grid.flipped[ii] = thing.toCard(stamps[ii]);
                 break;
             case UNFLIPPED:
                 grid.unflipped[thing.rarity.toByte()]++;
@@ -169,6 +168,7 @@ public class GameLogic
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         }
         // we have to load all the things in this category for this bit
+        // (TODO: get series size and card position from the ThingIndex)
         card.things = things.size();
         for (Thing tcard : things) {
             if (card.thing.thingId == tcard.thingId) {
@@ -220,21 +220,12 @@ public class GameLogic
      */
     public void giftCard (PlayerRecord owner, CardRecord card, PlayerRecord target, String message)
     {
-        // transfer the card to the target player
-        int targetId = target.userId;
-        _gameRepo.giftCard(card, targetId);
-
-        // record that this player gifted this card
-        Thing thing = _thingRepo.loadThing(card.thingId);
-        _playerRepo.recordFeedItem(
-            owner.userId, FeedItem.Type.GIFTED, targetId, thing.name, message);
-
-        // check whether the recipient just completed a series
-        boolean completed = checkCompletedSeries(target, thing);
+        // transfer the card to the target player (in gift form)
+        _gameRepo.giftCard(card, target.userId, message);
 
         // send a Facebook notification to the recipient
-        _playerLogic.sendGiftNotification(owner, target.facebookId, thing, _thingRepo.loadCategory(
-                                              thing.categoryId), completed, message);
+        Category series = _thingRepo.loadCategory(_thingRepo.loadThing(card.thingId).categoryId);
+        _playerLogic.sendGiftNotification(owner, target.facebookId, series);
 
         // it may be on their grid, in which case we need to update its status
         noteCardStatus(card, SlotStatus.GIFTED);
@@ -250,7 +241,7 @@ public class GameLogic
     {
         if (_gameRepo.noteCompletedSeries(user.userId, series.categoryId)) {
             log.info("Series completed!", "who", user.who(), "series", series.name, "how", how);
-            _playerRepo.recordFeedItem(user.userId, FeedItem.Type.COMPLETED, 0, series.name, null);
+            _playerRepo.recordFeedItem(user.userId, FeedItem.Type.COMPLETED, 0, series.name);
             return true;
         }
         return false;
@@ -472,7 +463,7 @@ public class GameLogic
         _gameRepo.createCard(user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
 
         // record a notice in their feed
-        _playerRepo.recordFeedItem(user.userId, FeedItem.Type.BIRTHDAY, 0, thing.name, null);
+        _playerRepo.recordFeedItem(user.userId, FeedItem.Type.BIRTHDAY, 0, thing.name);
 
         // and check whether they've completed this series
         checkCompletedSeries(user, thing);

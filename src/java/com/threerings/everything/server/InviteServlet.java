@@ -58,6 +58,7 @@ public class InviteServlet extends AppServlet
         OOOUser user = getUser(req);
         PlayerRecord player = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
         Set<String> targetFBIds = null;
+        int thingId = 0;
 
         try {
             if (player == null) {
@@ -71,7 +72,7 @@ public class InviteServlet extends AppServlet
                 return;
             }
 
-            int thingId = Integer.parseInt(ParameterUtil.getParameter(req, "thing", "0"));
+            thingId = Integer.parseInt(ParameterUtil.getParameter(req, "thing", "0"));
             if (thingId > 0) {
                 processThingGift(req, player, targetFBIds.iterator().next(), thingId);
             }
@@ -89,7 +90,8 @@ public class InviteServlet extends AppServlet
         } catch (Exception e) {
             log.warning("Failed to process invite gift: " + e.getMessage(),
                         "who", (player == null) ? "null" : player.who(),
-                        "agent", req.getHeader("User-agent"), "targetFBIds", targetFBIds);
+                        "agent", req.getHeader("User-agent"),
+                        "targetFBIds", targetFBIds, "thingId", thingId, e);
         }
 
         writeClose(rsp, true);
@@ -103,13 +105,6 @@ public class InviteServlet extends AppServlet
 
         // make sure they own the thing in question
         CardRecord card = _gameRepo.loadCard(player.userId, thingId, Long.parseLong(received));
-        if (card == null) {
-            throw new Exception("missing card");
-        }
-        Thing thing = _thingRepo.loadThing(card.thingId);
-        if (thing == null) {
-            throw new Exception("missing thing");
-        }
 
         // see if the recipient in question is already a player
         Map<String, Integer> ids = _userLogic.mapFacebookIds(Collections.singletonList(targetFBId));
@@ -126,9 +121,10 @@ public class InviteServlet extends AppServlet
             _gameRepo.escrowCard(card, targetFBId);
             _gameLogic.noteCardStatus(card, SlotStatus.GIFTED);
 
-            // send them a Facebook notification as well as an invite
-            _playerLogic.sendGiftNotification(
-                player, Long.parseLong(targetFBId), thing, null, false, null);
+            // send them a Facebook notification along with their invite
+            Thing thing = _thingRepo.loadThing(card.thingId);
+            _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId),
+                                              _thingRepo.loadCategory(thing.categoryId));
         }
     }
 

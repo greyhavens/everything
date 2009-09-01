@@ -17,8 +17,10 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import com.samskivert.util.IntIntMap;
+import com.samskivert.util.StringUtil;
 
 import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
@@ -34,6 +36,8 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+
+import com.threerings.samsara.app.data.AppCodes;
 
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
@@ -54,46 +58,15 @@ public class GameRepository extends DepotRepository
     {
         super(ctx);
 
-        // temp: populate "gifts"
-        registerMigration(new DataMigration("2009_08_25_compute_gifts") {
-            public void invoke () throws DatabaseException {
-                IntIntMap gifts = new IntIntMap();
-                for (CardRecord crec : findAll(CardRecord.class, CacheStrategy.NONE)) {
-                    if (crec.giverId != 0) {
-                        gifts.increment(crec.giverId, 1);
-                    }
+        // temp: migrate -1 to minint
+        if (!_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+            registerMigration(new DataMigration("2009_08_31_minint") {
+                public void invoke () throws DatabaseException {
+                    updatePartial(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(-1)), null,
+                                  CardRecord.OWNER_ID, Integer.MIN_VALUE);
                 }
-                for (IntIntMap.IntIntEntry entry : gifts.entrySet()) {
-                    CollectionRecord crec = new CollectionRecord();
-                    crec.userId = entry.getIntKey();
-                    crec.gifts = entry.getIntValue();
-                    crec.needsUpdate = true;
-                    store(crec);
-                }
-            }
-        });
-        // end temp
-
-        // temp: populate collection records
-        registerMigration(new DataMigration("2009_08_26_create_collrecs") {
-            public void invoke () throws DatabaseException {
-                Set<Integer> ids = Sets.newHashSet(findAllKeys(PlayerRecord.class, false).
-                                                   map(Key.<PlayerRecord>toInt()));
-                for (CollectionRecord rec : findAll(CollectionRecord.class, CacheStrategy.NONE)) {
-                    ids.remove(rec.userId);
-                }
-                log.info("Creating collection records for " + ids);
-                for (int userId : ids) {
-                    try {
-                        CollectionRecord crec = new CollectionRecord();
-                        crec.userId = userId;
-                        insert(crec);
-                    } catch (DatabaseException de) {
-                        log.warning("Failed to create collection record", "userId", userId, de);
-                    }
-                }
-            }
-        });
+            });
+        }
         // end temp
     }
 
@@ -218,12 +191,24 @@ public class GameRepository extends DepotRepository
     /**
      * Transfers the supplied card from it's current owner to the specified recipient.
      */
-    public void giftCard (CardRecord card, int toUserId)
+    public void giftCard (CardRecord card, int toUserId, String message)
     {
+        // transfer ownership of the card to -toUserId which "wraps" the card up
+        long received = System.currentTimeMillis();
         updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.received),
-                      CardRecord.OWNER_ID, toUserId,
+                      CardRecord.OWNER_ID, -toUserId,
                       CardRecord.GIVER_ID, card.ownerId,
-                      CardRecord.RECEIVED, new Timestamp(System.currentTimeMillis()));
+                      CardRecord.RECEIVED, new Timestamp(received));
+
+        // if a message was supplied, create a record to store that (ugh)
+        if (!StringUtil.isBlank(message)) {
+            GiftMessageRecord mrec = new GiftMessageRecord();
+            mrec.ownerId = toUserId;
+            mrec.thingId = card.thingId;
+            mrec.received = received;
+            mrec.message = message;
+            insert(mrec);
+        }
 
         // update collection dirtiness and gift stats
         if (card.giverId == 0) {
@@ -231,7 +216,42 @@ public class GameRepository extends DepotRepository
         } else {
             markCollectionDirty(card.ownerId);
         }
-        markCollectionDirty(toUserId);
+    }
+
+    /**
+     * Returns a list of all unopened gift cards for the specified player.
+     */
+    public List<CardRecord> loadGifts (int userId)
+    {
+        return findAll(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(-userId)));
+    }
+
+    /**
+     * Returns the gift message for the specified (wrapped) card or null.
+     */
+    public String loadGiftMessage (CardRecord gift)
+    {
+        GiftMessageRecord rec = load(GiftMessageRecord.getKey(-gift.ownerId, gift.thingId,
+                                                              gift.received.getTime()));
+        return (rec == null) ? null : rec.message;
+    }
+
+    /**
+     * "Unwraps" a gifted card, transfering it into the recipient's collection. Updates the ownerId
+     * of the supplied card to reflect its new owner. Also deletes any associated gift message.
+     */
+    public void unwrapGift (CardRecord card)
+    {
+        // update the card with the normal owner user id
+        updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.received),
+                      CardRecord.OWNER_ID, -card.ownerId);
+        card.ownerId = -card.ownerId;
+
+        // delete any associated gift message record
+        delete(GiftMessageRecord.getKey(card.ownerId, card.thingId, card.received.getTime()));
+
+        // mark the owner's collection stats as dirty
+        markCollectionDirty(card.ownerId);
     }
 
     /**
@@ -249,15 +269,18 @@ public class GameRepository extends DepotRepository
         erec.escrowed = now;
         insert(erec);
 
-        // gift the card to player -1 to remove it from the gifter's collection (we have to do this
-        // manually because we need to be sure that the timestamp is *exactly* the same)
+        // gift the card to player minint to remove it from the gifter's collection
         updatePartial(CardRecord.getKey(card.ownerId, card.thingId, card.received),
-                      CardRecord.OWNER_ID, -1,
+                      CardRecord.OWNER_ID, Integer.MIN_VALUE,
                       CardRecord.GIVER_ID, card.ownerId,
                       CardRecord.RECEIVED, now);
 
         // note that their collection status changed
-        markCollectionDirty(card.ownerId);
+        if (card.giverId == 0) {
+            noteCardGifted(card.ownerId);
+        } else {
+            markCollectionDirty(card.ownerId);
+        }
     }
 
     /**
@@ -270,7 +293,7 @@ public class GameRepository extends DepotRepository
             // transfer the card to the player
             log.info("Transfering escrowed card to new player", "card", card.thingId,
                      "player", player.who());
-            if (updatePartial(CardRecord.getKey(-1, card.thingId, card.created),
+            if (updatePartial(CardRecord.getKey(Integer.MIN_VALUE, card.thingId, card.created),
                               CardRecord.OWNER_ID, player.userId) == 0) {
                 log.warning("Failed to transfer escrowed card?", "card", card.thingId,
                             "created", card.created, "to", player.who());
@@ -500,17 +523,6 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Notes that the user in question gifted a flipped card. Also marks their collection as
-     * needing resummarizing.
-     */
-    public void noteCardGifted (int userId)
-    {
-        updatePartial(CollectionRecord.getKey(userId),
-                      CollectionRecord.GIFTS, CollectionRecord.GIFTS.plus(1),
-                      CollectionRecord.NEEDS_UPDATE, true);
-    }
-
-    /**
      * Returns stats on the collections of the specified set of players. This will cause the
      * collection summaries to be updated for any player that needs it. The names in the resulting
      * records will need to be resolved by the caller.
@@ -531,6 +543,17 @@ public class GameRepository extends DepotRepository
             stats.put(updaterId, updateCollectionStats(updaterId, index));
         }
         return Lists.newArrayList(Iterables.transform(stats.values(), CollectionRecord.TO_STATS));
+    }
+
+    /**
+     * Notes that the user in question gifted a card. Also marks their collection as needing
+     * resummarizing.
+     */
+    protected void noteCardGifted (int userId)
+    {
+        updatePartial(CollectionRecord.getKey(userId),
+                      CollectionRecord.GIFTS, CollectionRecord.GIFTS.plus(1),
+                      CollectionRecord.NEEDS_UPDATE, true);
     }
 
     /**
@@ -567,10 +590,13 @@ public class GameRepository extends DepotRepository
         classes.add(CardRecord.class);
         classes.add(CollectionRecord.class);
         classes.add(EscrowedCardRecord.class);
+        classes.add(GiftMessageRecord.class);
         classes.add(GridRecord.class);
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
     }
+
+    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
 }

@@ -77,10 +77,10 @@ public interface GameService extends RemoteService
         public GameStatus status;
     }
 
-    /** Provides results for {@link #flipCard}. */
-    public class FlipResult implements IsSerializable
+    /** A base class shared by {@link FlipResult} and {@link GiftResult}. */
+    public static class CardResult implements IsSerializable
     {
-        /** The card at the position they flipped. */
+        /** The card in question. */
         public Card card;
 
         /** Number of this thing already held by this player (not including this one). */
@@ -88,13 +88,17 @@ public interface GameService extends RemoteService
 
         /** Number of things remaining in this set not held by this player. */
         public int thingsRemaining;
+    }
 
+    /** Provides results for {@link #flipCard}. */
+    public static class FlipResult extends CardResult
+    {
         /** The player's new game status after the flip. */
         public GameStatus status;
     }
 
     /** Provides results for {@link #getGiftCardInfo}. */
-    public class GiftInfoResult implements IsSerializable
+    public static class GiftInfoResult implements IsSerializable
     {
         /** The number of things in the series of the card being considered for gifting. */
         public int things;
@@ -103,8 +107,15 @@ public interface GameService extends RemoteService
         public List<FriendCardInfo> friends;
     }
 
+    /** Provides results for {@link #openGift}. */
+    public static class GiftResult extends CardResult
+    {
+        /** The message from the gifter, if any. */
+        public String message;
+    }
+
     /** Provides results for {@link #getShopInfo}. */
-    public class ShopResult implements IsSerializable
+    public static class ShopResult implements IsSerializable
     {
         /** This player's current coin balance. */
         public int coins;
@@ -152,6 +163,11 @@ public interface GameService extends RemoteService
      * Gifts the specified card to the specified friend.
      */
     void giftCard (int thingId, long created, int friendId, String message) throws ServiceException;
+
+    /**
+     * Opens a card gift.
+     */
+    GiftResult openGift (int thingId, long created) throws ServiceException;
 
     /**
      * Returns data needed to display the shop.

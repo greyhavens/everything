@@ -6,12 +6,9 @@ package client.game;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.util.Value;
 
-import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.ThingCard;
@@ -27,15 +24,13 @@ public class SeriesPanel extends FluentTable
 
     public SeriesPanel (Context ctx, int ownerId, final Series series, final Value<Integer> owned)
     {
-        super(5, 0, "series");
+        super(0, 0, "series");
         add().setText(series.name, "Title").setColSpan(COLUMNS);
         for (int ii = 0; ii < series.things.length; ii++) {
-            final FluentTable.Cell cell = at(ii/COLUMNS+1, ii%COLUMNS);
+            final SlotView slot = new SlotView();
             final ThingCard card = series.things[ii];
-            Value<SlotStatus> status = new Value<SlotStatus>(SlotStatus.FLIPPED);
-            status.addListener(new Value.Listener<SlotStatus>() {
+            slot.status.addListener(new Value.Listener<SlotStatus>() {
                 public void valueChanged (SlotStatus status) {
-                    cell.setText(FlipPage.getStatusText(status));
                     // this card was sold or gifted, so update our owned count
                     Set<Integer> ids = new HashSet<Integer>();
                     for (ThingCard tcard : series.things) {
@@ -46,9 +41,8 @@ public class SeriesPanel extends FluentTable
                     owned.update(ids.size());
                 }
             });
-            ClickHandler onClick = (card == null) ? null : CardPopup.onClick(
-                ctx, new CardIdent(ownerId, card.thingId, card.received), status);
-            cell.setWidget(new ThingCardView(ctx, card, onClick)).alignCenter().alignMiddle();
+            slot.setCard(ctx, card, null);
+            setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
         }
     }
 }
