@@ -54,12 +54,12 @@ import static com.threerings.everything.Log.log;
 @Singleton
 public class GameRepository extends DepotRepository
 {
-    @Inject public GameRepository (PersistenceContext ctx)
+    @Inject public GameRepository (PersistenceContext ctx, @Named(AppCodes.APPVERS) String appvers)
     {
         super(ctx);
 
         // temp: migrate -1 to minint
-        if (!_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+        if (!appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
             registerMigration(new DataMigration("2009_08_31_minint") {
                 public void invoke () throws DatabaseException {
                     updatePartial(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(-1)), null,
@@ -597,6 +597,4 @@ public class GameRepository extends DepotRepository
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
     }
-
-    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
 }
