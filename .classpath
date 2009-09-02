@@ -4,10 +4,23 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/samsara"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/s3lib.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-fileupload.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api-schema.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/easymock/easymock.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/guice.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/gwt-user.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/aopalliance.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-collections.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/google-collect.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/junit4.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/servlet-api.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/velocity-1.5-dev.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-fileupload.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-io.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-lang.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-logging.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api-schema.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/json.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/jvnet-runtime.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/s3lib.jar"/>
 	<classpathentry kind="output" path="dist/eclipse"/>
 </classpath>
