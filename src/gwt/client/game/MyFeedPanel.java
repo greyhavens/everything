@@ -40,7 +40,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     {
         if (!result.gifts.isEmpty()) {
             add(Widgets.newLabel("Unopened Gifts", "Title"));
-            FluentTable cards = new FluentTable(5, 0);
+            FluentTable cards = new FluentTable(0, 0);
             int row = 0, col = 0;
             for (final ThingCard card : result.gifts) {
                 final SlotView slot = new SlotView();
