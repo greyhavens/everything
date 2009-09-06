@@ -47,12 +47,12 @@ public class SlotView extends SimplePanel
         return true;
     }
 
-    public void setCard (Context ctx, ThingCard card, ClickHandler onClick)
+    public void setCard (Context ctx, ThingCard card, boolean isGift, ClickHandler onClick)
     {
         if (onClick == null && card != null && card.thingId != 0) {
             CardIdent ident = new CardIdent(ctx.getMe().userId, card.thingId, card.received);
             onClick = CardPopup.onClick(ctx, ident, status);
         }
-        setWidget(new ThingCardView(ctx, card, onClick));
+        setWidget(new ThingCardView(ctx, card, isGift, onClick));
     }
 }

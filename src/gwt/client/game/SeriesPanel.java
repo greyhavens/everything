@@ -41,7 +41,7 @@ public class SeriesPanel extends FluentTable
                     owned.update(ids.size());
                 }
             });
-            slot.setCard(ctx, card, null);
+            slot.setCard(ctx, card, false, null);
             setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
         }
     }

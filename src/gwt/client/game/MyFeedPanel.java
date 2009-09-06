@@ -44,7 +44,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
             int row = 0, col = 0;
             for (final ThingCard card : result.gifts) {
                 final SlotView slot = new SlotView();
-                slot.setCard(_ctx, card, new ClickHandler() {
+                slot.setCard(_ctx, card, true, new ClickHandler() {
                     public void onClick (ClickEvent event) {
                         openGift(card, slot);
                     }
@@ -86,7 +86,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
                           new PopupCallback<GameService.GiftResult>(slot) {
             public void onSuccess (GameService.GiftResult result) {
                 // display the flipped card in the grid
-                slot.setCard(_ctx, result.card.toThingCard(), null);
+                slot.setCard(_ctx, result.card.toThingCard(), false, null);
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup.display(_ctx, result, slot.status, slot, result.message);
             }

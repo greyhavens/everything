@@ -191,7 +191,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
             final int position = ii;
             ThingCard card = _data.grid.flipped[ii];
             boolean flipped = (card != null && card.thingId > 0);
-            _slots[ii].setCard(_ctx, card, flipped ? null : new ClickHandler() {
+            _slots[ii].setCard(_ctx, card, false, flipped ? null : new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     flipCard(position);
                 }
@@ -241,7 +241,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 updateGameStatus(_data.status = result.status);
 
                 // display the flipped card in the grid
-                _slots[position].setCard(_ctx, result.card.toThingCard(), null);
+                _slots[position].setCard(_ctx, result.card.toThingCard(), false, null);
 
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup.display(_ctx, result, _slots[position].status, _slots[position], null);
