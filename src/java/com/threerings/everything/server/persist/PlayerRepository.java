@@ -35,7 +35,6 @@ import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
-import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;

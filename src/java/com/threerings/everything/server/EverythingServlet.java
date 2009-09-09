@@ -5,7 +5,6 @@ package com.threerings.everything.server;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -42,7 +41,6 @@ import com.threerings.samsara.app.server.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.Kontagent;
-import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.News;

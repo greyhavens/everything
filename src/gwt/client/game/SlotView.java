@@ -3,11 +3,8 @@
 
 package client.game;
 
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
 

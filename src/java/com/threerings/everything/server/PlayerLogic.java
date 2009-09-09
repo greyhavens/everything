@@ -18,11 +18,9 @@ import com.google.inject.Singleton;
 
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
-import com.samskivert.servlet.util.HTMLUtil;
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
-import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.app.server.UserLogic;
@@ -31,7 +29,6 @@ import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
-import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
@@ -167,7 +164,7 @@ public class PlayerLogic
             } else {
                 two.add(prec.facebookId);
             }
-        }            
+        }
         sendReminderNotifications(two, 2);
         sendReminderNotifications(four, 4);
         sendReminderNotifications(six, 6);

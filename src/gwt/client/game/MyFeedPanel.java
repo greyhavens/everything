@@ -3,21 +3,16 @@
 
 package client.game;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
 import com.threerings.gwt.ui.FluentTable;
-import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
-import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.ThingCard;
 
 import client.ui.XFBML;
