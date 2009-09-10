@@ -326,6 +326,7 @@
 
 .feed .Action .When {
   font-style: italic;
+  margin-bottom: 10px;
 }
 
 /** GridPage styles */
