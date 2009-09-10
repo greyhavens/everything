@@ -26,7 +26,7 @@ import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
-import com.samskivert.depot.Exps;
+import com.samskivert.depot.Funcs;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
@@ -312,7 +312,7 @@ public class GameRepository extends DepotRepository
         IntIntMap data = new IntIntMap();
         for (OwnerRecord orec : findAll(OwnerRecord.class,
                                         new FieldOverride(OwnerRecord.COUNT,
-                                                          Exps.countDistinct(CardRecord.THING_ID)),
+                                                          Funcs.countDistinct(CardRecord.THING_ID)),
                                         new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
                                                           CardRecord.THING_ID.in(thingIds))),
                                         new GroupBy(CardRecord.OWNER_ID))) {

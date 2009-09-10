@@ -16,7 +16,7 @@ import com.samskivert.depot.CountRecord;
 import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
-import com.samskivert.depot.Exps;
+import com.samskivert.depot.Funcs;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
@@ -314,7 +314,7 @@ public class ThingRepository extends DepotRepository
                                         CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
                                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
                                         new FieldOverride(OwnedRecord.OWNED,
-                                                          Exps.countDistinct(CardRecord.THING_ID)),
+                                                          Funcs.countDistinct(CardRecord.THING_ID)),
                                         new GroupBy(CategoryRecord.CATEGORY_ID),
                                         new Where(CardRecord.OWNER_ID.eq(ownerId)))) {
             owned.put(orec.categoryId, orec.owned);
