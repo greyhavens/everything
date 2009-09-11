@@ -150,6 +150,12 @@
   font-style: italic;
 }
 
+.cardMessagePopup {
+  z-index: 4;
+  font-size: 18px;
+  max-width: 550px;
+}
+
 /** ThingCardView styles */
 .thingCard {
   text-align: center;

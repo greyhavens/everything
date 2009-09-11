@@ -13,7 +13,9 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FX;
+import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.InfoPopup;
+import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
@@ -21,9 +23,11 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
+import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
 import client.util.PopupCallback;
@@ -41,30 +45,21 @@ public class CardPopup extends PopupPanel
                 final Widget centerOn = (Widget)event.getSource();
                 _gamesvc.getCard(ident, new PopupCallback<Card>() {
                     public void onSuccess (Card card) {
-                        display(ctx, new CardPopup(ctx, card, status), centerOn, null);
+                        display(ctx, new CardPopup(ctx, card, status), centerOn);
                     }
                 });
             }
         };
     }
 
-    public static void display (Context ctx, GameService.CardResult result, Value<SlotStatus> status,
-                                Widget centerOn, final String message)
+    public static void display (Context ctx, GameService.CardResult result,
+                                Value<SlotStatus> status, Widget centerOn, final String message)
     {
         final CardPopup popup = new CardPopup(ctx, result, status);
-        Command onComplete = StringUtil.isBlank(message) ? null : new Command() {
-            public void execute () {
-                // TODO: this sucks, display the message better...
-                int top = popup.getAbsoluteTop();
-                InfoPopup info = new InfoPopup("They said '" + message + "'");
-                info.setVisible(false);
-                info.show();
-                int left = (Window.getClientWidth() - info.getOffsetWidth())/2;
-                info.setPopupPosition(left, top - info.getOffsetHeight());
-                info.setVisible(true);
-            }
-        };
-        display(ctx, popup, centerOn, onComplete);
+        if (!StringUtil.isBlank(message)) {
+            popup.setGiftInfo(result.card.giver, message);
+        }
+        display(ctx, popup, centerOn);
     }
 
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
@@ -94,6 +89,26 @@ public class CardPopup extends PopupPanel
         addStyleName("card");
         _ctx = ctx;
         _status = status;
+    }
+
+    protected void setGiftInfo (PlayerName giver, String message)
+    {
+        final FluentTable table = new FluentTable(5, 0);
+        table.at(0, 0).setWidget(XFBML.newProfilePic(giver.facebookId));
+        table.at(0, 1).setText("'" + message + "'").alignTop();
+        _onAnimComplete = new Command() {
+            public void execute () {
+                _msgPop = Popups.newPopup("popup", table);
+                _msgPop.addStyleName("cardMessagePopup");
+                _msgPop.setVisible(false);
+                _msgPop.show();
+                XFBML.parse(_msgPop);
+                int top = getAbsoluteTop() + 5; // account for shadow
+                int left = (Window.getClientWidth() - _msgPop.getOffsetWidth())/2;
+                _msgPop.setPopupPosition(left, top);
+                FX.move(_msgPop).to(left, top - _msgPop.getOffsetHeight()).run(500);
+            }
+        };
     }
 
     protected Widget createContents (final Card card)
@@ -161,6 +176,9 @@ public class CardPopup extends PopupPanel
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
+                if (_msgPop != null) {
+                    _msgPop.hide();
+                }
                 int tx = -getOffsetWidth(), ty = getAbsoluteTop();
                 FX.move(CardPopup.this).to(tx, ty).onComplete(new Command() {
                     public void execute () {
@@ -171,18 +189,21 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    protected static void display (Context ctx, CardPopup popup, Widget centerOn, Command onComplete)
+    protected static void display (Context ctx, final CardPopup popup, Widget centerOn)
     {
         popup.setVisible(false);
         ctx.displayPopup(popup, centerOn);
         FX.move(popup).from(-popup.getOffsetWidth(), popup.getAbsoluteTop()).
-            onComplete(onComplete).run(500);
+            onComplete(FX.delay(popup._onAnimComplete, 500)).run(500);
     }
 
     protected Context _ctx;
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
     protected Value<SlotStatus> _status;
+
+    protected Command _onAnimComplete;
+    protected PopupPanel _msgPop;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
