@@ -32,11 +32,9 @@
 
 /** CardView styles */
 .cardView {
-  background: url(images/info_card.png) no-repeat;
-  width: 611px;
-  height: 451px;
+  width: 603px;
+  height: 443px;
   font-size: 15px;
-  padding: 2px 5px 6px 3px;
 }
 
 .cardViewTall {

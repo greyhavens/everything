@@ -14,6 +14,7 @@ import com.threerings.gwt.util.StringUtil;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 
+import client.ui.ShadowPanel;
 import client.util.ImageUtil;
 
 /**
@@ -37,7 +38,7 @@ public abstract class CardView extends FlowPanel
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
         box.add().setWidget(Widgets.newRow(buttons), "Buttons").setColSpan(2).alignCenter();
-        return box;
+        return new ShadowPanel(box, "images/info_card.png", "#EFE3C4", 2, 5, 6, 3);
     }
 
     protected static String nameSource (String source)
