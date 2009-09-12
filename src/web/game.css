@@ -153,6 +153,10 @@
   max-width: 550px;
 }
 
+.cardMessagePopup img {
+  display: block;
+}
+
 /** ThingCardView styles */
 .thingCard {
   text-align: center;
