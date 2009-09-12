@@ -16,6 +16,7 @@ import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.InfoPopup;
 import com.threerings.gwt.ui.Popups;
+import com.threerings.gwt.util.Handlers;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
@@ -167,7 +168,7 @@ public class CardPopup extends PopupPanel
         boolean completed = (_haveCount == 0 && _thingsRemaining == 0);
         PushButton share = ButtonUI.newButton(
             (card.giver == null) ? "Share" : "Thank",
-            ThingDialog.makeGotHandler(_ctx, card, completed));
+            Handlers.chain(ThingDialog.makeGotHandler(_ctx, card, completed), onHide()));
         if (card.giver == null) {
             share.setTitle("Tell your friends about this awesome card.");
         } else {
