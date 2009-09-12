@@ -91,20 +91,26 @@ fb\:profile-pic img {
   z-index: 10;
 }
 
-.gwt-PushButton {
+.gwt-PushButton, .wideButton {
   color: #442D17;
-  width: 81px;
   height: 46px;
 }
-.gwt-PushButton .html-face {
+.gwt-PushButton .html-face, .wideButton .html-face {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-size: 18px;
   padding: 11px 0px;
   text-align: center;
   cursor: pointer;
 }
-.longButton .html-face {
-  font-size: 12px;
+.gwt-PushButton-down-hovering .html-face, .wideButton-down-hovering .html-face {
+  padding: 12px 0px 10px 2px;
+}
+.gwt-PushButton-up-disabled, .wideButton-up-disabled {
+  color: #CCCCCC;
+}
+
+.gwt-PushButton {
+  width: 81px;
 }
 .gwt-PushButton-up {
   background: url(images/button/up.png);
@@ -115,16 +121,29 @@ fb\:profile-pic img {
 .gwt-PushButton-down-hovering {
   background: url(images/button/down.png);
 }
-.gwt-PushButton-down-hovering .html-face {
-  padding: 12px 0px 10px 2px;
-}
 .gwt-PushButton-up-disabled {
   background: url(images/button/up.png);
-  color: #CCCCCC;
+}
+
+.wideButton {
+  width: 99px;
+}
+.wideButton-up {
+  background: url(images/button/wide_up.png);
+}
+.wideButton-up-hovering {
+  background: url(images/button/wide_over.png);
+}
+.wideButton-down-hovering {
+  background: url(images/button/wide_down.png);
+}
+.wideButton-up-disabled {
+  background: url(images/button/wide_up.png);
 }
 
 .smallButton, .smallWideButton {
   color: #442D17;
+  height: 22px;
 }
 .smallButton .html-face, .smallWideButton .html-face {
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
@@ -141,7 +160,6 @@ fb\:profile-pic img {
 
 .smallButton {
   width: 50px;
-  height: 22px;
 }
 .smallButton-up {
   background: url(images/button/small_up.png);
@@ -158,7 +176,6 @@ fb\:profile-pic img {
 
 .smallWideButton {
   width: 80px;
-  height: 22px;
 }
 .smallWideButton-up {
   background: url(images/button/small_wide_up.png);
