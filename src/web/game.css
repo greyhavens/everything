@@ -382,7 +382,7 @@
   text-align: center;
 }
 
-.nsfPopup .gwt-PushButton {
+.nsfPopup .gwt-PushButton, .nsfPopup .wideButton {
   margin: 0px auto;
 }
 
@@ -448,7 +448,7 @@
   font-weight: bold;
 }
 
-.giftCard .Buttons .gwt-PushButton {
+.giftCard .Buttons .wideButton {
   margin: 0px 0px 0px auto;
 }
 
