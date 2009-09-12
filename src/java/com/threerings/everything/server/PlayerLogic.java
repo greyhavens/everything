@@ -123,6 +123,10 @@ public class PlayerLogic
     public void sendFacebookNotification (PlayerRecord from, final long toFBId,
                                           final String fbml, final String tracking)
     {
+        if (toFBId == 0) {
+            return; // noop, some day we'll support players who aren't on Facebook
+        }
+
         final Tuple<String, String> finfo = _userLogic.getFacebookAuthInfo(from.userId);
         if (finfo == null || finfo.right == null) {
             log.warning("Missing Facebook data for notification", "from", from.who(),
@@ -134,6 +138,7 @@ public class PlayerLogic
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 try {
+                    log.debug("Sending FB notification", "id", toFBId, "fbml", fbml);
                     // send the notification to Facebook
                     fbclient.notifications_send(Collections.singleton(toFBId), fbml);
                     // tell Kontagent that we sent a notification
