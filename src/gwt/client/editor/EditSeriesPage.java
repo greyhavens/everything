@@ -234,6 +234,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         card.thing = thing;
         card.position = position;
         card.things = result.things.size();
+        card.giver = _ctx.getMe();
         card.received = new Date();
         return card;
     }
