@@ -104,10 +104,13 @@ public class CardPopup extends PopupPanel
                 _msgPop.setVisible(false);
                 _msgPop.show();
                 XFBML.parse(_msgPop);
-                int top = getAbsoluteTop() + 5; // account for shadow
                 int left = (Window.getClientWidth() - _msgPop.getOffsetWidth())/2;
-                _msgPop.setPopupPosition(left, top);
-                FX.move(_msgPop).to(left, top - _msgPop.getOffsetHeight()).run(500);
+                int top = getAbsoluteTop();
+                _msgPop.setPopupPosition(left, top + 2); // account for shadow
+                _msgPop.setVisible(true);
+                FX.move(CardPopup.this).to(getAbsoluteLeft(), top+_msgPop.getOffsetHeight()-1).
+                    run(500);
+                // FX.move(_msgPop).to(left, top - _msgPop.getOffsetHeight()).run(500);
             }
         };
     }
