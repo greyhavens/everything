@@ -28,9 +28,11 @@ public abstract class CardView extends FlowPanel
     public static Widget create (Card card, String header, String status, Widget... buttons)
     {
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
+        String bgimage = "images/info_card.png";
         if (header != null) {
             box.add().setHTML(header, "Header", "machine").setColSpan(2);
             box.addStyleName("cardViewTall");
+            bgimage = "images/info_card_tall.png";
         }
         box.add().setWidget(new CardView.Left(card), "Left").
             right().setWidget(new CardView.Right(card), "Right");
@@ -38,7 +40,7 @@ public abstract class CardView extends FlowPanel
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
         box.add().setWidget(Widgets.newRow(buttons), "Buttons").setColSpan(2).alignCenter();
-        return new ShadowPanel(box, "images/info_card.png", "#EFE3C4", 2, 5, 6, 3);
+        return new ShadowPanel(box, bgimage, "#EFE3C4", 2, 5, 6, 3);
     }
 
     protected static String nameSource (String source)
