@@ -95,22 +95,22 @@ public abstract class CardView extends FlowPanel
         {
             add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
                                  getCategoriesSize(card.categories)));
-            Widget info = Widgets.newFlowPanel(
+            FlowPanel info = Widgets.newFlowPanel(
                 "Info", Widgets.newLabel(card.thing.descrip),
                 Widgets.newLabel("Facts:", "FactsTitle"),
                 Widgets.newHTML(formatFacts(card.thing.facts)),
                 Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source"));
             info.addStyleName(card.categories[0].name);
-            add(info);
             if (card.giver == null) {
-                add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received), "When"));
+                info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received), "When"));
             } else if (card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
-                add(Widgets.newLabel("A birthday present from Everything", "Giver"));
-                add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                info.add(Widgets.newLabel("A birthday present from Everything", "Giver"));
+                info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
             } else {
-                add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
-                add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
+                info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
             }
+            add(info);
         }
     }
 

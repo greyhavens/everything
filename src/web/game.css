@@ -47,7 +47,7 @@
 }
 .cardView .Right {
   width: 295px;
-  padding-right: 5px;
+  padding-right: 10px;
 }
 
 .cardView .Header {
@@ -82,9 +82,11 @@
 }
 
 .cardView .Categories {
-  padding-top: 10px;
   width: 280px;
+  height: 35px;
   font-weight: bold;
+  display: table-cell;
+  vertical-align: bottom;
 }
 .cardView .NormalCategories {
   font-size: 15px;
@@ -103,11 +105,11 @@
 }
 
 .cardView .Info {
-  margin: 10px 0px 10px 0px;
-  width: 290px;
-  height: 290px;
-  overflow: auto;
   background: url(images/category/default.png) top center no-repeat;
+  width: 290px;
+  height: 347px;
+  overflow: auto;
+  padding-right: 5px;
 }
 
 .cardView .Animals {
