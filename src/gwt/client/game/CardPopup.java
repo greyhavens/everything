@@ -134,15 +134,6 @@ public class CardPopup extends PopupPanel
             status = "You have " + have + " of " + total + " " + card.getSeries().name + ".";
         }
 
-        PushButton gift = ButtonUI.newButton(
-            "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
-                public void run () {
-                    onHide().onClick(null);
-                    _status.update(SlotStatus.GIFTED);
-                }
-            }, this));
-        gift.setTitle("Give this card to a friend.");
-
         PushButton sell = ButtonUI.newButton("Sell");
         sell.setTitle("Sell this card back for half its value.");
         new ClickCallback<Integer>(sell) {
@@ -161,15 +152,29 @@ public class CardPopup extends PopupPanel
                          CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
                          "Do you want to sell it?");
 
+        PushButton gift = ButtonUI.newButton(
+            "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+                public void run () {
+                    onHide().onClick(null);
+                    _status.update(SlotStatus.GIFTED);
+                }
+            }, this));
+        gift.setTitle("Give this card to a friend.");
+
+        PushButton keep = ButtonUI.newButton("Keep", onHide());
+        keep.setTitle("Keep this card for your collection.");
+
         boolean completed = (_haveCount == 0 && _thingsRemaining == 0);
-        PushButton brag = ButtonUI.newButton(
-            "Brag", ThingDialog.makeGotHandler(_ctx, card, completed));
-        brag.setTitle("Post this card to your Facebook feed.");
+        PushButton share = ButtonUI.newButton(
+            (card.giver == null) ? "Share" : "Thank",
+            ThingDialog.makeGotHandler(_ctx, card, completed));
+        if (card.giver == null) {
+            share.setTitle("Tell your friends about this awesome card.");
+        } else {
+            share.setTitle("Thank your friend for the awesome gift!");
+        }
 
-        PushButton done = ButtonUI.newButton("Keep", onHide());
-        done.setTitle("Keep this card for your collection.");
-
-        return CardView.create(card, _title, status, sell, gift, brag, done);
+        return CardView.create(card, _title, status, sell, gift, keep, share);
     }
 
     protected ClickHandler onHide ()
