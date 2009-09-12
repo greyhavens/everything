@@ -35,13 +35,13 @@ public class ThingDialog
     {
         if (completed) {
             return makeHandler(ctx, "got_comp", Build.Template.GOT_COMP.id, card,
-                               "Brag about your completed series to your friends:", "Woo hoo!");
+                               "Celebrate your completed series:", "Woo hoo!");
         } else if (card.giver != null) {
             return makeHandler(ctx, "got_gift", Build.Template.GOT_GIFT.id, card,
-                               "Brag about your awesome gift to your friends:", "Thanks!");
+                               "Thank your friend for this great gift:", "Thanks!");
         } else {
             return makeHandler(ctx, "got_card", Build.Template.GOT_CARD.id, card,
-                               "Brag about this awesome card to your friends:", "Woo!");
+                               "Tell your friends about this awesome card:", "Woo!");
         }
     }
 
