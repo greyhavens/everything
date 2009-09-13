@@ -169,16 +169,20 @@ public class CardPopup extends PopupPanel
         keep.setTitle("Keep this card for your collection.");
 
         boolean completed = (_haveCount == 0 && _thingsRemaining == 0);
-        PushButton share = ButtonUI.newButton(
-            (card.giver == null) ? "Share" : "Thank",
+        boolean wasGift = (card.giver != null);
+        PushButton share = ButtonUI.newButton(wasGift ? "Thank" : "Share",
             Handlers.chain(ThingDialog.makeGotHandler(_ctx, card, completed), onHide()));
-        if (card.giver == null) {
-            share.setTitle("Tell your friends about this awesome card.");
-        } else {
+        if (wasGift) {
             share.setTitle("Thank your friend for the awesome gift!");
+        } else {
+            share.setTitle("Tell your friends about this awesome card.");
         }
 
-        return CardView.create(card, _title, status, sell, gift, keep, share);
+        // only "incentivize" sharing if you just completed a series or you just received a gift
+        // (not when you are looking at a card gifted previously)
+        return (completed || (wasGift && (_title != null))) ?
+            CardView.create(card, _title, status, sell, gift, keep, share) :
+            CardView.create(card, _title, status, sell, gift, share, keep);
     }
 
     protected ClickHandler onHide ()
