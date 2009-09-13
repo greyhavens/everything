@@ -30,7 +30,7 @@ public abstract class CardView extends FlowPanel
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
         String bgimage = "images/info_card.png";
         if (header != null) {
-            box.add().setHTML(header, "Header", "machine").setColSpan(2);
+            box.add().setHTML(header, "Header", "machine").setColSpan(2).alignBottom();
             box.addStyleName("cardViewTall");
             bgimage = "images/info_card_tall.png";
         }

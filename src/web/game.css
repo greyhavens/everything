@@ -52,11 +52,11 @@
 
 .cardView .Header {
   font-size: 20px;
-  height: 40px;
+  height: 30px;
 }
 
 .cardView .Status {
-  height: 30px;
+  height: 20px;
 }
 .cardView .Buttons {
   height: 46px;
