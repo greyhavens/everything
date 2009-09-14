@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
-import com.threerings.gwt.ui.InfoPopup;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.util.Handlers;
 import com.threerings.gwt.util.StringUtil;
