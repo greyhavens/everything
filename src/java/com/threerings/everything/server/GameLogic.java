@@ -90,13 +90,14 @@ public class GameLogic
 
         // grids generally expire at midnight in the player's timezone
         TimeZone zone = TimeZone.getTimeZone(player.timezone);
-        grid.expires = Calendars.in(zone).zeroTime().addDays(1).toTimestamp();
-        // if the grid generated won't live for at least two hours, push its expiry out a day
+        Calendars.Builder cal = Calendars.in(zone).zeroTime().addDays(1);
+        grid.expires = cal.toTimestamp();
+        // extend the expiration of this grid out one or two hours to ensure it will live long
+        // enough for them to flip their cards comfortable
         long duration = grid.expires.getTime() - System.currentTimeMillis();
-        if (duration < MIN_GRID_DURATION) {
-            log.info("Rolling grid forward an extra day", "who", player.who(),
-                     "zone", player.timezone, "had", duration, "odate", grid.expires);
-            grid.expires = Calendars.in(zone).zeroTime().addDays(2).toTimestamp();
+        while (duration < MIN_GRID_DURATION) {
+            grid.expires = cal.addHours(1).toTimestamp();
+            duration = grid.expires.getTime() - System.currentTimeMillis();
         }
 
         return grid;
@@ -459,12 +460,12 @@ public class GameLogic
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 
-    /** The minimum allowed lifespan for a grid. */
-    protected static final long MIN_GRID_DURATION = 2 * 60 * 60 * 1000L;
-
     /** We'll try 10 times to pick a bonus card before giving up. */
     protected static final int MAX_BONUS_ATTEMPTS = 10;
 
     /** One hour in milliseconds. */
     protected static final long HOUR = 60*60*1000L;
+
+    /** The minimum allowed lifespan for a grid (two hours). */
+    protected static final long MIN_GRID_DURATION = 2*HOUR;
 }
