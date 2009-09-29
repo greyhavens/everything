@@ -272,7 +272,7 @@ public class EverythingServlet extends EveryServiceServlet
         // whom no name was found
         return Lists.newArrayList(Iterables.filter(stats.values(), new Predicate<PlayerStats>() {
             public boolean apply (PlayerStats stat) {
-                return stat.name != null;
+                return stat.name.name != null;
             }
         }));
     }
