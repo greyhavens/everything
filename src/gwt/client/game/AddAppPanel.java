@@ -25,6 +25,16 @@ public class AddAppPanel extends FlowPanel
             addStyleName("page");
         }
 
+        // add a bookmark hint once the player has added the app
+        if (!ctx.getMe().isGuest()) {
+            add(Widgets.newLabel(_msgs.introBookmark(), "Title", "machine"));
+            FluentTable intro = new FluentTable(5, 0);
+            intro.add().setWidget(Widgets.newImage("images/bookmark_tip.png")).
+                right().setText(_msgs.introBookmarkTip(), "Text");
+            add(intro);
+            add(Widgets.newShim(10, 10));
+        }
+
         add(Widgets.newLabel(_msgs.introTitle(), "Title", "machine"));
         add(Widgets.newLabel(_msgs.introIntro(), "Text"));
         FluentTable intro = new FluentTable(5, 0, "Steps");
