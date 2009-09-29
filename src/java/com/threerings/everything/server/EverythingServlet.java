@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import com.google.code.facebookapi.FacebookException;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
@@ -264,7 +266,15 @@ public class EverythingServlet extends EveryServiceServlet
             pstat.name = prec.getName();
             pstat.lastSession = new Date(prec.lastSession.getTime());
         }
-        return Lists.newArrayList(stats.values());
+        // friend records may exist for non-players (because a friend may arrive from facebook but
+        // never register, but then next time around Everything will notice the fbid to samid
+        // mapping and create a friend record for the friend), so we have to filter out players for
+        // whom no name was found
+        return Lists.newArrayList(Iterables.filter(stats.values(), new Predicate<PlayerStats>() {
+            public boolean apply (PlayerStats stat) {
+                return stat.name != null;
+            }
+        }));
     }
 
     // from interface EverythingService
