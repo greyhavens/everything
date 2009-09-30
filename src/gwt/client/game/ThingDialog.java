@@ -82,9 +82,10 @@ public class ThingDialog
         String cardURL = ctx.getEverythingURL(
             Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
+        String imageURL = GWT.getModuleBaseURL() + "/cardimg?thing=" + card.thing.thingId;
         showDialog(templateId, targetId, card.thing.name, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.getSeries().name,
-                   card.thing.rarity.toString(), ImageUtil.getImageURL(card.thing.image),
+                   card.thing.rarity.toString(), imageURL,
                    cardURL, everyURL, prompt, message, new Command() {
             public void execute () {
                 _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
