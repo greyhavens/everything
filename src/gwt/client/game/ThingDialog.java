@@ -82,7 +82,7 @@ public class ThingDialog
         String cardURL = ctx.getEverythingURL(
             Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
-        String imageURL = GWT.getModuleBaseURL() + "/cardimg?thing=" + card.thing.thingId;
+        String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(templateId, targetId, card.thing.name, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.getSeries().name,
                    card.thing.rarity.toString(), imageURL,
