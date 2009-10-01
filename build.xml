@@ -32,15 +32,15 @@
     <file name="extlibs/java/facebook-java-api.jar"/>
     <file name="extlibs/java/facebook-java-api-schema.jar"/>
     <file name="extlibs/java/jvnet-runtime.jar"/>
+    <file name="extlibs/java/json.jar"/>
+    <file name="extlibs/java/commons-lang.jar"/>
+    <file name="extlibs/java/commons-logging.jar"/>
   </filelist>
 
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
   <filelist dir="." id="runtime.libs">
-    <file name="extlibs/java/commons-lang.jar"/>
     <file name="extlibs/java/commons-fileupload.jar"/>
     <file name="extlibs/java/commons-io.jar"/>
-    <file name="extlibs/java/commons-logging.jar"/>
-    <file name="extlibs/java/json.jar"/>
     <file name="extlibs/java/s3lib.jar"/>
   </filelist>
 
