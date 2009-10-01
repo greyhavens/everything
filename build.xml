@@ -29,6 +29,9 @@
     <file name="extlibs/java/easymock/easymock.jar"/>
     <file name="extlibs/java/junit4.jar"/>
     <file name="extlibs/java/postgresql-jdbc4.jar"/>
+    <file name="extlibs/java/facebook-java-api.jar"/>
+    <file name="extlibs/java/facebook-java-api-schema.jar"/>
+    <file name="extlibs/java/jvnet-runtime.jar"/>
   </filelist>
 
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
@@ -38,9 +41,6 @@
     <file name="extlibs/java/commons-io.jar"/>
     <file name="extlibs/java/commons-logging.jar"/>
     <file name="extlibs/java/json.jar"/>
-    <file name="extlibs/java/jvnet-runtime.jar"/>
-    <file name="extlibs/java/facebook-java-api.jar"/>
-    <file name="extlibs/java/facebook-java-api-schema.jar"/>
     <file name="extlibs/java/s3lib.jar"/>
   </filelist>
 
@@ -275,7 +275,7 @@
     </antcall>
   </target>
 
-  <target name="web" depends="prepare" 
+  <target name="web" depends="prepare"
           description="Copies updated style sheets into the local installed app.">
     <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/" preservelastmodified="true">
       <fileset dir="${wsrc.dir}" includes="**"/>
