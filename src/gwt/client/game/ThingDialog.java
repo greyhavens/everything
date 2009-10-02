@@ -19,7 +19,6 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.gwt.util.Console;
 
 import client.util.Context;
-import client.util.ImageUtil;
 import client.util.KontagentUtil;
 import client.util.Page;
 
