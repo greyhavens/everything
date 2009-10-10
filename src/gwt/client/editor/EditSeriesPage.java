@@ -79,6 +79,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         FluentTable info = new FluentTable(5, 0, "handwriting");
         add(info);
         info.add().setText("Creator:").right().setWidget(Args.createInlink(series.get().creator));
+        info.add().setText("Seed ID:").right().setText(series.get().categoryId);
 
         if (_ctx.isAdmin() || _ctx.getMe().equals(series.get().creator)) {
             final TextBox name = Widgets.newTextBox(

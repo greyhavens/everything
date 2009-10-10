@@ -215,6 +215,21 @@ public class ThingIndex
         return (into.size() == 0) ? 0 : into.interator().nextInt();
     }
 
+    /**
+     * Selects a seed item from the specified seed category for a new player.
+     */
+    public int pickSeedThing (int seedCat)
+    {
+        ThingList things = new ThingList();
+        for (ThingInfo info : _bycat.get(seedCat)) {
+            if (info.rarity == Rarity.I) {
+                things.things.add(info);
+                things.totalWeight += info.rarity.weight();
+            }
+        }
+        return (things.things.size() == 0) ? 0 : pickWeightedThing(things);
+    }
+
     protected ThingList getCategoryThings (IntSet catIds, Rarity minRarity)
     {
         ThingList things = new ThingList();

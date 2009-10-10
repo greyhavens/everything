@@ -28,11 +28,13 @@ import com.google.code.facebookapi.ProfileField;
 import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
+import com.samskivert.servlet.util.CookieUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
 import com.threerings.user.OOOUser;
@@ -154,6 +156,23 @@ public class EverythingServlet extends EveryServiceServlet
 
             // transfer any escrowed cards into their collection
             _gameRepo.unescrowCards(fbinfo.left, player);
+
+            // if they have a seed cookie, grant them a single card from their seed series
+            String seed = CookieUtil.getCookieValue(
+                getThreadLocalRequest(), AuthServlet.SEED_COOKIE);
+            if (!StringUtil.isBlank(seed)) {
+                try {
+                    int thingId = _thingLogic.getThingIndex().pickSeedThing(
+                        Integer.parseInt(seed));
+                    if (thingId != 0) {
+                        _gameRepo.createCard(player.userId, thingId, 0);
+                        log.info("Granted seed thing to new player", "who", player.who(),
+                                 "thing", thingId);
+                    }
+                } catch (Exception e) {
+                    log.warning("Failed to process seed", "who", player.who(), "seed", seed, e);
+                }
+            }
 
             // look up their friends' facebook ids and make friend mappings for them
             updateFacebookFriends(player, fbinfo.right);

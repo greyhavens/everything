@@ -6,6 +6,7 @@ package com.threerings.everything.server;
 import java.io.IOException;
 import java.util.Random;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +31,9 @@ import static com.threerings.everything.Log.log;
  */
 public class AuthServlet extends AppServlet
 {
+    /** The name of the cookie in which we store the seed category. */
+    public static final String SEED_COOKIE = "s";
+
     @Override // from HttpServlet
     protected void doGet (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
@@ -77,6 +81,15 @@ public class AuthServlet extends AppServlet
         // report that the app was added
         if (tracking != null) {
             indexPath = "?t=" + tracking;
+        }
+
+        // if we have a seed category, stuff that into a session cookie so we can pick it up again
+        // after the client adds the app and validates their session for the first time
+        String seed = ParameterUtil.getParameter(req, "seed", false);
+        if (!StringUtil.isBlank(seed)) {
+            Cookie c = new Cookie(SEED_COOKIE, seed);
+            c.setPath("/");
+            rsp.addCookie(c);
         }
 
         // otherwise pass the buck to the app servlet, it may have to get jiggy

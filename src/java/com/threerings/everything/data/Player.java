@@ -34,8 +34,8 @@ public class Player
     /** This player's name. */
     public PlayerName name;
 
-    /** This player's birthday. */
-    public Date birthday;
+    /** The day of year on which this player's birthday falls as MMDD. */
+    public int birthdate;
 
     /** This player's preferred timezone. */
     public String timezone;

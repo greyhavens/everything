@@ -135,9 +135,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
             addDatum("Last seen", DateUtil.formatDateTime(details.lastSession));
             addDatum("Coins", details.coins);
             addDatum("Free flips", details.freeFlips);
-            if (details.birthday != null) {
-                addDatum("Birthday", _bfmt.format(details.birthday));
-            }
+            addDatum("Birthdate", (details.birthdate/100) + "/" + (details.birthdate%100));
             addDatum("Timezone", details.timezone);
 
             final CheckBox isEditor = new CheckBox();
