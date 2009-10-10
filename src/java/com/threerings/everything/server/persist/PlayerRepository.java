@@ -52,26 +52,8 @@ public class PlayerRepository extends DepotRepository
     {
         super(ctx);
 
-        // TODO: remove a week or two after 07-17-2009
-        _ctx.registerMigration(PlayerRecord.class,
-                               new SchemaMigration.Retype(8, PlayerRecord.FREE_FLIPS));
-
-        // temp: migrate "birthday" to "birthdate"
-        registerMigration(new DataMigration("2009_08_01_birthday_to_date") {
-            public void invoke () throws DatabaseException {
-                for (PlayerRecord prec : findAll(PlayerRecord.class)) {
-                    if (prec.birthday == null) {
-                        updatePartial(PlayerRecord.getKey(prec.userId),
-                                      PlayerRecord.BIRTHDATE, -1);
-                    } else {
-                        updatePartial(PlayerRecord.getKey(prec.userId),
-                                      PlayerRecord.BIRTHDATE, toDateVal(prec.birthday.getTime()));
-                    }
-                }
-            }
-        });
-
-        // TODO: drop birthday column once the above has run
+        // TODO: remove a week or two after 10-09-2009
+        _ctx.registerMigration(PlayerRecord.class, new SchemaMigration.Drop(12, "birthday"));
     }
 
     /**
