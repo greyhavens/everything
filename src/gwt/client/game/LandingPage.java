@@ -56,11 +56,7 @@ public class LandingPage extends FlowPanel
             add(link);
             add(Widgets.newShim(10, 10));
 
-        } else if (news.get() == null) {
-            add(Widgets.newLabel("Latest News", "Title", "machine"));
-            add(Widgets.newLabel("No gnus is good gnus.", "Text"));
-
-        } else {
+        } else if (news.get() != null) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
