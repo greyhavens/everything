@@ -225,41 +225,40 @@
   text-align: center;
 }
 
-/** AddAppPanel styles */
-.addApp .Title, .addApp .Steps {
-  font-size: 18px;
-}
-
-.addApp .Steps {
-  margin: 10px auto;
-  text-align: center;
-}
-
-.addApp .Arrow {
-  font-size: 45px;
-}
-
-.addApp .Text {
-  margin: 5px 0px;
-  font-family: Trebuchet MS, sans-serif;
-}
-
-.addApp .Text a {
-  font-size: 18px;
-  font-family: Machine Bold, Helvetia, Arial, sans-serif;
-  font-weight: bold;
-}
-
 /** LandingPage styles */
 .landing {
   font-family: Times, Times New Roman, serif;
   background: url(images/page_news.png) no-repeat;
 }
 
-.landing .Title {
+.landing .Title, .landing .Steps, .landing .CTA {
   font-size: 18px;
+}
+
+.landing .CTA {
+  text-align: center;
+  border: 2px solid;
+  padding: 10px;
+  margin: 0px 250px;
+}
+
+.landing .Steps {
+  margin: 10px auto;
+  text-align: center;
+  font-size: 18px;
+}
+
+.landing .Arrow {
+  font-size: 45px;
+}
+
+.landing .BigFlip {
+  font-size: 24px;
   font-family: Machine Bold, Helvetia, Arial, sans-serif;
   font-weight: bold;
+  margin: 0px 240px;
+  padding: 10px;
+  border: 2px solid;
 }
 
 .landing .Text {

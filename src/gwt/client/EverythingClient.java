@@ -33,7 +33,6 @@ import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditFAQPage;
 import client.editor.EditSeriesPage;
-import client.game.AddAppPanel;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
 import client.game.FlipPage;
@@ -222,7 +221,7 @@ public class EverythingClient
 
         // otherwise guests see the "add this app to play" button
         if (getMe().isGuest()) {
-            setContent(new AddAppPanel(this, true));
+            setContent(new LandingPage(this, _news));
             return;
         }
 
