@@ -11,6 +11,10 @@
   margin: 5px 0px;
 }
 
+.editCats .FAQ {
+  width: 200px;
+}
+
 /** EditSeriesPanel styles */
 .editSeries .Header {
   font-size: 24px;
@@ -29,4 +33,17 @@
 
 .editSeries .Editor .Wide .gwt-TextArea, .editSeries .Editor .Wide .gwt-TextBox {
   width: 500px;
+}
+
+.editFAQ {
+  padding: 10px 15px;
+}
+
+.editFAQ .Header {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.editFAQ blockquote {
+  margin-left: 15px;
 }

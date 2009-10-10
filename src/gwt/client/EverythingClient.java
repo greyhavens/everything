@@ -31,6 +31,7 @@ import client.admin.EditNewsPage;
 import client.admin.PlayersPage;
 import client.admin.StatsPage;
 import client.editor.EditCatsPage;
+import client.editor.EditFAQPage;
 import client.editor.EditSeriesPage;
 import client.game.AddAppPanel;
 import client.game.BrowsePage;
@@ -252,6 +253,9 @@ public class EverythingClient
                     setContent(new EditCatsPage(this));
                 }
                 ((EditCatsPage)_content).setArgs(args);
+                return;
+            case EDIT_FAQ:
+                setContent(new EditFAQPage(this));
                 return;
             case EDIT_SERIES:
                 setContent(new EditSeriesPage(this, args.get(0, 0)));
