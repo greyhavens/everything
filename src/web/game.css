@@ -231,15 +231,15 @@
   background: url(images/page_news.png) no-repeat;
 }
 
-.landing .Title, .landing .Steps, .landing .CTA {
+.landing .Title, .landing .Steps {
   font-size: 18px;
 }
 
 .landing .CTA {
-  text-align: center;
+  font-size: 24px;
   border: 2px solid;
   padding: 10px;
-  margin: 0px 250px;
+  margin: 0px 220px;
 }
 
 .landing .Steps {
@@ -254,11 +254,9 @@
 
 .landing .BigFlip {
   font-size: 24px;
-  font-family: Machine Bold, Helvetia, Arial, sans-serif;
-  font-weight: bold;
-  margin: 0px 240px;
-  padding: 10px;
   border: 2px solid;
+  padding: 10px;
+  margin: 0px 240px;
 }
 
 .landing .Text {

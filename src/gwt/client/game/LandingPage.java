@@ -52,6 +52,7 @@ public class LandingPage extends FlowPanel
             add(Widgets.newShim(10, 10));
             Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
             link.addStyleName("BigFlip");
+            link.addStyleName("machine");
             add(link);
             add(Widgets.newShim(10, 10));
 
