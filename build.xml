@@ -133,7 +133,7 @@
     </javac>
   </target>
 
-  <target name="gclient" depends="prepare" description="Builds our GWT client.">
+  <target name="gclient" depends="prepare,genasync" description="Builds our GWT client.">
     <!-- blow away our old app -->
     <delete dir="${deploy.dir}/gwt/${app.ident}"/>
 
@@ -330,5 +330,13 @@
     <grecord classpathref="build.classpath">
       <fileset dir="${src.dir}" includes="**/*Record.java"/>
     </grecord>
+  </target>
+
+  <target name="genasync" depends="compile" description="Regenerates GWT Async interfaces.">
+    <taskdef name="genasync" classname="com.samskivert.asyncgen.AsyncGenTask"
+             classpath="extlibs/java/gwt-asyncgen.jar"/>
+    <genasync classpathref="build.classpath">
+      <fileset dir="${src.dir}" includes="**/*Service.java"/>
+    </genasync>
   </target>
 </project>
