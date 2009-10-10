@@ -255,8 +255,9 @@ public class ThingIndex
         int iters = 0, added = 0;
         while (added < count) {
             if (iters++ >= MAX_SELECT_ITERS) {
-                throw new RuntimeException("Failed to select " + count + " things after " +
-                                           MAX_SELECT_ITERS + " attempts.");
+                log.warning("Failed to select " + count + " things after " +
+                            MAX_SELECT_ITERS + " attempts.");
+                break;
             }
             int thingId = pickWeightedThing(things, totalWeight);
             if (!excludeIds.contains(thingId) && into.add(thingId)) {
