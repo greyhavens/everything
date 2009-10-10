@@ -4,9 +4,7 @@
 package com.threerings.everything.client;
 
 import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
@@ -19,8 +17,7 @@ public interface EverythingServiceAsync
     /**
      * The async version of {@link EverythingService#validateSession}.
      */
-    void validateSession (String version, int tzOffset, String kontagentToken,
-                          AsyncCallback<SessionData> callback);
+    void validateSession (String version, int tzOffset, String kontagentToken, AsyncCallback<SessionData> callback);
 
     /**
      * The async version of {@link EverythingService#getRecentFeed}.

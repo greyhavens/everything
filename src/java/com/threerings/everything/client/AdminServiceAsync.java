@@ -4,9 +4,7 @@
 package com.threerings.everything.client;
 
 import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 

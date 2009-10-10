@@ -4,7 +4,6 @@
 package com.threerings.everything.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Grid;
@@ -30,7 +29,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#getCard}.
      */
-    void getCard (CardIdent ident, AsyncCallback<Card> callback);
+    void getCard (CardIdent cardId, AsyncCallback<Card> callback);
 
     /**
      * The async version of {@link GameService#getGrid}.
@@ -40,8 +39,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#flipCard}.
      */
-    void flipCard (int gridId, int position, int expectedCost,
-                   AsyncCallback<GameService.FlipResult> callback);
+    void flipCard (int gridId, int position, int expectedCost, AsyncCallback<GameService.FlipResult> callback);
 
     /**
      * The async version of {@link GameService#sellCard}.
@@ -51,14 +49,12 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#getGiftCardInfo}.
      */
-    void getGiftCardInfo (int thingId, long created,
-                          AsyncCallback<GameService.GiftInfoResult> callback);
+    void getGiftCardInfo (int thingId, long created, AsyncCallback<GameService.GiftInfoResult> callback);
 
     /**
      * The async version of {@link GameService#giftCard}.
      */
-    void giftCard (int thingId, long created, int friendId, String message,
-                   AsyncCallback<Void> callback);
+    void giftCard (int thingId, long created, int friendId, String message, AsyncCallback<Void> callback);
 
     /**
      * The async version of {@link GameService#openGift}.
@@ -71,7 +67,7 @@ public interface GameServiceAsync
     void getShopInfo (AsyncCallback<GameService.ShopResult> callback);
 
     /**
-     * The async version of {@link GameService#getPowerups}.
+     * The async version of {@link GameService#buyPowerup}.
      */
     void buyPowerup (Powerup type, AsyncCallback<Void> callback);
 
