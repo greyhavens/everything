@@ -15,6 +15,7 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import com.google.code.facebookapi.schema.User;
 
@@ -22,8 +23,7 @@ import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.server.persist.PlayerRecord;
-import com.threerings.samsara.app.server.AppLogic;
-
+import com.threerings.samsara.app.data.AppCodes;
 import static com.threerings.everything.Log.log;
 
 /**
@@ -38,7 +38,7 @@ public class KontagentLogic
     public String generateUniqueId (int forUserId)
     {
         int now = (int)(System.currentTimeMillis() % Integer.MAX_VALUE);
-        int rando = _rando.nextInt(), nodeId = _appLogic.getNodeId() << 24;
+        int rando = _rando.nextInt(), nodeId = _nodeId << 24;
         ByteBuffer buf = ByteBuffer.allocate(8);
         buf.asIntBuffer().put(forUserId | nodeId).put(now ^ rando);
         return StringUtil.hexlate(buf.array());
@@ -122,7 +122,7 @@ public class KontagentLogic
 
     protected Random _rando = new Random();
 
-    @Inject protected AppLogic _appLogic;
+    @Inject @Named(AppCodes.NODE_ID) protected int _nodeId;
     @Inject protected EverythingApp _app;
 
     protected static SimpleDateFormat _bfmt = new SimpleDateFormat("MMMM dd, yyyy");

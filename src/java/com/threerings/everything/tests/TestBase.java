@@ -15,7 +15,6 @@ import com.samskivert.depot.PersistenceContext;
 import com.samskivert.jdbc.ConnectionProvider;
 
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AppLogic;
 import com.threerings.samsara.common.ServletLogic;
 import com.threerings.samsara.common.UserLogic;
 
@@ -56,9 +55,6 @@ public abstract class TestBase
             bind(String.class).annotatedWith(Names.named(AppCodes.APPVERS)).
                 toInstance(AppCodes.RELEASE_CANDIDATE);
             bind(PersistenceContext.class).toInstance(new PersistenceContext());
-        }
-        @Provides protected AppLogic getAppLogic () {
-            return EasyMock.createMock(AppLogic.class);
         }
         @Provides protected UserLogic getUserLogic () {
             return EasyMock.createMock(UserLogic.class);
