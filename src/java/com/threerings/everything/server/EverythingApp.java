@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -23,32 +22,67 @@ import com.threerings.user.OOOUser;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.App;
-import com.threerings.samsara.app.server.Binding;
-
+import com.threerings.samsara.app.server.AbstractApp;
+import com.threerings.samsara.app.server.AbstractAppModule;
+import com.threerings.samsara.shared.App;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
-import com.threerings.everything.server.persist.AdminRepository;
-import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
-import com.threerings.everything.server.persist.ThingRepository;
-
 import static com.threerings.everything.Log.log;
 
 /**
  * The main entry point for the Everything app.
  */
 @Singleton
-public class EverythingApp extends App
+public class EverythingApp extends AbstractApp
 {
     /** Our app identifier. */
     public static final String IDENT = "everything";
 
-    public static class Module extends AbstractModule
+    public static class Module extends AbstractAppModule
     {
-        @Override protected void configure () {
+        @Override protected void configureApp () {
             bind(App.class).to(EverythingApp.class);
+            // bind our various servlets
+            serve(AuthServlet.class).at("/auth");
+            serve(InviteServlet.class).at("/invite");
+            serve(ShowInviteServlet.class).at("/showinvite");
+            serve(MediaUploadServlet.class).at("/upload");
+            serve(CardImageServlet.class).at("cardimg");
+            serve(EverythingServlet.class).at("/" +EverythingServlet.ENTRY_POINT);
+            serve(GameServlet.class).at("/" + GameServlet.ENTRY_POINT);
+            serve(EditorServlet.class).at("/" + EditorServlet.ENTRY_POINT);
+            serve(AdminServlet.class).at("/" + AdminServlet.ENTRY_POINT);
+            if (!_version.equals(AppCodes.RELEASE_CANDIDATE)) {
+                schedule("process_birthdays", ProcessBirthdays.class).every(1);
+                schedule("send_reminders", SendReminders.class).every(1);
+                schedule("prune_feed", PruneFeed.class).at(1);
+            }
         }
+    }
+
+    protected static class ProcessBirthdays implements Runnable {
+        @Override public void run () {
+            _gameLogic.processBirthdays();
+        }
+        @Inject GameLogic _gameLogic;
+    }
+
+    protected static class SendReminders implements Runnable {
+        @Override public void run () {
+            _playerLogic.sendReminderNotifications();
+        }
+        @Inject PlayerLogic _playerLogic;
+    }
+
+    protected static class PruneFeed implements Runnable {
+        @Override public void run () {
+            int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+            if (deleted > 0) {
+                log.info("Pruned " + deleted + " old feed items.");
+            }
+        }
+        @Inject PlayerRepository _playerRepo;
     }
 
     /**
@@ -187,47 +221,6 @@ public class EverythingApp extends App
     }
 
     @Override // from App
-    public Binding[] getBindings ()
-    {
-        List<Binding> binds = Lists.newArrayList();
-
-        // bind our various servlets
-        binds.add(new Binding.Servlet("/auth", AuthServlet.class));
-        binds.add(new Binding.Servlet("/invite", InviteServlet.class));
-        binds.add(new Binding.Servlet("/showinvite", ShowInviteServlet.class));
-        binds.add(new Binding.Servlet("/upload", MediaUploadServlet.class));
-        binds.add(new Binding.Servlet("/cardimg", CardImageServlet.class));
-        binds.add(new Binding.Servlet("/"+EverythingServlet.ENTRY_POINT, EverythingServlet.class));
-        binds.add(new Binding.Servlet("/"+GameServlet.ENTRY_POINT, GameServlet.class));
-        binds.add(new Binding.Servlet("/"+EditorServlet.ENTRY_POINT, EditorServlet.class));
-        binds.add(new Binding.Servlet("/"+AdminServlet.ENTRY_POINT, AdminServlet.class));
-
-        // only bind our cron jobs in the production instance
-        if (!_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
-            binds.add(Binding.Job.every(1, "process_birthdays", new Runnable() {
-                public void run () {
-                    _gameLogic.processBirthdays();
-                }
-            }));
-            binds.add(Binding.Job.every(1, "send_reminders", new Runnable() {
-                public void run () {
-                    _playerLogic.sendReminderNotifications();
-                }
-            }));
-            binds.add(Binding.Job.at(1, "prune_feed", new Runnable() {
-                public void run () {
-                    int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-                    if (deleted > 0) {
-                        log.info("Pruned " + deleted + " old feed items.");
-                    }
-                }
-            }));
-        }
-
-        return binds.toArray(new Binding[binds.size()]);
-    }
-
-    @Override // from App
     public int getSiteId ()
     {
         return OOOUser.EVERYTHING_SITE_ID;
@@ -253,7 +246,7 @@ public class EverythingApp extends App
     }
 
     @Override // from App
-    public void didInit ()
+    public void didAttach ()
     {
         log.info("Everything app initialized.", "version", _appvers, "build", Build.version());
     }
@@ -277,15 +270,7 @@ public class EverythingApp extends App
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
-    @Inject protected GameLogic _gameLogic;
-    @Inject protected PlayerLogic _playerLogic;
-
-    // we need to inject all repositories here to ensure that they are resolved when our app is
-    // resolved so that everything is registered and ready to go when Samsara initializes Depot
-    @Inject protected AdminRepository _adminRepo;
-    @Inject protected GameRepository _gameRepo;
     @Inject protected PlayerRepository _playerRepo;
-    @Inject protected ThingRepository _thingRepo;
 
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
     protected static final int FEED_PRUNE_DAYS = 5;

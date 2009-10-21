@@ -16,8 +16,8 @@ import com.samskivert.jdbc.ConnectionProvider;
 
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppLogic;
-import com.threerings.samsara.app.server.ServletLogic;
-import com.threerings.samsara.app.server.UserLogic;
+import com.threerings.samsara.common.ServletLogic;
+import com.threerings.samsara.common.UserLogic;
 
 import com.threerings.everything.server.EverythingApp;
 
@@ -36,7 +36,7 @@ public abstract class TestBase
         PersistenceContext perCtx = injector.getInstance(PersistenceContext.class);
         perCtx.init(app.getIdentifier(), conprov, null);
         perCtx.initializeRepositories(true);
-        app.didInit();
+        app.didAttach();
         injector.getInstance(testClass).run(args);
         app.didDetach();
     }

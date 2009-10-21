@@ -6,6 +6,7 @@
   <property name="wsrc.dir" value="src/web"/>
   <property name="asrc.dir" value="src/as"/>
   <property name="deploy.dir" value="dist"/>
+  <property name="classes.dir" value="${deploy.dir}/classes"/>
   <property name="pkg.user" value="_samsara"/>
   <property name="pkg.maintainer.name" value="Three Rings Design"/>
   <property name="pkg.maintainer.email" value="ooo-dev@threerings.net"/>
@@ -15,43 +16,52 @@
 
   <!-- we need these libraries to build -->
   <filelist dir="." id="build.libs">
-    <file name="extlibs/java/commons-collections.jar"/>
-    <file name="extlibs/java/google-collect.jar"/>
-    <file name="extlibs/java/guice.jar"/>
-    <file name="extlibs/java/gwt-user.jar"/>
-    <file name="extlibs/java/servlet-api.jar"/>
-    <file name="extlibs/java/velocity-1.5-dev.jar"/>
     <file name="extlibs/flash/corelib.swc"/>
     <file name="extlibs/flash/flexlib.swc"/>
     <file name="extlibs/flash/tweener.swc"/>
+    <file name="extlibs/java/jetty6/jetty.jar"/>
+    <file name="extlibs/java/jetty6/jetty-util.jar"/>
+
     <!-- these are for unit tests and mocking -->
-    <file name="extlibs/java/aopalliance.jar"/>
     <file name="extlibs/java/easymock/easymock.jar"/>
     <file name="extlibs/java/junit4.jar"/>
-    <file name="extlibs/java/postgresql-jdbc4.jar"/>
-    <file name="extlibs/java/facebook-java-api.jar"/>
-    <file name="extlibs/java/facebook-java-api-schema.jar"/>
-    <file name="extlibs/java/jvnet-runtime.jar"/>
-    <file name="extlibs/java/json.jar"/>
-    <file name="extlibs/java/commons-lang.jar"/>
-    <file name="extlibs/java/commons-logging.jar"/>
   </filelist>
 
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
   <filelist dir="." id="runtime.libs">
+    <file name="extlibs/java/aopalliance.jar"/>
+    <file name="extlibs/java/activation.jar"/>
+    <file name="extlibs/java/commons-collections.jar"/>
     <file name="extlibs/java/commons-fileupload.jar"/>
     <file name="extlibs/java/commons-io.jar"/>
+    <file name="extlibs/java/commons-lang.jar"/>
+    <file name="extlibs/java/commons-logging.jar"/>
+    <file name="extlibs/java/ehcache.jar"/>
+    <file name="extlibs/java/facebook-java-api.jar"/>
+    <file name="extlibs/java/facebook-java-api-schema.jar"/>
+    <file name="extlibs/java/google-collect.jar"/>
+    <file name="extlibs/java/guice.jar"/>
+    <file name="extlibs/java/guice-multibindings.jar"/>
+    <file name="extlibs/java/gwt-user.jar"/>
+    <file name="extlibs/java/jvnet-runtime.jar"/>
+    <file name="extlibs/java/json.jar"/>
+    <file name="extlibs/java/log4j.jar"/>
+    <file name="extlibs/java/mail.jar"/>
+    <file name="extlibs/java/postgresql-jdbc4.jar"/>
     <file name="extlibs/java/s3lib.jar"/>
+    <file name="extlibs/java/servlet-api.jar"/>
+    <file name="extlibs/java/velocity-1.5-dev.jar"/>
   </filelist>
 
+
   <path id="build.classpath">
-    <pathelement location="${deploy.dir}/classes"/>
+    <pathelement location="${classes.dir}"/>
     <fileset dir="${deploy.dir}/lib" includes="*.jar"/>
   </path>
 
   <target name="prepare">
     <mkdir dir="${deploy.dir}"/>
-    <mkdir dir="${deploy.dir}/classes"/>
+    <mkdir dir="${classes.dir}"/>
 
     <!-- obtain our configuration files -->
     <gatherconfiguration app="${app.ident}" distribution="${ooo.distribution}" dest="${deploy.dir}">
@@ -64,6 +74,9 @@
     </gatherconfiguration>
     <property file="${deploy.dir}/build.properties"/>
     <property file="${deploy.dir}/everything.properties"/>
+    <!-- copy our distribution-specific but otherwise uncustomized configuration files -->
+    <copy file="etc/log4j-${ooo.distribution}.properties" tofile="${classes.dir}/log4j.properties"/>
+    <copy file="etc/ehcache-${ooo.distribution}.xml" tofile="${classes.dir}/ehcache.xml"/>
 
     <!-- copy our build dependencies into place -->
     <mkdir dir="${deploy.dir}/lib"/>
@@ -79,6 +92,7 @@
       <dependency groupId="com.samskivert" artifactId="depot" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.samskivert" artifactId="samskivert-gwt" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="samsara-shared" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
@@ -113,7 +127,7 @@
   </target>
 
   <target name="clean" description="Cleans out the compilation results.">
-    <delete dir="${deploy.dir}/classes"/>
+    <delete dir="${classes.dir}"/>
   </target>
 
   <target name="distcleanall" depends="clean" description="Cleans out all build data.">
@@ -125,7 +139,7 @@
   </target>
 
   <target name="compile" depends="prepare" description="Compiles the source code.">
-    <javac srcdir="${src.dir}" destdir="${deploy.dir}/classes" debug="on"
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on"
            optimize="off" deprecation="on" includeAntRuntime="no">
       <classpath refid="build.classpath"/>
       <compilerarg value="-Xlint"/>
@@ -230,7 +244,7 @@
 
   <target name="dist" depends="prepare,compile" description="Builds our app jar file.">
     <jar destfile="${deploy.dir}/${app.ident}.jar">
-      <fileset dir="${deploy.dir}/classes" includes="**" excludes="**/tests/**"/>
+      <fileset dir="${classes.dir}" includes="**" excludes="**/tests/**"/>
       <fileset dir="${deploy.dir}" includes="everything.properties"/>
     </jar>
   </target>
@@ -256,7 +270,7 @@
     <mkdir dir="${instroot.dir}/lib"/>
     <copy todir="${instroot.dir}/lib" file="${deploy.dir}/${app.ident}.jar"/>
     <copyfilelist dest="${instroot.dir}/lib">
-      <filelist refid="runtime.libs"/>
+      <fileset dir="${deploy.dir}/lib" includes="*.jar" excludes="samsara-shared*"/>
     </copyfilelist>
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web" preservelastmodified="true">
@@ -322,7 +336,7 @@
     <taskdef name="grecord" classname="com.samskivert.depot.tools.GenRecordTask"
              classpathref="build.classpath"/>
     <!-- make sure the record class files are all compiled -->
-    <javac srcdir="${src.dir}" destdir="${deploy.dir}/classes" debug="on" deprecation="on">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
       <classpath refid="build.classpath"/>
       <include name="**/*Record.java"/>
     </javac>

@@ -23,14 +23,13 @@ import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.Tuple;
 
-import com.threerings.samsara.app.server.UserLogic;
-
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.samsara.common.UserLogic;
 
 import static com.threerings.everything.Log.log;
 

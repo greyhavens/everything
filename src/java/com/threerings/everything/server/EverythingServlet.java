@@ -41,7 +41,7 @@ import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.UserLogic;
+import com.threerings.samsara.common.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.Kontagent;

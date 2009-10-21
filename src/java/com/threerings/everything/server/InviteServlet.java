@@ -21,7 +21,7 @@ import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.server.AppServlet;
-import com.threerings.samsara.app.server.UserLogic;
+import com.threerings.samsara.common.UserLogic;
 
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.SlotStatus;
