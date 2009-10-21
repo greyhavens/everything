@@ -268,10 +268,10 @@
   <target name="install-app">
     <delete dir="${instroot.dir}"/>
     <mkdir dir="${instroot.dir}/lib"/>
-    <copy todir="${instroot.dir}/lib" file="${deploy.dir}/${app.ident}.jar"/>
-    <copyfilelist dest="${instroot.dir}/lib">
+    <copy todir="${instroot.dir}/lib">
+      <fileset dir="${deploy.dir}" includes="${app.ident}.jar"/>
       <fileset dir="${deploy.dir}/lib" includes="*.jar" excludes="samsara-shared*"/>
-    </copyfilelist>
+    </copy>
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web" preservelastmodified="true">
       <fileset dir="${wsrc.dir}" includes="**"/>
