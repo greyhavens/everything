@@ -36,7 +36,6 @@
     <file name="extlibs/java/commons-io.jar"/>
     <file name="extlibs/java/commons-lang.jar"/>
     <file name="extlibs/java/commons-logging.jar"/>
-    <file name="extlibs/java/ehcache.jar"/>
     <file name="extlibs/java/facebook-java-api.jar"/>
     <file name="extlibs/java/facebook-java-api-schema.jar"/>
     <file name="extlibs/java/google-collect.jar"/>
@@ -76,7 +75,6 @@
     <property file="${deploy.dir}/everything.properties"/>
     <!-- copy our distribution-specific but otherwise uncustomized configuration files -->
     <copy file="etc/log4j-${ooo.distribution}.properties" tofile="${classes.dir}/log4j.properties"/>
-    <copy file="etc/ehcache-${ooo.distribution}.xml" tofile="${classes.dir}/ehcache.xml"/>
 
     <!-- copy our build dependencies into place -->
     <mkdir dir="${deploy.dir}/lib"/>
