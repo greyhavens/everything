@@ -15,12 +15,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import com.samskivert.jdbc.ConnectionProvider;
-import com.samskivert.util.Config;
 import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
-import com.threerings.util.PostgresUtil;
-
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AbstractApp;
 import com.threerings.samsara.app.server.AbstractAppModule;
@@ -38,6 +34,11 @@ public class EverythingApp extends AbstractApp
 {
     /** Our app identifier. */
     public static final String IDENT = "everything";
+
+    public EverythingApp ()
+    {
+        super(IDENT);
+    }
 
     public static class Module extends AbstractAppModule
     {
@@ -215,12 +216,6 @@ public class EverythingApp extends AbstractApp
     }
 
     @Override // from App
-    public String getIdentifier ()
-    {
-        return IDENT;
-    }
-
-    @Override // from App
     public int getSiteId ()
     {
         return OOOUser.EVERYTHING_SITE_ID;
@@ -230,12 +225,6 @@ public class EverythingApp extends AbstractApp
     public String getFacebookSecret (String uri)
     {
         return getFacebookSecret(); // we don't do per-uri secrets
-    }
-
-    @Override // from App
-    public ConnectionProvider createConnectionProvider (String ident)
-    {
-        return PostgresUtil.createPoolingProvider(_config, ident);
     }
 
     @Override // from App
@@ -266,7 +255,6 @@ public class EverythingApp extends AbstractApp
         return (_appvers.equals(AppCodes.RELEASE_CANDIDATE) ? "candidate_" : "") + key;
     }
 
-    protected Config _config = createConfig("everything");
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
