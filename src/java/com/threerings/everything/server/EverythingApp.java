@@ -48,7 +48,7 @@ public class EverythingApp extends AbstractApp
             serve(InviteServlet.class).at("/invite");
             serve(ShowInviteServlet.class).at("/showinvite");
             serve(MediaUploadServlet.class).at("/upload");
-            serve(CardImageServlet.class).at("cardimg");
+            serve(CardImageServlet.class).at("/cardimg");
             serve(EverythingServlet.class).at("/" +EverythingServlet.ENTRY_POINT);
             serve(GameServlet.class).at("/" + GameServlet.ENTRY_POINT);
             serve(EditorServlet.class).at("/" + EditorServlet.ENTRY_POINT);
