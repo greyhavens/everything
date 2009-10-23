@@ -12,8 +12,6 @@ import com.google.inject.name.Names;
 import org.easymock.EasyMock;
 
 import com.samskivert.depot.PersistenceContext;
-import com.samskivert.jdbc.ConnectionProvider;
-
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.common.ServletLogic;
 import com.threerings.samsara.common.UserLogic;
@@ -31,10 +29,7 @@ public abstract class TestBase
     {
         Injector injector = Guice.createInjector(new TestModule());
         EverythingApp app = injector.getInstance(EverythingApp.class);
-        ConnectionProvider conprov = app.createConnectionProvider(app.getIdentifier());
-        PersistenceContext perCtx = injector.getInstance(PersistenceContext.class);
-        perCtx.init(app.getIdentifier(), conprov, null);
-        perCtx.initializeRepositories(true);
+        app.willAttach();
         app.didAttach();
         injector.getInstance(testClass).run(args);
         app.didDetach();
