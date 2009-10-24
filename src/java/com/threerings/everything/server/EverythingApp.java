@@ -18,8 +18,8 @@ import com.google.inject.name.Named;
 import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AbstractApp;
-import com.threerings.samsara.app.server.AbstractAppModule;
+import com.threerings.samsara.app.server.AbstractSamsaraApp;
+import com.threerings.samsara.app.server.AbstractSamsaraAppModule;
 import com.threerings.samsara.shared.App;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
@@ -30,7 +30,7 @@ import static com.threerings.everything.Log.log;
  * The main entry point for the Everything app.
  */
 @Singleton
-public class EverythingApp extends AbstractApp
+public class EverythingApp extends AbstractSamsaraApp
 {
     /** Our app identifier. */
     public static final String IDENT = "everything";
@@ -40,9 +40,10 @@ public class EverythingApp extends AbstractApp
         super(IDENT);
     }
 
-    public static class Module extends AbstractAppModule
+    public static class Module extends AbstractSamsaraAppModule
     {
-        @Override protected void configureApp () {
+        @Override protected void configure () {
+            super.configure();
             bind(App.class).to(EverythingApp.class);
             // bind our various servlets
             serve(AuthServlet.class).at("/auth");
