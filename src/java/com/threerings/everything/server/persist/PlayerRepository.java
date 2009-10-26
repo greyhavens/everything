@@ -18,8 +18,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.internal.Maps;
 
-import com.samskivert.depot.DataMigration;
-import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.KeySet;

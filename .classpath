@@ -21,6 +21,6 @@
 	<classpathentry kind="var" path="EXT_LIBS_DIR/facebook-java-api.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/json.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/jvnet-runtime.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/s3lib.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/s3lib.jar" sourcepath="/S3LIB_HOME"/>
 	<classpathentry kind="output" path="dist/eclipse"/>
 </classpath>
