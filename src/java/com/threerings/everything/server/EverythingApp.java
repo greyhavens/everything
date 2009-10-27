@@ -170,7 +170,7 @@ public class EverythingApp extends AbstractSamsaraApp
         args.add(_config.getValue("kontagent_secret", "secret"));
 
         // now construct the URL
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("http://").append(_config.getValue("kontagent_server", "localhost"));
         buf.append("/api/v1/").append(_config.getValue("kontagent_key", "key")).append("/");
         buf.append(type.code).append("/?ts=").append(now);
