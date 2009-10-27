@@ -28,7 +28,7 @@ public class EverythingUI extends Sprite
         if (ExternalInterface.available) {
             ExternalInterface.addCallback("setValue", setValue);
         }
-        MultiLoader.loadClasses([UI], _contentDomain, onReady);
+        MultiLoader.loadClasses(UI, _contentDomain, onReady);
     }
 
     protected function onReady () :void
