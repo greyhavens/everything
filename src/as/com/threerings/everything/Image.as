@@ -52,17 +52,8 @@ public class Image extends Loader
             trace("Got dimensions " + info.width + "x" + info.height +
                   " (self " + width + "x" + height + ")");
 
-            var wf :Number = info.width / _maxwidth;
-            var hf :Number = info.height / _maxheight;
-
-            if (wf > 1 && wf > hf) {
-                scaleX = 1/wf;
-                scaleY = 1/wf;
-            } else if (hf > 1 && hf > wf) {
-                scaleX = 1/hf;
-                scaleY = 1/hf;
-            }
-
+            scaleX = scaleY = 1 /
+                Math.max(1, Math.max(info.width / _maxwidth, info.height / _maxheight));
             x -= width/2;
             y -= height/2;
 
