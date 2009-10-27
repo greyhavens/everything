@@ -26,7 +26,7 @@ public class GameUtil
         long shortDay = 3*ONE_DAY/4;
         if (elapsed < shortDay) {
             log.warning("Requested to compute free flips with less than 18 hours elapsed?",
-                        "who", record.who(),  "elapsed", elapsed);
+                        "who", record.who(), "elapsed", elapsed);
         }
 
         // if you have free flips left over, we only top you up (but we'll always give you at least

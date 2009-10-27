@@ -33,19 +33,6 @@ public enum Rarity implements ByteEnum
     public final int value;
 
     /**
-     * Returns the {@link Rarity} associated with the supplied code or null.
-     */
-    public static Rarity fromByte (byte code)
-    {
-        for (Rarity value : Rarity.values()) {
-            if (value.toByte() == code) {
-                return value;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the value obtained when selling a card of this rarity.
      */
     public int saleValue ()
