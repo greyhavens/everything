@@ -37,7 +37,7 @@ public class TestSelectGridThings extends TestBase
             return;
         }
         try {
-            pup = (args.length > 1) ? Enum.valueOf(Powerup.class, args[1].toUpperCase()) : null;
+            pup = (args.length > 1) ? Powerup.valueOf(args[1].toUpperCase()) : null;
         } catch (Exception e) {
             usage("Valid powerups: " + StringUtil.toString(Powerup.values()));
             return;

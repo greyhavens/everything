@@ -4,7 +4,6 @@
 package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
-import java.util.EnumSet;
 
 import com.google.common.base.Function;
 
@@ -73,7 +72,7 @@ public class GridRecord extends PersistentRecord
     /** Generates {@link Grid#unflipped}. */
     public int[] getUnflipped ()
     {
-        return new int[EnumSet.allOf(Rarity.class).size()]; // the caller will fill this in
+        return new int[Rarity.values().length]; // the caller will fill this in
     }
 
     // AUTO-GENERATED: METHODS START
