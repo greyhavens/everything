@@ -42,7 +42,7 @@ public class FriendsPage extends DataPanel<List<PlayerStats>>
     public void setMode (String mode)
     {
         try {
-            _mode = Enum.valueOf(Mode.class, mode);
+            _mode = Mode.valueOf(mode);
         } catch (Exception e) {
             _mode = Mode.THINGS;
         }

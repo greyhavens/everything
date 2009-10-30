@@ -134,7 +134,7 @@ public class Args
     protected static Page parsePage (String pagestr)
     {
         try {
-            return Enum.valueOf(Page.class, pagestr);
+            return Page.valueOf(pagestr);
         } catch (Exception e) {
             return Page.LANDING;
         }
