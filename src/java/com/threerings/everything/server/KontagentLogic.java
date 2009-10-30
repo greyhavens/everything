@@ -109,12 +109,12 @@ public class KontagentLogic
 
         // TODO: friend count?
 
-        reportAction(Kontagent.USER_INFO, args.toArray(new Object[args.size()]));
+        reportAction(Kontagent.USER_INFO, args.toArray());
     }
 
     protected static void add (List<Object> args, String code, Object value)
     {
-        if (!StringUtil.isBlank(String.valueOf(value))) {
+        if ((value != null) && !StringUtil.isBlank(String.valueOf(value))) {
             args.add(code);
             args.add(value);
         }
