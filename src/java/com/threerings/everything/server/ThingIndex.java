@@ -275,10 +275,10 @@ public class ThingIndex
     {
         int rando = _rando.nextInt(totalWeight);
         for (ThingInfo info : things) {
-            if (rando < info.rarity.weight()) {
+            rando -= info.rarity.weight();
+            if (rando < 0) {
                 return info.thingId;
             }
-            rando -= info.rarity.weight();
         }
         throw new IllegalStateException("Random weight exceeded total weight! So impossible!");
     }
