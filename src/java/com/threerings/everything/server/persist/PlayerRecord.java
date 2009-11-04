@@ -33,7 +33,6 @@ public class PlayerRecord extends PersistentRecord
     public static final ColumnExp FACEBOOK_ID = colexp(_R, "facebookId");
     public static final ColumnExp NAME = colexp(_R, "name");
     public static final ColumnExp SURNAME = colexp(_R, "surname");
-    public static final ColumnExp BIRTHDAY = colexp(_R, "birthday");
     public static final ColumnExp BIRTHDATE = colexp(_R, "birthdate");
     public static final ColumnExp LAST_GIFT_YEAR = colexp(_R, "lastGiftYear");
     public static final ColumnExp TIMEZONE = colexp(_R, "timezone");
@@ -138,7 +137,7 @@ public class PlayerRecord extends PersistentRecord
     }
 
     /**
-     * Initializes {@link Player#name} and  {@link FriendStatus#name}.
+     * Initializes {@link Player#name} and {@link FriendStatus#name}.
      */
     public PlayerName getName ()
     {
