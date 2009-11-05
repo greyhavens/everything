@@ -52,6 +52,18 @@ public class CardPopup extends PopupPanel
         };
     }
 
+    public static ClickHandler recruitGiftClick (final Context ctx, final Card card,
+                                                 final Value<SlotStatus> status)
+    {
+        // TODO: clean this up, combine with above?
+        return new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                final Widget centerOn = (Widget)event.getSource();
+                display(ctx, new CardPopup(ctx, card, status), centerOn);
+            }
+        };
+    }
+
     public static void display (Context ctx, GameService.CardResult result,
                                 Value<SlotStatus> status, Widget centerOn, final String message)
     {
@@ -116,6 +128,22 @@ public class CardPopup extends PopupPanel
 
     protected Widget createContents (final Card card)
     {
+        // if we're looking at a recruitment gift, just have close and gift
+        if (card.owner == null) {
+            PushButton gift = ButtonUI.newButton("Recruit", new ClickHandler() {
+                public void onClick (ClickEvent event) {
+                    _ctx.displayPopup(new InvitePopup(_ctx, card, new Runnable() {
+                        public void run () {
+                            onHide().onClick(null);
+                            _status.update(SlotStatus.GIFTED);
+                        }
+                    }), CardPopup.this);
+                }
+            });
+            PushButton cancel = ButtonUI.newButton("Cancel", onHide());
+            return CardView.create(card, _title, null, cancel, gift);
+        }
+
         // if we're looking at someone else's card, we don't need any fancy stuff
         if (!_ctx.getMe().equals(card.owner)) {
             PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));

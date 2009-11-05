@@ -59,7 +59,9 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 onGifted.run();
             }
         };
-        _gamesvc.getGiftCardInfo(card.thing.thingId, card.received.getTime(), createCallback());
+        _gamesvc.getGiftCardInfo(card.thing.thingId,
+            (card.received != null) ? card.received.getTime() : 0,
+            createCallback());
     }
 
     @Override // from DataPopup<GameService.GiftInfoResult>

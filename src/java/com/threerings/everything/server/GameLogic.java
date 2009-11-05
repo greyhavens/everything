@@ -156,31 +156,24 @@ public class GameLogic
         return grid;
     }
 
+    public Card resolveCard (CardRecord record)
+    {
+        return fillCard(resolveCard(record.thingId), record);
+    }
+
+    public Card resolveCard (int thingId)
+    {
+        Thing thing = _thingRepo.loadThing(thingId);
+        SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
+        return resolveCard(thing, things);
+    }
+
     /**
      * Resolves runtime card data for the supplied card.
      */
     public Card resolveCard (CardRecord record, Thing thing, SortedSet<Thing> things)
     {
-        Card card = new Card();
-        card.owner = _playerRepo.loadPlayerName(record.ownerId);
-        card.thing = thing;
-        card.categories = resolveCategories(card.thing.categoryId);
-        card.received = new Date(record.received.getTime());
-        if (record.giverId > 0) {
-            card.giver = _playerRepo.loadPlayerName(record.giverId);
-        } else if (record.giverId == Card.BIRTHDAY_GIVER_ID) {
-            card.giver = PlayerName.create(Card.BIRTHDAY_GIVER_ID);
-        }
-        // we have to load all the things in this category for this bit
-        // (TODO: get series size and card position from the ThingIndex)
-        card.things = things.size();
-        for (Thing tcard : things) {
-            if (card.thing.thingId == tcard.thingId) {
-                break;
-            }
-            card.position++;
-        }
-        return card;
+        return fillCard(resolveCard(thing, things), record);
     }
 
     /**
@@ -450,6 +443,37 @@ public class GameLogic
         _gameRepo.createCard(-user.userId, thingId, Card.BIRTHDAY_GIVER_ID);
 
         log.info("Gave out a birthday present", "to", user.who(), "what", thing.name);
+    }
+
+    // TODO
+    protected Card resolveCard (Thing thing, SortedSet<Thing> things)
+    {
+        Card card = new Card();
+        card.thing = thing;
+        card.categories = resolveCategories(thing.categoryId);
+        // we have to load all the things in this category for this bit
+        // (TODO: get series size and card position from the ThingIndex)
+        card.things = things.size();
+        for (Thing tcard : things) {
+            if (card.thing.thingId == tcard.thingId) {
+                break;
+            }
+            card.position++;
+        }
+        return card;
+    }
+
+    // TODO
+    protected Card fillCard (Card card, CardRecord record)
+    {
+        card.owner = _playerRepo.loadPlayerName(record.ownerId);
+        card.received = new Date(record.received.getTime());
+        if (record.giverId > 0) {
+            card.giver = _playerRepo.loadPlayerName(record.giverId);
+        } else if (record.giverId == Card.BIRTHDAY_GIVER_ID) {
+            card.giver = PlayerName.create(Card.BIRTHDAY_GIVER_ID);
+        }
+        return card;
     }
 
     @Inject protected EverythingApp _app;

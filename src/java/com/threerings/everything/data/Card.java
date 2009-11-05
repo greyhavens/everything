@@ -52,6 +52,6 @@ public class Card
     /** Converts this Card to a ThingCard. */
     public ThingCard toThingCard ()
     {
-        return thing.toCard(received.getTime());
+        return thing.toCard((received != null) ? received.getTime() : 0L);
     }
 }

@@ -14,6 +14,7 @@ import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.data.SlotStatus;
 
 import client.ui.XFBML;
 import client.util.Context;
@@ -33,6 +34,19 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     @Override // from DataPanel
     protected void init (EverythingService.FeedResult result)
     {
+        SlotView recruitSlot = new SlotView();
+        if (result.recruitGift == null) {
+            recruitSlot.status.update(SlotStatus.GIFTED);
+
+        } else {
+            recruitSlot.status.update(SlotStatus.FLIPPED);
+            recruitSlot.setCard(_ctx, result.recruitGift.toThingCard(), false,
+                CardPopup.recruitGiftClick(_ctx, result.recruitGift, recruitSlot.status));
+        }
+        add(Widgets.newLabel("Gold Box Recruitment Gift of the Day! Thp~!", "Title"));
+        add(Widgets.newLabel("A special gift for you to use to invite new friends"));
+        add(recruitSlot);
+
         if (!result.gifts.isEmpty()) {
             add(Widgets.newLabel("Unopened Gifts", "Title"));
             FluentTable cards = new FluentTable(0, 0);

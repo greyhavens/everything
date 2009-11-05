@@ -50,12 +50,14 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.PlayerStats;
+import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
+import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -252,6 +254,17 @@ public class EverythingServlet extends EveryServiceServlet
             card.thingId = gift.thingId;
             card.received = gift.received.getTime();
             result.gifts.add(card);
+        }
+
+        RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
+        if (recruit == null || recruit.isExpired()) {
+            // load all the player's things of rarity II or less.
+            int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
+                _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
+            recruit = _playerRepo.storeRecruitGift(player.userId, giftId);
+        }
+        if (recruit.giftId != 0) {
+            result.recruitGift = _gameLogic.resolveCard(recruit.giftId);
         }
 
         return result;

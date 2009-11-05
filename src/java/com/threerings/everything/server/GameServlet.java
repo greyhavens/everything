@@ -131,10 +131,7 @@ public class GameServlet extends EveryServiceServlet
     // from interface GameService
     public Card getCard (CardIdent ident) throws ServiceException
     {
-        CardRecord card = requireCard(ident.ownerId, ident.thingId, ident.received);
-        Thing thing = _thingRepo.loadThing(card.thingId);
-        return _gameLogic.resolveCard(
-            card, thing, Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId)));
+        return _gameLogic.resolveCard(requireCard(ident.ownerId, ident.thingId, ident.received));
     }
 
     // from interface GameService

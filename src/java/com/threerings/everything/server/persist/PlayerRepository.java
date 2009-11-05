@@ -298,6 +298,36 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Loads the RecruitGiftRecord for the specified player.
+     */
+    public RecruitGiftRecord loadRecruitGift (int userId)
+    {
+        return load(RecruitGiftRecord.getKey(userId));
+    }
+
+    /**
+     * Store a newly-generated recruit gift for the specified player.
+     */
+    public RecruitGiftRecord storeRecruitGift (int userId, int giftId)
+    {
+        RecruitGiftRecord recruit = new RecruitGiftRecord();
+        recruit.userId = userId;
+        recruit.giftId = giftId;
+        recruit.lastGenerated = new Timestamp(System.currentTimeMillis());
+        insert(recruit);
+        return recruit;
+    }
+
+    /**
+     * Note that the player used their daily recruit gift.
+     */
+    public void noteRecruitGiftSent (int userId)
+    {
+        updatePartial(RecruitGiftRecord.getKey(userId),
+                      RecruitGiftRecord.GIFT_ID, 0);
+    }
+
+    /**
      * Consumes the specified number of coins from the specified player.
      *
      * @return true if the coins were consumed, false if the player did not have sufficient coins
@@ -413,6 +443,7 @@ public class PlayerRepository extends DepotRepository
         classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
         classes.add(WishRecord.class);
+        classes.add(RecruitGiftRecord.class);
     }
 
     /**

@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import com.samskivert.util.ArrayIntSet;
+import com.samskivert.util.Interator;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
@@ -216,6 +217,17 @@ public class ThingIndex
     }
 
     /**
+     * Pick a thing to use as a recruitment gift from among the specified things.
+     */
+    public int pickRecruitmentThing (IntSet thingIds)
+    {
+        if (thingIds.isEmpty()) {
+            return 0;
+        }
+        return pickWeightedThing(getThings(thingIds));
+    }
+
+    /**
      * Selects a seed item from the specified seed category for a new player.
      */
     public int pickSeedThing (int seedCat)
@@ -228,6 +240,17 @@ public class ThingIndex
             }
         }
         return (things.things.size() == 0) ? 0 : pickWeightedThing(things);
+    }
+
+    protected ThingList getThings (IntSet thingIds)
+    {
+        ThingList things = new ThingList();
+        for (Interator it = thingIds.interator(); it.hasNext();) {
+            ThingInfo info = _byid.get(it.nextInt());
+            things.things.add(info);
+            things.totalWeight += info.rarity.weight();
+        }
+        return things;
     }
 
     protected ThingList getCategoryThings (IntSet catIds, Rarity minRarity)

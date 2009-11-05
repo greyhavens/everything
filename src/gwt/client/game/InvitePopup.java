@@ -22,7 +22,10 @@ public class InvitePopup extends PopupPanel
         _onComplete = onComplete;
         String uri = "showinvite";
         if (card != null) {
-            uri += "?thing=" + card.thing.thingId + "&received=" + card.received.getTime();
+            uri += "?thing=" + card.thing.thingId;
+            if (card.received != null) {
+                uri += "&received=" + card.received.getTime();
+            }
         }
         setWidget(new Frame(uri));
     }

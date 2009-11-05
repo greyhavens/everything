@@ -11,6 +11,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.threerings.samsara.app.client.ServiceException;
 
+import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PlayerName;
@@ -45,6 +46,9 @@ public interface EverythingService extends RemoteService
     /** Provides results for {@link #getRecentFeed}. */
     public static class FeedResult implements IsSerializable
     {
+        /** The "recruitment gift" for you to use to slurp in new players, or null. */
+        public Card recruitGift;
+
         /** Gifts awaiting this player, if any. */
         public List<ThingCard> gifts;
 

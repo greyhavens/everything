@@ -102,7 +102,10 @@ public abstract class CardView extends FlowPanel
                 Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source"));
             info.addStyleName(card.categories[0].name);
             if (card.giver == null) {
-                info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received), "When"));
+                if (card.received != null) {
+                    info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received),
+                                              "When"));
+                }
             } else if (card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
                 info.add(Widgets.newLabel("A birthday present from Everything", "Giver"));
                 info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
