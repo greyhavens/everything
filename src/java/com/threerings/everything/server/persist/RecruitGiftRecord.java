@@ -31,16 +31,10 @@ public class RecruitGiftRecord extends PersistentRecord
     @Id public int userId;
 
     /** The time at which a recruitment gift was last generated. */
-    public Timestamp lastGenerated;
+    public Timestamp expires;
 
     /** The thingId of the gift, or 0 if it's already been gifted. */
     public int giftId;
-
-    /** TODO placeholder impl */
-    public boolean isExpired ()
-    {
-        return (giftId == 0);
-    }
 
     // AUTO-GENERATED: METHODS START
     /**

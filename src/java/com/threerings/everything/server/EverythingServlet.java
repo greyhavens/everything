@@ -257,11 +257,11 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
-        if (recruit == null || recruit.isExpired()) {
+        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
             // load all the player's things of rarity II or less.
             int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
                 _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
-            recruit = _playerRepo.storeRecruitGift(player.userId, giftId);
+            recruit = _playerRepo.storeRecruitGift(player, giftId);
         }
         if (recruit.giftId != 0) {
             result.recruitGift = _gameLogic.resolveCard(recruit.giftId);
