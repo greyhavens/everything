@@ -257,7 +257,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
-        if (recruit == null || (recruit.lastGenerated.getTime() < System.currentTimeMillis())) {
+        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
             // load all the player's things of rarity II or less.
             int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
                 _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));

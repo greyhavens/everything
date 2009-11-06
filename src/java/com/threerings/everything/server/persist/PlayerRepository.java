@@ -53,6 +53,10 @@ public class PlayerRepository extends DepotRepository
 
         // TODO: remove a week or two after 10-09-2009
         _ctx.registerMigration(PlayerRecord.class, new SchemaMigration.Drop(12, "birthday"));
+
+        // TODO: remove a few weeks after 2009-11-06
+        _ctx.registerMigration(RecruitGiftRecord.class,
+            new SchemaMigration.Rename(2, "lastGenerated", RecruitGiftRecord.EXPIRES));
     }
 
     /**
@@ -314,7 +318,7 @@ public class PlayerRepository extends DepotRepository
         RecruitGiftRecord recruit = new RecruitGiftRecord();
         recruit.userId = player.userId;
         recruit.giftId = giftId;
-        recruit.lastGenerated = Calendars.in(TimeZone.getTimeZone(player.timezone))
+        recruit.expires = Calendars.in(TimeZone.getTimeZone(player.timezone))
             .zeroTime().addDays(1).toTimestamp();
         store(recruit);
         return recruit;
