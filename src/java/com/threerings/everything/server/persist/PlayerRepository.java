@@ -314,7 +314,7 @@ public class PlayerRepository extends DepotRepository
         RecruitGiftRecord recruit = new RecruitGiftRecord();
         recruit.userId = player.userId;
         recruit.giftId = giftId;
-        recruit.expires = Calendars.in(TimeZone.getTimeZone(player.timezone))
+        recruit.lastGenerated = Calendars.in(TimeZone.getTimeZone(player.timezone))
             .zeroTime().addDays(1).toTimestamp();
         store(recruit);
         return recruit;

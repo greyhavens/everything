@@ -30,8 +30,8 @@ public class RecruitGiftRecord extends PersistentRecord
     /** The Samsara user id of this player. */
     @Id public int userId;
 
-    /** The time at which a recruitment gift was last generated. */
-    public Timestamp expires;
+    /** The time at which this record expires. */
+    public Timestamp lastGenerated; //expires;
 
     /** The thingId of the gift, or 0 if it's already been gifted. */
     public int giftId;
