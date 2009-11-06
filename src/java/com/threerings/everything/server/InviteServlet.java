@@ -30,6 +30,7 @@ import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -101,10 +102,23 @@ public class InviteServlet extends AppServlet
                                      int thingId)
         throws Exception
     {
-        String received = requireParameter(req, "received");
+        long received = Long.parseLong(requireParameter(req, "received"));
+        CardRecord card = null;
+        if (received == 0L) {
+            // recruitment gift...
+            RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
+            if (recruit != null && recruit.giftId == thingId) {
+                card = _gameRepo.createCard(player.userId, thingId, 0);
+                _playerRepo.noteRecruitGiftSent(player.userId);
+            }
 
-        // make sure they own the thing in question
-        CardRecord card = _gameRepo.loadCard(player.userId, thingId, Long.parseLong(received));
+        } else {
+            // make sure they own the thing in question
+            card = _gameRepo.loadCard(player.userId, thingId, received);
+        }
+        if (card == null) {
+            throw new Exception("no such card"); // TODO?
+        }
 
         // see if the recipient in question is already a player
         Map<String, Integer> ids = _userLogic.mapFacebookIds(Collections.singletonList(targetFBId));

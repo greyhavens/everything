@@ -126,31 +126,46 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    protected Widget createContents (final Card card)
+    protected Widget createContents (Card card)
     {
         // if we're looking at a recruitment gift, just have close and gift
         if (card.owner == null) {
-            PushButton gift = ButtonUI.newButton("Recruit", new ClickHandler() {
-                public void onClick (ClickEvent event) {
-                    _ctx.displayPopup(new InvitePopup(_ctx, card, new Runnable() {
-                        public void run () {
-                            onHide().onClick(null);
-                            _status.update(SlotStatus.GIFTED);
-                        }
-                    }), CardPopup.this);
-                }
-            });
-            PushButton cancel = ButtonUI.newButton("Cancel", onHide());
-            return CardView.create(card, _title, null, cancel, gift);
-        }
+            return createRecruitGiftContents(card);
 
         // if we're looking at someone else's card, we don't need any fancy stuff
-        if (!_ctx.getMe().equals(card.owner)) {
-            PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
-            want.setTitle("Post to your Facebook feed that you want this card.");
-            return CardView.create(card, _title, null, want, ButtonUI.newButton("Close", onHide()));
-        }
+        } else if (!_ctx.getMe().equals(card.owner)) {
+            return createFriendCardContents(card);
 
+        } else {
+            return createOwnCardContents(card);
+        }
+    }
+
+    protected Widget createRecruitGiftContents (final Card card)
+    {
+        PushButton gift = ButtonUI.newButton("Recruit", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                _ctx.displayPopup(new InvitePopup(_ctx, card, new Runnable() {
+                    public void run () {
+                        onHide().onClick(null);
+                        _status.update(SlotStatus.GIFTED);
+                    }
+                }), CardPopup.this);
+            }
+        });
+        PushButton cancel = ButtonUI.newButton("Cancel", onHide());
+        return CardView.create(card, _title, null, cancel, gift);
+    }
+
+    protected Widget createFriendCardContents (Card card)
+    {
+        PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
+        want.setTitle("Post to your Facebook feed that you want this card.");
+        return CardView.create(card, _title, null, want, ButtonUI.newButton("Close", onHide()));
+    }
+
+    protected Widget createOwnCardContents (final Card card)
+    {
         String status = null;
         if (_haveCount > 1) {
             status = "You already have " + _haveCount + " of these cards.";

@@ -29,6 +29,7 @@ import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
+import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -73,8 +74,19 @@ public class ShowInviteServlet extends AppServlet
         CardRecord card = null;
         int thingId = Integer.parseInt(ParameterUtil.getParameter(req, "thing", "0"));
         long received = Long.parseLong(ParameterUtil.getParameter(req, "received", "0"));
-        if (player != null && thingId > 0 && received > 0L) {
-            card = _gameRepo.loadCard(player.userId, thingId, received);
+        if (player != null && thingId > 0) {
+            if (received > 0L) {
+                card = _gameRepo.loadCard(player.userId, thingId, received);
+
+            } else if (received == 0L) {
+                // this should match their recruitment gift..
+                RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
+                if (recruit != null && (recruit.giftId == thingId)) {
+                    // fake up a CardRecord
+                    card = new CardRecord();
+                    card.thingId = thingId;
+                }
+            }
         }
 
         if (card == null) {
@@ -93,7 +105,7 @@ public class ShowInviteServlet extends AppServlet
             subs.put("BUTTON", "View the card!");
             subs.put("MAX_INVITES", "1");
             subs.put("THING_ID", ""+card.thingId);
-            subs.put("RECEIVED", ""+card.received.getTime());
+            subs.put("RECEIVED", "" + ((card.received == null) ? 0L : card.received.getTime()));
         }
 
         String template = _template;
