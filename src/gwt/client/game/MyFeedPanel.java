@@ -35,8 +35,8 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     protected void init (EverythingService.FeedResult result)
     {
         if (result.recruitGift != null) {
-            add(Widgets.newLabel("Gold Box Recruitment Gift of the Day!", "Title"));
-            add(Widgets.newLabel("A special gift for you to use to invite new friends"));
+            add(Widgets.newLabel("Send a Free Gift to your friends!", "Title"));
+            add(Widgets.newLabel("More players means more things!"));
             SlotView recruitSlot = new SlotView();
             recruitSlot.status.update(SlotStatus.FLIPPED);
             recruitSlot.setCard(_ctx, result.recruitGift.toThingCard(), false,
