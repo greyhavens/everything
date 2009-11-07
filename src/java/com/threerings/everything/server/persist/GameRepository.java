@@ -294,7 +294,7 @@ public class GameRepository extends DepotRepository
             log.info("Transfering escrowed card to new player", "card", card.thingId,
                      "player", player.who());
             if (updatePartial(CardRecord.getKey(Integer.MIN_VALUE, card.thingId, card.created),
-                              CardRecord.OWNER_ID, player.userId) == 0) {
+                              CardRecord.OWNER_ID, -player.userId) == 0) {
                 log.warning("Failed to transfer escrowed card?", "card", card.thingId,
                             "created", card.created, "to", player.who());
             }
