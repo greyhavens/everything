@@ -86,7 +86,7 @@ public class PlayerLogic
             }
         }
 
-        // return the list of objects for convenient chainig
+        // return the list of objects for convenient chaining
         return objects;
     }
 
