@@ -38,9 +38,14 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
             add(Widgets.newLabel("Send a Free Gift to your friends!", "Title"));
             add(Widgets.newLabel("More players means more things!"));
             SlotView recruitSlot = new SlotView();
-            recruitSlot.status.update(SlotStatus.FLIPPED);
-            recruitSlot.setCard(_ctx, result.recruitGift.toThingCard(), false,
-                CardPopup.recruitGiftClick(_ctx, result.recruitGift, recruitSlot.status));
+            if (result.recruitGift.thing == null) { // already gifted
+                recruitSlot.status.update(SlotStatus.RECRUIT_GIFTED);
+            } else {
+                recruitSlot.status.update(SlotStatus.FLIPPED);
+                ClickHandler clickHandler =
+                    CardPopup.recruitGiftClick(_ctx, result.recruitGift, recruitSlot.status);
+                recruitSlot.setCard(_ctx, result.recruitGift.toThingCard(), false, clickHandler);
+            }
             add(recruitSlot);
         }
 

@@ -45,6 +45,7 @@ import com.threerings.samsara.common.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.Kontagent;
+import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.News;
@@ -256,16 +257,8 @@ public class EverythingServlet extends EveryServiceServlet
             result.gifts.add(card);
         }
 
-        RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
-        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
-            // load all the player's things of rarity II or less.
-            int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
-                _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
-            recruit = _playerRepo.storeRecruitGift(player, giftId);
-        }
-        if (recruit.giftId != 0) {
-            result.recruitGift = _gameLogic.resolveCard(recruit.giftId);
-        }
+        // resolve the user's recruitment gift
+        result.recruitGift = resolveRecruitGift(player);
 
         return result;
     }
@@ -412,6 +405,32 @@ public class EverythingServlet extends EveryServiceServlet
                 // END TEMP
             }
         });
+    }
+
+    /**
+     * Resolve the player's daily recruitment gift.
+     * @return null (for no gift), a blank Card instance (to indicate already gifted) or a
+     * Card.
+     */
+    protected Card resolveRecruitGift (PlayerRecord player)
+    {
+        RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
+        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
+            // load all the player's things of rarity II or less.
+            int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
+                _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
+            recruit = _playerRepo.storeRecruitGift(player, giftId);
+        }
+        switch (recruit.giftId) {
+        case 0:
+            return null; // no gift (new player, probably)
+
+        case -1:
+            return new Card(); // a blank, to indicate "already gifted"
+
+        default:
+            return _gameLogic.resolveCard(recruit.giftId);
+        }
     }
 
     protected static class ItemKey {

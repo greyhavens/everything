@@ -38,6 +38,7 @@ public class SlotView extends SimplePanel
         switch (status) {
         case GIFTED: text = "Gifted!"; break;
         case SOLD: text = "Sold!"; break;
+        case RECRUIT_GIFTED: text = "Come back tomorrow to send another Free Gift!"; break;
         default: return false; // others not used
         }
         setWidget(Widgets.newLabel(text, "SlotStatus"));

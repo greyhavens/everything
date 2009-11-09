@@ -149,7 +149,7 @@ public class CardPopup extends PopupPanel
                 _ctx.displayPopup(new InvitePopup(_ctx, card, new Runnable() {
                     public void run () {
                         onHide().onClick(null);
-                        _status.update(SlotStatus.GIFTED);
+                        _status.update(SlotStatus.RECRUIT_GIFTED);
                     }
                 }), CardPopup.this);
             }

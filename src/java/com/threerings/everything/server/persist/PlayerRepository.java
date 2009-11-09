@@ -330,7 +330,7 @@ public class PlayerRepository extends DepotRepository
     public void noteRecruitGiftSent (int userId)
     {
         updatePartial(RecruitGiftRecord.getKey(userId),
-                      RecruitGiftRecord.GIFT_ID, 0);
+                      RecruitGiftRecord.GIFT_ID, -1);
     }
 
     /**

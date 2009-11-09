@@ -20,7 +20,10 @@ public enum SlotStatus implements ByteEnum
     GIFTED(2),
 
     /** The card at this slot has been sold. */
-    SOLD(3);
+    SOLD(3),
+
+    /** The card was recruitment gifted (runtime only, nongrid). */
+    RECRUIT_GIFTED(4);
 
     // from interface ByteEnum
     public byte toByte () {
