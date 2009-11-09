@@ -143,8 +143,8 @@ public class CardPopup extends PopupPanel
 
     protected Widget createRecruitGiftContents (final Card card)
     {
-        _title = "Give the gift of everything...";
-        PushButton gift = ButtonUI.newButton("Recruit", new ClickHandler() {
+        _title = "Give the gift of Everything...";
+        PushButton gift = ButtonUI.newButton("Send", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 _ctx.displayPopup(new InvitePopup(_ctx, card, new Runnable() {
                     public void run () {
