@@ -45,6 +45,14 @@ public class EditorServlet extends EveryServiceServlet
     }
 
     // from interface EditorService
+    public List<Category> loadMySeries () throws ServiceException
+    {
+        PlayerRecord editor = requireEditor();
+        return _playerLogic.resolveNames(
+            Lists.newArrayList(_thingRepo.loadCategoriesBy(editor.userId)));
+    }
+
+    // from interface EditorService
     public int createCategory (Category category) throws ServiceException
     {
         PlayerRecord editor = requireEditor();

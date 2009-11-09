@@ -8,7 +8,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -29,6 +32,8 @@ import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
+import com.samskivert.util.IntMaps;
+import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
 
 import com.threerings.everything.data.Category;
@@ -108,6 +113,38 @@ public class ThingRepository extends DepotRepository
                        new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
                        new GroupBy(CategoryRecord.CATEGORY_ID)).
             map(CategoryRecord.TO_CATEGORY);
+    }
+
+    /**
+     * Loads all leaf categories created by the specified player.
+     */
+    public Iterable<Category> loadCategoriesBy (int creatorId)
+    {
+        // load all categories created by this player (will include non-leaves)
+        IntMap<Category> cats = IntMaps.newHashIntMap();
+        Set<Integer> parentIds = Sets.newHashSet();
+        for (CategoryRecord crec : findAll(CategoryRecord.class,
+                                           new Where(CategoryRecord.CREATOR_ID.eq(creatorId)))) {
+            cats.put(crec.categoryId, CategoryRecord.TO_CATEGORY.apply(crec));
+            parentIds.add(crec.parentId);
+        }
+
+        // now load up all parents of those categories, only those parents who also have parents
+        // are sub-categories, meaning their children are leaves
+        final Set<Integer> validParents = Sets.newHashSet();
+        for (CategoryRecord crec : findAll(CategoryRecord.class,
+                                           new Where(CategoryRecord.CATEGORY_ID.in(parentIds)))) {
+            if (crec.parentId != 0) {
+                validParents.add(crec.categoryId);
+            }
+        }
+
+        // now return only those categories with valid parents
+        return Iterables.filter(cats.values(), new Predicate<Category>() {
+            public boolean apply (Category cat) {
+                return validParents.contains(cat.parentId);
+            }
+        });
     }
 
     /**

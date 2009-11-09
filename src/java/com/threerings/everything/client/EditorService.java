@@ -56,6 +56,11 @@ public interface EditorService extends RemoteService
     List<Category> loadCategories (int parentId) throws ServiceException;
 
     /**
+     * Loads the list of series created by the caller (pending and shipped).
+     */
+    List<Category> loadMySeries () throws ServiceException;
+
+    /**
      * Creates a new category with the specified configuration.
      *
      * @return the new category's id.

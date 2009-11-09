@@ -20,6 +20,11 @@ public interface EditorServiceAsync
     void loadCategories (int parentId, AsyncCallback<List<Category>> callback);
 
     /**
+     * The async version of {@link EditorService#loadMySeries}.
+     */
+    void loadMySeries (AsyncCallback<List<Category>> callback);
+
+    /**
      * The async version of {@link EditorService#createCategory}.
      */
     void createCategory (Category category, AsyncCallback<Integer> callback);

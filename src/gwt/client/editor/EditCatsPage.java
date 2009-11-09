@@ -6,6 +6,7 @@ package client.editor;
 import java.util.List;
 
 import com.google.common.base.Function;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -42,15 +43,18 @@ public class EditCatsPage extends FluentTable
     {
         super(5, 0, "page", "editCats");
 
+        FlowPanel faq = Widgets.newFlowPanel(
+            Widgets.newLabel("New editors, read:", "machine"),
+            Args.createLink("Editor Guidelines", "handwriting", Page.EDIT_FAQ),
+            Widgets.newShim(10, 10),
+            Widgets.newLabel("Your Series", "machine"), new MySeriesPanel(ctx));
+
         at(0, 0).setWidget(_cats).alignTop();
         at(0, 1).setWidget(_subcats).alignTop();
         at(0, 2).setWidget(_series).alignTop();
-        FlowPanel faq = Widgets.newFlowPanel(Widgets.newLabel("New editors, read"),
-                                             Args.createLink("Editor Guidelines", Page.EDIT_FAQ));
-        at(0, 3).setWidget(faq, "machine", "FAQ").alignTop().alignRight();
-
-        at(1, 0).setHTML("Click the <img src='images/folder.png'> icon to move or delete an entry.",
-                         "handwriting").setColSpan(4);
+        at(0, 3).setWidget(Widgets.newShim(25, 10)).alignTop();
+        at(0, 4).setWidget(faq).alignTop();
+        at(1, 0).setHTML(_msgs.ecTip(), "handwriting").setColSpan(5);
 
         _ctx = ctx;
         _cats.setChild(_subcats);
@@ -341,4 +345,6 @@ public class EditCatsPage extends FluentTable
     };
 
     protected Context _ctx;
+
+    protected static final EditorMessages _msgs = GWT.create(EditorMessages.class);
 }
