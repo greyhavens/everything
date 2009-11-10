@@ -12,6 +12,7 @@ import java.util.Random;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -56,12 +57,12 @@ public class ThingIndex
         }
 
         // finally shuffle our things to avoid aliasing if the RNG is not perfect
-        Collections.shuffle(_things.things);
-        for (Rarity rare : Rarity.BONUS) {
-            Collections.shuffle(_byrare.get(rare).things);
+        _things.shuffle();
+        for (ThingList rareList : _byrare.values()) {
+            rareList.shuffle();
         }
 
-        log.info("Updated things index", "things", _things.size(), "tweight", _things.totalWeight);
+        log.info("Updated things index", "things", _things.size(), "tweight", _things.totalWeight());
     }
 
     // TODO: support category or other limitations on thing selection
@@ -148,19 +149,15 @@ public class ThingIndex
      */
     public void pickThingOf (Rarity rarity, IntSet fromIds, IntSet into)
     {
-        ThingList selected = new ThingList();
-        for (ThingInfo info : _byrare.get(rarity)) {
-            if (fromIds.contains(info.thingId)) {
-                selected.add(info);
-            }
-        }
+        ThingList rareList = _byrare.get(rarity);
+        ThingList selected = rareList.copyWith(fromIds);
         if (selected.size() > 0) {
             log.debug("Picking rare thing from selection", "rarity", rarity,
                       "selected", selected);
             into.add(pickWeightedThing(selected));
         } else {
             log.debug("Picking rare thing from full set", "rarity", rarity);
-            into.add(pickWeightedThing(_byrare.get(rarity)));
+            into.add(pickWeightedThing(rareList));
         }
     }
 
@@ -188,25 +185,19 @@ public class ThingIndex
      */
     public int pickBirthdayThing (IntSet ownedCats, IntSet heldRares)
     {
-        ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
-
-        // remove the things they already have
-        for (Iterator<ThingInfo> iter = things.iterator(); iter.hasNext(); ) {
-            ThingInfo info = iter.next();
-            if (heldRares.contains(info.thingId)) {
-                iter.remove();
-                things.totalWeight -= info.rarity.weight();
-            }
-        }
-
-        // if there are any left, pick one of those as a gift
-        if (things.size() > 0) {
-            return pickWeightedThing(things);
-        }
-
-        // otherwise pick a random rarity X item as a gift
         IntSet into = new ArrayIntSet();
-        pickThingOf(Rarity.X, new ArrayIntSet(), into);
+        // pick a rare gift from a category they collect
+        ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
+        if (things.size() >= 1) {
+            selectThings(things, 1, heldRares, into);
+        }
+
+        // if that didn't work, pick a random rarity X item
+        if (into.isEmpty()) {
+            pickThingOf(Rarity.X, new ArrayIntSet(), into);
+        }
+
+        // cope if we've got nothing
         return into.isEmpty() ? 0 : into.interator().nextInt();
     }
 
@@ -263,6 +254,13 @@ public class ThingIndex
                                     "Cannot select " + count + " things. " +
                                     "Index only contains " + things.size() + " things.");
 
+        if ((excludeIds.size() / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD) {
+            log.info("Selecting things with a well-endowed exclude list",
+                     "things", things.size(), "exclude", excludeIds.size());
+            things = things.copyWithout(excludeIds);
+            excludeIds = new ArrayIntSet();
+        }
+
         // select the requested number of random things
         int iters = 0, added = 0;
         while (added < count) {
@@ -280,7 +278,7 @@ public class ThingIndex
 
     protected int pickWeightedThing (ThingList things)
     {
-        int rando = _rando.nextInt(things.totalWeight);
+        int rando = _rando.nextInt(things.totalWeight());
         for (ThingInfo info : things) {
             rando -= info.rarity.weight();
             if (rando < 0) {
@@ -304,27 +302,65 @@ public class ThingIndex
     protected static class ThingList
         implements Iterable<ThingInfo>
     {
-        public List<ThingInfo> things = Lists.newArrayList();
-        public int totalWeight;
-
         public void add (ThingInfo info) {
-            things.add(info);
-            totalWeight += info.rarity.weight();
+            _things.add(info);
+            _totalWeight += info.rarity.weight();
+        }
+
+        public int totalWeight () {
+            return _totalWeight;
+        }
+
+        public void shuffle () {
+            Collections.shuffle(_things);
         }
 
         public int size () {
-            return things.size();
+            return _things.size();
         }
 
         // from Iterable
         public Iterator<ThingInfo> iterator () {
-            return things.iterator();
+            return Iterators.unmodifiableIterator(_things.iterator());
         }
 
         @Override
         public String toString () {
-            return things.toString();
+            return _things.toString();
         }
+
+        /**
+         * Create a copy of this ThingList with the specified excluded items removed.
+         */
+        public ThingList copyWithout (IntSet withoutIds)
+        {
+            if (withoutIds.isEmpty()) {
+                return this;
+            }
+            ThingList that = new ThingList();
+            for (ThingInfo info : this) {
+                if (!withoutIds.contains(info.thingId)) {
+                    that.add(info);
+                }
+            }
+            return that;
+        }
+
+        public ThingList copyWith (IntSet withIds)
+        {
+            ThingList that = new ThingList();
+            if (!withIds.isEmpty()) { // smart optimization
+                for (ThingInfo info : this) {
+                    if (withIds.contains(info.thingId)) {
+                        that.add(info);
+                    }
+                }
+            }
+            return that;
+        }
+
+        protected int _totalWeight;
+        protected List<ThingInfo> _things = Lists.newArrayList();
     }
 
     protected ThingList _things = new ThingList();
@@ -341,4 +377,7 @@ public class ThingIndex
 
     /** Used to avoid infinite loopage. */
     protected static final int MAX_SELECT_ITERS = 1024;
+
+    /** If we're selecting things and excluding more than this percentage of things, make a copy. */
+    protected static final float EXCLUDE_COPY_THRESHOLD = 0.5f;
 }
