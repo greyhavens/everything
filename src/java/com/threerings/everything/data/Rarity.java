@@ -45,7 +45,7 @@ public enum Rarity implements ByteEnum
      */
     public int weight ()
     {
-        return Math.round(100 * AVG_COST / value);
+        return _weight;
     }
 
     /**
@@ -74,26 +74,26 @@ public enum Rarity implements ByteEnum
     /** A human grokkable description of this rarity. */
     protected String _descrip;
 
-    protected static float computeAvgCost ()
-    {
-        float totalCost = 0;
-        int count = 0;
-        for (Rarity rarity : Rarity.values()) {
-            totalCost += rarity.value;
-            count++;
-        }
-        return totalCost / count;
-    }
+    /** The weight of this Rarity (computed after all instances are constructed) */
+    protected int _weight;
 
     protected static int computeRarity (Rarity rarity)
     {
         float sumWeights = 0;
-        for (Rarity r : Rarity.values()) {
+        for (Rarity r : values()) {
             sumWeights += r.weight();
         }
         return Math.round(sumWeights / rarity.weight());
     }
 
-    /** The maximum value of any rarity. */
-    protected static final float AVG_COST = computeAvgCost();
+    static { // initialize the _weight value of each Rarity
+        int totalCost = 0;
+        for (Rarity r : values()) {
+            totalCost += r.value;
+        }
+        float avgCost100 = 100f * totalCost / values().length;
+        for (Rarity r : values()) {
+            r._weight = Math.round(avgCost100 / r.value);
+        }
+    }
 }
