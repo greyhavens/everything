@@ -205,12 +205,23 @@ public class ThingIndex
     /**
      * Pick a thing to use as a recruitment gift from among the specified things.
      */
-    public int pickRecruitmentThing (IntSet thingIds)
+    public IntSet pickRecruitmentThings (IntSet playerThingIds)
     {
-        if (thingIds.isEmpty()) {
-            return 0;
+        IntSet giftIds = new ArrayIntSet();
+        // try 10 times to pick a Rarity II or less fully-random thing
+        for (int ii = 0; ii < 10; ii++) {
+            int thingId = pickWeightedThing(_things);
+            if (getRarity(thingId).ordinal() <= Rarity.II.ordinal()) {
+                giftIds.add(thingId);
+                break;
+            }
         }
-        return pickWeightedThing(getThings(thingIds));
+        // then select up to 2 more from the player's collection
+        int count = Math.min(2, playerThingIds.size() - giftIds.size());
+        if (count > 0) {
+            selectThings(getThings(playerThingIds), count, giftIds, giftIds);
+        }
+        return giftIds;
     }
 
     /**

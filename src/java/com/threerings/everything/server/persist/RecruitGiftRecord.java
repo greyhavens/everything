@@ -11,6 +11,8 @@ import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.samskivert.util.ArrayUtil;
+
 /**
  * Records generation and use of a player's daily recruitment gift.
  */
@@ -21,11 +23,12 @@ public class RecruitGiftRecord extends PersistentRecord
     public static final ColumnExp USER_ID = colexp(_R, "userId");
     public static final ColumnExp EXPIRES = colexp(_R, "expires");
     public static final ColumnExp GIFT_ID = colexp(_R, "giftId");
+    public static final ColumnExp GIFT_IDS = colexp(_R, "giftIds");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
       * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -33,8 +36,19 @@ public class RecruitGiftRecord extends PersistentRecord
     /** The time at which this record expires. */
     public Timestamp expires;
 
-    /** The thingId of the gift, or 0 if it's already been gifted. */
-    public int giftId;
+    // TODO: remove soon
+    public int giftId; // OLD
+
+    /** The thingIds of each potential gift, or 0 to indicate "gifted". */
+    public int[] giftIds;
+
+    /**
+     * Get the index of the specified gift, or -1.
+     */
+    public int getGiftIndex (int thingId)
+    {
+        return ArrayUtil.indexOf(giftIds, thingId);
+    }
 
     // AUTO-GENERATED: METHODS START
     /**

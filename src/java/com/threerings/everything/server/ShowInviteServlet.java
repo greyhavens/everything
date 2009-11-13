@@ -80,8 +80,8 @@ public class ShowInviteServlet extends AppServlet
 
             } else if (received == 0L) {
                 // this should match their recruitment gift..
-                RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
-                if (recruit != null && (recruit.giftId == thingId)) {
+                RecruitGiftRecord recruit = _playerRepo.loadRecruitGifts(player.userId);
+                if (recruit != null && (-1 != recruit.getGiftIndex(thingId))) {
                     // fake up a CardRecord
                     card = new CardRecord();
                     card.thingId = thingId;

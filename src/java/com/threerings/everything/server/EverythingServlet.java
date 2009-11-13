@@ -29,11 +29,13 @@ import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
 import com.samskivert.servlet.util.CookieUtil;
+import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.IntSet;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -258,7 +260,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
 
         // resolve the user's recruitment gift
-        result.recruitGift = resolveRecruitGift(player);
+        result.recruitGifts = resolveRecruitGifts(player);
 
         return result;
     }
@@ -412,25 +414,22 @@ public class EverythingServlet extends EveryServiceServlet
      * @return null (for no gift), a blank Card instance (to indicate already gifted) or a
      * Card.
      */
-    protected Card resolveRecruitGift (PlayerRecord player)
+    protected List<Card> resolveRecruitGifts (PlayerRecord player)
     {
-        RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
+        RecruitGiftRecord recruit = _playerRepo.loadRecruitGifts(player.userId);
         if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
             // load all the player's things of rarity II or less.
-            int giftId = _thingLogic.getThingIndex().pickRecruitmentThing(
+            IntSet giftIds = _thingLogic.getThingIndex().pickRecruitmentThings(
                 _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
-            recruit = _playerRepo.storeRecruitGift(player, giftId);
+            int[] gifts = giftIds.toIntArray();
+            ArrayUtil.shuffle(gifts);
+            recruit = _playerRepo.storeRecruitGifts(player, gifts);
         }
-        switch (recruit.giftId) {
-        case 0:
-            return null; // no gift (new player, probably)
-
-        case -1:
-            return new Card(); // a blank, to indicate "already gifted"
-
-        default:
-            return _gameLogic.resolveCard(recruit.giftId);
+        List<Card> list = Lists.newArrayListWithCapacity(recruit.giftIds.length);
+        for (int giftId : recruit.giftIds) {
+            list.add((giftId == 0) ? null : _gameLogic.resolveCard(giftId));
         }
+        return list;
     }
 
     protected static class ItemKey {

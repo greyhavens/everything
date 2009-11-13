@@ -19,6 +19,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.internal.Maps;
 
+import com.samskivert.depot.DatabaseException;
+import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.KeySet;
@@ -51,12 +53,29 @@ public class PlayerRepository extends DepotRepository
     {
         super(ctx);
 
-        // TODO: remove a week or two after 10-09-2009
-        _ctx.registerMigration(PlayerRecord.class, new SchemaMigration.Drop(12, "birthday"));
-
         // TODO: remove a few weeks after 2009-11-06
         _ctx.registerMigration(RecruitGiftRecord.class,
             new SchemaMigration.Rename(2, "lastGenerated", RecruitGiftRecord.EXPIRES));
+
+        // TODO: remove a few weeks after 2009-11-12
+        _ctx.registerMigration(RecruitGiftRecord.class,
+            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
+        registerMigration(new DataMigration("2009_11_12_multi_recruit_gifts") {
+            @Override public void invoke ()
+                throws DatabaseException
+            {
+                for (RecruitGiftRecord rec : findAll(RecruitGiftRecord.class, CacheStrategy.NONE)) {
+                    if (rec.giftId == 0) {
+                        rec.giftIds = new int[0];
+                    } else if (rec.giftId == -1) {
+                        rec.giftIds = new int[1];
+                    } else {
+                        rec.giftIds = new int[]{ rec.giftId };
+                    }
+                    update(rec);
+                }
+            }
+        });
     }
 
     /**
@@ -305,7 +324,7 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads the RecruitGiftRecord for the specified player.
      */
-    public RecruitGiftRecord loadRecruitGift (int userId)
+    public RecruitGiftRecord loadRecruitGifts (int userId)
     {
         return load(RecruitGiftRecord.getKey(userId));
     }
@@ -313,11 +332,11 @@ public class PlayerRepository extends DepotRepository
     /**
      * Store a newly-generated recruit gift for the specified player.
      */
-    public RecruitGiftRecord storeRecruitGift (PlayerRecord player, int giftId)
+    public RecruitGiftRecord storeRecruitGifts (PlayerRecord player, int[] giftIds)
     {
         RecruitGiftRecord recruit = new RecruitGiftRecord();
         recruit.userId = player.userId;
-        recruit.giftId = giftId;
+        recruit.giftIds = giftIds;
         recruit.expires = Calendars.in(TimeZone.getTimeZone(player.timezone))
             .zeroTime().addDays(1).toTimestamp();
         store(recruit);
@@ -325,12 +344,22 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Note that the player used their daily recruit gift.
+     * Note that the player used one of their daily recruit gifts.
+     *
+     * @return true if they did indeed have this gift.
      */
-    public void noteRecruitGiftSent (int userId)
+    public boolean noteRecruitGiftSent (int userId, int thingId)
     {
-        updatePartial(RecruitGiftRecord.getKey(userId),
-                      RecruitGiftRecord.GIFT_ID, -1);
+        RecruitGiftRecord rec = loadRecruitGifts(userId);
+        if (rec != null) {
+            int index = rec.getGiftIndex(thingId);
+            if (index != -1) {
+                rec.giftIds[index] = 0;
+                update(rec);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

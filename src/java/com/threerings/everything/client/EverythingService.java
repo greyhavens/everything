@@ -46,9 +46,9 @@ public interface EverythingService extends RemoteService
     /** Provides results for {@link #getRecentFeed}. */
     public static class FeedResult implements IsSerializable
     {
-        /** The "recruitment gift" for you to use to slurp in new players, or null if you have no gift, or a blank Card
-         * instance if you've already gifted it. */
-        public Card recruitGift;
+        /** The "recruitment gifts" for you to use to slurp in new players, or null to mark
+         * a slot as already gifted. */
+        public List<Card> recruitGifts;
 
         /** Gifts awaiting this player, if any. */
         public List<ThingCard> gifts;

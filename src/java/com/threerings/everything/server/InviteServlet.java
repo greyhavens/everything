@@ -30,7 +30,6 @@ import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
-import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
 
 import static com.threerings.everything.Log.log;
@@ -106,10 +105,8 @@ public class InviteServlet extends AppServlet
         CardRecord card = null;
         if (received == 0L) {
             // recruitment gift...
-            RecruitGiftRecord recruit = _playerRepo.loadRecruitGift(player.userId);
-            if (recruit != null && recruit.giftId == thingId) {
+            if (_playerRepo.noteRecruitGiftSent(player.userId, thingId)) {
                 card = _gameRepo.createCard(player.userId, thingId, 0);
-                _playerRepo.noteRecruitGiftSent(player.userId);
             }
 
         } else {

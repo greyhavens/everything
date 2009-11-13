@@ -13,6 +13,7 @@ import com.threerings.gwt.ui.Widgets;
 import com.threerings.everything.client.EverythingService;
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.Card;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.data.SlotStatus;
 
@@ -34,19 +35,24 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     @Override // from DataPanel
     protected void init (EverythingService.FeedResult result)
     {
-        if (result.recruitGift != null) {
-            add(Widgets.newLabel("Send a Free Gift to your friends!", "Title"));
+        if (result.recruitGifts.size() > 0) {
+            add(Widgets.newLabel("Send Free Gifts to your friends!", "Title"));
             add(Widgets.newLabel("More players means more things!"));
-            SlotView recruitSlot = new SlotView();
-            if (result.recruitGift.thing == null) { // already gifted
-                recruitSlot.status.update(SlotStatus.RECRUIT_GIFTED);
-            } else {
-                recruitSlot.status.update(SlotStatus.FLIPPED);
-                ClickHandler clickHandler =
-                    CardPopup.recruitGiftClick(_ctx, result.recruitGift, recruitSlot.status);
-                recruitSlot.setCard(_ctx, result.recruitGift.toThingCard(), false, clickHandler);
+            FluentTable cards = new FluentTable(0, 0);
+            int col = 0;
+            for (Card card : result.recruitGifts) {
+                SlotView slot = new SlotView();
+                if (card == null) { // already gifted
+                    slot.status.update(SlotStatus.RECRUIT_GIFTED);
+                } else {
+                    slot.status.update(SlotStatus.FLIPPED);
+                    slot.setCard(_ctx, card.toThingCard(), false,
+                        CardPopup.recruitGiftClick(_ctx, card, slot.status));
+                }
+                cards.at(0, col).setWidget(slot);
+                col++;
             }
-            add(recruitSlot);
+            add(cards);
         }
 
         if (!result.gifts.isEmpty()) {
