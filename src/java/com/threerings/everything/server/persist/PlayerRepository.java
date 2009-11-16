@@ -54,8 +54,8 @@ public class PlayerRepository extends DepotRepository
         super(ctx);
 
         // TODO: remove a few weeks after 2009-11-12
-//        _ctx.registerMigration(RecruitGiftRecord.class,
-//            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
+        _ctx.registerMigration(RecruitGiftRecord.class,
+            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
 //        registerMigration(new DataMigration("2009_11_12_multi_recruit_gifts") {
 //            @Override public void invoke ()
 //                throws DatabaseException
@@ -328,7 +328,7 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Store a newly-generated recruit gift for the specified player.
+     * Store newly-generated recruit gifts for the specified player.
      */
     public RecruitGiftRecord storeRecruitGifts (PlayerRecord player, int[] giftIds)
     {
