@@ -102,9 +102,9 @@ public class InviteServlet extends AppServlet
         throws Exception
     {
         long received = Long.parseLong(requireParameter(req, "received"));
+        boolean recruitGift = (received == 0L);
         CardRecord card = null;
-        if (received == 0L) {
-            // recruitment gift...
+        if (recruitGift) {
             if (_playerRepo.noteRecruitGiftSent(player.userId, thingId)) {
                 card = _gameRepo.createCard(player.userId, thingId, 0);
             }
@@ -124,7 +124,7 @@ public class InviteServlet extends AppServlet
         if (targetId != null && (target = _playerRepo.loadPlayer(targetId)) != null) {
             log.info("Gifting card directly to player", "gifter", player.who(),
                      "thing", card.thingId, "recip", target.who());
-            _gameLogic.giftCard(player, card, target, null);
+            _gameLogic.giftCard(player, card, target, null, recruitGift);
 
         } else {
             log.info("Escrowing card for hopeful future player", "gifter", player.who(),

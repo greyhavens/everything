@@ -215,7 +215,9 @@ public class GameLogic
      * Transfers the specified card to the specified target player. Takes care of feed message
      * generation and set completion checking and all the whatnots.
      */
-    public void giftCard (PlayerRecord owner, CardRecord card, PlayerRecord target, String message)
+    public void giftCard (
+        PlayerRecord owner, CardRecord card, PlayerRecord target, String message,
+        boolean recruitGift)
     {
         // transfer the card to the target player (in gift form)
         _gameRepo.giftCard(card, target.userId, message);
@@ -224,8 +226,10 @@ public class GameLogic
         Category series = _thingRepo.loadCategory(_thingRepo.loadThing(card.thingId).categoryId);
         _playerLogic.sendGiftNotification(owner, target.facebookId, series);
 
-        // it may be on their grid, in which case we need to update its status
-        noteCardStatus(card, SlotStatus.GIFTED);
+        if (!recruitGift) {
+            // it may be on their grid, in which case we need to update its status
+            noteCardStatus(card, SlotStatus.GIFTED);
+        }
     }
 
     /**
@@ -250,6 +254,9 @@ public class GameLogic
      */
     public void noteCardStatus (CardRecord card, SlotStatus status)
     {
+        // TODO: this is a little hacky. It's possible that they're trying to give away their
+        // old card but we're zapping its twin from their grid. Their collection will be
+        // as intended, but the grid won't look right.
         if (card.giverId == 0 && (System.currentTimeMillis() - card.received.getTime()) < 24*HOUR) {
             GridRecord grid = _gameRepo.loadGrid(card.ownerId);
             if (grid == null) {
