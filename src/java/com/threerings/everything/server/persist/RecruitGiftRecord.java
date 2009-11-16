@@ -22,7 +22,6 @@ public class RecruitGiftRecord extends PersistentRecord
     public static final Class<RecruitGiftRecord> _R = RecruitGiftRecord.class;
     public static final ColumnExp USER_ID = colexp(_R, "userId");
     public static final ColumnExp EXPIRES = colexp(_R, "expires");
-    public static final ColumnExp GIFT_ID = colexp(_R, "giftId");
     public static final ColumnExp GIFT_IDS = colexp(_R, "giftIds");
     // AUTO-GENERATED: FIELDS END
 
@@ -35,9 +34,6 @@ public class RecruitGiftRecord extends PersistentRecord
 
     /** The time at which this record expires. */
     public Timestamp expires;
-
-    // TODO: remove soon
-    public int giftId; // OLD
 
     /** The thingIds of each potential gift, or 0 to indicate "gifted". */
     public int[] giftIds;

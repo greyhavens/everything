@@ -53,29 +53,27 @@ public class PlayerRepository extends DepotRepository
     {
         super(ctx);
 
-        // TODO: remove a few weeks after 2009-11-06
-        _ctx.registerMigration(RecruitGiftRecord.class,
-            new SchemaMigration.Rename(2, "lastGenerated", RecruitGiftRecord.EXPIRES));
-
         // TODO: remove a few weeks after 2009-11-12
-        _ctx.registerMigration(RecruitGiftRecord.class,
-            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
-        registerMigration(new DataMigration("2009_11_12_multi_recruit_gifts") {
-            @Override public void invoke ()
-                throws DatabaseException
-            {
-                for (RecruitGiftRecord rec : findAll(RecruitGiftRecord.class, CacheStrategy.NONE)) {
-                    if (rec.giftId == 0) {
-                        rec.giftIds = new int[0];
-                    } else if (rec.giftId == -1) {
-                        rec.giftIds = new int[1];
-                    } else {
-                        rec.giftIds = new int[]{ rec.giftId };
-                    }
-                    update(rec);
-                }
-            }
-        });
+//        _ctx.registerMigration(RecruitGiftRecord.class,
+//            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
+//        registerMigration(new DataMigration("2009_11_12_multi_recruit_gifts") {
+//            @Override public void invoke ()
+//                throws DatabaseException
+//            {
+//                for (RecruitGiftRecord rec : findAll(RecruitGiftRecord.class, CacheStrategy.NONE)) {
+//                    if (rec.giftId == 0) {
+//                        rec.giftIds = new int[0];
+//                    } else if (rec.giftId == -1) {
+//                        rec.giftIds = new int[1];
+//                    } else {
+//                        rec.giftIds = new int[]{ rec.giftId };
+//                    }
+//                    update(rec);
+//                }
+//            }
+//        });
+        // TODO: enable sometime soon
+//        _ctx.registerMigration(RecruitGiftRecord.class, new SchemaMigration.Drop(4, "giftId"));
     }
 
     /**
