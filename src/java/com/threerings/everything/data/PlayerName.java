@@ -45,6 +45,12 @@ public class PlayerName
         return (other instanceof PlayerName) && userId == ((PlayerName)other).userId;
     }
 
+    @Override // from Object
+    public int hashCode ()
+    {
+        return userId;
+    }
+
     /**
      * Returns a blank name with just the user id.
      */
