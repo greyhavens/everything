@@ -72,8 +72,8 @@ public class PlayerRepository extends DepotRepository
 //                }
 //            }
 //        });
-        // TODO: enable sometime soon
-//        _ctx.registerMigration(RecruitGiftRecord.class, new SchemaMigration.Drop(4, "giftId"));
+        // TODO: remove a few weeks after 2009-11-16
+        _ctx.registerMigration(RecruitGiftRecord.class, new SchemaMigration.Drop(4, "giftId"));
     }
 
     /**

@@ -27,7 +27,7 @@ public class RecruitGiftRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
       * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 3;
+    public static final int SCHEMA_VERSION = 4;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
