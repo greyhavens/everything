@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TimeZone;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -335,8 +334,7 @@ public class PlayerRepository extends DepotRepository
         RecruitGiftRecord recruit = new RecruitGiftRecord();
         recruit.userId = player.userId;
         recruit.giftIds = giftIds;
-        recruit.expires = Calendars.in(TimeZone.getTimeZone(player.timezone))
-            .zeroTime().addDays(1).toTimestamp();
+        recruit.expires = player.calculateNextExpires();
         store(recruit);
         return recruit;
     }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TimeZone;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -22,7 +21,6 @@ import com.google.inject.Singleton;
 
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
-import com.samskivert.util.Calendars;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
@@ -80,24 +78,13 @@ public class GameLogic
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
-        grid.thingIds = selectGridThings(player, pup);
         grid.status = GridStatus.NORMAL;
+        grid.thingIds = selectGridThings(player, pup);
+        grid.expires = player.calculateNextExpires();
 
         // now that we successfully selected things for our grid, consume the powerup
         if (pup != Powerup.NOOP && !_gameRepo.consumePowerupCharge(player.userId, pup)) {
             throw new ServiceException(GameService.E_LACK_CHARGE);
-        }
-
-        // grids generally expire at midnight in the player's timezone
-        TimeZone zone = TimeZone.getTimeZone(player.timezone);
-        Calendars.Builder cal = Calendars.in(zone).zeroTime().addDays(1);
-        grid.expires = cal.toTimestamp();
-        // extend the expiration of this grid out one or two hours to ensure it will live long
-        // enough for them to flip their cards comfortable
-        long duration = grid.expires.getTime() - System.currentTimeMillis();
-        while (duration < MIN_GRID_DURATION) {
-            grid.expires = cal.addHours(1).toTimestamp();
-            duration = grid.expires.getTime() - System.currentTimeMillis();
         }
 
         return grid;

@@ -5,9 +5,12 @@ package com.threerings.everything.server.persist;
 
 import java.sql.Timestamp;
 import java.util.Set;
+import java.util.TimeZone;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
+
+import com.samskivert.util.Calendars;
 
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
@@ -166,6 +169,20 @@ public class PlayerRecord extends PersistentRecord
         return name + "/" + userId;
     }
 
+    /**
+     * Calculate the next expire time for a generated grid, or gift record, for this player.
+     */
+    public Timestamp calculateNextExpires ()
+    {
+        TimeZone zone = TimeZone.getTimeZone(timezone);
+        Calendars.Builder cal = Calendars.in(zone).zeroTime().addDays(1);
+        long now = System.currentTimeMillis();
+        while ((cal.toTime() - now) < MIN_EXPIRE_DURATION) {
+            cal.addHours(1);
+        }
+        return cal.toTimestamp();
+    }
+
     // AUTO-GENERATED: METHODS START
     /**
      * Create and return a primary {@link Key} to identify a {@link PlayerRecord}
@@ -179,4 +196,7 @@ public class PlayerRecord extends PersistentRecord
                 new Comparable[] { userId });
     }
     // AUTO-GENERATED: METHODS END
+
+    /** The minimum allowed lifespan for a grid (and recruitment gifts) (2 hours). */
+    protected static final long MIN_EXPIRE_DURATION = 2L * 60 * 60 * 1000L;
 }
