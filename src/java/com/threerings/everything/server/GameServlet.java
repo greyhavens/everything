@@ -313,7 +313,7 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
         CardRecord card = requireCard(player.userId, thingId, received);
-        _gameLogic.giftCard(player, card, friend, message);
+        _gameLogic.giftCard(player, card, friend, message, false);
     }
 
     // from interface GameService
