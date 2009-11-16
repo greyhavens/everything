@@ -263,16 +263,9 @@ public class ThingIndex
     protected void selectThings (ThingList things, int count, IntSet excludeIds, IntSet into)
     {
         if ((excludeIds.size() / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD) {
-            log.info("Selecting things with a well-endowed exclude list",
-                     "things", things.size(), "exclude", excludeIds.size());
             things = things.copyWithout(excludeIds);
             excludeIds = new ArrayIntSet();
         }
-
-        // now check
-        Preconditions.checkArgument(things.size() >= count,
-                                    "Cannot select " + count + " things. " +
-                                    "Index only contains " + things.size() + " things.");
 
         // select the requested number of random things
         int iters = 0, added = 0;
