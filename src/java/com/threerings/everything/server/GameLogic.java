@@ -252,6 +252,9 @@ public class GameLogic
     {
         if (card.giverId == 0 && (System.currentTimeMillis() - card.received.getTime()) < 24*HOUR) {
             GridRecord grid = _gameRepo.loadGrid(card.ownerId);
+            if (grid == null) {
+                return;
+            }
             for (int ii = 0; ii < grid.thingIds.length; ii++) {
                 if (grid.thingIds[ii] == card.thingId) {
                     _gameRepo.updateSlot(card.ownerId, ii, SlotStatus.FLIPPED, status);
