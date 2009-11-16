@@ -486,7 +486,4 @@ public class GameLogic
 
     /** One hour in milliseconds. */
     protected static final long HOUR = 60*60*1000L;
-
-    /** The minimum allowed lifespan for a grid (two hours). */
-    protected static final long MIN_GRID_DURATION = 2*HOUR;
 }
