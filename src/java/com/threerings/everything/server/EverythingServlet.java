@@ -92,6 +92,9 @@ public class EverythingServlet extends EveryServiceServlet
             return data; // allow the player to do some things anonymously
         }
 
+        // compute the player's timezone (note: tzOffset is minutes *before* GMT)
+        String tz = String.format("GMT%+03d:%02d", -tzOffset/60, tzOffset%60);
+
         PlayerRecord player = _playerRepo.loadPlayer(user.userId);
         if (player == null) {
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
@@ -122,9 +125,6 @@ public class EverythingServlet extends EveryServiceServlet
                             "fbinfo", fbinfo);
                 throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
             }
-
-            // compute the player's timezone (note: tzOffset is minutes *before* GMT)
-            String tz = String.format("GMT%+03d:%02d", -tzOffset/60, tzOffset%60);
 
             // create a new player with their Facebook data
             User fbuser = uinfo.getUser().get(0);
@@ -192,7 +192,7 @@ public class EverythingServlet extends EveryServiceServlet
         } else {
             // if this is not their first session, update their last session timestamp
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
-            _playerRepo.recordSession(player.userId, now);
+            _playerRepo.recordSession(player, now, tz);
             log.info("Welcome back", "who", player.who(), "gone", elapsed,
                      "tracking", kontagentToken);
 

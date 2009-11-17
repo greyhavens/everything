@@ -8,15 +8,16 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.internal.Maps;
 
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DataMigration;
@@ -31,6 +32,7 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
@@ -303,10 +305,15 @@ public class PlayerRepository extends DepotRepository
      * Updates the specified user's last session stamp and grants them free flips earned since
      * their previous session.
      */
-    public void recordSession (int userId, long sessionStamp)
+    public void recordSession (PlayerRecord player, long sessionStamp, String timezone)
     {
-        updatePartial(PlayerRecord.getKey(userId),
-                      PlayerRecord.LAST_SESSION, new Timestamp(sessionStamp));
+        Map<ColumnExp, Object> updates = Maps.newHashMap();
+        updates.put(PlayerRecord.LAST_SESSION, new Timestamp(sessionStamp));
+        if (!player.timezone.equals(timezone)) {
+            updates.put(PlayerRecord.TIMEZONE, timezone);
+            player.timezone = timezone; // and update it in the local record instance
+        }
+        updatePartial(PlayerRecord.getKey(player.userId), updates);
     }
 
     /**
