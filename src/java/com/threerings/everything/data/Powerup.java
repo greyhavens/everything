@@ -38,7 +38,7 @@ public enum Powerup implements ByteEnum
     },
 
     /** Generates grid that contains only cards not held by the player. */
-    ALL_NEW_CARDS(4, 250, 3),
+    ALL_NEW_CARDS(4, 750, 3),
 
     /** Generates grid that contains only cards in series being collected. */
     ALL_COLLECTED_SERIES(5, 250, 3),
