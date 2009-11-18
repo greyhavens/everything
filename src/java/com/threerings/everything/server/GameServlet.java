@@ -289,13 +289,12 @@ public class GameServlet extends EveryServiceServlet
         result.friends = Lists.newArrayList();
         for (Integer friendId : friendIds) {
             FriendCardInfo info = new FriendCardInfo();
+            // some of their friends may be samsara users but not everything players: skip nulls
             info.friend = names.get(friendId);
             if (info.friend != null) {
                 info.hasThings = holdings.getOrElse(friendId, 0);
                 info.onWishlist = false; // TODO
                 result.friends.add(info);
-//            } else {
-//                log.info("Player has imaginary friend?", "who", player.who(), "friendId", friendId);
             }
         }
         return result;
