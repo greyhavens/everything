@@ -442,7 +442,10 @@ public class GameLogic
         log.info("Gave out a birthday present", "to", user.who(), "what", thing.name);
     }
 
-    // TODO
+    /**
+     * Create a Card from the specified Thing, filling in the positional information from the
+     * set of things in the series.
+     */
     protected Card resolveCard (Thing thing, SortedSet<Thing> things)
     {
         Card card = new Card();
@@ -460,7 +463,9 @@ public class GameLogic
         return card;
     }
 
-    // TODO
+    /**
+     * Fill in a created Card instance with the information from the CardRecord and database.
+     */
     protected Card fillCard (Card card, CardRecord record)
     {
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
