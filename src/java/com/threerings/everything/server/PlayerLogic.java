@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -197,12 +198,13 @@ public class PlayerLogic
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
         _app.getExecutor().execute(new Runnable() {
             public void run () {
-                // TODO: break fbids up if it's larger than 50 ids
-                try {
-                    fbclient.notifications_send(fbids, fbml, true);
-                } catch (Exception e) {
-                    log.info("Failed to send Facebook reminder notification", "fbml", fbml,
-                             "error", e.getMessage());
+                for (List<Long> ids : Iterables.partition(fbids, 50)) {
+                    try {
+                        fbclient.notifications_send(ids, fbml, true);
+                    } catch (Exception e) {
+                        log.info("Failed to send Facebook reminder notification", "fbml", fbml,
+                                 "error", e.getMessage());
+                    }
                 }
             }
         });
