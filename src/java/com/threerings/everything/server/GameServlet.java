@@ -294,8 +294,8 @@ public class GameServlet extends EveryServiceServlet
                 info.hasThings = holdings.getOrElse(friendId, 0);
                 info.onWishlist = false; // TODO
                 result.friends.add(info);
-            } else {
-                log.info("Player has imaginary friend?", "who", player.who(), "friendId", friendId);
+//            } else {
+//                log.info("Player has imaginary friend?", "who", player.who(), "friendId", friendId);
             }
         }
         return result;
