@@ -22,8 +22,6 @@ import com.google.inject.name.Named;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.StringUtil;
 
-import com.samskivert.depot.DataMigration;
-import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.DuplicateKeyException;
 import com.samskivert.depot.Funcs;
@@ -57,17 +55,6 @@ public class GameRepository extends DepotRepository
     @Inject public GameRepository (PersistenceContext ctx, @Named(AppCodes.APPVERS) String appvers)
     {
         super(ctx);
-
-        // temp: migrate -1 to minint
-        if (!appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
-            registerMigration(new DataMigration("2009_08_31_minint") {
-                public void invoke () throws DatabaseException {
-                    updatePartial(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(-1)), null,
-                                  CardRecord.OWNER_ID, Integer.MIN_VALUE);
-                }
-            });
-        }
-        // end temp
     }
 
     /**
