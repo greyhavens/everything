@@ -34,12 +34,19 @@ public class ThingDialog
     {
         if (completed) {
             return makeHandler(ctx, "got_comp", card,
+                               "" + ctx.getMe() + " got the " + card.thing.name +
+                                       " card and completed the " + card.getSeries() +
+                                       " series in Everything!",
                                "Celebrate your completed series:", "Woo hoo!");
         } else if (card.giver != null) {
             return makeHandler(ctx, "got_gift", card,
+                               "" + ctx.getMe() + " got the " + card.thing.name +
+                                       " card from " + card.giver + " in Everything.",
                                "Thank your friend for this great gift:", "Thanks!");
         } else {
             return makeHandler(ctx, "got_card", card,
+                               "" + ctx.getMe() + " got the " + card.thing.name +
+                                       " card in Everything.",
                                "Tell your friends about this awesome card:", "Woo!");
         }
     }
@@ -50,6 +57,8 @@ public class ThingDialog
     public static ClickHandler makeWantHandler (Context ctx, Card card)
     {
         return makeHandler(ctx, "want_card", card,
+                           "" + ctx.getMe() + " wants the " + card.thing.name +
+                                   " card in Everything.",
                            "Let your friends know you want this card:", "I wants it!");
     }
 
@@ -58,23 +67,26 @@ public class ThingDialog
      */
     public static void showGifted (Context ctx, Card card, PlayerName target)
     {
-        showDialog(ctx, "gave_card", ""+target.facebookId, card,
+        showDialog(ctx, "gave_card", ""+target.facebookId,
+                   "" + ctx.getMe() + " gave the " + card.thing.name + " card to " + target +
+                            " in Everything.",
+                   card,
                    target, "Tell your friends why you gave " + target.name + " this card:", "");
     }
 
     protected static ClickHandler makeHandler (final Context ctx, final String vec,
-                                               final Card card, final String prompt,
-                                               final String message)
+                                               final Card card, final String title,
+                                               final String prompt, final String message)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
-                showDialog(ctx, vec, targetId, card, card.owner, prompt, message);
+                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message);
             }
         };
     }
 
-    protected static void showDialog (Context ctx, String vec, String targetId,
+    protected static void showDialog (Context ctx, String vec, String targetId, String title,
                                       Card card, PlayerName owner, String prompt, String message)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
@@ -82,7 +94,7 @@ public class ThingDialog
             Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
-        showDialog(targetId, card.thing.name, card.thing.descrip,
+        showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, cardURL, everyURL, prompt, message, new Command() {
             public void execute () {
@@ -96,13 +108,13 @@ public class ThingDialog
         });
     }
 
-    protected static native void showDialog (String targetId, String thing, String descrip,
+    protected static native void showDialog (String targetId, String title, String descrip,
                                              String categories, String rarity,
                                              String imageURL, String cardURL, String everyURL,
                                              String prompt, String message,
                                              Command onComplete) /*-{
         var attachment = {
-            'name': thing,
+            'name': title,
             'href': everyURL,
             'description': descrip,
             'media': [{ 'type': 'image',
