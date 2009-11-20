@@ -83,9 +83,8 @@ public class ThingDialog
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, card.thing.name, card.thing.descrip,
-                   Category.getHierarchy(card.categories), card.getSeries().name,
-                   card.thing.rarity.toString(), imageURL,
-                   cardURL, everyURL, prompt, message, new Command() {
+                   Category.getHierarchy(card.categories), card.thing.rarity.toString(),
+                   imageURL, cardURL, everyURL, prompt, message, new Command() {
             public void execute () {
                 _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
                     public void onSuccess (Void result) { /* nada */ }
@@ -98,7 +97,7 @@ public class ThingDialog
     }
 
     protected static native void showDialog (String targetId, String thing, String descrip,
-                                             String categories, String series, String rarity,
+                                             String categories, String rarity,
                                              String imageURL, String cardURL, String everyURL,
                                              String prompt, String message,
                                              Command onComplete) /*-{
@@ -109,13 +108,12 @@ public class ThingDialog
             'media': [{ 'type': 'image',
                         'src': imageURL,
                         'href': cardURL }],
-            'properties': {'category': categories,
-                           'series': series,
-                           'rarity': rarity,
-                           'Join the fun': {'text': 'Play Everything!',
+            'properties': {'Category': categories,
+                           'Rarity': rarity,
+                           'Join the fun': {'text': 'Start your own Everything collection!',
                                             'href': everyURL }},
         };
-        var actions = [{ "text": "Play Everything",
+        var actions = [{ "text": "Collect Everything",
                          "href": everyURL }];
         $wnd.FB.Connect.streamPublish(message, attachment, actions, targetId, prompt,
             function (postId, exception) {
