@@ -35,13 +35,12 @@ public class EverythingApp extends AbstractSamsaraApp
     /** Our app identifier. */
     public static final String IDENT = "everything";
 
-    public EverythingApp ()
-    {
-        super(IDENT);
-    }
-
     public static class Module extends AbstractSamsaraAppModule
     {
+        public Module () {
+            super(IDENT);
+        }
+
         @Override protected void configure () {
             super.configure();
             bind(App.class).to(EverythingApp.class);
