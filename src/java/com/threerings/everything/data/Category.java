@@ -98,4 +98,10 @@ public class Category
     {
         return name.compareTo(other.name);
     }
+
+    @Override
+    public String toString ()
+    {
+        return name;
+    }
 }
