@@ -271,8 +271,9 @@ public class ThingIndex
         int iters = 0, added = 0;
         while (added < count) {
             if (iters++ >= MAX_SELECT_ITERS) {
-                log.warning("Failed to select " + count + " things after " +
-                            MAX_SELECT_ITERS + " attempts.");
+                log.warning("Failed to select things",
+                    "ThingList.size()", things.size(), "exludeIds.size()", excludeIds.size(),
+                    "count", count, "added", added, "into.size()", into.size());
                 break;
             }
             int thingId = pickWeightedThing(things);

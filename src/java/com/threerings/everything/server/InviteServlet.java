@@ -114,7 +114,10 @@ public class InviteServlet extends AppServlet
             card = _gameRepo.loadCard(player.userId, thingId, received);
         }
         if (card == null) {
-            throw new Exception("no such card"); // TODO?
+            log.warning("Unable to find gift",
+                "player", player.who(), "thingId", thingId, "received", received,
+                "targetFBId", targetFBId);
+            throw new Exception("no such card");
         }
 
         // see if the recipient in question is already a player
