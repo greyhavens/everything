@@ -16,8 +16,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.depot.CountRecord;
-import com.samskivert.depot.DataMigration;
-import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Funcs;
 import com.samskivert.depot.Key;
@@ -53,14 +51,6 @@ public class ThingRepository extends DepotRepository
     @Inject public ThingRepository (PersistenceContext ctx)
     {
         super(ctx);
-
-        // temp: migrate "active" to "state = ACTIVE"
-        registerMigration(new DataMigration("2009_07_29_category_active") {
-            public void invoke () throws DatabaseException {
-                updatePartial(CategoryRecord.class, new Where(CategoryRecord.ACTIVE.eq(true)),
-                              null, CategoryRecord.STATE, Category.State.ACTIVE);
-            }
-        });
     }
 
     /**
