@@ -3,6 +3,7 @@
 
 package com.threerings.everything.tests;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -18,6 +19,7 @@ import static org.junit.Assert.*;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.ThingIndex;
+import com.threerings.everything.server.persist.AttractorRecord;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
 /**
@@ -38,7 +40,8 @@ public class ThingIndexTest
     @Test public void testPickBirthdayThing ()
     {
         IntMap<ThingInfoRecord> things = createThings();
-        ThingIndex index = new ThingIndex(mapCategories(things), things.values());
+        List<AttractorRecord> attractors = Collections.emptyList();
+        ThingIndex index = new ThingIndex(mapCategories(things), things.values(), attractors);
         // create a random collection
         IntSet ids = new ArrayIntSet(), exclude = new ArrayIntSet();
         index.selectThings(25, ids, exclude);
@@ -62,7 +65,8 @@ public class ThingIndexTest
     protected ThingIndex createTestIndex ()
     {
         IntMap<ThingInfoRecord> things = createThings();
-        return new ThingIndex(mapCategories(things), things.values());
+        List<AttractorRecord> attractors = Collections.emptyList();
+        return new ThingIndex(mapCategories(things), things.values(), attractors);
     }
 
     protected IntMap<ThingInfoRecord> createThings ()
