@@ -10,7 +10,10 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -231,7 +234,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
     {
         _gamesvc.flipCard(_data.grid.gridId, position, _data.status.nextFlipCost,
                           new PopupCallback<GameService.FlipResult>(_slots[position]) {
-            public void onSuccess (GameService.FlipResult result) {
+            public void onSuccess (final GameService.FlipResult result) {
                 // update our status
                 _data.grid.slots[position] = SlotStatus.FLIPPED;
                 _data.grid.unflipped[result.card.thing.rarity.ordinal()]--;
@@ -242,7 +245,24 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 _slots[position].setCard(_ctx, result.card.toThingCard(), false, null);
 
                 // display the card big and fancy and allow them to gift it or cash it in
-                CardPopup.display(_ctx, result, _slots[position].status, _slots[position], null);
+                CardPopup popup = CardPopup.display(
+                    _ctx, result, _slots[position].status, _slots[position], null);
+                if (result.bonanza != null) {
+                    popup.addCloseHandler(new CloseHandler<PopupPanel>() {
+                        public void onClose (CloseEvent<PopupPanel> event) {
+                            // BONANZA!!!!
+                            CardPopup.displayBonanza(_ctx, result.bonanza,
+                                new AsyncCallback<GameStatus>() {
+                                    public void onSuccess (GameStatus status) {
+                                        updateGameStatus(_data.status = status);
+                                    }
+                                    public void onFailure (Throwable caught) {
+                                        // nada
+                                    }
+                                });
+                        }
+                    });
+                }
             }
             public void onFailure (Throwable cause) {
                 if (cause.getMessage().equals("e.nsf_for_flip")) {

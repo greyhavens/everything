@@ -416,6 +416,15 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Set the 'next attractor' time.
+     */
+    public void setNextAttractor (PlayerRecord record, Timestamp stamp)
+    {
+        updatePartial(PlayerRecord.getKey(record.userId), PlayerRecord.NEXT_ATTRACTOR, stamp);
+        record.nextAttractor = stamp;
+    }
+
+    /**
      * Records an item to the specified actor's feed.
      */
     public void recordFeedItem (int actorId, FeedItem.Type type, int targetId, String object)

@@ -3,6 +3,7 @@
 
 package com.threerings.everything.server;
 
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.google.inject.Inject;
 
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -30,6 +32,7 @@ import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendCardInfo;
+import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.Player;
@@ -231,6 +234,12 @@ public class GameServlet extends EveryServiceServlet
 
         // record that this player flipped this card
         _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name);
+
+        // on a free flip, there's a chance they'll get a bonanza card
+        if (expectedCost == 0) {
+            result.bonanza = maybePickBonanza(player);
+        }
+
         return result;
     }
 
@@ -316,7 +325,31 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public GiftResult openGift (int thingId, long created) throws ServiceException
+    public GameStatus bonanzaViewed (boolean posted)
+        throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        if (!player.eligibleForAttractor()) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+        }
+        // if they posted the attractor, give them another one 2 days from now, otherwise 5 days..
+        _playerRepo.setNextAttractor(player,
+            new Timestamp(player.calculateNextExpires().getTime() +
+                ((posted ? 1 : 4) * GameUtil.ONE_DAY)));
+        if (!posted) {
+            return null; // that's it, they turned us down, screw them.
+        }
+        // otherwise, grant them a free flip
+        _playerRepo.grantFreeFlips(player, 1);
+        // return their game status
+        return _gameLogic.getGameStatus(player, null /* unflipped */);
+        // (Note: we pass null for 'unflipped' because it won't be used since we know for a fact
+        // that they have at least one free flip (we just granted it!))
+    }
+
+    // from interface GameService
+    public GiftResult openGift (int thingId, long created)
+        throws ServiceException
     {
         PlayerRecord player = requirePlayer();
         final CardRecord card = _gameRepo.loadCard(-player.userId, thingId, created);
@@ -520,7 +553,33 @@ public class GameServlet extends EveryServiceServlet
         return card;
     }
 
+    /**
+     * Maybe pick an attractor card to return as a "bonanza card".
+     */
+    protected BonanzaInfo maybePickBonanza (PlayerRecord player)
+    {
+        if (!player.eligibleForAttractor() || (Math.random() >= BONANZA_CHANCE)) {
+            return null;
+        }
+        // OK! pick a card
+        ThingIndex index = _thingLogic.getThingIndex();
+        Tuple<Integer, Tuple<String, String>> att = index.pickAttractor();
+        if (att == null) {
+            return null; // nothing to pick!
+        }
+
+        BonanzaInfo info = new BonanzaInfo();
+        info.card = _gameLogic.resolveCard(att.left);
+        info.title = att.right.left;
+        info.message = att.right.right;
+        return info;
+    }
+
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
+
+    /** The percent chance that a free flip will find a bonanza card. */
+    protected static final double BONANZA_CHANCE = 0.2; // 20%
 }

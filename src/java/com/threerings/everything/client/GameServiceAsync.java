@@ -6,6 +6,7 @@ package com.threerings.everything.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Powerup;
@@ -55,6 +56,11 @@ public interface GameServiceAsync
      * The async version of {@link GameService#giftCard}.
      */
     void giftCard (int thingId, long created, int friendId, String message, AsyncCallback<Void> callback);
+
+    /**
+     * The async version of {@link GameService#bonanzaViewed}.
+     */
+    void bonanzaViewed (boolean posted, AsyncCallback<GameStatus> callback);
 
     /**
      * The async version of {@link GameService#openGift}.

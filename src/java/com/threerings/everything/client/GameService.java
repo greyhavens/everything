@@ -90,11 +90,27 @@ public interface GameService extends RemoteService
         public int thingsRemaining;
     }
 
+    /** Contains information on a "bonanza card" that a player may flip on their grid. */
+    public static class BonanzaInfo implements IsSerializable
+    {
+        /** The bonanza card. */
+        public Card card;
+
+        /** The attractor feed post title. */
+        public String title;
+
+        /** The attractor feed post message. */
+        public String message;
+    }
+
     /** Provides results for {@link #flipCard}. */
     public static class FlipResult extends CardResult
     {
         /** The player's new game status after the flip. */
         public GameStatus status;
+
+        /** The bonanza information returned as part of the flip, or null. */
+        public BonanzaInfo bonanza;
     }
 
     /** Provides results for {@link #getGiftCardInfo}. */
@@ -163,6 +179,12 @@ public interface GameService extends RemoteService
      * Gifts the specified card to the specified friend.
      */
     void giftCard (int thingId, long created, int friendId, String message) throws ServiceException;
+
+    /**
+     * Notify the server that we've posted or skipped after seeing a bonanza card.
+     * Returns the caller's current free flip count.
+     */
+    GameStatus bonanzaViewed (boolean posted) throws ServiceException;
 
     /**
      * Opens a card gift.

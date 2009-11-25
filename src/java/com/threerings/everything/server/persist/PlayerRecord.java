@@ -45,6 +45,7 @@ public class PlayerRecord extends PersistentRecord
     public static final ColumnExp COINS = colexp(_R, "coins");
     public static final ColumnExp FREE_FLIPS = colexp(_R, "freeFlips");
     public static final ColumnExp FLAGS = colexp(_R, "flags");
+    public static final ColumnExp NEXT_ATTRACTOR = colexp(_R, "nextAttractor");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting this record to a {@link PlayerName}. */
@@ -65,7 +66,7 @@ public class PlayerRecord extends PersistentRecord
 
     /** Increment this value if you modify the definition of this persistent object in a way that
      * will result in a change to its SQL counterpart. */
-    public static final int SCHEMA_VERSION = 12;
+    public static final int SCHEMA_VERSION = 13;
 
     /** The Samsara user id of this player. */
     @Id public int userId;
@@ -106,6 +107,9 @@ public class PlayerRecord extends PersistentRecord
 
     /** Flags tracked for this player. */
     public int flags;
+
+    @Column(nullable=true)
+    public Timestamp nextAttractor;
 
     /**
      * Sets the specified flag on this player.
@@ -167,6 +171,14 @@ public class PlayerRecord extends PersistentRecord
     public String who ()
     {
         return name + "/" + userId;
+    }
+
+    /**
+     * Are we eligible to post an attractor card?
+     */
+    public boolean eligibleForAttractor ()
+    {
+        return (nextAttractor == null) || (nextAttractor.getTime() < System.currentTimeMillis());
     }
 
     /**

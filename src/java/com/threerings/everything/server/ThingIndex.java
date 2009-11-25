@@ -24,8 +24,10 @@ import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
 import com.samskivert.util.StringUtil;
+import com.samskivert.util.Tuple;
 
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.server.persist.AttractorRecord;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
 import static com.threerings.everything.Log.log;
@@ -36,7 +38,8 @@ import static com.threerings.everything.Log.log;
  */
 public class ThingIndex
 {
-    public ThingIndex (IntIntMap catmap, Iterable<ThingInfoRecord> things)
+    public ThingIndex (
+        IntIntMap catmap, Iterable<ThingInfoRecord> things, Iterable<AttractorRecord> attractors)
     {
         for (ThingInfoRecord thing : things) {
             ThingInfo info = new ThingInfo();
@@ -60,6 +63,16 @@ public class ThingIndex
         _things.shuffle();
         for (ThingList rareList : _byrare.values()) {
             rareList.shuffle();
+        }
+
+        for (AttractorRecord attractor : attractors) {
+            ThingInfo info = _byid.get(attractor.thingId);
+            if (info == null) {
+                log.warning("Dropping attractor for inactive thing", "thingId", attractor.thingId);
+                continue;
+            }
+            _attractorThings.add(info);
+            _attractors.put(attractor.thingId, Tuple.newTuple(attractor.title, attractor.message));
         }
 
         log.info("Updated things index",
@@ -238,6 +251,24 @@ public class ThingIndex
         return (things.size() == 0) ? 0 : pickWeightedThing(things);
     }
 
+    /**
+     * Pick an attractor card.
+     * TODO: clean up tuple mess?
+     */
+    public Tuple<Integer, Tuple<String, String>> pickAttractor ()
+    {
+        if (_attractorThings.size() == 0) {
+            return null;
+        }
+        ArrayIntSet pick = new ArrayIntSet(1);
+        selectThings(_attractorThings, 1, pick, pick);
+        if (pick.isEmpty()) {
+            return null;
+        }
+        int thingId = pick.interator().nextInt();
+        return Tuple.newTuple(thingId, _attractors.get(thingId));
+    }
+
     protected ThingList getThings (IntSet thingIds)
     {
         ThingList things = new ThingList();
@@ -375,6 +406,8 @@ public class ThingIndex
     protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
+    protected IntMap<Tuple<String,String>> _attractors = IntMaps.newHashIntMap();
+    protected ThingList _attractorThings = new ThingList();
 
     { // initialize the _byrare map
         for (Rarity rarity : Rarity.BONUS) {

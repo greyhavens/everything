@@ -53,7 +53,7 @@ public class ThingLogic
                 catmap.put(cat.categoryId, cat.parentId);
             }
         }
-        return new ThingIndex(catmap, _thingRepo.loadActiveThings());
+        return new ThingIndex(catmap, _thingRepo.loadActiveThings(), _thingRepo.loadAttractors());
     }
 
     protected ThingIndex _index;

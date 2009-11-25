@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,6 +24,7 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
+import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
 
@@ -64,16 +66,36 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    public static void display (Context ctx, GameService.CardResult result,
-                                Value<SlotStatus> status, Widget centerOn, final String message)
+    public static CardPopup display (Context ctx, GameService.CardResult result,
+                                     Value<SlotStatus> status, Widget centerOn,
+                                     final String message)
     {
         final CardPopup popup = new CardPopup(ctx, result, status);
         if (!StringUtil.isBlank(message)) {
             popup.setGiftInfo(result.card.giver, message);
         }
         display(ctx, popup, centerOn);
+        return popup;
     }
 
+    /**
+     * Display the "bonanza card" interface and allow the user to post for a free flip.
+     */
+    public static void displayBonanza (
+        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
+    {
+        CardPopup popup = new CardPopup(ctx, bonanzaInfo, callback);
+        display(ctx, popup, null);
+    }
+
+    protected CardPopup (
+        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
+    {
+        this(ctx, (Value<SlotStatus>)null);
+        setWidget(createBonanzaContents(bonanzaInfo, callback));
+    }
+
+    /** Constructor for recruitment gift cards. */
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
         this(ctx, status);
@@ -139,6 +161,39 @@ public class CardPopup extends PopupPanel
         } else {
             return createOwnCardContents(card);
         }
+    }
+
+    protected Widget createBonanzaContents (
+        GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
+    {
+        _title = "It's a card BONANZA! Give it and get a free click, brah!";
+        PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
+            public void onClick (ClickEvent event) {
+                // TODO: post to your feed. On Success....
+                _gamesvc.bonanzaViewed(true, new AsyncCallback<GameStatus>() {
+                    public void onSuccess (GameStatus status) {
+                        callback.onSuccess(status);
+                    }
+
+                    public void onFailure (Throwable cause) {
+                        // TODO (shouldn't happen)
+                    }
+                });
+                onHide().onClick(null); // close the popup..
+            }
+        });
+        PushButton cancel = ButtonUI.newButton("Skip", onHide());
+        new ClickCallback<GameStatus>(cancel) {
+            protected boolean callService () {
+                _gamesvc.bonanzaViewed(false, this);
+                return true;
+            }
+            protected boolean gotResult (GameStatus status) {
+                // status == null, don't do shit.. right?
+                return true;
+            }
+        };
+        return CardView.create(bonanzaInfo.card, _title, null, cancel, post);
     }
 
     protected Widget createRecruitGiftContents (final Card card)
