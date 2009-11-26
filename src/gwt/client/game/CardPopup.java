@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Handlers;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
@@ -164,22 +165,33 @@ public class CardPopup extends PopupPanel
     }
 
     protected Widget createBonanzaContents (
-        GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
+        final GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
     {
         _title = "It's a card BONANZA! Give it and get a free click, brah!";
         PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                // TODO: post to your feed. On Success....
-                _gamesvc.bonanzaViewed(true, new AsyncCallback<GameStatus>() {
-                    public void onSuccess (GameStatus status) {
-                        callback.onSuccess(status);
-                    }
+                ThingDialog.showAttractor(_ctx, bonanzaInfo.card, bonanzaInfo.title,
+                    bonanzaInfo.message, new AsyncCallback<Boolean>() {
+                        public void onSuccess (Boolean posted) {
+                            Console.log("Got posting callback: " + posted);
+                            if (!posted) {
+                                return; // just leave the dialog up
+                            }
+                            _gamesvc.bonanzaViewed(true, new AsyncCallback<GameStatus>() {
+                                public void onSuccess (GameStatus status) {
+                                    callback.onSuccess(status);
+                                }
 
-                    public void onFailure (Throwable cause) {
-                        // TODO (shouldn't happen)
-                    }
-                });
-                onHide().onClick(null); // close the popup..
+                                public void onFailure (Throwable cause) {
+                                    // TODO (shouldn't happen)
+                                }
+                            });
+                            onHide().onClick(null); // close the popup..
+                        }
+                        public void onFailure (Throwable cause) {
+                            // TODO (shouldn't happen)
+                        }
+                    });
             }
         });
         PushButton cancel = ButtonUI.newButton("Skip", onHide());

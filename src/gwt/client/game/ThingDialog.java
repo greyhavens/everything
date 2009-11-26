@@ -71,7 +71,21 @@ public class ThingDialog
                    "" + ctx.getMe() + " gave the " + card.thing.name + " card to " + target +
                             " in Everything.",
                    card,
-                   target, "Tell your friends why you gave " + target.name + " this card:", "");
+                   target, "Tell your friends why you gave " + target.name + " this card:", "",
+                   null);
+    }
+
+    /**
+     * Displays a feed dialog for posting an "attractor" card to recruit new players.
+     * The specified callback will be called with 'true' if they ended up posting the story.
+     */
+    public static void showAttractor (
+        Context ctx, Card card, String title, String message, AsyncCallback<Boolean> callback)
+    {
+        // TODO: owner: probably not use us, we don't have an owner..
+        // TODO: we need to just call the javascript version directly so we can customize more
+        showDialog(ctx, "attractor", null, title, card, ctx.getMe(),
+            "Let your friends know about Everything fun:", message, callback);
     }
 
     protected static ClickHandler makeHandler (final Context ctx, final String vec,
@@ -81,13 +95,14 @@ public class ThingDialog
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
-                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message);
+                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message, null);
             }
         };
     }
 
     protected static void showDialog (Context ctx, String vec, String targetId, String title,
-                                      Card card, PlayerName owner, String prompt, String message)
+                                      Card card, PlayerName owner, String prompt, String message,
+                                      final AsyncCallback<Boolean> optCallback)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
         String cardURL = ctx.getEverythingURL(
@@ -96,23 +111,35 @@ public class ThingDialog
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   imageURL, cardURL, everyURL, prompt, message, new Command() {
-            public void execute () {
-                _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
-                    public void onSuccess (Void result) { /* nada */ }
-                    public void onFailure (Throwable cause) {
-                        Console.log("Failed to report story post", "tracking", tracking, cause);
-                    }
-                });
-            }
-        });
+                   imageURL, cardURL, everyURL, prompt, message,
+                   new Command() { // complete callback
+                       public void execute () {
+                           _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
+                               public void onSuccess (Void result) { /* nada */ }
+                               public void onFailure (Throwable cause) {
+                                   Console.log("Failed to report story post",
+                                       "tracking", tracking, cause);
+                               }
+                           });
+                           if (optCallback != null) {
+                               optCallback.onSuccess(Boolean.TRUE);
+                           }
+                       }
+                   },
+                   new Command() { // incomplete callback
+                       public void execute () {
+                           if (optCallback != null) {
+                               optCallback.onSuccess(Boolean.FALSE);
+                           }
+                       }
+                   });
     }
 
     protected static native void showDialog (String targetId, String title, String descrip,
                                              String categories, String rarity,
                                              String imageURL, String cardURL, String everyURL,
                                              String prompt, String message,
-                                             Command onComplete) /*-{
+                                             Command onComplete, Command onIncomplete) /*-{
         var attachment = {
             'name': title,
             'href': everyURL,
@@ -129,8 +156,10 @@ public class ThingDialog
                          "href": everyURL }];
         $wnd.FB.Connect.streamPublish(message, attachment, actions, targetId, prompt,
             function (postId, exception) {
-                if (postId != null) {
+                if ((postId != null) && (postId != "null")) { // holy shit, what a fiasco
                     onComplete.@com.google.gwt.user.client.Command::execute()();
+                } else {
+                    onIncomplete.@com.google.gwt.user.client.Command::execute()();
                 }
             }
         );
