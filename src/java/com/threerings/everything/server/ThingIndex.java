@@ -304,7 +304,8 @@ public class ThingIndex
             if (iters++ >= MAX_SELECT_ITERS) {
                 log.warning("Failed to select things",
                     "ThingList.size()", things.size(), "exludeIds.size()", excludeIds.size(),
-                    "count", count, "added", added, "into.size()", into.size());
+                    "count", count, "added", added, "into.size()", into.size(),
+                    new Exception("DON'T PANIC"));
                 break;
             }
             int thingId = pickWeightedThing(things);
