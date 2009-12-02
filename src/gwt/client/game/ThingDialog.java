@@ -71,8 +71,7 @@ public class ThingDialog
                    "" + ctx.getMe() + " gave the " + card.thing.name + " card to " + target +
                             " in Everything.",
                    card,
-                   target, "Tell your friends why you gave " + target.name + " this card:", "",
-                   null);
+                   target, "Tell your friends why you gave " + target.name + " this card:", "");
     }
 
     /**
@@ -80,12 +79,33 @@ public class ThingDialog
      * The specified callback will be called with 'true' if they ended up posting the story.
      */
     public static void showAttractor (
-        Context ctx, Card card, String title, String message, AsyncCallback<Boolean> callback)
+        Context ctx, Card card, String title, String message, final AsyncCallback<Boolean> callback)
     {
-        // TODO: owner: probably not use us, we don't have an owner..
-        // TODO: we need to just call the javascript version directly so we can customize more
-        showDialog(ctx, "attractor", null, title, card, ctx.getMe(),
-            "Let your friends know about Everything fun:", message, callback);
+        final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
+//        String joinURL = ctx.getEverythingURL(
+        String joinURL = ctx.getFacebookAddURL(
+            Kontagent.POST, tracking, Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
+        String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
+        showDialog("", title, message,
+                   Category.getHierarchy(card.categories), card.thing.rarity.toString(),
+                   imageURL, joinURL, joinURL, "Recruit your friends:", "" /* message */,
+                   new Command() { // complete callback
+                       public void execute () {
+                           _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
+                               public void onSuccess (Void result) { /* nada */ }
+                               public void onFailure (Throwable cause) {
+                                   Console.log("Failed to report story post",
+                                       "tracking", tracking, cause);
+                               }
+                           });
+                           callback.onSuccess(Boolean.TRUE);
+                       }
+                   },
+                   new Command() { // incomplete callback
+                       public void execute () {
+                           callback.onSuccess(Boolean.FALSE);
+                       }
+                   });
     }
 
     protected static ClickHandler makeHandler (final Context ctx, final String vec,
@@ -95,14 +115,13 @@ public class ThingDialog
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
-                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message, null);
+                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message);
             }
         };
     }
 
     protected static void showDialog (Context ctx, String vec, String targetId, String title,
-                                      Card card, PlayerName owner, String prompt, String message,
-                                      final AsyncCallback<Boolean> optCallback)
+                                      Card card, PlayerName owner, String prompt, String message)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
         String cardURL = ctx.getEverythingURL(
@@ -121,16 +140,11 @@ public class ThingDialog
                                        "tracking", tracking, cause);
                                }
                            });
-                           if (optCallback != null) {
-                               optCallback.onSuccess(Boolean.TRUE);
-                           }
                        }
                    },
                    new Command() { // incomplete callback
                        public void execute () {
-                           if (optCallback != null) {
-                               optCallback.onSuccess(Boolean.FALSE);
-                           }
+                           // nada
                        }
                    });
     }

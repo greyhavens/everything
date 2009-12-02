@@ -63,6 +63,11 @@ public interface GameServiceAsync
     void bonanzaViewed (boolean posted, AsyncCallback<GameStatus> callback);
 
     /**
+     * The async version of {@link GameService#getAttractor}.
+     */
+    void getAttractor (int thingId, int friendId, AsyncCallback<GameService.CardResult> callback);
+
+    /**
      * The async version of {@link GameService#openGift}.
      */
     void openGift (int thingId, long created, AsyncCallback<GameService.GiftResult> callback);

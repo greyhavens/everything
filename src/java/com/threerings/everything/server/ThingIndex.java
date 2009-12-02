@@ -269,6 +269,11 @@ public class ThingIndex
         return Tuple.newTuple(thingId, _attractors.get(thingId));
     }
 
+    public boolean isAttractor (int thingId)
+    {
+        return _attractors.containsKey(thingId);
+    }
+
     protected ThingList getThings (IntSet thingIds)
     {
         ThingList things = new ThingList();

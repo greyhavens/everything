@@ -187,6 +187,11 @@ public interface GameService extends RemoteService
     GameStatus bonanzaViewed (boolean posted) throws ServiceException;
 
     /**
+     * Add an attractor card to the player's collection, if they don't already have it.
+     */
+    CardResult getAttractor (int thingId, int friendId) throws ServiceException;
+
+    /**
      * Opens a card gift.
      */
     GiftResult openGift (int thingId, long created) throws ServiceException;

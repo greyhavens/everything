@@ -167,7 +167,9 @@ public class CardPopup extends PopupPanel
     protected Widget createBonanzaContents (
         final GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
     {
-        _title = "It's a card BONANZA! Give it and get a free click, brah!";
+        _title = "Bonanza!";
+        // TODO: explain the double-card bonanza.
+        // Probably, we want to use an entirely different popup
         PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 ThingDialog.showAttractor(_ctx, bonanzaInfo.card, bonanzaInfo.title,

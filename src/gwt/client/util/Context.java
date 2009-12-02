@@ -34,6 +34,9 @@ public interface Context
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text);
 
+    /** Returns HTML for an anchor tag that will add our app. */
+    String getFacebookAddLink (String text, Page page, Object... args);
+
     /** Returns true if this player is still pretty new. */
     boolean isNewbie ();
 

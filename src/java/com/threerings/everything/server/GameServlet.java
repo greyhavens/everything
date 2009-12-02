@@ -19,6 +19,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
+import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.Tuple;
@@ -210,19 +211,15 @@ public class GameServlet extends EveryServiceServlet
         player = _playerRepo.loadPlayer(player.userId);
 
         // load up the thing going on the card they just flipped
-        final Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
+        Thing thing = _thingRepo.loadThing(grec.thingIds[position]);
 
         log.info("Yay! Card flipped", "who", player.who(), "thing", thing.name,
                  "rarity", thing.rarity, "paid", expectedCost);
 
         // create the card, add it to their collection and resolve associated bits
-        final int userId = player.userId;
         FlipResult result = new FlipResult();
-        CardRecord card = prepareCard(player, thing, result, new Callable<CardRecord>() {
-            public CardRecord call () throws Exception {
-                return _gameRepo.createCard(userId, thing.thingId, 0);
-            }
-        });
+        CardRecord card = prepareCard(player, thing, result,
+            cardCreator(player.userId, thing.thingId, 0));
 
         // decrement the unflipped count for the flipped card's rarity so that we can properly
         // compute the new next flip cost
@@ -345,6 +342,33 @@ public class GameServlet extends EveryServiceServlet
         return _gameLogic.getGameStatus(player, null /* unflipped */);
         // (Note: we pass null for 'unflipped' because it won't be used since we know for a fact
         // that they have at least one free flip (we just granted it!))
+    }
+
+    // from interface GameService
+    public CardResult getAttractor (int thingId, int friendId)
+        throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+
+        // validate that the thingId is an 'attractor'
+        if (!_thingLogic.getThingIndex().isAttractor(thingId)) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+        }
+
+        // see if the player already has one
+        List<CardRecord> cards = _gameRepo.loadCards(
+            player.userId, new ArrayIntSet(new int[] { thingId }), false);
+        if (!cards.isEmpty()) {
+            return null; // indicate that we've already got one!
+        }
+
+        // else, go ahead and grant them the card. Even if they're an old player.
+        Thing thing = _thingRepo.loadThing(thingId);
+        CardResult result = new CardResult();
+        CardRecord card = prepareCard(player, thing, result,
+            cardCreator(player.userId, thingId, friendId));
+        // TODO?
+        return result;
     }
 
     // from interface GameService
@@ -551,6 +575,16 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(E_UNKNOWN_CARD);
         }
         return card;
+    }
+
+    protected Callable<CardRecord> cardCreator (
+        final int userId, final int thingId, final int friendId)
+    {
+        return new Callable<CardRecord>() {
+            public CardRecord call () throws Exception {
+                return _gameRepo.createCard(userId, thingId, friendId);
+            }
+        };
     }
 
     /**

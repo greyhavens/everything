@@ -33,6 +33,7 @@ import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditFAQPage;
 import client.editor.EditSeriesPage;
+import client.game.AttractorPage;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
 import client.game.FlipPage;
@@ -122,7 +123,13 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddLink (String text)
     {
-        String url = getFacebookAddURL(Kontagent.APP_ADDED, _kontagentToken, Page.LANDING);
+        return getFacebookAddLink(text, Page.LANDING);
+    }
+
+    // from interface Context
+    public String getFacebookAddLink (String text, Page page, Object... args)
+    {
+        String url = getFacebookAddURL(Kontagent.APP_ADDED, _kontagentToken, page, args);
         StringBuilder buf = new StringBuilder();
         buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();
@@ -198,6 +205,9 @@ public class EverythingClient
 
         // these are OK to view as a guest
         switch (args.page) {
+        case ATTRACTOR:
+            setContent(new AttractorPage(this, args.get(0, 0), args.get(1, 0)));
+            return;
         case LANDING:
             setContent(new LandingPage(this, _news));
             return;
