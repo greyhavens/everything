@@ -63,8 +63,7 @@ public class AuthServlet extends AppServlet
                             "req", req.getRequestURI());
                 // whatever, overwrite it with our short code
             }
-            tracking = Integer.toHexString(_rando.nextInt());
-            tracking = StringUtil.fill('0', 8-tracking.length()) + tracking;
+            tracking = StringUtil.prepad(Integer.toHexString(_rando.nextInt()), 8, '0');
         }
 
         // if we're the release candidate, use /candidate/everything/ otherwise use the versionless
