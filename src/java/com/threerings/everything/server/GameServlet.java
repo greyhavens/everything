@@ -355,6 +355,11 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
         }
 
+        // make sure the player is "new"
+        if (player.joined.getTime() + (GameUtil.ONE_DAY * 3) < System.currentTimeMillis()) {
+            return null; // not new
+        }
+
         // see if the player already has one
         List<CardRecord> cards = _gameRepo.loadCards(
             player.userId, new ArrayIntSet(new int[] { thingId }), false);
@@ -604,9 +609,15 @@ public class GameServlet extends EveryServiceServlet
 
         BonanzaInfo info = new BonanzaInfo();
         info.card = _gameLogic.resolveCard(att.left);
-        info.title = att.right.left;
-        info.message = att.right.right;
+        info.title = feedReplacements(att.right.left, player);
+        info.message = feedReplacements(att.right.right, player);
         return info;
+    }
+
+    protected String feedReplacements (String source, PlayerRecord player)
+    {
+        // for now we simply replace "%n" with the first name
+        return source.replace("%n", player.name);
     }
 
     @Inject protected GameLogic _gameLogic;

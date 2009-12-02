@@ -26,35 +26,25 @@ public class LandingPage extends FlowPanel
 {
     public LandingPage (Context ctx, Value<News> news)
     {
+        this(ctx, news, false);
         setStyleName("landing");
         addStyleName("page"); // we're a top-level page
+    }
+
+    public LandingPage (Context ctx, Value<News> news, boolean showNewbiesInstructions)
+    {
 
         if (ctx.getMe().isGuest()) {
-            add(Widgets.newLabel(_msgs.introTitle(), "Title", "machine"));
-            add(Widgets.newLabel(_msgs.introIntro(), "Text"));
-            FluentTable intro = new FluentTable(5, 0, "Steps");
-            intro.add().setText(_msgs.introStepOne(), "machine").
-                right().setText("\u2023", "Arrow").
-                right().setText(_msgs.introStepTwo(), "machine").
-                right().setText("\u2023", "Arrow").
-                right().setText(_msgs.introStepThree(), "machine").
-                right().setText("\u2023", "Arrow").
-                right().setText(_msgs.introStepFour(), "machine");
-            add(intro);
+            addInstructions();
             add(Widgets.newHTML(ctx.getFacebookAddLink("Start playing now!"), "CTA", "machine"));
 
+        } else if (showNewbiesInstructions && ctx.isNewbie()) {
+            addInstructions();
+            add(Widgets.newShim(10, 10));
+            addBigFlip();
+
         } else if (ctx.isNewbie()) {
-            add(Widgets.newLabel(_msgs.introBookmark(), "Title", "machine"));
-            FluentTable intro = new FluentTable(5, 0);
-            intro.add().setWidget(Widgets.newImage("images/bookmark_tip.png")).
-                right().setText(_msgs.introBookmarkTip(), "Text");
-            add(intro);
-            add(Widgets.newShim(10, 10));
-            Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
-            link.addStyleName("BigFlip");
-            link.addStyleName("machine");
-            add(link);
-            add(Widgets.newShim(10, 10));
+            addBigFlip();
 
         } else if (news.get() != null) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
@@ -70,6 +60,36 @@ public class LandingPage extends FlowPanel
         if (ctx.isEditor()) {
             add(Widgets.newLabel("Build: " + Build.time(), "machine"));
         }
+    }
+
+    protected void addInstructions ()
+    {
+        add(Widgets.newLabel(_msgs.introTitle(), "Title", "machine"));
+        add(Widgets.newLabel(_msgs.introIntro(), "Text"));
+        FluentTable intro = new FluentTable(5, 0, "Steps");
+        intro.add().setText(_msgs.introStepOne(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepTwo(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepThree(), "machine").
+            right().setText("\u2023", "Arrow").
+            right().setText(_msgs.introStepFour(), "machine");
+        add(intro);
+    }
+
+    protected void addBigFlip ()
+    {
+        add(Widgets.newLabel(_msgs.introBookmark(), "Title", "machine"));
+        FluentTable intro = new FluentTable(5, 0);
+        intro.add().setWidget(Widgets.newImage("images/bookmark_tip.png")).
+            right().setText(_msgs.introBookmarkTip(), "Text");
+        add(intro);
+        add(Widgets.newShim(10, 10));
+        Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
+        link.addStyleName("BigFlip");
+        link.addStyleName("machine");
+        add(link);
+        add(Widgets.newShim(10, 10));
     }
 
     protected static String formatNews (String text)

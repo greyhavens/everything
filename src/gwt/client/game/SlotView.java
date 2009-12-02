@@ -45,11 +45,17 @@ public class SlotView extends SimplePanel
         return true;
     }
 
+    /**
+     * @param onClick if null, a default ClickHandler will be used.
+     */
     public void setCard (Context ctx, ThingCard card, boolean isGift, ClickHandler onClick)
     {
         setCard(ctx, card, ctx.getMe().userId, isGift, onClick);
     }
 
+    /**
+     * @param onClick if null, a default ClickHandler will be used.
+     */
     public void setCard (Context ctx, ThingCard card, int ownerId, boolean isGift,
                          ClickHandler onClick)
     {
