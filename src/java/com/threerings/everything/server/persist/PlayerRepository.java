@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 
 import com.samskivert.depot.DatabaseException;
 import com.samskivert.depot.DataMigration;
+import com.samskivert.depot.DateFuncs;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.KeySet;
@@ -323,6 +324,15 @@ public class PlayerRepository extends DepotRepository
     {
         updatePartial(PlayerRecord.getKey(userId),
                       PlayerRecord.COINS, PlayerRecord.COINS.plus(coins));
+    }
+
+    /**
+     * Expire any old recruitment gift records.
+     */
+    public int pruneGiftRecords ()
+    {
+        return deleteAll(RecruitGiftRecord.class,
+            new Where(RecruitGiftRecord.EXPIRES.lessThan(DateFuncs.now())));
     }
 
     /**

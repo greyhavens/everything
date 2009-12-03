@@ -57,7 +57,7 @@ public class EverythingApp extends AbstractSamsaraApp
             if (!_version.equals(AppCodes.RELEASE_CANDIDATE)) {
                 schedule("process_birthdays", ProcessBirthdays.class).every(1);
                 schedule("send_reminders", SendReminders.class).every(1);
-                schedule("prune_feed", PruneFeed.class).at(1);
+                schedule("prune_records", PruneRecords.class).at(1);
             }
         }
     }
@@ -76,12 +76,18 @@ public class EverythingApp extends AbstractSamsaraApp
         @Inject PlayerLogic _playerLogic;
     }
 
-    protected static class PruneFeed implements Runnable {
+    protected static class PruneRecords implements Runnable {
         @Override public void run () {
-            int deleted = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-            if (deleted > 0) {
-                log.info("Pruned " + deleted + " old feed items.");
+            int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+            int recruit = _playerRepo.pruneGiftRecords();
+            if (feed > 0) {
+                log.info("Pruned " + feed + " old feed items.");
             }
+            if (recruit > 0) {
+                log.info("Pruned " + recruit + " old recruitment gift records.");
+            }
+            // TODO: prune GridRecords, but only after the maximum number of free flips
+            // can be accumulated into the PlayerRecord
         }
         @Inject PlayerRepository _playerRepo;
     }
