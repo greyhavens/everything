@@ -24,10 +24,6 @@ public class GameUtil
     public static int computeFreeFlips (PlayerRecord record, long elapsed)
     {
         long shortDay = 3*ONE_DAY/4;
-        if (elapsed < shortDay) {
-            log.warning("Requested to compute free flips with less than 18 hours elapsed?",
-                        "who", record.who(), "elapsed", elapsed);
-        }
 
         // if you have free flips left over, we only top you up (but we'll always give you at least
         // vacation_free_flips for your elapsed day)
