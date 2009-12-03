@@ -26,36 +26,57 @@ public class LandingPage extends FlowPanel
 {
     public LandingPage (Context ctx, Value<News> news)
     {
-        this(ctx, news, false);
-        setStyleName("landing");
-        addStyleName("page"); // we're a top-level page
+        this(ctx, news, 0, 0);
     }
 
-    public LandingPage (Context ctx, Value<News> news, boolean showNewbiesInstructions)
+    public LandingPage (Context ctx, int attractorId, int friendId)
     {
+        this(ctx, null, attractorId, friendId);
+    }
 
-        if (ctx.getMe().isGuest()) {
+    private LandingPage (Context ctx, Value<News> news, int attractorId, int friendId)
+    {
+        setStyleName("landing");
+        addStyleName("page"); // we're a top-level page
+
+        boolean isGuest = ctx.getMe().isGuest();
+
+        if (attractorId != 0) {
+            if (isGuest) {
+                // This is a non-normal landing, they should have added the app before
+                // trying to get the attractor. Cope.
+                add(Widgets.newHTML(
+                    ctx.getFacebookAddLink("Play everything and get the card you want",
+                        Page.ATTRACTOR, attractorId, friendId)));
+                return;
+            }
+            add(new AttractorPanel(ctx, attractorId, friendId));
+
+        } else if (isGuest) {
             addInstructions();
             add(Widgets.newHTML(ctx.getFacebookAddLink("Start playing now!"), "CTA", "machine"));
+            return;
+        }
 
-        } else if (showNewbiesInstructions && ctx.isNewbie()) {
+        if (attractorId != 0 && ctx.isNewbie()) {
+            // show extra help for a new player that arrived via an attractor
             addInstructions();
             add(Widgets.newShim(10, 10));
             addBigFlip();
 
         } else if (ctx.isNewbie()) {
+            // don't confuse newbies with too many options
             addBigFlip();
 
-        } else if (news.get() != null) {
+        } else if (news != null && news.get() != null) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
         }
 
-        if (!ctx.getMe().isGuest()) {
-            add(Widgets.newShim(5, 5));
-            add(new MyFeedPanel(ctx));
-        }
+        // at this point, nobody is a guest
+        add(Widgets.newShim(5, 5));
+        add(new MyFeedPanel(ctx));
 
         if (ctx.isEditor()) {
             add(Widgets.newLabel("Build: " + Build.time(), "machine"));

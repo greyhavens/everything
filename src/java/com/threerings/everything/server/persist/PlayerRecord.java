@@ -24,6 +24,7 @@ import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
+import com.threerings.everything.util.GameUtil;
 
 /**
  * Maintains persistent state for a player.
@@ -171,6 +172,15 @@ public class PlayerRecord extends PersistentRecord
     public String who ()
     {
         return name + "/" + userId;
+    }
+
+    /**
+     * Is this player relatively "new", having joined *approximately* within the specified
+     * number of days?
+     */
+    public boolean isNewByDays (int days)
+    {
+        return (joined.getTime() + (GameUtil.ONE_DAY * days) > System.currentTimeMillis());
     }
 
     /**

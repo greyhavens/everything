@@ -19,21 +19,13 @@ import client.util.Context;
 import client.util.Page;
 
 /**
- * A landing page for acquiring an 'attractor' card for your collection.
+ * A panel, placed on the landing page, for acquiring an 'attractor' card for your new collection.
  */
-public class AttractorPage extends DataPanel<GameService.CardResult>
+public class AttractorPanel extends DataPanel<GameService.CardResult>
 {
-    public AttractorPage (Context ctx, int attractorId, int friendId)
+    public AttractorPanel (Context ctx, int attractorId, int friendId)
     {
-        super(ctx, "attractor", "page"); // styles TODO
-
-        if (ctx.getMe().isGuest()) {
-            // How did they get here??? Oh well, cope.
-            add(Widgets.newHTML(
-                ctx.getFacebookAddLink("Play everything and get the card you want",
-                    Page.ATTRACTOR, attractorId, friendId)));
-            return;
-        }
+        super(ctx, "attractor"); // styles TODO
 
         // grant ourselves this attractor, unless we already have one
         _gamesvc.getAttractor(attractorId, friendId, createCallback());
@@ -46,15 +38,12 @@ public class AttractorPage extends DataPanel<GameService.CardResult>
             add(Widgets.newLabel("Sorry, this card is only available for new players"));
 
         } else {
-
             add(Widgets.newLabel("Congratulations. Your collection has been started!"));
             SlotView slot = new SlotView();
             slot.status.update(SlotStatus.FLIPPED);
             slot.setCard(_ctx, data.card.toThingCard(), false, null);
             add(slot);
         }
-
-        add(new LandingPage(_ctx, new Value<News>(null), true));
     }
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);

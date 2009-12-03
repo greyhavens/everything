@@ -418,11 +418,16 @@ public class EverythingServlet extends EveryServiceServlet
     {
         RecruitGiftRecord recruit = _playerRepo.loadRecruitGifts(player.userId);
         if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
-            // load all the player's things of rarity II or less.
-            IntSet giftIds = _thingLogic.getThingIndex().pickRecruitmentThings(
-                _thingRepo.loadPlayerThings(player.userId, null, Rarity.II));
-            int[] gifts = giftIds.toIntArray();
-            ArrayUtil.shuffle(gifts);
+            int[] gifts;
+            if (player.isNewByDays(2)) {
+                gifts = new int[0]; // wait a few days before we get them on the recruitment train
+
+            } else {
+                // load all the player's things of rarity II or less.
+                gifts = _thingLogic.getThingIndex().pickRecruitmentThings(
+                    _thingRepo.loadPlayerThings(player.userId, null, Rarity.II)).toIntArray();
+                ArrayUtil.shuffle(gifts);
+            }
             recruit = _playerRepo.storeRecruitGifts(player, gifts);
         }
         List<Card> list = Lists.newArrayListWithCapacity(recruit.giftIds.length);

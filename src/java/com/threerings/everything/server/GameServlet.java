@@ -356,7 +356,7 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // make sure the player is "new"
-        if (player.joined.getTime() + (GameUtil.ONE_DAY * 3) < System.currentTimeMillis()) {
+        if (player.isNewByDays(2)) {
             return null; // not new
         }
 

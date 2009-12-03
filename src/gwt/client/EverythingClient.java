@@ -33,7 +33,6 @@ import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditFAQPage;
 import client.editor.EditSeriesPage;
-import client.game.AttractorPage;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
 import client.game.FlipPage;
@@ -206,7 +205,7 @@ public class EverythingClient
         // these are OK to view as a guest
         switch (args.page) {
         case ATTRACTOR:
-            setContent(new AttractorPage(this, args.get(0, 0), args.get(1, 0)));
+            setContent(new LandingPage(this, args.get(0, 0), args.get(1, 0)));
             return;
         case LANDING:
             setContent(new LandingPage(this, _news));
