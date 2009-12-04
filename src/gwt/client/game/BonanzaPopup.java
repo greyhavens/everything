@@ -29,28 +29,42 @@ import client.util.Context;
 public class BonanzaPopup extends PopupPanel
 {
     public BonanzaPopup (
-        Context ctx, final GameService.BonanzaInfo bonanzaInfo,
-        final AsyncCallback<GameStatus> callback)
+        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
     {
         setStyleName("popup");
         _ctx = ctx;
 
         FluentTable box = new FluentTable(0, 0, "bonanza");
-        box.add().alignCenter().setHTML("BONANZA");
-        box.add().alignCenter().setHTML(bonanzaInfo.title);
-        box.add().setHTML(
-            "You found an extra card. It wouldn't be fair for you to keep it, but if you post " +
-            "it to your feed, we'll grant you an extra free flip for your efforts.");
+        box.add().setColSpan(2).alignCenter().setHTML("It's a card Bonanza!");
+        box.add().setColSpan(2).setHTML(
+            "You found an extra card while flipping! Now, it just wouldn't be fair for you " +
+            "to keep it, but you can earn an extra free flip if you post it to your feed.");
 
+        box.add().setColSpan(2).alignCenter().setHTML(bonanzaInfo.title);
         SlotView slot = new SlotView();
         slot.setStatus(SlotStatus.FLIPPED);
         slot.setCard(ctx, bonanzaInfo.card.toThingCard(), false, new ClickHandler() {
             public void onClick (ClickEvent event) {
                 // nada
+                // TODO?
             }
         });
-        box.add().setWidgets(slot, Widgets.newHTML(bonanzaInfo.message));
+        box.add().setWidget(slot).right().setHTML(bonanzaInfo.message);
 
+
+        box.add().setColSpan(2).alignCenter().setWidget(makeButtons(bonanzaInfo, callback));
+
+        setWidget(box);
+
+        // now animate it in
+        setVisible(false);
+        _ctx.displayPopup(this, null);
+        FX.move(this).from(-getOffsetWidth(), getAbsoluteTop()).run(500);
+    }
+
+    protected Widget makeButtons (
+        final GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
+    {
         PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
             public void onClick (ClickEvent event) {
                 ThingDialog.showAttractor(_ctx, bonanzaInfo.card, bonanzaInfo.title,
@@ -88,14 +102,7 @@ public class BonanzaPopup extends PopupPanel
             }
         };
 
-        box.add().setWidget(Widgets.newRow(cancel, post));
-
-        setWidget(box);
-
-        // now animate it in
-        setVisible(false);
-        _ctx.displayPopup(this, null);
-        FX.move(this).from(-getOffsetWidth(), getAbsoluteTop()).run(500);
+        return Widgets.newRow(cancel, post);
     }
 
     protected ClickHandler onHide ()

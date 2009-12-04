@@ -159,6 +159,13 @@
   display: block;
 }
 
+/** Bonanza styles */
+.bonanza {
+  width: 403px;
+  height: 443px;
+  font-size: 15px;
+}
+
 /** ThingCardView styles */
 .thingCard {
   text-align: center;
