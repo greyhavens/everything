@@ -87,15 +87,11 @@ public class CardImageServlet extends AppServlet
                 int x = CARD.x + (CARD.width - name.getSize().width)/2;
                 name.render(gfx, x, 5);
 
-                Label rarity = new Label(thing.rarity.toString(), TEXT_COLOR,
-                                         _mfont.deriveFont(Font.PLAIN, 14));
-                // RAY 2009-11-19: instead of the rarity, use some brandin' in the feed post
-                if (true) {
-                    rarity.setText("Everything!");
-                }
-                rarity.layout(gfx);
-                x = CARD.x + (CARD.width - rarity.getSize().width)/2;
-                rarity.render(gfx, x, CARD.y + CARD.height - rarity.getSize().height - 5);
+                Label brand = new Label("Everything!", TEXT_COLOR,
+                                        _mfont.deriveFont(Font.PLAIN, 14));
+                brand.layout(gfx);
+                x = CARD.x + (CARD.width - brand.getSize().width)/2;
+                brand.render(gfx, x, CARD.y + CARD.height - brand.getSize().height - 5);
             }
 
         } catch (Exception e) {
