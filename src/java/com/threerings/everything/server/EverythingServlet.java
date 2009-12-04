@@ -35,7 +35,6 @@ import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntSet;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -76,7 +75,7 @@ public class EverythingServlet extends EveryServiceServlet
         throws ServiceException
     {
         SessionData data = new SessionData();
-        data.candidate = _appvers.equals(AppCodes.RELEASE_CANDIDATE);
+        data.candidate = _candidate;
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
             data.news = news;
         }
@@ -461,7 +460,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
     }
 
-    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+    @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected EverythingApp _app;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;

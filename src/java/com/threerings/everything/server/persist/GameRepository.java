@@ -17,8 +17,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.StringUtil;
 
@@ -35,8 +33,6 @@ import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 
-import com.threerings.samsara.app.data.AppCodes;
-
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerStats;
@@ -52,7 +48,7 @@ import static com.threerings.everything.Log.log;
 @Singleton
 public class GameRepository extends DepotRepository
 {
-    @Inject public GameRepository (PersistenceContext ctx, @Named(AppCodes.APPVERS) String appvers)
+    @Inject public GameRepository (PersistenceContext ctx)
     {
         super(ctx);
     }

@@ -54,7 +54,7 @@ public class EverythingApp extends AbstractSamsaraApp
             serve(GameServlet.class).at("/" + GameServlet.ENTRY_POINT);
             serve(EditorServlet.class).at("/" + EditorServlet.ENTRY_POINT);
             serve(AdminServlet.class).at("/" + AdminServlet.ENTRY_POINT);
-            if (!_version.equals(AppCodes.RELEASE_CANDIDATE)) {
+            if (!_candidate) {
                 schedule("process_birthdays", ProcessBirthdays.class).every(1);
                 schedule("send_reminders", SendReminders.class).every(1);
                 schedule("prune_records", PruneRecords.class).at(1);
@@ -258,12 +258,13 @@ public class EverythingApp extends AbstractSamsaraApp
 
     protected String getFacebookKey (String key)
     {
-        return (_appvers.equals(AppCodes.RELEASE_CANDIDATE) ? "candidate_" : "") + key;
+        return (_candidate ? "candidate_" : "") + key;
     }
 
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+    @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected PlayerRepository _playerRepo;
 
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";

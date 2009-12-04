@@ -71,7 +71,7 @@ public class AuthServlet extends AppServlet
         // are fine from version to version and not using the versioned URL means we don't start
         // 404ing after a release)
         String indexPath = "/everything/";
-        if (_appvers.equals(AppCodes.RELEASE_CANDIDATE)) {
+        if (_candidate) {
             indexPath = "/" + AppCodes.RELEASE_CANDIDATE + indexPath;
         }
 
@@ -150,7 +150,7 @@ public class AuthServlet extends AppServlet
 
     protected Random _rando = new Random();
 
-    @Inject protected @Named(AppCodes.APPVERS) String _appvers;
+    @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected EverythingApp _app;
     @Inject protected KontagentLogic _kontLogic;
 }
