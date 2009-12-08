@@ -368,12 +368,12 @@ public class EverythingServlet extends EveryServiceServlet
                     Set<Integer> newFriendIds = Sets.difference(allFriendIds, curFriendIds);
                     Set<Integer> oldFriendIds = Sets.difference(curFriendIds, allFriendIds);
                     // add any newly-acquired friends
-                    if (newFriendIds.size() > 0) {
+                    if (!newFriendIds.isEmpty()) {
                         log.info("Wiring up friends", "who", prec.who(), "friends", newFriendIds);
                         _playerRepo.addFriends(prec.userId, newFriendIds);
                     }
                     // remove any old friends
-                    if (oldFriendIds.size() > 0) {
+                    if (!oldFriendIds.isEmpty()) {
                         int removed = _playerRepo.removeFriends(prec.userId, oldFriendIds);
                         log.info("Removing friends",
                             "who", prec.who(), "friends", oldFriendIds, "removed", removed);
