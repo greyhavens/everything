@@ -56,12 +56,12 @@ public class GameRepository extends DepotRepository
     /**
      * Loads up the latest news. The supplied array will contain zero or one elements.
      */
-    public List<News> loadLatestNews ()
+    public Collection<News> loadLatestNews ()
     {
-        return Lists.transform(
-            findAll(NewsRecord.class,
-                OrderBy.descending(NewsRecord.REPORTED), new Limit(0, 1)),
-            NewsRecord.TO_NEWS);
+        return findAll(NewsRecord.class,
+                       OrderBy.descending(NewsRecord.REPORTED),
+                       new Limit(0, 1))
+            .map(NewsRecord.TO_NEWS);
     }
 
     /**
