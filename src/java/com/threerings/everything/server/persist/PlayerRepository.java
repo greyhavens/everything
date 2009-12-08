@@ -45,6 +45,8 @@ import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 
+import static com.threerings.everything.Log.log;
+
 /**
  * Manages player state for the Everything app.
  */
@@ -284,9 +286,18 @@ public class PlayerRepository extends DepotRepository
      */
     public int removeFriends (int userId, Collection<Integer> exFriendIds)
     {
-        return deleteAll(FriendRecord.class,
+        int forward = deleteAll(FriendRecord.class,
             new Where(Ops.and(FriendRecord.USER_ID.eq(userId),
                               FriendRecord.FRIEND_ID.in(exFriendIds))));
+        int backward = 0;
+        for (Integer friendId : exFriendIds) {
+            backward += delete(FriendRecord.getKey(friendId, userId));
+        }
+        if (forward != backward) {
+            log.warning("Removing friend mappings that aren't reciprocal?",
+                "forward", forward, "backward", backward);
+        }
+        return forward;
     }
 
     /**
