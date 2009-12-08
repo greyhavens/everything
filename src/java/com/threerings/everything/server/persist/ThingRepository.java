@@ -80,8 +80,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<Category> loadCategories (int parentId)
     {
-        return findAll(CategoryRecord.class, new Where(CategoryRecord.PARENT_ID.eq(parentId))).
-            map(CategoryRecord.TO_CATEGORY);
+        return findAll(CategoryRecord.class, new Where(CategoryRecord.PARENT_ID.eq(parentId)))
+            .map(CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -89,8 +89,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<Category> loadCategories (Set<Integer> ids)
     {
-        return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))).
-            map(CategoryRecord.TO_CATEGORY);
+        return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids)))
+            .map(CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -101,8 +101,8 @@ public class ThingRepository extends DepotRepository
         return findAll(CategoryRecord.class,
                        CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
                        new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
-                       new GroupBy(CategoryRecord.CATEGORY_ID)).
-            map(CategoryRecord.TO_CATEGORY);
+                       new GroupBy(CategoryRecord.CATEGORY_ID))
+            .map(CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -142,7 +142,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<Category> loadAllCategories ()
     {
-        return findAll(CategoryRecord.class).map(CategoryRecord.TO_CATEGORY);
+        return findAll(CategoryRecord.class)
+            .map(CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -198,8 +199,8 @@ public class ThingRepository extends DepotRepository
     {
         return findAll(CategoryCommentRecord.class,
                        new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
-                       OrderBy.descending(CategoryCommentRecord.WHEN)).
-            map(CategoryCommentRecord.TO_COMMENT);
+                       OrderBy.descending(CategoryCommentRecord.WHEN))
+            .map(CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
@@ -213,8 +214,8 @@ public class ThingRepository extends DepotRepository
                        CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
                        new Where(Ops.and(CategoryRecord.CREATOR_ID.eq(creatorId),
                                          CategoryCommentRecord.WHEN.greaterEq(since))),
-                       OrderBy.descending(CategoryCommentRecord.WHEN)).
-            map(CategoryCommentRecord.TO_COMMENT);
+                       OrderBy.descending(CategoryCommentRecord.WHEN))
+            .map(CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
@@ -244,8 +245,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<Thing> loadThings (Set<Integer> thingIds)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))).
-            map(ThingRecord.TO_THING);
+        return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds)))
+            .map(ThingRecord.TO_THING);
     }
 
     /**
@@ -253,8 +254,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<Thing> loadThings (int categoryId)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
-            map(ThingRecord.TO_THING);
+        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId)))
+            .map(ThingRecord.TO_THING);
     }
 
     /**
@@ -262,8 +263,8 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<ThingCard> loadThingCards (int categoryId)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).
-            map(ThingRecord.TO_CARD);
+        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId)))
+            .map(ThingRecord.TO_CARD);
     }
 
     /**
@@ -359,8 +360,8 @@ public class ThingRepository extends DepotRepository
         return new ArrayIntSet(
             findAllKeys(ThingRecord.class, false,
                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
-                        new Where(Ops.and(whereConds))).
-            map(Key.<ThingRecord>toInt()));
+                        new Where(Ops.and(whereConds)))
+            .map(Key.<ThingRecord>toInt()));
     }
 
     /**

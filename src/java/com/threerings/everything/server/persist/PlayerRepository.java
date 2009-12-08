@@ -131,7 +131,8 @@ public class PlayerRepository extends DepotRepository
     public Collection<PlayerName> loadRecentPlayers (int count)
     {
         return findAll(PlayerRecord.class, OrderBy.descending(PlayerRecord.USER_ID),
-                       new Limit(0, count)).map(PlayerRecord.TO_NAME);
+                       new Limit(0, count))
+            .map(PlayerRecord.TO_NAME);
     }
 
     /**
@@ -183,8 +184,8 @@ public class PlayerRepository extends DepotRepository
     {
         // TODO: none of this is indexed nor is it case insensitive, change to full text
         return findAll(PlayerRecord.class, new Where(Ops.or(PlayerRecord.NAME.eq(query),
-                                                            PlayerRecord.SURNAME.eq(query)))).
-            map(PlayerRecord.TO_NAME);
+                                                            PlayerRecord.SURNAME.eq(query))))
+            .map(PlayerRecord.TO_NAME);
     }
 
     /**
@@ -285,8 +286,8 @@ public class PlayerRepository extends DepotRepository
         return findAll(PlayerRecord.class,
                        PlayerRecord.USER_ID.join(FriendRecord.FRIEND_ID),
                        new Where(FriendRecord.USER_ID.eq(userId)),
-                       OrderBy.descending(PlayerRecord.LAST_SESSION)).
-            map(PlayerRecord.TO_FRIEND_STATUS);
+                       OrderBy.descending(PlayerRecord.LAST_SESSION))
+            .map(PlayerRecord.TO_FRIEND_STATUS);
     }
 
     /**
@@ -294,8 +295,8 @@ public class PlayerRepository extends DepotRepository
      */
     public Collection<Integer> loadFriendIds (int userId)
     {
-        return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId))).map(
-            new Function<FriendRecord, Integer>() {
+        return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId)))
+            .map(new Function<FriendRecord, Integer>() {
                 public Integer apply (FriendRecord record) {
                     return record.friendId;
                 }
@@ -459,7 +460,8 @@ public class PlayerRepository extends DepotRepository
         return findAll(FeedItemRecord.class,
                        new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
                        OrderBy.descending(FeedItemRecord.WHEN),
-                       new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
+                       new Limit(0, maxItems))
+            .map(FeedItemRecord.TO_FEED_ITEM);
     }
 
     /**
@@ -471,7 +473,8 @@ public class PlayerRepository extends DepotRepository
         return findAll(FeedItemRecord.class,
                        new Where(FeedItemRecord.ACTOR_ID.eq(userId)),
                        OrderBy.descending(FeedItemRecord.WHEN),
-                       new Limit(0, maxItems)).map(FeedItemRecord.TO_FEED_ITEM);
+                       new Limit(0, maxItems))
+            .map(FeedItemRecord.TO_FEED_ITEM);
     }
 
     /**
