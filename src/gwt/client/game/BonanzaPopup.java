@@ -35,12 +35,16 @@ public class BonanzaPopup extends PopupPanel
         _ctx = ctx;
 
         FluentTable box = new FluentTable(0, 0, "bonanza");
-        box.add().setColSpan(2).alignCenter().setHTML("It's a card Bonanza!");
-        box.add().setColSpan(2).setHTML(
-            "You found an extra card while flipping! Now, it just wouldn't be fair for you " +
-            "to keep it, but you can earn an extra free flip if you post it to your feed.");
+        box.add().alignCenter().setHTML("It's a card Bonanza!", "Title");
+        box.add().setHTML(
+            "You found an extra card while flipping! It just wouldn't be fair for you " +
+            "to keep it, but you can earn an <b>extra free flip</b> if you post it to your feed. " +
+            "Any of your friends that join the game by clicking on this post will start their " +
+            "collections with this card!");
 
-        box.add().setColSpan(2).alignCenter().setHTML(bonanzaInfo.title);
+
+        FluentTable whiteBox = new FluentTable(0, 0, "attractorPreview");
+        whiteBox.add().setColSpan(2).alignCenter().setHTML(bonanzaInfo.title);
         SlotView slot = new SlotView();
         slot.setStatus(SlotStatus.FLIPPED);
         slot.setCard(ctx, bonanzaInfo.card.toThingCard(), false, new ClickHandler() {
@@ -49,10 +53,10 @@ public class BonanzaPopup extends PopupPanel
                 // TODO?
             }
         });
-        box.add().setWidget(slot).right().setHTML(bonanzaInfo.message);
+        whiteBox.add().setWidget(slot).right().setHTML(bonanzaInfo.message);
 
-
-        box.add().setColSpan(2).alignCenter().setWidget(makeButtons(bonanzaInfo, callback));
+        box.add().setWidget(whiteBox);
+        box.add().alignCenter().setWidget(makeButtons(bonanzaInfo, callback));
 
         setWidget(box);
 

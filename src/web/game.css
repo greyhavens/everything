@@ -164,6 +164,17 @@
   width: 403px;
   height: 443px;
   font-size: 15px;
+  padding: 20px;
+}
+
+.bonanza .Title {
+  font-size: 18px;
+}
+
+.bonanza .attractorPreview {
+  border: 1px solid;
+  background: #FFFFFF;
+  padding: 5px;
 }
 
 /** ThingCardView styles */
