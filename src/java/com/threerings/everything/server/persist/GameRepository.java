@@ -60,7 +60,8 @@ public class GameRepository extends DepotRepository
     {
         return findAll(NewsRecord.class,
                        OrderBy.descending(NewsRecord.REPORTED),
-                       new Limit(0, 1)).map(NewsRecord.TO_NEWS);
+                       new Limit(0, 1))
+            .map(NewsRecord.TO_NEWS);
     }
 
     /**
