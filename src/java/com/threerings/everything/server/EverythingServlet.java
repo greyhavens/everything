@@ -359,14 +359,24 @@ public class EverythingServlet extends EveryServiceServlet
                         fbFriendIds.add(uid.toString());
                     }
                     // map those friends to Samsara user ids
-                    Set<Integer> newFriendIds =
+                    Set<Integer> allFriendIds =
                         Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
-                    // remove all friends for whom we already have a mapping
-                    newFriendIds.removeAll(_playerRepo.loadFriendIds(prec.userId));
-                    // finally add mappings for any new friends we've discovered
+                    // load our current friends
+                    Set<Integer> curFriendIds =
+                        Sets.newHashSet(_playerRepo.loadFriendIds(prec.userId));
+                    // figure out new and old friends
+                    Set<Integer> newFriendIds = Sets.difference(allFriendIds, curFriendIds);
+                    Set<Integer> oldFriendIds = Sets.difference(curFriendIds, allFriendIds);
+                    // add any newly-acquired friends
                     if (newFriendIds.size() > 0) {
                         log.info("Wiring up friends", "who", prec.who(), "friends", newFriendIds);
                         _playerRepo.addFriends(prec.userId, newFriendIds);
+                    }
+                    // remove any old friends
+                    if (oldFriendIds.size() > 0) {
+                        int removed = _playerRepo.removeFriends(prec.userId, oldFriendIds);
+                        log.info("Removing friends",
+                            "who", prec.who(), "friends", oldFriendIds, "removed", removed);
                     }
                 } catch (Exception e) {
                     log.info("Failed to wire up Facebook friends", "who", prec.who(),

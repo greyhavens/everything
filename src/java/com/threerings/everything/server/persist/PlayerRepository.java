@@ -279,6 +279,17 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Remove friend mappings.
+     * @return the number of friends removed.
+     */
+    public int removeFriends (int userId, Collection<Integer> exFriendIds)
+    {
+        return deleteAll(FriendRecord.class,
+            new Where(Ops.and(FriendRecord.USER_ID.eq(userId),
+                              FriendRecord.FRIEND_ID.in(exFriendIds))));
+    }
+
+    /**
      * Loads this status of this user's friends.
      */
     public Collection<FriendStatus> loadFriendStatus (int userId)
