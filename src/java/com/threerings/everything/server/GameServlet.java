@@ -355,20 +355,25 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
         }
 
-        // make sure the player is "new"
-        if (player.isNewByDays(2)) {
-            return null; // not new
-        }
+        // get information on the thing
+        Thing thing = _thingRepo.loadThing(thingId);
 
         // see if the player already has one
         List<CardRecord> cards = _gameRepo.loadCards(
             player.userId, new ArrayIntSet(new int[] { thingId }), false);
         if (!cards.isEmpty()) {
-            return null; // indicate that we've already got one!
+            // TODO: xlate
+            throw new ServiceException("You already have the " + thing.name + " card!");
+        }
+
+        // see if we've ever granted them the attractor before...
+        if (!_gameRepo.grantAttractor(player.userId, thingId)) {
+            // TODO: xlate
+            throw new ServiceException("You have already been granted a free " +
+                thing.name + " card, you can't have another!");
         }
 
         // else, go ahead and grant them the card. Even if they're an old player.
-        Thing thing = _thingRepo.loadThing(thingId);
         CardResult result = new CardResult();
         CardRecord card = prepareCard(player, thing, result,
             cardCreator(player.userId, thingId, friendId));

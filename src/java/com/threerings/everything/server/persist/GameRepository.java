@@ -531,6 +531,15 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Note that the user will be granted the specified attractor card.
+     * @return true if they haven't previously been granted this card.
+     */
+    public boolean grantAttractor (int userId, int thingId)
+    {
+        return store(new AttractorGrantedRecord(userId, thingId));
+    }
+
+    /**
      * Notes that the user in question gifted a card. Also marks their collection as needing
      * resummarizing.
      */
@@ -581,5 +590,6 @@ public class GameRepository extends DepotRepository
         classes.add(PowerupRecord.class);
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
+        classes.add(AttractorGrantedRecord.class);
     }
 }
