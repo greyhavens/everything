@@ -177,6 +177,12 @@
   padding: 5px;
 }
 
+/** Attractor (bonanza landing) */
+
+.attractor .Title {
+  font-size: 18px;
+}
+
 /** ThingCardView styles */
 .thingCard {
   text-align: center;

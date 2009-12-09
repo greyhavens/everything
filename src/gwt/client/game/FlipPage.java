@@ -282,6 +282,8 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                                 new AsyncCallback<GameStatus>() {
                                 public void onSuccess (GameStatus status) {
                                     updateGameStatus(_data.status = status);
+                                    Popups.infoNear("You've earned an extra free flip.",
+                                        _slots[position]);
                                 }
                                 public void onFailure (Throwable caught) {
                                     // nada

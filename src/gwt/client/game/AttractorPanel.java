@@ -25,7 +25,7 @@ public class AttractorPanel extends DataPanel<GameService.CardResult>
 {
     public AttractorPanel (Context ctx, int attractorId, int friendId)
     {
-        super(ctx, "attractor"); // styles TODO
+        super(ctx, "attractor");
 
         // grant ourselves this attractor, unless we already have one
         _gamesvc.getAttractor(attractorId, friendId, createCallback());
@@ -33,17 +33,11 @@ public class AttractorPanel extends DataPanel<GameService.CardResult>
 
     protected void init (GameService.CardResult data)
     {
-        if (data == null) {
-            // they're either an old player or already have the card
-            add(Widgets.newLabel("Sorry, this card is only available for new players"));
-
-        } else {
-            add(Widgets.newLabel("Congratulations. Your collection has been started!"));
-            SlotView slot = new SlotView();
-            slot.status.update(SlotStatus.FLIPPED);
-            slot.setCard(_ctx, data.card.toThingCard(), false, null);
-            add(slot);
-        }
+        add(Widgets.newLabel("Congratulations. Your collection has been started!", "Title"));
+        SlotView slot = new SlotView();
+        slot.status.update(SlotStatus.FLIPPED);
+        slot.setCard(_ctx, data.card.toThingCard(), false, null);
+        add(slot);
     }
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
