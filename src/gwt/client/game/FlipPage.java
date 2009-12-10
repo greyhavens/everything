@@ -278,6 +278,9 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 if (result.bonanza != null) {
                     popup.addCloseHandler(new CloseHandler<PopupPanel>() {
                         public void onClose (CloseEvent<PopupPanel> event) {
+                            if (event.isAutoClosed()) {
+                                return; // wait until it's closed manually...
+                            }
                             new BonanzaPopup(_ctx, result.bonanza,
                                 new AsyncCallback<GameStatus>() {
                                 public void onSuccess (GameStatus status) {
