@@ -6,6 +6,7 @@
   <property name="wsrc.dir" value="src/web"/>
   <property name="asrc.dir" value="src/as"/>
   <property name="deploy.dir" value="dist"/>
+  <property name="candidate.dir" value="${deploy.dir}/candidate"/>
   <property name="classes.dir" value="${deploy.dir}/classes"/>
   <property name="pkg.user" value="_samsara"/>
   <property name="pkg.maintainer.name" value="Three Rings Design"/>
@@ -60,6 +61,7 @@
 
   <target name="prepare">
     <mkdir dir="${deploy.dir}"/>
+    <mkdir dir="${candidate.dir}"/>
     <mkdir dir="${classes.dir}"/>
 
     <!-- obtain our configuration files -->
@@ -75,6 +77,20 @@
     <property file="${deploy.dir}/everything.properties"/>
     <!-- copy our distribution-specific but otherwise uncustomized configuration files -->
     <copy file="etc/log4j-${ooo.distribution}.properties" tofile="${classes.dir}/log4j.properties"/>
+
+    <!-- copy the candidate-specific distribution-specific log configuration file if it exists, otherwise use
+    the standard one -->
+    <if>
+        <available file="etc/candidate-log4j-${ooo.distribution}.properties"/>
+        <then>
+            <copy file="etc/candidate-log4j-${ooo.distribution}.properties"
+                tofile="${candidate.dir}/log4j.properties"/>
+        </then>
+        <else>
+            <copy file="etc/log4j-${ooo.distribution}.properties"
+                tofile="${candidate.dir}/log4j.properties"/>
+        </else>
+    </if>
 
     <!-- copy our build dependencies into place -->
     <mkdir dir="${deploy.dir}/lib"/>
@@ -245,6 +261,9 @@
       <fileset dir="${classes.dir}" includes="**" excludes="**/tests/**"/>
       <fileset dir="${deploy.dir}" includes="everything.properties"/>
     </jar>
+    <jar destfile="${deploy.dir}/${app.ident}-candidate.jar">
+        <fileset dir="${candidate.dir}" includes="**"/>
+    </jar>
   </target>
 
   <target name="distall" depends="mavendeps,version,dist,flashui,gclient"
@@ -268,6 +287,7 @@
     <mkdir dir="${instroot.dir}/lib"/>
     <copy todir="${instroot.dir}/lib">
       <fileset dir="${deploy.dir}" includes="${app.ident}.jar"/>
+      <fileset dir="${deploy.dir}" includes="${app.ident}-candidate.jar"/>
       <fileset dir="${deploy.dir}/lib" includes="*.jar" excludes="samsara-shared*"/>
     </copy>
     <mkdir dir="${instroot.dir}/web"/>
