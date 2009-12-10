@@ -79,23 +79,6 @@ public class CardPopup extends PopupPanel
         return popup;
     }
 
-    /**
-     * Display the "bonanza card" interface and allow the user to post for a free flip.
-     */
-    public static void displayBonanza (
-        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
-    {
-        CardPopup popup = new CardPopup(ctx, bonanzaInfo, callback);
-        display(ctx, popup, null);
-    }
-
-    protected CardPopup (
-        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
-    {
-        this(ctx, (Value<SlotStatus>)null);
-        setWidget(createBonanzaContents(bonanzaInfo, callback));
-    }
-
     /** Constructor for recruitment gift cards. */
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
@@ -162,52 +145,6 @@ public class CardPopup extends PopupPanel
         } else {
             return createOwnCardContents(card);
         }
-    }
-
-    protected Widget createBonanzaContents (
-        final GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
-    {
-        _title = "Bonanza!";
-        // TODO: explain the double-card bonanza.
-        // Probably, we want to use an entirely different popup
-        PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                ThingDialog.showAttractor(_ctx, bonanzaInfo.card, bonanzaInfo.title,
-                    bonanzaInfo.message, new AsyncCallback<Boolean>() {
-                        public void onSuccess (Boolean posted) {
-                            Console.log("Got posting callback: " + posted);
-                            if (!posted) {
-                                return; // just leave the dialog up
-                            }
-                            _gamesvc.bonanzaViewed(true, new AsyncCallback<GameStatus>() {
-                                public void onSuccess (GameStatus status) {
-                                    callback.onSuccess(status);
-                                }
-
-                                public void onFailure (Throwable cause) {
-                                    // TODO (shouldn't happen)
-                                }
-                            });
-                            onHide().onClick(null); // close the popup..
-                        }
-                        public void onFailure (Throwable cause) {
-                            // TODO (shouldn't happen)
-                        }
-                    });
-            }
-        });
-        PushButton cancel = ButtonUI.newButton("Skip", onHide());
-        new ClickCallback<GameStatus>(cancel) {
-            protected boolean callService () {
-                _gamesvc.bonanzaViewed(false, this);
-                return true;
-            }
-            protected boolean gotResult (GameStatus status) {
-                // status == null, don't do shit.. right?
-                return true;
-            }
-        };
-        return CardView.create(bonanzaInfo.card, _title, null, cancel, post);
     }
 
     protected Widget createRecruitGiftContents (final Card card)
