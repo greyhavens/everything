@@ -350,9 +350,12 @@ public class GameServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
 
-        // validate that the thingId is an 'attractor'
-        if (!_thingLogic.getThingIndex().isAttractor(thingId)) {
-            throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+        // TEMP:HACK (Crack has been disabled as an attractor, but continue to support it)
+        if (thingId != 648) { // Crack
+            // validate that the thingId is an 'attractor'
+            if (!_thingLogic.getThingIndex().isAttractor(thingId)) {
+                throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+            }
         }
 
         // get information on the thing
