@@ -19,8 +19,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import com.samskivert.depot.DatabaseException;
-import com.samskivert.depot.DataMigration;
 import com.samskivert.depot.DateFuncs;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Key;
@@ -28,7 +26,6 @@ import com.samskivert.depot.KeySet;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
-import com.samskivert.depot.SchemaMigration;
 import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
@@ -56,28 +53,6 @@ public class PlayerRepository extends DepotRepository
     @Inject public PlayerRepository (PersistenceContext ctx)
     {
         super(ctx);
-
-        // TODO: remove a few weeks after 2009-11-12
-        _ctx.registerMigration(RecruitGiftRecord.class,
-            new SchemaMigration.Add(3, RecruitGiftRecord.GIFT_IDS, "E''")); // E'' means empty bytea
-//        registerMigration(new DataMigration("2009_11_12_multi_recruit_gifts") {
-//            @Override public void invoke ()
-//                throws DatabaseException
-//            {
-//                for (RecruitGiftRecord rec : findAll(RecruitGiftRecord.class, CacheStrategy.NONE)) {
-//                    if (rec.giftId == 0) {
-//                        rec.giftIds = new int[0];
-//                    } else if (rec.giftId == -1) {
-//                        rec.giftIds = new int[1];
-//                    } else {
-//                        rec.giftIds = new int[]{ rec.giftId };
-//                    }
-//                    update(rec);
-//                }
-//            }
-//        });
-        // TODO: remove a few weeks after 2009-11-16
-        _ctx.registerMigration(RecruitGiftRecord.class, new SchemaMigration.Drop(4, "giftId"));
     }
 
     /**
