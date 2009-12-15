@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.IntSet;
 import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.app.client.ServiceException;
@@ -350,12 +351,10 @@ public class GameServlet extends EveryServiceServlet
     {
         PlayerRecord player = requirePlayer();
 
-        // TEMP:HACK (Crack has been disabled as an attractor, but continue to support it)
-        if (thingId != 648) { // Crack
-            // validate that the thingId is an 'attractor'
-            if (!_thingLogic.getThingIndex().isAttractor(thingId)) {
-                throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
-            }
+        // validate that the thingId is an 'attractor'
+        if (!OLD_ATTRACTORS.contains(thingId) &&
+                !_thingLogic.getThingIndex().isAttractor(thingId)) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
         }
 
         // get information on the thing
@@ -632,6 +631,11 @@ public class GameServlet extends EveryServiceServlet
     @Inject protected GameRepository _gameRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
+
+    /** Old attractors that are no longer in the database but
+     * which we still allow to be received. */
+    protected static final IntSet OLD_ATTRACTORS = new ArrayIntSet(
+        new int[] { 648 /* Crack */ });
 
     /** The percent chance that a free flip will find a bonanza card. */
     protected static final double BONANZA_CHANCE = 0.2; // 20%
