@@ -40,7 +40,6 @@ public class LandingPage extends FlowPanel
         addStyleName("page"); // we're a top-level page
 
         boolean isGuest = ctx.getMe().isGuest();
-
         if (attractorId != 0) {
             if (isGuest) {
                 // This is a non-normal landing, they should have added the app before
@@ -62,19 +61,21 @@ public class LandingPage extends FlowPanel
             // show extra help for a new player that arrived via an attractor
             addInstructions();
             add(Widgets.newShim(10, 10));
-            addBigFlip();
+            addBookmarkTip();
 
         } else if (ctx.isNewbie()) {
             // don't confuse newbies with too many options
-            addBigFlip();
+            addBookmarkTip();
 
         } else if (news != null && news.get() != null) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
+            add(Widgets.newShim(10, 10));
         }
 
         // at this point, nobody is a guest
+        addBigFlip();
         add(Widgets.newShim(5, 5));
         add(new MyFeedPanel(ctx));
 
@@ -98,7 +99,7 @@ public class LandingPage extends FlowPanel
         add(intro);
     }
 
-    protected void addBigFlip ()
+    protected void addBookmarkTip ()
     {
         add(Widgets.newLabel(_msgs.introBookmark(), "Title", "machine"));
         FluentTable intro = new FluentTable(5, 0);
@@ -106,6 +107,10 @@ public class LandingPage extends FlowPanel
             right().setText(_msgs.introBookmarkTip(), "Text");
         add(intro);
         add(Widgets.newShim(10, 10));
+    }
+
+    protected void addBigFlip ()
+    {
         Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
         link.addStyleName("BigFlip");
         link.addStyleName("machine");
