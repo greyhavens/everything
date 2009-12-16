@@ -46,6 +46,19 @@ public class RecruitGiftRecord extends PersistentRecord
         return ArrayUtil.indexOf(giftIds, thingId);
     }
 
+    /**
+     * Return true if there is a nonzero number of gifts here and all are ungifted.
+     */
+    public boolean isUnused ()
+    {
+        for (int gift : giftIds) {
+            if (gift == 0) {
+                return false;
+            }
+        }
+        return (giftIds.length > 0);
+    }
+
     // AUTO-GENERATED: METHODS START
     /**
      * Create and return a primary {@link Key} to identify a {@link RecruitGiftRecord}

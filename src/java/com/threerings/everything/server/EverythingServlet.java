@@ -55,6 +55,7 @@ import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.util.GameUtil;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -425,17 +426,25 @@ public class EverythingServlet extends EveryServiceServlet
      */
     protected List<Card> resolveRecruitGifts (PlayerRecord player)
     {
+        long now = System.currentTimeMillis();
         RecruitGiftRecord recruit = _playerRepo.loadRecruitGifts(player.userId);
-        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
+        if (recruit == null || (recruit.expires.getTime() < now)) {
+            // only give gifts if they're not super new
+            boolean giveGifts = !player.isNewByDays(2); // first few days: no gifts
+            // and if their last gift record was a few days old or if they never gifted anything..
+            if ((giveGifts && (recruit != null)) &&
+                    (recruit.isUnused() ||
+                        (recruit.expires.getTime() < (now - GameUtil.ONE_DAY)))) {
+                giveGifts = false;
+            }
             int[] gifts;
-            if (player.isNewByDays(2)) {
-                gifts = new int[0]; // wait a few days before we get them on the recruitment train
-
-            } else {
+            if (giveGifts) {
                 // load all the player's things of rarity II or less.
                 gifts = _thingLogic.getThingIndex().pickRecruitmentThings(
                     _thingRepo.loadPlayerThings(player.userId, null, Rarity.II)).toIntArray();
                 ArrayUtil.shuffle(gifts);
+            } else {
+                gifts = new int[0];
             }
             recruit = _playerRepo.storeRecruitGifts(player, gifts);
         }
