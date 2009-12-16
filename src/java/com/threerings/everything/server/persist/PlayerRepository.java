@@ -329,8 +329,13 @@ public class PlayerRepository extends DepotRepository
      */
     public int pruneGiftRecords ()
     {
+        // TODO: this was changed to keep the records for a few days because now I
+        // determine whether to give recruitment gifts by the behavior on previous days...
+        // If that is dumped, we can revert to expiring these records aggressively.
+        Timestamp oldness = Calendars.now().addDays(-3).toTimestamp();
         return deleteAll(RecruitGiftRecord.class,
-            new Where(RecruitGiftRecord.EXPIRES.lessThan(DateFuncs.now())));
+            new Where(RecruitGiftRecord.EXPIRES.lessThan(oldness)));
+            //new Where(RecruitGiftRecord.EXPIRES.lessThan(teFuncs.now())));
     }
 
     /**
