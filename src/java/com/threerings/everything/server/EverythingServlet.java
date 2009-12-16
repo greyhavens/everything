@@ -426,17 +426,11 @@ public class EverythingServlet extends EveryServiceServlet
      */
     protected List<Card> resolveRecruitGifts (PlayerRecord player)
     {
-        long now = System.currentTimeMillis();
         RecruitGiftRecord recruit = _playerRepo.loadRecruitGifts(player.userId);
-        if (recruit == null || (recruit.expires.getTime() < now)) {
-            // only give gifts if they're not super new
-            boolean giveGifts = !player.isNewByDays(2); // first few days: no gifts
-            // and if their last gift record was a few days old or if they never gifted anything..
-            if ((giveGifts && (recruit != null)) &&
-                    (recruit.isUnused() ||
-                        (recruit.expires.getTime() < (now - GameUtil.ONE_DAY)))) {
-                giveGifts = false;
-            }
+        if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
+            // only give gifts if they're not super new and if they actually used yesterday's
+            // gifts (or didn't get any yesterday).
+            boolean giveGifts = !player.isNewByDays(2) && ((recruit == null) || recruit.isUnused());
             int[] gifts;
             if (giveGifts) {
                 // load all the player's things of rarity II or less.
