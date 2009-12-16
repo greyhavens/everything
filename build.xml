@@ -175,7 +175,7 @@
     <!-- invoke the GWT compiler and grindy grindy grindy -->
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
-        <fileset dir="extlibs/java" includes="gwt-dev-*.jar"/> <!-- the GWT compiler -->
+        <fileset dir="extlibs/java" includes="gwt-dev-linux.jar"/> <!-- the GWT compiler -->
         <fileset dir="${deploy.dir}/lib">
           <include name="gwt-user.jar"/>
           <include name="gwt-utils*.jar"/>
