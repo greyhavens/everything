@@ -40,9 +40,10 @@
     <file name="extlibs/java/facebook-java-api.jar"/>
     <file name="extlibs/java/facebook-java-api-schema.jar"/>
     <file name="extlibs/java/google-collect.jar"/>
+    <file name="extlibs/java/guava.jar"/>
     <file name="extlibs/java/guice.jar"/>
     <file name="extlibs/java/guice-multibindings.jar"/>
-    <file name="extlibs/java/gwt-user.jar"/>
+    <file name="extlibs/java/gwt-user-2.0.jar"/>
     <file name="extlibs/java/jvnet-runtime.jar"/>
     <file name="extlibs/java/json.jar"/>
     <file name="extlibs/java/log4j.jar"/>
@@ -175,9 +176,9 @@
     <!-- invoke the GWT compiler and grindy grindy grindy -->
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
-        <fileset dir="extlibs/java" includes="gwt-dev-linux.jar"/> <!-- the GWT compiler -->
+        <fileset dir="extlibs/java" includes="gwt-dev-2.0.jar"/> <!-- the GWT compiler -->
         <fileset dir="${deploy.dir}/lib">
-          <include name="gwt-user.jar"/>
+          <include name="gwt-user-2.0.jar"/>
           <include name="gwt-utils*.jar"/>
           <include name="samskivert-gwt*.jar"/>
           <include name="samsara-app*.jar"/>
@@ -211,19 +212,32 @@
   <target name="gshell" depends="prepare" description="Runs our GWT client in HostedMode.">
     <java fork="true" classname="com.google.gwt.dev.HostedMode">
       <classpath>
-        <pathelement path="lib/gwt/gwt-dev-linux.jar"/>
-        <pathelement path="${deploy.dir}/lib/gwt-user.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-dev-2.0.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-user-2.0.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samsara-app-0.0-SNAPSHOT.jar"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="${gsrc.dir}"/>
       </classpath>
+      <jvmarg value="-XstartOnFirstThread"/>
+      <jvmarg value="-Xmx256M"/>
+      <jvmarg value="-d32"/>
       <arg value="-noserver"/>
       <arg value="-port"/>
       <arg value="8080"/>
       <arg value="-startupUrl"/>
       <arg value="candidate/everything/auth?user=${gshell_username}&amp;pass=${gshell_password}"/>
+      <arg value="-whitelist"/>
+      <arg value="^http[:][/][/]api[.]connect[.]facebook[.]com"/>
+      <arg value="-whitelist"/>
+      <arg value="^https[:][/][/]login[.]facebook[.]com"/>
+      <arg value="-whitelist"/>
+      <arg value="^http[:][/][/]www[.]facebook[.]com"/>
+      <arg value="-whitelist"/>
+      <arg value="^http[:][/][/]apps[.]facebook[.]com"/>
+      <arg value="-whitelist"/>
+      <arg value="^http[:][/][/]malacca[.]sea[.]earth[.]threerings[.]net"/>
       <arg value="-war"/>
       <arg value="${deploy.dir}/gwt"/>
       <arg value="everything"/>
