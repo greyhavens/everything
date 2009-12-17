@@ -37,17 +37,17 @@ public class ThingDialog
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                        " card and completed the " + card.getSeries() +
                                        " series in Everything!",
-                               "Celebrate your completed series:", "Woo hoo!");
+                               "Celebrate your completed series:");
         } else if (card.giver != null) {
             return makeHandler(ctx, "got_gift", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                        " card from " + card.giver + " in Everything.",
-                               "Thank your friend for this great gift:", "Thanks!");
+                               "Thank your friend for this great gift:");
         } else {
             return makeHandler(ctx, "got_card", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
-                                       " card in Everything.",
-                               "Tell your friends about this awesome card:", "Woo!");
+                                   " card in Everything.",
+                               "Tell your friends about this awesome card:");
         }
     }
 
@@ -59,7 +59,7 @@ public class ThingDialog
         return makeHandler(ctx, "want_card", card,
                            "" + ctx.getMe() + " wants the " + card.thing.name +
                                    " card in Everything.",
-                           "Let your friends know you want this card:", "I wants it!");
+                           "Let your friends know you want this card:");
     }
 
     /**
@@ -71,7 +71,7 @@ public class ThingDialog
                    "" + ctx.getMe() + " gave the " + card.thing.name + " card to " + target +
                             " in Everything.",
                    card,
-                   target, "Tell your friends why you gave " + target.name + " this card:", "");
+                   target, "Tell your friends why you gave " + target.name + " this card:");
     }
 
     /**
@@ -88,7 +88,7 @@ public class ThingDialog
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog("", title, message,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   imageURL, joinURL, joinURL, "Recruit your friends:", "" /* message */,
+                   imageURL, joinURL, joinURL, "Recruit your friends:",
                    new Command() { // complete callback
                        public void execute () {
                            _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
@@ -110,18 +110,18 @@ public class ThingDialog
 
     protected static ClickHandler makeHandler (final Context ctx, final String vec,
                                                final Card card, final String title,
-                                               final String prompt, final String message)
+                                               final String prompt)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
-                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, message);
+                showDialog(ctx, vec, targetId, title, card, card.owner, prompt);
             }
         };
     }
 
     protected static void showDialog (Context ctx, String vec, String targetId, String title,
-                                      Card card, PlayerName owner, String prompt, String message)
+                                      Card card, PlayerName owner, String prompt)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
         String cardURL = ctx.getEverythingURL(
@@ -130,7 +130,7 @@ public class ThingDialog
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   imageURL, cardURL, everyURL, prompt, message,
+                   imageURL, cardURL, everyURL, prompt,
                    new Command() { // complete callback
                        public void execute () {
                            _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
@@ -152,7 +152,7 @@ public class ThingDialog
     protected static native void showDialog (String targetId, String title, String descrip,
                                              String categories, String rarity,
                                              String imageURL, String cardURL, String everyURL,
-                                             String prompt, String message,
+                                             String prompt,
                                              Command onComplete, Command onIncomplete) /*-{
         var attachment = {
             'name': title,
@@ -168,7 +168,7 @@ public class ThingDialog
         };
         var actions = [{ "text": "Collect Everything",
                          "href": everyURL }];
-        $wnd.FB.Connect.streamPublish(message, attachment, actions, targetId, prompt,
+        $wnd.FB.Connect.streamPublish("", attachment, actions, targetId, prompt,
             function (postId, exception) {
                 if ((postId != null) && (postId != "null")) { // holy shit, what a fiasco
                     onComplete.@com.google.gwt.user.client.Command::execute()();
