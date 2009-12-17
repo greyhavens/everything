@@ -15,6 +15,7 @@ import com.threerings.gwt.util.Value;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.News;
 
+import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -57,15 +58,18 @@ public class LandingPage extends FlowPanel
             return;
         }
 
+        // TODO: use FQL to determine if they've bookmarked or not and provide additional prompting
+        add(XFBML.newInlineTag("bookmark"));
+
         if (attractorId != 0 && ctx.isNewbie()) {
             // show extra help for a new player that arrived via an attractor
             addInstructions();
             add(Widgets.newShim(10, 10));
-            addBookmarkTip();
+            //addBookmarkTip();
 
         } else if (ctx.isNewbie()) {
             // don't confuse newbies with too many options
-            addBookmarkTip();
+            //addBookmarkTip();
 
         } else if (news != null && news.get() != null) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
@@ -82,6 +86,15 @@ public class LandingPage extends FlowPanel
         if (ctx.isEditor()) {
             add(Widgets.newLabel("Build: " + Build.time(), "machine"));
         }
+    }
+
+    @Override
+    protected void onLoad ()
+    {
+        super.onLoad();
+        // Strangely, this doesn't seem to be necessary. Maybe we're getting handled
+        // by the header?
+        XFBML.parse(this);
     }
 
     protected void addInstructions ()
