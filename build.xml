@@ -209,10 +209,10 @@
     </apply>
   </target>
 
-  <target name="gshell" depends="prepare" description="Runs our GWT client in HostedMode.">
-    <java fork="true" classname="com.google.gwt.dev.HostedMode">
+  <target name="gdevmode" depends="gclient" description="Runs development mode.">
+    <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
-        <pathelement path="${deploy.dir}/lib/gwt-dev-2.0.jar"/>
+        <pathelement path="extlibs/java/gwt-dev-2.0.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-user-2.0.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
