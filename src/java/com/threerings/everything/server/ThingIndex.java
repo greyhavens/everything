@@ -229,8 +229,8 @@ public class ThingIndex
                 break;
             }
         }
-        // then select up to 2 more from the player's collection
-        int count = Math.min(2, playerThingIds.size() - giftIds.size());
+        // then select up to 1 or 2 more from the player's collection
+        int count = Math.min(1 + _rando.nextInt(2), playerThingIds.size() - giftIds.size());
         if (count > 0) {
             selectThings(getThings(playerThingIds), count, giftIds, giftIds);
         }
