@@ -430,7 +430,8 @@ public class EverythingServlet extends EveryServiceServlet
         if (recruit == null || (recruit.expires.getTime() < System.currentTimeMillis())) {
             // only give gifts if they're not super new and if they actually used yesterday's
             // gifts (or didn't get any yesterday).
-            boolean giveGifts = !player.isNewByDays(2) && ((recruit == null) || recruit.isUnused());
+            boolean giveGifts = !player.isNewByDays(2) &&
+                ((recruit == null) || !recruit.isUnused());
             int[] gifts;
             if (giveGifts) {
                 // load all the player's things of rarity II or less.
