@@ -44,7 +44,7 @@ public class EditFAQPage extends FlowPanel
         add(Widgets.newLabel(_msgs.faqGlyphsTitle(), "machine"));
         add(Widgets.newHTML(_msgs.faqGlyphs()));
 
-        add(Args.createLink("Back to Add Things", Page.EDIT_CATS));
+        add(Args.createLink("Back to Editor Page", Page.EDIT_CATS));
     }
 
     protected EditorMessages _msgs = GWT.create(EditorMessages.class);

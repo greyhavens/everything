@@ -61,6 +61,15 @@ public class LandingPage extends FlowPanel
         // TODO: use FQL to determine if they've bookmarked or not and provide additional prompting
         add(XFBML.newInlineTag("bookmark"));
 
+        // maybe tell them about how it all works
+        int expLevel = ctx.getGridsConsumed() - Context.EXPERIENCED_GRIDS;
+        if (!ctx.isEditor() && (expLevel == 0 || expLevel == 1)) {
+            add(Widgets.newShim(20, 20));
+            add(Widgets.newLabel("Experienced Player!", "Title"));
+            add(Widgets.newLabel(_msgs.experiencedMsg(), "Text"));
+            add(Widgets.newShim(10, 10));
+        }
+
         if (attractorId != 0 && ctx.isNewbie()) {
             // show extra help for a new player that arrived via an attractor
             addInstructions();

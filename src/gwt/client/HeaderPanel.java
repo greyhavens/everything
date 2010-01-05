@@ -34,9 +34,9 @@ public class HeaderPanel extends FlowPanel
         }
 
         FlowPanel extras = Widgets.newFlowPanel("machine");
-        if (ctx.isEditor()) {
+        if ((ctx.getGridsConsumed() >= Context.EXPERIENCED_GRIDS) || ctx.isEditor()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Add Things", Page.EDIT_CATS));
+            extras.add(Args.createInlink("Editors", Page.EDIT_CATS));
         }
         if (ctx.isAdmin()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));

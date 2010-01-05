@@ -16,6 +16,9 @@ import com.threerings.gwt.util.Value;
  */
 public interface Context
 {
+    /** The number of grids a user must have seen before we consider them fairly experienced. */
+    public static final int EXPERIENCED_GRIDS = 20;
+
     /** Configures the main client display. */
     void setContent (Widget widget);
 
@@ -39,6 +42,9 @@ public interface Context
 
     /** Returns true if this player is still pretty new. */
     boolean isNewbie ();
+
+    /** Returns the number of grids this user has consumed. */
+    int getGridsConsumed ();
 
     /** Returns whether this player has editor privileges. */
     boolean isEditor ();

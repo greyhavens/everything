@@ -32,6 +32,7 @@ import client.admin.PlayersPage;
 import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditFAQPage;
+import client.editor.EditIntroPage;
 import client.editor.EditSeriesPage;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
@@ -142,6 +143,12 @@ public class EverythingClient
     public boolean isNewbie ()
     {
         return _data.gridsConsumed < NEWBIE_GRIDS;
+    }
+
+    // from interface Context
+    public int getGridsConsumed ()
+    {
+        return _data.gridsConsumed;
     }
 
     // from interface Context
@@ -273,6 +280,10 @@ public class EverythingClient
                 setContent(new EditSeriesPage(this, args.get(0, 0)));
                 return;
             }
+
+        } else if (args.page == Page.EDIT_CATS) {
+            setContent(new EditIntroPage(this));
+            return;
         }
 
         // these are OK for admins
