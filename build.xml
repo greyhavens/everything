@@ -39,7 +39,6 @@
     <file name="extlibs/java/commons-logging.jar"/>
     <file name="extlibs/java/facebook-java-api.jar"/>
     <file name="extlibs/java/facebook-java-api-schema.jar"/>
-    <file name="extlibs/java/google-collect.jar"/>
     <file name="extlibs/java/guava.jar"/>
     <file name="extlibs/java/guice.jar"/>
     <file name="extlibs/java/guice-multibindings.jar"/>

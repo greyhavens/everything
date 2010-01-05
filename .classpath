@@ -6,10 +6,10 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/samsara"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/easymock/easymock.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/guice.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/gwt-user.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/gwt-user-2.0.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/aopalliance.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-collections.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/google-collect.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/guava.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/junit4.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/servlet-api.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/velocity-1.5-dev.jar"/>
