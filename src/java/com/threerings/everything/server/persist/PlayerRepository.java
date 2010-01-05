@@ -492,8 +492,9 @@ public class PlayerRepository extends DepotRepository
     /** Helper for {@link #loadIdlePlayers}. */
     protected SQLExpression fromTo (int daysAgo, int hour)
     {
-        Timestamp from = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour).toTimestamp();
-        Timestamp to = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour+1).toTimestamp();
+        Calendars.Builder builder = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour);
+        Timestamp from = builder.toTimestamp();
+        Timestamp to = builder.addHours(1).toTimestamp();
         return Ops.and(PlayerRecord.LAST_SESSION.greaterEq(from),
                        PlayerRecord.LAST_SESSION.lessThan(to));
     }
