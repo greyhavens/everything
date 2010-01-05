@@ -278,13 +278,18 @@ public class GameServlet extends EveryServiceServlet
             thingIds.add(thing.thingId);
         }
 
-        // determine which friends do not have a card with this thing on it
+        // determine which friends do not have a card with this thing on it,
+        // including friends who have it as a pending gift
         Set<Integer> friendIds = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
         friendIds.removeAll(_gameRepo.countCardHoldings(
-                                friendIds, Collections.singleton(thingId)).keySet());
+                                friendIds, Collections.singleton(thingId), true).keySet());
 
         // count up how many of the cards in this series are held by these friends
-        IntIntMap holdings = _gameRepo.countCardHoldings(friendIds, thingIds);
+        // Note that here we do NOT count pending gifts, as that may encourage a friend to
+        // give you a second card in the same series when aren't *really* collecting it yet-
+        // you may opt to sell the first gift and there's no reason to make it look like
+        // you are a "collector" of that series...
+        IntIntMap holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
 
         // load up the names of those friends
         IntMap<PlayerName> names = _playerRepo.loadPlayerNames(friendIds);

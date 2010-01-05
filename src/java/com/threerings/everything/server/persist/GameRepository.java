@@ -292,8 +292,17 @@ public class GameRepository extends DepotRepository
      * Counts up and returns the number of cards in the supplied set of things that are held by
      * each of the specified owners.
      */
-    public IntIntMap countCardHoldings (Set<Integer> ownerIds, Set<Integer> thingIds)
+    public IntIntMap countCardHoldings (
+        Set<Integer> ownerIds, Set<Integer> thingIds, boolean includeUnopenedGifts)
     {
+        if (includeUnopenedGifts) {
+            Set<Integer> ids = Sets.newHashSet();
+            for (Integer id : ownerIds) {
+                ids.add(id);
+                ids.add(-id); // gifts are stored by negative ownerId
+            }
+            ownerIds = ids;
+        }
         IntIntMap data = new IntIntMap();
         for (OwnerRecord orec : findAll(OwnerRecord.class,
                                         new FieldOverride(OwnerRecord.COUNT,
@@ -301,7 +310,7 @@ public class GameRepository extends DepotRepository
                                         new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
                                                           CardRecord.THING_ID.in(thingIds))),
                                         new GroupBy(CardRecord.OWNER_ID))) {
-            data.put(orec.ownerId, orec.count);
+            data.increment(Math.abs(orec.ownerId), orec.count);
         }
         return data;
     }
