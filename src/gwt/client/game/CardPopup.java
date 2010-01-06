@@ -79,6 +79,33 @@ public class CardPopup extends PopupPanel
         return popup;
     }
 
+    /**
+     * Create a Sell button (can be put on another popup...)
+     */
+    public static PushButton createSellButton (
+        final Context ctx, final Card card, final Value<SlotStatus> status,
+        final GameServiceAsync gameSvc, final Runnable onSold)
+    {
+        PushButton sell = ButtonUI.newButton("Sell");
+        sell.setTitle("Sell this card back for half its value.");
+        new ClickCallback<Integer>(sell) {
+            protected boolean callService () {
+                gameSvc.sellCard(card.thing.thingId, card.received.getTime(), this);
+                return true;
+            }
+            protected boolean gotResult (Integer result) {
+                // let the client know we have an updated coins value
+                ctx.getCoins().update(result);
+                status.update(SlotStatus.SOLD);
+                onSold.run();
+                return false;
+            }
+        }.setConfirmHTML("You can sell the <b>" + card.thing.name + "</b> card for <b>" +
+                         CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
+                         "Do you want to sell it?");
+        return sell;
+    }
+
     /** Constructor for recruitment gift cards. */
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
@@ -187,29 +214,17 @@ public class CardPopup extends PopupPanel
             status = "You have " + have + " of " + total + " " + card.getSeries().name + ".";
         }
 
-        PushButton sell = ButtonUI.newButton("Sell");
-        sell.setTitle("Sell this card back for half its value.");
-        new ClickCallback<Integer>(sell) {
-            protected boolean callService () {
-                _gamesvc.sellCard(card.thing.thingId, card.received.getTime(), this);
-                return true;
-            }
-            protected boolean gotResult (Integer result) {
-                // let the client know we have an updated coins value
-                _ctx.getCoins().update(result);
-                onHide().onClick(null);
-                _status.update(SlotStatus.SOLD);
-                return false;
-            }
-        }.setConfirmHTML("You can sell the <b>" + card.thing.name + "</b> card for <b>" +
-                         CoinLabel.getCoinHTML(card.thing.rarity.saleValue()) + "</b>. " +
-                         "Do you want to sell it?");
-
-        PushButton gift = ButtonUI.newButton(
-            "Gift", GiftCardPopup.onClick(_ctx, card, new Runnable() {
+        PushButton sell = createSellButton(_ctx, card, _status, _gamesvc,
+            new Runnable() {
                 public void run () {
                     onHide().onClick(null);
-                    _status.update(SlotStatus.GIFTED);
+                }
+            });
+
+        PushButton gift = ButtonUI.newButton(
+            "Gift", GiftCardPopup.onClick(_ctx, card, _status, new Runnable() {
+                public void run () {
+                    onHide().onClick(null);
                 }
             }, this));
         gift.setTitle("Give this card to a friend.");

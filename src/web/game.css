@@ -475,6 +475,10 @@
   font-weight: bold;
 }
 
+.giftCard .Buttons {
+  width: 100%;
+}
+
 .giftCard .Buttons .wideButton {
   margin: 0px 0px 0px auto;
 }

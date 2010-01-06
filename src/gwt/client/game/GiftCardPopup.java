@@ -20,11 +20,13 @@ import com.threerings.gwt.ui.EscapeClickAdapter;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.FriendCardInfo;
+import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
@@ -39,24 +41,29 @@ import client.util.Prefs;
  */
 public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
 {
-    public static ClickHandler onClick (final Context ctx, final Card card, final Runnable onGifted,
-                                        final Widget trigger)
+    /**
+     * @param onCardSent called when the card is gifted OR sold.
+     */
+    public static ClickHandler onClick (
+        final Context ctx, final Card card, final Value<SlotStatus> status,
+        final Runnable onSent, final Widget trigger)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ctx.displayPopup(new GiftCardPopup(ctx, card, onGifted), trigger);
+                ctx.displayPopup(new GiftCardPopup(ctx, card, status, onSent), trigger);
             }
         };
     }
 
-    public GiftCardPopup (Context ctx, Card card, final Runnable onGifted)
+    public GiftCardPopup (Context ctx, Card card, Value<SlotStatus> status, final Runnable onSent)
     {
         super("giftCard", ctx);
         _card = card;
-        _onGifted = new Runnable() {
+        _status = status;
+        _onSent = new Runnable() {
             public void run () {
                 hide();
-                onGifted.run();
+                onSent.run();
             }
         };
         _gamesvc.getGiftCardInfo(card.thing.thingId,
@@ -105,11 +112,14 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 _ctx.displayPopup(new InvitePopup(_ctx, _card, new Runnable() {
                     public void run () {
                         Popups.info("Card sent! Thanks for sharing the Everything love.");
-                        _onGifted.run();
+                        _status.update(SlotStatus.GIFTED);
+                        _onSent.run();
                     }
                 }), GiftCardPopup.this);
             }
         }));
+
+        PushButton sell = CardPopup.createSellButton(_ctx, _card, _status, _gamesvc, _onSent);
 
         return Widgets.newFlowPanel(
             Widgets.newLabel("Send " + _card.thing.name + " to a Facebook friend:", "machine"),
@@ -117,7 +127,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             Widgets.newShim(10, 10),
             Widgets.newLabel("Send " + _card.thing.name + " to an Everything friend:", "machine"),
             Widgets.newScrollPanelY(grid, 190),
-            Widgets.newFlowPanel("Buttons", ButtonUI.newButton("Cancel", onHide())));
+            Widgets.newRow("Buttons", sell, ButtonUI.newButton("Cancel", onHide())));
     }
 
     protected PopupPanel makeGiftPopup (final FriendCardInfo info)
@@ -159,7 +169,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                     Popups.info("Card gifted. Your friend will be so happy!");
                 }
                 hider.onClick(null); // hide ourselves
-                _onGifted.run();
+                _status.update(SlotStatus.GIFTED);
+                _onSent.run();
                 if (post.getValue()) {
                     ThingDialog.showGifted(_ctx, _card, info.friend);
                 }
@@ -172,8 +183,9 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
     }
 
     protected Card _card;
+    protected Value<SlotStatus> _status;
     protected long _received;
-    protected Runnable _onGifted;
+    protected Runnable _onSent;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
