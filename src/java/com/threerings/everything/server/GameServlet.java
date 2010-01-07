@@ -23,7 +23,6 @@ import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
-import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -614,15 +613,15 @@ public class GameServlet extends EveryServiceServlet
         }
         // OK! pick a card
         ThingIndex index = _thingLogic.getThingIndex();
-        Tuple<Integer, Tuple<String, String>> att = index.pickAttractor();
+        AttractorInfo att = index.pickAttractor();
         if (att == null) {
             return null; // nothing to pick!
         }
 
         BonanzaInfo info = new BonanzaInfo();
-        info.card = _gameLogic.resolveCard(att.left);
-        info.title = feedReplacements(att.right.left, player);
-        info.message = feedReplacements(att.right.right, player);
+        info.card = _gameLogic.resolveCard(att.thingId);
+        info.title = feedReplacements(att.title, player);
+        info.message = feedReplacements(att.message, player);
         return info;
     }
 

@@ -8,8 +8,13 @@ import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Column;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
+import com.samskivert.depot.util.RuntimeUtil;
+
+import com.google.common.base.Function;
 
 import com.threerings.everything.data.Thing;
+
+import com.threerings.everything.server.AttractorInfo;
 
 /**
  * Contains cute upselly text for particularly cool things in our database.
@@ -52,4 +57,16 @@ public class AttractorRecord extends PersistentRecord
                 new Comparable[] { thingId });
     }
     // AUTO-GENERATED: METHODS END
+
+    /** A function for converting this record to an {@link AttractorInfo}. */
+    public static Function<AttractorRecord, AttractorInfo> TO_INFO =
+        RuntimeUtil.makeToRuntime(AttractorRecord.class, AttractorInfo.class);
+
+    /**
+     * Turns this into an AttractorInfo.
+     */
+    public AttractorInfo toInfo ()
+    {
+        return TO_INFO.apply(this);
+    }
 }

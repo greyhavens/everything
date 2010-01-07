@@ -24,7 +24,6 @@ import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
 import com.samskivert.util.StringUtil;
-import com.samskivert.util.Tuple;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.AttractorRecord;
@@ -72,7 +71,7 @@ public class ThingIndex
                 continue;
             }
             _attractorThings.add(info);
-            _attractors.put(attractor.thingId, Tuple.newTuple(attractor.title, attractor.message));
+            _attractors.put(attractor.thingId, attractor.toInfo());
         }
 
         log.info("Updated things index",
@@ -253,9 +252,8 @@ public class ThingIndex
 
     /**
      * Pick an attractor card.
-     * TODO: clean up tuple mess?
      */
-    public Tuple<Integer, Tuple<String, String>> pickAttractor ()
+    public AttractorInfo pickAttractor ()
     {
         if (_attractorThings.size() == 0) {
             return null;
@@ -265,8 +263,7 @@ public class ThingIndex
         if (pick.isEmpty()) {
             return null;
         }
-        int thingId = pick.interator().nextInt();
-        return Tuple.newTuple(thingId, _attractors.get(thingId));
+        return _attractors.get(pick.interator().nextInt());
     }
 
     public boolean isAttractor (int thingId)
@@ -415,7 +412,7 @@ public class ThingIndex
     protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
-    protected IntMap<Tuple<String,String>> _attractors = IntMaps.newHashIntMap();
+    protected IntMap<AttractorInfo> _attractors = IntMaps.newHashIntMap();
     protected ThingList _attractorThings = new ThingList();
 
     { // initialize the _byrare map
