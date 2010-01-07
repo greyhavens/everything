@@ -421,8 +421,6 @@ public class EverythingServlet extends EveryServiceServlet
 
     /**
      * Resolve the player's daily recruitment gift.
-     * @return null (for no gift), a blank Card instance (to indicate already gifted) or a
-     * Card.
      */
     protected List<Card> resolveRecruitGifts (PlayerRecord player)
     {
