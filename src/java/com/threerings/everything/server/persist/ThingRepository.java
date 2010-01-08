@@ -28,11 +28,11 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.SQLExpression;
-import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
@@ -357,7 +357,7 @@ public class ThingRepository extends DepotRepository
         if (maxRarity != null) {
             whereConds.add(ThingRecord.RARITY.lessEq(maxRarity));
         }
-        return new ArrayIntSet(
+        return IntSets.create(
             findAllKeys(ThingRecord.class, false,
                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
                         new Where(Ops.and(whereConds)))

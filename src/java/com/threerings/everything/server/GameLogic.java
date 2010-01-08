@@ -19,12 +19,12 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
@@ -100,7 +100,7 @@ public class GameLogic
 
         // load up all the cards in the grid
         IntMap<Thing> things = IntMaps.newHashIntMap();
-        for (Thing thing : _thingRepo.loadThings(new ArrayIntSet(record.thingIds))) {
+        for (Thing thing : _thingRepo.loadThings(IntSets.create(record.thingIds))) {
             things.put(thing.thingId, thing);
         }
 
@@ -284,12 +284,12 @@ public class GameLogic
         throws ServiceException
     {
         ThingIndex index = _thingLogic.getThingIndex();
-        IntSet thingIds = new ArrayIntSet();
+        IntSet thingIds = IntSets.create();
 
         // load up this player's collection summary, identify incomplete series
         Multimap<Integer, Integer> collection = _gameRepo.loadCollection(player.userId, index);
-        IntSet haveIds = new ArrayIntSet(collection.values());
-        IntSet haveCats = new ArrayIntSet();
+        IntSet haveIds = IntSets.create(collection.values());
+        IntSet haveCats = IntSets.create();
         for (int categoryId : collection.keySet()) {
             if (index.getCategorySize(categoryId) > collection.get(categoryId).size()) {
                 haveCats.add(categoryId);
@@ -343,7 +343,7 @@ public class GameLogic
         }
 
         // if they requested all new cards, load up the things they own
-        IntSet excludeIds = (pup == Powerup.ALL_NEW_CARDS) ? haveIds : new ArrayIntSet();
+        IntSet excludeIds = (pup == Powerup.ALL_NEW_CARDS) ? haveIds : IntSets.create();
 
         // now select the remainder randomly from all possible things
         int randoCount = Grid.GRID_SIZE - thingIds.size();
@@ -376,7 +376,7 @@ public class GameLogic
     protected IntSet resolveOwnedCats (int userId, ThingIndex index)
     {
         IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(userId);
-        IntSet ownedCats = new ArrayIntSet();
+        IntSet ownedCats = IntSets.create();
         for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
             if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
                 ownedCats.add(entry.getIntKey());

@@ -19,10 +19,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -365,8 +365,7 @@ public class GameServlet extends EveryServiceServlet
         Thing thing = _thingRepo.loadThing(thingId);
 
         // see if the player already has one
-        List<CardRecord> cards = _gameRepo.loadCards(
-            player.userId, new ArrayIntSet(new int[] { thingId }), false);
+        List<CardRecord> cards = _gameRepo.loadCards(player.userId, IntSets.create(thingId), false);
         if (!cards.isEmpty()) {
             // TODO: xlate
             throw new ServiceException("You already have the " + thing.name + " card!");
@@ -638,8 +637,7 @@ public class GameServlet extends EveryServiceServlet
 
     /** Old attractors that are no longer in the database but
      * which we still allow to be received. */
-    protected static final IntSet OLD_ATTRACTORS = new ArrayIntSet(
-        new int[] { 648 /* Crack */ });
+    protected static final IntSet OLD_ATTRACTORS = IntSets.create(648); // Crack
 
     /** The percent chance that a free flip will find a bonanza card. */
     protected static final double BONANZA_CHANCE = 0.2; // 20%

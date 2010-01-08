@@ -18,12 +18,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
-import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.Interator;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.data.Rarity;
@@ -131,7 +131,7 @@ public class ThingIndex
      */
     public IntSet computeNeeded (Multimap<Integer, Integer> collection)
     {
-        IntSet needed = new ArrayIntSet();
+        IntSet needed = IntSets.create();
         for (Map.Entry<Integer, Collection<Integer>> entry : collection.asMap().entrySet()) {
             int catId = entry.getKey();
             Collection<Integer> heldIds = entry.getValue();
@@ -160,7 +160,7 @@ public class ThingIndex
      */
     public void selectThingsFrom (IntSet catIds, int count, IntSet into)
     {
-        selectThingsFrom(catIds, count, new ArrayIntSet(), into);
+        selectThingsFrom(catIds, count, IntSets.create(), into);
     }
 
     /**
@@ -217,7 +217,7 @@ public class ThingIndex
      */
     public int pickBirthdayThing (IntSet ownedCats, IntSet heldRares)
     {
-        IntSet into = new ArrayIntSet();
+        IntSet into = IntSets.create();
         // pick a rare gift from a category they collect
         ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
         if (things.size() >= 1) {
@@ -226,7 +226,7 @@ public class ThingIndex
 
         // if that didn't work, pick a random rarity X item
         if (into.isEmpty()) {
-            pickThingOf(Rarity.X, new ArrayIntSet(), into);
+            pickThingOf(Rarity.X, IntSets.create(), into);
         }
 
         // cope if we've got nothing
@@ -238,7 +238,7 @@ public class ThingIndex
      */
     public IntSet pickRecruitmentThings (IntSet playerThingIds)
     {
-        IntSet giftIds = new ArrayIntSet();
+        IntSet giftIds = IntSets.create();
         // try 10 times to pick a Rarity II or less fully-random thing
         for (int ii = 0; ii < 10; ii++) {
             int thingId = pickWeightedThing(_things);
@@ -277,7 +277,7 @@ public class ThingIndex
         if (_attractorThings.size() == 0) {
             return null;
         }
-        ArrayIntSet pick = new ArrayIntSet(1);
+        IntSet pick = IntSets.create();
         selectThings(_attractorThings, 1, pick, pick);
         if (pick.isEmpty()) {
             return null;
@@ -329,7 +329,7 @@ public class ThingIndex
     {
         if ((excludeIds.size() / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD) {
             things = things.copyWithout(excludeIds);
-            excludeIds = new ArrayIntSet();
+            excludeIds = IntSets.create();
         }
 
         // select the requested number of random things
@@ -384,7 +384,7 @@ public class ThingIndex
             thingId = info.thingId;
             categoryId = info.categoryId;
             rarity = info.rarity;
-            weight = (int) Math.round(rarity.weight() * adjust);
+            weight = Math.round(rarity.weight() * adjust);
         }
 
         public ThingInfo copyWeighted (IntMap<Float> preferences)

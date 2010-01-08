@@ -19,9 +19,10 @@ import com.google.inject.Singleton;
 
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
-import com.samskivert.util.ArrayIntSet;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntMap;
+import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 import com.samskivert.util.Tuple;
 
 import com.threerings.everything.client.GameCodes;
@@ -46,7 +47,7 @@ public class PlayerLogic
     public <T, L extends Iterable<T>> L resolveNames (L objects, PlayerName... resolved)
     {
         // extract the set of ids we need to resolve
-        ArrayIntSet ids = new ArrayIntSet();
+        IntSet ids = IntSets.create();
         for (T object : objects) {
             try {
                 for (Field field : getNameFields(object.getClass())) {
