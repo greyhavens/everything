@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +37,13 @@ import static com.threerings.everything.Log.log;
  * properly accounting for their rarity.
  */
 public class ThingIndex
+    implements Cloneable
 {
     public ThingIndex (
         IntIntMap catmap, Iterable<ThingInfoRecord> things, Iterable<AttractorRecord> attractors)
     {
         for (ThingInfoRecord thing : things) {
-            ThingInfo info = new ThingInfo();
-            info.thingId = thing.thingId;
-            info.categoryId = thing.categoryId;
-            info.rarity = thing.rarity;
+            ThingInfo info = new ThingInfo(thing);
             // resolve the categories of which this thing is a member
             int categoryId = thing.categoryId;
             while (categoryId != 0) {
@@ -79,6 +78,20 @@ public class ThingIndex
     }
 
     // TODO: support category or other limitations on thing selection
+
+    public ThingIndex copyWeighted (IntMap<Boolean> preferences)
+    {
+        if (preferences.isEmpty()) {
+            return this;
+        }
+        ThingIndex copy = (ThingIndex) clone();
+        copy._things = _things.copyWeighted(preferences);
+        copy._byrare = _byrare.clone();
+        for (Map.Entry<Rarity, ThingList> entry : copy._byrare.entrySet()) {
+            entry.setValue(entry.getValue().copyWeighted(preferences));
+        }
+        return copy;
+    }
 
     /**
      * Returns the category to which the specified thing belongs or 0 if the thing is unknown.
@@ -271,6 +284,19 @@ public class ThingIndex
         return _attractors.containsKey(thingId);
     }
 
+    // "from" Cloneable
+    public Object clone ()
+    {
+        try {
+            ThingIndex copy = (ThingIndex) super.clone();
+            copy._rando = new Random(_rando.nextLong());
+            return copy;
+
+        } catch (CloneNotSupportedException cnse) {
+            throw new AssertionError(cnse);
+        }
+    }
+
     protected ThingList getThings (IntSet thingIds)
     {
         ThingList things = new ThingList();
@@ -324,7 +350,7 @@ public class ThingIndex
     {
         int rando = _rando.nextInt(things.totalWeight());
         for (ThingInfo info : things) {
-            rando -= info.rarity.weight();
+            rando -= info.weight;
             if (rando < 0) {
                 return info.thingId;
             }
@@ -334,9 +360,32 @@ public class ThingIndex
 
     protected static class ThingInfo
     {
-        public int thingId;
-        public int categoryId;
-        public Rarity rarity;
+        public final int thingId;
+        public final int categoryId;
+        public final Rarity rarity;
+        public final int weight;
+
+        public ThingInfo (ThingInfoRecord record)
+        {
+            thingId = record.thingId;
+            categoryId = record.categoryId;
+            rarity = record.rarity;
+            weight = rarity.weight();
+        }
+
+        protected ThingInfo (ThingInfo info, boolean pref)
+        {
+            thingId = info.thingId;
+            categoryId = info.categoryId;
+            rarity = info.rarity;
+            weight = (int) Math.round(rarity.weight() * (pref ? 2 : .5));
+        }
+
+        public ThingInfo copyWeighted (IntMap<Boolean> preferences)
+        {
+            Boolean pref = preferences.get(categoryId);
+            return (pref == null) ? this : new ThingInfo(this, pref);
+        }
 
         public String toString () {
             return StringUtil.fieldsToString(this);
@@ -348,7 +397,7 @@ public class ThingIndex
     {
         public void add (ThingInfo info) {
             _things.add(info);
-            _totalWeight += info.rarity.weight();
+            _totalWeight += info.weight;
         }
 
         public int totalWeight () {
@@ -403,6 +452,18 @@ public class ThingIndex
             return that;
         }
 
+        public ThingList copyWeighted (IntMap<Boolean> preferences)
+        {
+            if (preferences.isEmpty()) {
+                return this;
+            }
+            ThingList that = new ThingList();
+            for (ThingInfo info : this) {
+                that.add(info.copyWeighted(preferences));
+            }
+            return that;
+        }
+
         protected int _totalWeight;
         protected List<ThingInfo> _things = Lists.newArrayList();
     }
@@ -410,7 +471,7 @@ public class ThingIndex
     protected ThingList _things = new ThingList();
     protected IntMap<ThingInfo> _byid = IntMaps.newHashIntMap();
     protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
-    protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
+    protected EnumMap<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
     protected IntMap<AttractorInfo> _attractors = IntMaps.newHashIntMap();
     protected ThingList _attractorThings = new ThingList();
