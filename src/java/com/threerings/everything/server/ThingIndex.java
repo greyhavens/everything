@@ -79,7 +79,13 @@ public class ThingIndex
 
     // TODO: support category or other limitations on thing selection
 
-    public ThingIndex copyWeighted (IntMap<Boolean> preferences)
+    /**
+     * Make a copy of this ThingIndex, with category weightings applied.
+     *
+     * @param preferences a mapping of categoryId -> weighting adjustment. Categories not specified
+     * will not be adjusted.
+     */
+    public ThingIndex copyWeighted (IntMap<Float> preferences)
     {
         if (preferences.isEmpty()) {
             return this;
@@ -373,18 +379,18 @@ public class ThingIndex
             weight = rarity.weight();
         }
 
-        protected ThingInfo (ThingInfo info, boolean pref)
+        protected ThingInfo (ThingInfo info, float adjust)
         {
             thingId = info.thingId;
             categoryId = info.categoryId;
             rarity = info.rarity;
-            weight = (int) Math.round(rarity.weight() * (pref ? 2 : .5));
+            weight = (int) Math.round(rarity.weight() * adjust);
         }
 
-        public ThingInfo copyWeighted (IntMap<Boolean> preferences)
+        public ThingInfo copyWeighted (IntMap<Float> preferences)
         {
-            Boolean pref = preferences.get(categoryId);
-            return (pref == null) ? this : new ThingInfo(this, pref);
+            Float adjust = preferences.get(categoryId);
+            return (adjust == null) ? this : new ThingInfo(this, adjust);
         }
 
         public String toString () {
@@ -452,7 +458,7 @@ public class ThingIndex
             return that;
         }
 
-        public ThingList copyWeighted (IntMap<Boolean> preferences)
+        public ThingList copyWeighted (IntMap<Float> preferences)
         {
             if (preferences.isEmpty()) {
                 return this;
