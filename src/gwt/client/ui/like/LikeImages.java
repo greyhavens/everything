@@ -11,21 +11,21 @@ import com.google.gwt.user.client.ui.ImageBundle;
  */
 public interface LikeImages extends ImageBundle
 {
-    @Resource("good.gif")
-    AbstractImagePrototype good ();
+    @Resource("pos.png")
+    AbstractImagePrototype pos ();
 
-    @Resource("neutral.gif")
-    AbstractImagePrototype neutral ();
+    @Resource("neu.png")
+    AbstractImagePrototype neu ();
 
-    @Resource("bad.jpg")
-    AbstractImagePrototype bad ();
+    @Resource("neg.png")
+    AbstractImagePrototype neg ();
 
-    @Resource("good_selected.gif")
-    AbstractImagePrototype good_selected ();
+    @Resource("pos_sel.png")
+    AbstractImagePrototype pos_selected ();
 
-    @Resource("neutral_selected.gif")
-    AbstractImagePrototype neutral_selected ();
+    @Resource("neu_sel.png")
+    AbstractImagePrototype neu_selected ();
 
-    @Resource("bad_selected.jpg")
-    AbstractImagePrototype bad_selected ();
+    @Resource("neg_sel.png")
+    AbstractImagePrototype neg_selected ();
 }
