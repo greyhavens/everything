@@ -30,6 +30,10 @@
   border: 1px solid #442D17;
 }
 
+.Series {
+  text-align: left;
+}
+
 /** CardView styles */
 .cardView {
   width: 603px;

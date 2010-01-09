@@ -30,6 +30,7 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
+import client.ui.LikeWidget;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -110,7 +111,7 @@ public class CardPopup extends PopupPanel
     protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
         this(ctx, status);
-        setWidget(createContents(card));
+        setWidget(createContents(card, null));
     }
 
     protected CardPopup (Context ctx, GameService.CardResult result, Value<SlotStatus> status)
@@ -125,7 +126,7 @@ public class CardPopup extends PopupPanel
         }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
-        setWidget(createContents(result.card));
+        setWidget(createContents(result.card, Value.create(result.liked)));
     }
 
     protected CardPopup (Context ctx, Value<SlotStatus> status)
@@ -159,22 +160,22 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    protected Widget createContents (Card card)
+    protected Widget createContents (Card card, Value<Boolean> liked)
     {
         // if we're looking at a recruitment gift, just have close and gift
         if (card.owner == null) {
-            return createRecruitGiftContents(card);
+            return createRecruitGiftContents(card, liked);
 
         // if we're looking at someone else's card, we don't need any fancy stuff
         } else if (!_ctx.getMe().equals(card.owner)) {
-            return createFriendCardContents(card);
+            return createFriendCardContents(card, liked);
 
         } else {
-            return createOwnCardContents(card);
+            return createOwnCardContents(card, liked);
         }
     }
 
-    protected Widget createRecruitGiftContents (final Card card)
+    protected Widget createRecruitGiftContents (final Card card, Value<Boolean> liked)
     {
         _title = "Give the gift of Everything...";
         PushButton gift = ButtonUI.newButton("Send", new ClickHandler() {
@@ -188,17 +189,18 @@ public class CardPopup extends PopupPanel
             }
         });
         PushButton cancel = ButtonUI.newButton("Cancel", onHide());
-        return CardView.create(card, _title, null, cancel, gift);
+        return CardView.create(card, liked, _title, null, cancel, gift);
     }
 
-    protected Widget createFriendCardContents (Card card)
+    protected Widget createFriendCardContents (Card card, Value<Boolean> liked)
     {
         PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
         want.setTitle("Post to your Facebook feed that you want this card.");
-        return CardView.create(card, _title, null, want, ButtonUI.newButton("Close", onHide()));
+        return CardView.create(
+            card, liked, _title, null, want, ButtonUI.newButton("Close", onHide()));
     }
 
-    protected Widget createOwnCardContents (final Card card)
+    protected Widget createOwnCardContents (final Card card, Value<Boolean> liked)
     {
         String status = null;
         if (_haveCount > 1) {
@@ -245,8 +247,8 @@ public class CardPopup extends PopupPanel
         // only "incentivize" sharing if you just completed a series or you just received a gift
         // (not when you are looking at a card gifted previously)
         return (completed || (wasGift && (_title != null))) ?
-            CardView.create(card, _title, status, sell, gift, keep, share) :
-            CardView.create(card, _title, status, sell, gift, share, keep);
+            CardView.create(card, liked, _title, status, sell, gift, keep, share) :
+            CardView.create(card, liked, _title, status, sell, gift, share, keep);
     }
 
     protected ClickHandler onHide ()

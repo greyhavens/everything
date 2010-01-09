@@ -10,10 +10,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.StringUtil;
+import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 
+import client.ui.LikeWidget;
 import client.ui.ShadowPanel;
 import client.util.ImageUtil;
 
@@ -25,7 +27,8 @@ public abstract class CardView extends FlowPanel
     /**
      * Creates a view for the specified card.
      */
-    public static Widget create (Card card, String header, String status, Widget... buttons)
+    public static Widget create (
+        Card card, Value<Boolean> liked, String header, String status, Widget... buttons)
     {
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
         String bgimage = "images/info_card.png";
@@ -35,7 +38,7 @@ public abstract class CardView extends FlowPanel
             bgimage = "images/info_card_tall.png";
         }
         box.add().setWidget(new CardView.Left(card), "Left").
-            right().setWidget(new CardView.Right(card), "Right");
+            right().setWidget(new CardView.Right(card, liked), "Right");
         if (header != null) { // if we have a header, we always need a status
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
@@ -91,10 +94,20 @@ public abstract class CardView extends FlowPanel
 
     protected static class Right extends CardView
     {
-        public Right (Card card)
+        public Right (Card card, Value<Boolean> liked)
         {
-            add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                 getCategoriesSize(card.categories)));
+            // TODO: make the alignment here not fucking suck
+            // TODO: cleanup a bit, never should have liked == null
+            if (liked == null) {
+                // no liked data
+                add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
+                                     getCategoriesSize(card.categories)));
+            } else {
+                add(Widgets.newRow("Series",
+                    Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
+                                     getCategoriesSize(card.categories)),
+                    new LikeWidget(card.getSeries().categoryId, liked)));
+            }
             FlowPanel info = Widgets.newFlowPanel(
                 "Info", Widgets.newLabel(card.thing.descrip),
                 Widgets.newLabel("Facts:", "FactsTitle"),

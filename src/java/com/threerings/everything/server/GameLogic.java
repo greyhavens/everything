@@ -44,6 +44,7 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
+import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.SlotStatusRecord;
@@ -75,11 +76,16 @@ public class GameLogic
     public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
         throws ServiceException
     {
+        IntMap<Float> preferences = IntMaps.newHashIntMap();
+        for (LikeRecord likeRec : _playerRepo.loadLikes(player.userId)) {
+            preferences.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
+        }
+
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
         grid.status = GridStatus.NORMAL;
-        grid.thingIds = selectGridThings(player, pup);
+        grid.thingIds = selectGridThings(player, pup, preferences);
         grid.expires = player.calculateNextExpires();
 
         // now that we successfully selected things for our grid, consume the powerup
@@ -280,10 +286,10 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    public int[] selectGridThings (PlayerRecord player, Powerup pup)
+    public int[] selectGridThings (PlayerRecord player, Powerup pup, IntMap<Float> preferences)
         throws ServiceException
     {
-        ThingIndex index = _thingLogic.getThingIndex();
+        ThingIndex index = _thingLogic.getThingIndex().copyWeighted(preferences);
         IntSet thingIds = IntSets.create();
 
         // load up this player's collection summary, identify incomplete series
@@ -485,6 +491,10 @@ public class GameLogic
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
+
+    protected static final Float LIKE_WEIGHT = 2f;
+
+    protected static final Float DISLIKE_WEIGHT = .5f;
 
     /** We'll try 10 times to pick a bonus card before giving up. */
     protected static final int MAX_BONUS_ATTEMPTS = 10;

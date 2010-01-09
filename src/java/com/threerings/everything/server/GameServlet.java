@@ -327,6 +327,15 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
+    public void setLike (int categoryId, Boolean like)
+        throws ServiceException
+    {
+        PlayerRecord player = requirePlayer();
+        // TODO: validate categoryId is valid (prevent malicious filling-up of the db?)
+        _playerRepo.setLike(player.userId, categoryId, like);
+    }
+
+    // from interface GameService
     public GameStatus bonanzaViewed (boolean posted)
         throws ServiceException
     {
@@ -572,6 +581,9 @@ public class GameServlet extends EveryServiceServlet
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        // load the user's like preference for the series
+        result.liked = _playerRepo.getLike(player.userId, thing.categoryId);
 
         // note that this player completed this series and if appropriate report to their feed
         if (result.thingsRemaining == 0) {

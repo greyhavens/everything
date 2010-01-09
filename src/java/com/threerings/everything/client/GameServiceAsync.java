@@ -58,6 +58,11 @@ public interface GameServiceAsync
     void giftCard (int thingId, long created, int friendId, String message, AsyncCallback<Void> callback);
 
     /**
+     * The async version of {@link GameService#setLike}.
+     */
+    void setLike (int categoryId, Boolean like, AsyncCallback<Void> callback);
+
+    /**
      * The async version of {@link GameService#bonanzaViewed}.
      */
     void bonanzaViewed (boolean posted, AsyncCallback<GameStatus> callback);

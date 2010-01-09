@@ -83,6 +83,9 @@ public interface GameService extends RemoteService
         /** The card in question. */
         public Card card;
 
+        /** Our like/dislike preference for this card's series. */
+        public Boolean liked;
+
         /** Number of this thing already held by this player (not including this one). */
         public int haveCount;
 
@@ -179,6 +182,11 @@ public interface GameService extends RemoteService
      * Gifts the specified card to the specified friend.
      */
     void giftCard (int thingId, long created, int friendId, String message) throws ServiceException;
+
+    /**
+     * Sets whether the player likes the specified category.
+     */
+    void setLike (int categoryId, Boolean like) throws ServiceException;
 
     /**
      * Notify the server that we've posted or skipped after seeing a bonanza card.

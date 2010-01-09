@@ -325,6 +325,44 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Load all the like records for the specified user.
+     */
+    public List<LikeRecord> loadLikes (int userId)
+    {
+        return findAll(LikeRecord.class, new Where(LikeRecord.USER_ID.eq(userId)));
+    }
+
+    /**
+     * Get the user's "like" preference for the specified category.
+     *
+     * @return null if the user has no preference.
+     */
+    public Boolean getLike (int userId, int categoryId)
+    {
+        LikeRecord rec = load(LikeRecord.getKey(userId, categoryId));
+        return (rec == null) ? null : rec.like;
+    }
+
+    /**
+     * Set the "like" preference for the specified category.
+     *
+     * @param like if null, the preference is erased.
+     */
+    public void setLike (int userId, int categoryId, Boolean like)
+    {
+        LikeRecord rec = new LikeRecord();
+        rec.userId = userId;
+        rec.categoryId = categoryId;
+        if (like != null) {
+            rec.like = like;
+            store(rec);
+
+        } else {
+            delete(rec);
+        }
+    }
+
+    /**
      * Expire any old recruitment gift records.
      */
     public int pruneGiftRecords ()
@@ -506,6 +544,7 @@ public class PlayerRepository extends DepotRepository
         classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
         classes.add(WishRecord.class);
+        classes.add(LikeRecord.class);
         classes.add(RecruitGiftRecord.class);
     }
 

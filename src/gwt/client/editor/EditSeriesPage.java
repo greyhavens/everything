@@ -421,7 +421,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             if (getWidgetCount() > 0) {
                 remove(0);
             }
-            insert(CardView.create(card, null, null, _edit), 0);
+            insert(CardView.create(card, null, null, null, _edit), 0);
         }
 
         protected FluentTable _ctrl;
