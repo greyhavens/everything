@@ -73,6 +73,19 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _cards = Value.create(coll.countCards());
             _series = Value.create(coll.countSeries());
             _completed = Value.create(coll.countCompletedSeries());
+            // initialize likes
+            _likes.clear();
+            if (coll.likes != null) {
+                // create a Value<Boolean> for every series, even if no preference was shipped down
+                for (Map<String, List<SeriesCard>> cat : coll.series.values()) {
+                    for (List<SeriesCard> subcat : cat.values()) {
+                        for (SeriesCard series : subcat) {
+                            _likes.put(series.categoryId,
+                                Value.create(coll.likes.get(series.categoryId)));
+                        }
+                    }
+                }
+            }
 
             _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded").
                 setRowSpan(3);
@@ -87,20 +100,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             XFBML.parse(this);
         }
         _coll = coll;
-
-        // initialize likes
-        _likes.clear();
-        if (coll.likes != null) {
-            // create a Value<Boolean> for every series, even if no preference was shipped down
-            for (Map<String, List<SeriesCard>> cat : coll.series.values()) {
-                for (List<SeriesCard> subcat : cat.values()) {
-                    for (SeriesCard series : subcat) {
-                        _likes.put(series.categoryId,
-                            Value.create(coll.likes.get(series.categoryId)));
-                    }
-                }
-            }
-        }
 
         // update our links every time as we may have switched between feed and collection
         Widget view;
