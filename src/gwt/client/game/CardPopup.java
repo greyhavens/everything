@@ -42,14 +42,14 @@ import client.util.PopupCallback;
 public class CardPopup extends PopupPanel
 {
     public static ClickHandler onClick (final Context ctx, final CardIdent ident,
-                                        final Value<SlotStatus> status)
+                                        final Value<SlotStatus> status, final Value<Boolean> liked)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 final Widget centerOn = (Widget)event.getSource();
                 _gamesvc.getCard(ident, new PopupCallback<Card>() {
                     public void onSuccess (Card card) {
-                        display(ctx, new CardPopup(ctx, card, status), centerOn);
+                        display(ctx, new CardPopup(ctx, card, status, liked), centerOn);
                     }
                 });
             }
@@ -63,7 +63,7 @@ public class CardPopup extends PopupPanel
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 final Widget centerOn = (Widget)event.getSource();
-                display(ctx, new CardPopup(ctx, card, status), centerOn);
+                display(ctx, new CardPopup(ctx, card, status, null), centerOn);
             }
         };
     }
@@ -108,10 +108,10 @@ public class CardPopup extends PopupPanel
     }
 
     /** Constructor for recruitment gift cards. */
-    protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
+    protected CardPopup (Context ctx, Card card, Value<SlotStatus> status, Value<Boolean> liked)
     {
         this(ctx, status);
-        setWidget(createContents(card, null));
+        setWidget(createContents(card, liked));
     }
 
     protected CardPopup (Context ctx, GameService.CardResult result, Value<SlotStatus> status)

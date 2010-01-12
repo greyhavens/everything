@@ -50,18 +50,18 @@ public class SlotView extends SimplePanel
      */
     public void setCard (Context ctx, ThingCard card, boolean isGift, ClickHandler onClick)
     {
-        setCard(ctx, card, ctx.getMe().userId, isGift, onClick);
+        setCard(ctx, card, ctx.getMe().userId, isGift, null, onClick);
     }
 
     /**
      * @param onClick if null, a default ClickHandler will be used.
      */
     public void setCard (Context ctx, ThingCard card, int ownerId, boolean isGift,
-                         ClickHandler onClick)
+                         Value<Boolean> liked, ClickHandler onClick)
     {
         if (onClick == null && card != null && card.thingId != 0) {
             CardIdent ident = new CardIdent(ownerId, card.thingId, card.received);
-            onClick = CardPopup.onClick(ctx, ident, status);
+            onClick = CardPopup.onClick(ctx, ident, status, liked);
         }
         setWidget(new ThingCardView(ctx, card, isGift, onClick));
     }

@@ -13,6 +13,7 @@ import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.ThingCard;
 
+import client.ui.LikeWidget;
 import client.util.Context;
 
 /**
@@ -25,6 +26,10 @@ public class SeriesPanel extends FluentTable
     public SeriesPanel (Context ctx, int ownerId, final Series series, final Value<Integer> owned)
     {
         super(0, 0, "series");
+
+        Value<Boolean> liked = Value.create(series.liked);
+
+        add().setWidget(new LikeWidget(series.categoryId, liked)).setColSpan(COLUMNS);
         add().setText(series.name, "Title").setColSpan(COLUMNS);
         for (int ii = 0; ii < series.things.length; ii++) {
             final SlotView slot = new SlotView();
@@ -41,8 +46,8 @@ public class SeriesPanel extends FluentTable
                     owned.update(ids.size());
                 }
             });
-            slot.setCard(ctx, card, ownerId, false, null);
-            setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
+            slot.setCard(ctx, card, ownerId, false, liked, null);
+            setWidget(ii/COLUMNS+2, ii%COLUMNS, slot);
         }
     }
 }

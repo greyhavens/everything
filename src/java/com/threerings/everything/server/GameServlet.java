@@ -24,6 +24,8 @@ import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
 import com.samskivert.util.IntSets;
 
+import com.threerings.user.OOOUser;
+
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 
@@ -49,6 +51,7 @@ import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
+import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
 import com.threerings.everything.util.GameUtil;
 
@@ -129,6 +132,12 @@ public class GameServlet extends EveryServiceServlet
         series.categoryId = categoryId;
         series.name = category.name;
         series.things = cards.toArray(new ThingCard[cards.size()]);
+
+        // Load the viewing user's 'like' record
+        OOOUser user = getUser();
+        if (user != null) {
+            series.liked = _playerRepo.getLike(user.userId, categoryId);
+        }
         return series;
     }
 
@@ -644,6 +653,7 @@ public class GameServlet extends EveryServiceServlet
 
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 
