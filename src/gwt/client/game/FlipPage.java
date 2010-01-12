@@ -423,8 +423,8 @@ public class FlipPage extends DataPanel<GameService.GridResult>
     protected AbsolutePanel _cards;
     protected SlotView[] _slots;
 
-    /** Our bonanza card, if any. */
-    protected SlotView _bonanza;
+//    /** Our bonanza card, if any. */
+//    protected SlotView _bonanza;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
