@@ -38,6 +38,7 @@ import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
+import com.threerings.everything.data.Like;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
@@ -50,6 +51,7 @@ import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
+import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -97,6 +99,15 @@ public class GameServlet extends EveryServiceServlet
             coll.series.put(cat.name, scats);
         }
 
+        // if we're loading the player's own collection, load their 'like' preferences
+        OOOUser user = getUser();
+        if (user.userId == ownerId) {
+            coll.likes = Maps.newHashMap();
+            for (LikeRecord like : _playerRepo.loadLikes(ownerId)) {
+                coll.likes.put(like.categoryId, like.like);
+            }
+        }
+
         return coll;
     }
 
@@ -132,12 +143,6 @@ public class GameServlet extends EveryServiceServlet
         series.categoryId = categoryId;
         series.name = category.name;
         series.things = cards.toArray(new ThingCard[cards.size()]);
-
-        // Load the viewing user's 'like' record
-        OOOUser user = getUser();
-        if (user != null) {
-            series.liked = _playerRepo.getLike(user.userId, categoryId);
-        }
         return series;
     }
 

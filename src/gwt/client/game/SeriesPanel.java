@@ -6,7 +6,10 @@ package client.game;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.Widget;
+
 import com.threerings.gwt.ui.FluentTable;
+import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.data.Series;
@@ -23,14 +26,18 @@ public class SeriesPanel extends FluentTable
 {
     public static final int COLUMNS = 5;
 
-    public SeriesPanel (Context ctx, int ownerId, final Series series, final Value<Integer> owned)
+    public SeriesPanel (
+        Context ctx, int ownerId, final Series series,
+        Value<Boolean> liked, final Value<Integer> owned)
     {
         super(0, 0, "series");
 
-        Value<Boolean> liked = Value.create(series.liked);
-
-        add().setWidget(new LikeWidget(series.categoryId, liked)).setColSpan(COLUMNS);
-        add().setText(series.name, "Title").setColSpan(COLUMNS);
+        Widget title = Widgets.newLabel(series.name, "Title");
+        if (liked != null) {
+            // add in the like widget if needed
+            title = Widgets.newRow(title, new LikeWidget(series.categoryId, liked));
+        }
+        add().setWidget(title).setColSpan(COLUMNS);
         for (int ii = 0; ii < series.things.length; ii++) {
             final SlotView slot = new SlotView();
             final ThingCard card = series.things[ii];
@@ -47,7 +54,7 @@ public class SeriesPanel extends FluentTable
                 }
             });
             slot.setCard(ctx, card, ownerId, false, liked, null);
-            setWidget(ii/COLUMNS+2, ii%COLUMNS, slot);
+            setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
         }
     }
 }

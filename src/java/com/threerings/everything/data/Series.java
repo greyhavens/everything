@@ -19,7 +19,4 @@ public class Series
 
     /** The things in the series, in rarity order. Things not owned by the player will be null. */
     public ThingCard[] things;
-
-    /** The like preference of the viewer, not the owner, of this series. */
-    public Boolean liked;
 }
