@@ -38,7 +38,6 @@ import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
-import com.threerings.everything.data.Like;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
