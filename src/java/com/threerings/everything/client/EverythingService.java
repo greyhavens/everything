@@ -39,7 +39,7 @@ public interface EverythingService extends RemoteService
     {
         public PlayerName design;
         public PlayerName art;
-        public PlayerName code;
+        public List<PlayerName> code;
         public List<PlayerName> editors;
     }
 

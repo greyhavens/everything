@@ -316,7 +316,8 @@ public class EverythingServlet extends EveryServiceServlet
         CreditsResult result = new CreditsResult();
         result.design = _playerRepo.loadPlayerName(2); // mdb
         result.art = _playerRepo.loadPlayerName(30); // josh
-        result.code = _playerRepo.loadPlayerName(2); // mdb
+        result.code = Lists.newArrayList(
+            _playerRepo.loadPlayerName(2), _playerRepo.loadPlayerName(25)); // mdb & ray
         final IntIntMap edinfo = _thingRepo.loadEditorInfo();
         result.editors = Lists.newArrayList(_playerRepo.loadPlayerNames(edinfo.keySet()).values());
         Collections.sort(result.editors, new Comparator<PlayerName>() {

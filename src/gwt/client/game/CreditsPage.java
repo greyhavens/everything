@@ -4,9 +4,11 @@
 package client.game;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Anchor;
@@ -45,24 +47,27 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
         FluentTable peeps = new FluentTable(10, 0, "Peeps");
         peeps.add().setWidgets(Widgets.newLabel("Design:"), personLink(data.design)).
             right().setWidgets(Widgets.newLabel("Art:"), personLink(data.art)).
-            right().setWidgets(Widgets.newLabel("Code:"), personLink(data.code));
+            right().setWidgets(
+                Widgets.newLabel("Code:"), addPeeps(Widgets.newFlowPanel(), data.code));
 
-        FlowPanel editors = Widgets.newFlowPanel("Long");
-        for (PlayerName editor : data.editors) {
-            if (editors.getWidgetCount() > 0) {
-                editors.add(Widgets.newInlineLabel(", "));
-            }
-            editors.add(personLink(editor));
-        }
-        peeps.add().setWidgets(Widgets.newLabel("Series Editors:"), editors).setColSpan(3);
+        peeps.add().setWidgets(Widgets.newLabel("Series Editors:"),
+            addPeeps(Widgets.newFlowPanel("Long"), data.editors)).setColSpan(3);
         Widget thanks = Widgets.newLabel(SPECIAL_THANKS, "Long", "handwriting");
         peeps.add().setWidgets(Widgets.newLabel("Special Thanks:"), thanks).setColSpan(3);
         add(peeps);
     }
 
-    protected Widget labeled (String label, Widget widget)
+    protected Panel addPeeps (Panel panel, List<PlayerName> peeps)
     {
-        return Widgets.newFlowPanel(Widgets.newLabel(label), widget);
+        int added = 0;
+        for (PlayerName peep : peeps) {
+            if (added > 0) {
+                panel.add(Widgets.newInlineLabel(", "));
+            }
+            panel.add(personLink(peep));
+            added++;
+        }
+        return panel;
     }
 
     protected Widget personLink (PlayerName person)
