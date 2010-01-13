@@ -73,19 +73,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _cards = Value.create(coll.countCards());
             _series = Value.create(coll.countSeries());
             _completed = Value.create(coll.countCompletedSeries());
-            // initialize likes
-            _likes.clear();
-            if (coll.likes != null) {
-                // create a Value<Boolean> for every series, even if no preference was shipped down
-                for (Map<String, List<SeriesCard>> cat : coll.series.values()) {
-                    for (List<SeriesCard> subcat : cat.values()) {
-                        for (SeriesCard series : subcat) {
-                            _likes.put(series.categoryId,
-                                Value.create(coll.likes.get(series.categoryId)));
-                        }
-                    }
-                }
-            }
 
             _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded").
                 setRowSpan(3);
@@ -289,8 +276,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         final int animTime = (26 + rows * 167);
         _gamesvc.getSeries(_coll.owner.userId, card.categoryId, new PopupCallback<Series>() {
             public void onSuccess (Series series) {
-                final SeriesPanel panel = new SeriesPanel(
-                    _ctx, _coll.owner.userId, series, _likes.get(series.categoryId), owned);
+                final SeriesPanel panel = new SeriesPanel(_ctx, _coll.owner.userId, series, owned);
                 if (_clearSeries != null) {
                     _clearSeries.execute();
                 }
@@ -332,7 +318,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected Widget _contents;
     protected Value<Integer> _cards, _series, _completed;
     protected Command _clearSeries;
-    protected Map<Integer, Value<Boolean>> _likes = new HashMap<Integer, Value<Boolean>>();
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 

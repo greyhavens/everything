@@ -27,15 +27,14 @@ public class SeriesPanel extends FluentTable
     public static final int COLUMNS = 5;
 
     public SeriesPanel (
-        Context ctx, int ownerId, final Series series,
-        Value<Boolean> liked, final Value<Integer> owned)
+        Context ctx, int ownerId, final Series series, final Value<Integer> owned)
     {
         super(0, 0, "series");
 
         Widget title = Widgets.newLabel(series.name, "Title");
-        if (liked != null) {
+        if (ownerId == ctx.getMe().userId) {
             // add in the like widget if needed
-            title = Widgets.newRow(title, new LikeWidget(series.categoryId, liked));
+            title = Widgets.newRow(title, new LikeWidget(ctx, series.categoryId));
         }
         add().setWidget(title).setColSpan(COLUMNS);
         for (int ii = 0; ii < series.things.length; ii++) {
@@ -53,7 +52,7 @@ public class SeriesPanel extends FluentTable
                     owned.update(ids.size());
                 }
             });
-            slot.setCard(ctx, card, ownerId, false, liked, null);
+            slot.setCard(ctx, card, ownerId, false, null);
             setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
         }
     }

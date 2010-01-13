@@ -33,6 +33,7 @@ import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
+import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
 
@@ -332,16 +333,31 @@ public class PlayerRepository extends DepotRepository
         return findAll(LikeRecord.class, new Where(LikeRecord.USER_ID.eq(userId)));
     }
 
-    /**
-     * Get the user's "like" preference for the specified category.
-     *
-     * @return null if the user has no preference.
-     */
-    public Boolean getLike (int userId, int categoryId)
-    {
-        LikeRecord rec = load(LikeRecord.getKey(userId, categoryId));
-        return (rec == null) ? null : rec.like;
-    }
+//    /**
+//     * Load the like preferences of all this user's friends.
+//     *
+//     * @return a mapping from categoryId to the count of likes minus the count of dislikes.
+//     */
+//    public IntIntMap loadFriendLikes (int userId)
+//    {
+//        IntIntMap likes = new IntIntMap();
+//        for (LikeRecord rec : findAll(LikeRecord.class,
+//                                      new Where(LikeRecord.USER_ID.in(loadFriendIds(userId))))) {
+//            likes.increment(rec.categoryId, rec.like ? 1 : -1);
+//        }
+//        return likes;
+//    }
+
+//    /**
+//     * Get the user's "like" preference for the specified category.
+//     *
+//     * @return null if the user has no preference.
+//     */
+//    public Boolean getLike (int userId, int categoryId)
+//    {
+//        LikeRecord rec = load(LikeRecord.getKey(userId, categoryId));
+//        return (rec == null) ? null : rec.like;
+//    }
 
     /**
      * Set the "like" preference for the specified category.

@@ -83,9 +83,6 @@ public interface GameService extends RemoteService
         /** The card in question. */
         public Card card;
 
-        /** Our like/dislike preference for this card's series. */
-        public Boolean liked;
-
         /** Number of this thing already held by this player (not including this one). */
         public int haveCount;
 

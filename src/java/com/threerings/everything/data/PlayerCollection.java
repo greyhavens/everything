@@ -20,10 +20,6 @@ public class PlayerCollection
     /** A mapping from category -> sub-category -> series card(s) for the entire collection. */
     public Map<String, Map<String, List<SeriesCard>>> series;
 
-    /** The player's like preferences for series, or null if viewing another player's collection.
-     * Series with 'no preference' are omitted. */
-    public Map<Integer, Boolean> likes;
-
     /**
      * Returns the number of (unique) cards in this collection.
      */

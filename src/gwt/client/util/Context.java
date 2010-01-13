@@ -61,6 +61,10 @@ public interface Context
     /** Returns the time at which our current grid expires. */
     Value<Long> getGridExpiry ();
 
+    /** Get (or create) the 'like' setting for the specified category.
+     * The Boolean may be null if the user has no setting yet for this category. */
+    Value<Boolean> getLike (int categoryId);
+
     /** Displays a popup, hiding any existing popup (which will be restored when this popup is
      * cleared). The popup will be vertically centered on the supplied optional widget. */
     void displayPopup (PopupPanel popup, Widget onCenter);

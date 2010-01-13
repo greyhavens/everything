@@ -3,6 +3,9 @@
 
 package client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
@@ -182,6 +185,17 @@ public class EverythingClient
     }
 
     // from interface Context
+    public Value<Boolean> getLike (int categoryId)
+    {
+        Value<Boolean> like = _likes.get(categoryId);
+        if (like == null) {
+            like = Value.create(null);
+            _likes.put(categoryId, like);
+        }
+        return like;
+    }
+
+    // from interface Context
     public void displayPopup (PopupPanel popup, Widget onCenter)
     {
         _pstack.show(popup, onCenter);
@@ -312,6 +326,14 @@ public class EverythingClient
         _gridExpires = new Value<Long>(data.gridExpires);
         _news = new Value<News>(data.news);
         _pupsmodel = new PowerupsModel(data.powerups);
+        _likes = new HashMap<Integer, Value<Boolean>>();
+        for (Integer like : data.likes) {
+            _likes.put(like, Value.create(Boolean.TRUE));
+        }
+        for (Integer dislike : data.dislikes) {
+            _likes.put(dislike, Value.create(Boolean.FALSE));
+        }
+
         setContent(null);
         initFacebook(Build.facebookKey(data.candidate));
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
@@ -345,6 +367,7 @@ public class EverythingClient
     protected Value<Integer> _coins;
     protected Value<Long> _gridExpires;
     protected Value<News> _news;
+    protected Map<Integer, Value<Boolean>> _likes;
 
     protected HeaderPanel _header;
     protected Widget _content, _wrapper;

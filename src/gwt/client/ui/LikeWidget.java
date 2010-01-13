@@ -21,18 +21,18 @@ import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
 
 import client.ui.like.LikeImages;
+import client.util.Context;
 
 public class LikeWidget extends HorizontalPanel
     implements Value.Listener<Boolean>
 {
-    public LikeWidget (int categoryId, Value<Boolean> liked)
+    public LikeWidget (Context ctx, int categoryId)
     {
         _categoryId = categoryId;
-        _liked = liked;
+        _liked = ctx.getLike(categoryId);
 
-        add(_good = createImage(Boolean.TRUE));
-        add(_neutral = createImage(null));
-        add(_bad = createImage(Boolean.FALSE));
+        add(_pos = createImage(Boolean.TRUE));
+        add(_neg = createImage(Boolean.FALSE));
     }
 
     protected void onAttach ()
@@ -50,9 +50,8 @@ public class LikeWidget extends HorizontalPanel
     // from ValueListener
     public void valueChanged (Boolean liked)
     {
-        ((liked == Boolean.TRUE) ? _images.pos_selected() : _images.pos()).applyTo(_good);
-        ((liked == null) ? _images.neu_selected() : _images.neu()).applyTo(_neutral);
-        ((liked == Boolean.FALSE) ? _images.neg_selected() : _images.neg()).applyTo(_bad);
+        ((liked == Boolean.TRUE ) ? _images.pos_selected() : _images.pos()).applyTo(_pos);
+        ((liked == Boolean.FALSE) ? _images.neg_selected() : _images.neg()).applyTo(_neg);
     }
 
     protected Image createImage (final Boolean buttonValue)
@@ -92,7 +91,7 @@ public class LikeWidget extends HorizontalPanel
     protected boolean _disarmed;
     protected Value<Boolean> _liked;
 
-    protected Image _good, _neutral, _bad;
+    protected Image _pos, _neg;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
     protected static final LikeImages _images = GWT.create(LikeImages.class);

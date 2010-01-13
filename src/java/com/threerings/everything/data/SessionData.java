@@ -3,6 +3,7 @@
 
 package com.threerings.everything.data;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -30,6 +31,12 @@ public class SessionData
 
     /** This player's current powerups count. */
     public Map<Powerup, Integer> powerups;
+
+    /** The categoryIds this player likes. */
+    public List<Integer> likes;
+
+    /** The categoryIds that this player dislikes. */
+    public List<Integer> dislikes;
 
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;

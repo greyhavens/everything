@@ -77,6 +77,7 @@ public class GameLogic
         throws ServiceException
     {
         IntMap<Float> preferences = IntMaps.newHashIntMap();
+        // TODO: use friend (or global) weightings for categories for which we have no pref
         for (LikeRecord likeRec : _playerRepo.loadLikes(player.userId)) {
             preferences.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
         }

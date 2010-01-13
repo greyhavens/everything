@@ -24,8 +24,6 @@ import com.samskivert.util.IntMap;
 import com.samskivert.util.IntSet;
 import com.samskivert.util.IntSets;
 
-import com.threerings.user.OOOUser;
-
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 
@@ -50,7 +48,6 @@ import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
-import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -96,15 +93,6 @@ public class GameServlet extends EveryServiceServlet
                 scats.put(scat.name, slist);
             }
             coll.series.put(cat.name, scats);
-        }
-
-        // if we're loading the player's own collection, load their 'like' preferences
-        OOOUser user = getUser();
-        if (user.userId == ownerId) {
-            coll.likes = Maps.newHashMap();
-            for (LikeRecord like : _playerRepo.loadLikes(ownerId)) {
-                coll.likes.put(like.categoryId, like.like);
-            }
         }
 
         return coll;
@@ -595,9 +583,6 @@ public class GameServlet extends EveryServiceServlet
             throw new RuntimeException(e);
         }
 
-        // load the user's like preference for the series
-        result.liked = _playerRepo.getLike(player.userId, thing.categoryId);
-
         // note that this player completed this series and if appropriate report to their feed
         if (result.thingsRemaining == 0) {
             _gameLogic.maybeReportCompleted(player, result.card.getSeries(),
@@ -657,7 +642,6 @@ public class GameServlet extends EveryServiceServlet
 
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 

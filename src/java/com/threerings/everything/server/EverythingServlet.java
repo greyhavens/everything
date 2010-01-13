@@ -59,6 +59,7 @@ import com.threerings.everything.util.GameUtil;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
+import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -209,6 +210,11 @@ public class EverythingServlet extends EveryServiceServlet
         data.isMaintainer = user.holdsToken(OOOUser.MAINTAINER);
         data.coins = player.coins;
         data.powerups = _gameRepo.loadPowerups(player.userId);
+        data.likes = Lists.newArrayList();
+        data.dislikes = Lists.newArrayList();
+        for (LikeRecord rec : _playerRepo.loadLikes(player.userId)) {
+            (rec.like ? data.likes : data.dislikes).add(rec.categoryId);
+        }
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST, "s", player.facebookId);
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid != null) {

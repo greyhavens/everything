@@ -42,14 +42,14 @@ import client.util.PopupCallback;
 public class CardPopup extends PopupPanel
 {
     public static ClickHandler onClick (final Context ctx, final CardIdent ident,
-                                        final Value<SlotStatus> status, final Value<Boolean> liked)
+                                        final Value<SlotStatus> status)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 final Widget centerOn = (Widget)event.getSource();
                 _gamesvc.getCard(ident, new PopupCallback<Card>() {
                     public void onSuccess (Card card) {
-                        display(ctx, new CardPopup(ctx, card, status, liked), centerOn);
+                        display(ctx, new CardPopup(ctx, card, status), centerOn);
                     }
                 });
             }
@@ -63,7 +63,7 @@ public class CardPopup extends PopupPanel
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 final Widget centerOn = (Widget)event.getSource();
-                display(ctx, new CardPopup(ctx, card, status, null), centerOn);
+                display(ctx, new CardPopup(ctx, card, status), centerOn);
             }
         };
     }
@@ -108,10 +108,10 @@ public class CardPopup extends PopupPanel
     }
 
     /** Constructor for recruitment gift cards. */
-    protected CardPopup (Context ctx, Card card, Value<SlotStatus> status, Value<Boolean> liked)
+    protected CardPopup (Context ctx, Card card, Value<SlotStatus> status)
     {
         this(ctx, status);
-        setWidget(createContents(card, liked));
+        setWidget(createContents(card));
     }
 
     protected CardPopup (Context ctx, GameService.CardResult result, Value<SlotStatus> status)
@@ -126,7 +126,7 @@ public class CardPopup extends PopupPanel
         }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
-        setWidget(createContents(result.card, Value.create(result.liked)));
+        setWidget(createContents(result.card));
     }
 
     protected CardPopup (Context ctx, Value<SlotStatus> status)
@@ -160,22 +160,22 @@ public class CardPopup extends PopupPanel
         };
     }
 
-    protected Widget createContents (Card card, Value<Boolean> liked)
+    protected Widget createContents (Card card)
     {
         // if we're looking at a recruitment gift, just have close and gift
         if (card.owner == null) {
-            return createRecruitGiftContents(card, liked);
+            return createRecruitGiftContents(card);
 
         // if we're looking at someone else's card, we don't need any fancy stuff
         } else if (!_ctx.getMe().equals(card.owner)) {
-            return createFriendCardContents(card, liked);
+            return createFriendCardContents(card);
 
         } else {
-            return createOwnCardContents(card, liked);
+            return createOwnCardContents(card);
         }
     }
 
-    protected Widget createRecruitGiftContents (final Card card, Value<Boolean> liked)
+    protected Widget createRecruitGiftContents (final Card card)
     {
         _title = "Give the gift of Everything...";
         PushButton gift = ButtonUI.newButton("Send", new ClickHandler() {
@@ -189,18 +189,18 @@ public class CardPopup extends PopupPanel
             }
         });
         PushButton cancel = ButtonUI.newButton("Cancel", onHide());
-        return CardView.create(card, liked, _title, null, cancel, gift);
+        return CardView.create(_ctx, card, false, _title, null, cancel, gift);
     }
 
-    protected Widget createFriendCardContents (Card card, Value<Boolean> liked)
+    protected Widget createFriendCardContents (Card card)
     {
         PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
         want.setTitle("Post to your Facebook feed that you want this card.");
         return CardView.create(
-            card, liked, _title, null, want, ButtonUI.newButton("Close", onHide()));
+            _ctx, card, false, _title, null, want, ButtonUI.newButton("Close", onHide()));
     }
 
-    protected Widget createOwnCardContents (final Card card, Value<Boolean> liked)
+    protected Widget createOwnCardContents (final Card card)
     {
         String status = null;
         if (_haveCount > 1) {
@@ -246,9 +246,10 @@ public class CardPopup extends PopupPanel
 
         // only "incentivize" sharing if you just completed a series or you just received a gift
         // (not when you are looking at a card gifted previously)
-        return (completed || (wasGift && (_title != null))) ?
-            CardView.create(card, liked, _title, status, sell, gift, keep, share) :
-            CardView.create(card, liked, _title, status, sell, gift, share, keep);
+        Widget[] buttons = (completed || (wasGift && (_title != null)))
+            ? new Widget[] { sell, gift, keep, share }
+            : new Widget[] { sell, gift, share, keep };
+        return CardView.create(_ctx, card, true, _title, status, buttons);
     }
 
     protected ClickHandler onHide ()
