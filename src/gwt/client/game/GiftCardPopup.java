@@ -84,8 +84,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             if (info.hasThings > 0) {
                 text += " (has " + info.hasThings + "/" + result.things + ")";
             }
-            grid.at(row, col).setText(text, "nowrap");
-            grid.at(row, col+1).setWidget(LikeWidget.getDisplay(info.like));
+            grid.at(row, col).setWidget(LikeWidget.getDisplay(info.like));
+            grid.at(row, col+1).setText(text, "nowrap");
             grid.at(row, col+2).setWidget(ButtonUI.newSmallButton("Give", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     _ctx.displayPopup(makeGiftPopup(info), GiftCardPopup.this);

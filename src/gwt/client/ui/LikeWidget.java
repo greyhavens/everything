@@ -26,11 +26,18 @@ import client.util.Context;
 public class LikeWidget extends HorizontalPanel
     implements Value.Listener<Boolean>
 {
+    /**
+     * Get an Image that displays another user's uneditable like preference for some category.
+     */
     public static Image getDisplay (Boolean like)
     {
         return (like == null) ? null : (like ? _images.pos() : _images.neg()).createImage();
     }
 
+    /**
+     * Construct a LikeWidget that displays the user's like preference and allows it to
+     * be edited.
+     */
     public LikeWidget (Context ctx, int categoryId)
     {
         _categoryId = categoryId;
