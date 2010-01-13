@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 
@@ -31,7 +32,12 @@ public class LikeWidget extends HorizontalPanel
      */
     public static Image getDisplay (Boolean like)
     {
-        return (like == null) ? null : (like ? _images.pos() : _images.neg()).createImage();
+        if (like == null) {
+            return null;
+        }
+        Image img = (like ? _images.pos() : _images.neg()).createImage();
+        img.setTitle(like ? "Liked" : "Disliked");
+        return img;
     }
 
     /**
@@ -47,28 +53,29 @@ public class LikeWidget extends HorizontalPanel
         add(_neg = createImage(Boolean.FALSE));
     }
 
-    protected void onAttach ()
-    {
-        super.onAttach();
-        _liked.addListenerAndTrigger(this);
-    }
-
-    protected void onDetach ()
-    {
-        super.onDetach();
-        _liked.removeListener(this);
-    }
-
     // from ValueListener
     public void valueChanged (Boolean liked)
     {
-        ((liked == Boolean.TRUE ) ? _images.pos_selected() : _images.pos()).applyTo(_pos);
-        ((liked == Boolean.FALSE) ? _images.neg_selected() : _images.neg()).applyTo(_neg);
+        proto(Boolean.TRUE, liked).applyTo(_pos);
+        proto(Boolean.FALSE, liked).applyTo(_neg);
+    }
+
+    protected void onLoad ()
+    {
+        super.onLoad();
+        _liked.addListener(this);
+    }
+
+    protected void onUnload ()
+    {
+        _liked.removeListener(this);
+        super.onUnload();
     }
 
     protected Image createImage (final Boolean buttonValue)
     {
-        Image img = new Image();
+        Image img = proto(buttonValue, _liked.get()).createImage();
+        img.setTitle(buttonValue ? "I like this series" : "I dislike this series");
         Widgets.makeActionable(img, new ClickHandler() {
             public void onClick (ClickEvent event) {
                 updateLike(buttonValue);
@@ -79,6 +86,13 @@ public class LikeWidget extends HorizontalPanel
             }
         }));
         return img;
+    }
+
+    protected AbstractImagePrototype proto (Boolean buttonValue, Boolean liked)
+    {
+        return buttonValue
+            ? ((liked == buttonValue) ? _images.pos_selected() : _images.pos())
+            : ((liked == buttonValue) ? _images.neg_selected() : _images.neg());
     }
 
     protected void updateLike (final Boolean like)
