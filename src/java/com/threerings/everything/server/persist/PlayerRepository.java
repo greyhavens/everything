@@ -333,6 +333,21 @@ public class PlayerRepository extends DepotRepository
         return findAll(LikeRecord.class, new Where(LikeRecord.USER_ID.eq(userId)));
     }
 
+    /**
+     * Load a mapping of userId to the like preference for the specified category.
+     * Users that have no like preference will be omitted from the mapping.
+     */
+    public IntMap<Boolean> loadLikes (Collection<Integer> userIds, int categoryId)
+    {
+        IntMap<Boolean> result = IntMaps.newHashIntMap();
+        for (LikeRecord rec : findAll(LikeRecord.class,
+                new Where(Ops.and(
+                        LikeRecord.USER_ID.in(userIds), LikeRecord.CATEGORY_ID.eq(categoryId))))) {
+            result.put(rec.userId, Boolean.valueOf(rec.like));
+        }
+        return result;
+    }
+
 //    /**
 //     * Load the like preferences of all this user's friends.
 //     *

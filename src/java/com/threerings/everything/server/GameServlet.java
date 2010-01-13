@@ -271,10 +271,11 @@ public class GameServlet extends EveryServiceServlet
         PlayerRecord player = requirePlayer();
         requireCard(player.userId, thingId, received);
 
+        int categoryId = _thingRepo.loadThing(thingId).categoryId;
+
         // load up data on the things in this set
         Set<Integer> thingIds = Sets.newHashSet();
-        for (ThingCard thing : _thingRepo.loadThingCards(
-                 _thingRepo.loadThing(thingId).categoryId)) {
+        for (ThingCard thing : _thingRepo.loadThingCards(categoryId)) {
             thingIds.add(thing.thingId);
         }
 
@@ -284,6 +285,12 @@ public class GameServlet extends EveryServiceServlet
         friendIds.removeAll(_gameRepo.countCardHoldings(
                                 friendIds, Collections.singleton(thingId), true).keySet());
 
+        // load up the names of those friends
+        IntMap<PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
+        // remove anyone that doesn't have a name
+        // (some friends may be samsara users but not everything players)
+        friendIds.retainAll(names.keySet());
+
         // count up how many of the cards in this series are held by these friends
         // Note that here we do NOT count pending gifts, as that may encourage a friend to
         // give you a second card in the same series when aren't *really* collecting it yet-
@@ -291,23 +298,18 @@ public class GameServlet extends EveryServiceServlet
         // you are a "collector" of that series...
         IntIntMap holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
 
-        // load up the names of those friends
-        IntMap<PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
-
-        // TODO: load up wishlist info on this thing
+        // load up the likes for these friends
+        IntMap<Boolean> likes = _playerRepo.loadLikes(friendIds, categoryId);
 
         GiftInfoResult result = new GiftInfoResult();
         result.things = thingIds.size();
-        result.friends = Lists.newArrayList();
+        result.friends = Lists.newArrayListWithCapacity(friendIds.size());
         for (Integer friendId : friendIds) {
             FriendCardInfo info = new FriendCardInfo();
-            // some of their friends may be samsara users but not everything players: skip nulls
             info.friend = names.get(friendId);
-            if (info.friend != null) {
-                info.hasThings = holdings.getOrElse(friendId, 0);
-                info.onWishlist = false; // TODO
-                result.friends.add(info);
-            }
+            info.hasThings = holdings.getOrElse(friendId, 0);
+            info.like = likes.get(friendId);
+            result.friends.add(info);
         }
         return result;
     }

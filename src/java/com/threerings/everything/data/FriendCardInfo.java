@@ -17,16 +17,33 @@ public class FriendCardInfo
     /** The number of things in the same series as this thing that the friend has. */
     public int hasThings;
 
-    /** True if this thing is on the friend's wishlist. */
-    public boolean onWishlist;
+    /** The friend's like preference for this thing's category, if any. */
+    public Boolean like;
 
     // from interface FriendCardInfo
     public int compareTo (FriendCardInfo other)
     {
-        if (hasThings != other.hasThings) {
-            return (hasThings > other.hasThings) ? -1 : 1;
-        } else {
-            return friend.name.compareTo(other.friend.name);
+        int cmp = likeComparison(like) - likeComparison(other.like);
+        if (cmp == 0) {
+            cmp = other.hasThings - hasThings;
+            if (cmp == 0) {
+                cmp = friend.name.compareTo(other.friend.name);
+            }
         }
+        return cmp;
+//        return ComparisonChain.start()
+//            .compare(likeComparison(like), likeComparison(other.like))
+//            .compare(other.hasThings, hasThings)
+//            .compare(friend.name, other.friend.name)
+//            .result();
+    }
+
+    /**
+     * Return what the 'like' value compares as.
+     * We want the following ordering: like, no-pref, dislike.
+     */
+    protected static int likeComparison (Boolean like)
+    {
+        return (like == null) ? 0 : (like ? -1 : 1);
     }
 }

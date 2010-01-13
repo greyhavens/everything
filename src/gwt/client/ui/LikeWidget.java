@@ -26,6 +26,11 @@ import client.util.Context;
 public class LikeWidget extends HorizontalPanel
     implements Value.Listener<Boolean>
 {
+    public static Image getDisplay (Boolean like)
+    {
+        return (like == null) ? null : (like ? _images.pos() : _images.neg()).createImage();
+    }
+
     public LikeWidget (Context ctx, int categoryId)
     {
         _categoryId = categoryId;

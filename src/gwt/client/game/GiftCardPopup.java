@@ -30,6 +30,7 @@ import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
 import client.ui.DataPopup;
+import client.ui.LikeWidget;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -80,19 +81,18 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         int row = 0, col = 0;
         for (final FriendCardInfo info : result.friends) {
             String text = info.friend.toString();
-            if (info.onWishlist) {
-                text += " (on wishlist)";
-            } else if (info.hasThings > 0) {
+            if (info.hasThings > 0) {
                 text += " (has " + info.hasThings + "/" + result.things + ")";
             }
             grid.at(row, col).setText(text, "nowrap");
-            grid.at(row, col+1).setWidget(ButtonUI.newSmallButton("Give", new ClickHandler() {
+            grid.at(row, col+1).setWidget(LikeWidget.getDisplay(info.like));
+            grid.at(row, col+2).setWidget(ButtonUI.newSmallButton("Give", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     _ctx.displayPopup(makeGiftPopup(info), GiftCardPopup.this);
                 }
             }));
-            col += 2;
-            if (col > 3) {
+            col += 3;
+            if (col > 5) {
                 row++;
                 col = 0;
             }
