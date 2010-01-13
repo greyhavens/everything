@@ -37,8 +37,7 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
     protected void init (EverythingService.CreditsResult data)
     {
         add(Widgets.newLabel("The Everything Game", "Title"));
-        int year = DateUtil.getYear(new Date());
-        String copy = (year == 2009) ? "2009" : "2009-" + year;
+        String copy = "2009-" + DateUtil.getYear(new Date());
         add(Widgets.newFlowPanel(
                 "Subtitle", Widgets.newHTML("Copyright &copy; " + copy + " ", "inline"),
                 new Anchor("http://www.threerings.net/", "Three Rings", "_blank")));
