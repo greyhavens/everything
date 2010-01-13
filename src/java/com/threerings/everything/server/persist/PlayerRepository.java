@@ -574,7 +574,6 @@ public class PlayerRepository extends DepotRepository
         classes.add(FeedItemRecord.class);
         classes.add(FriendRecord.class);
         classes.add(PlayerRecord.class);
-        classes.add(WishRecord.class);
         classes.add(LikeRecord.class);
         classes.add(RecruitGiftRecord.class);
     }
