@@ -90,7 +90,7 @@ public class ThingIndex
         if (preferences.isEmpty()) {
             return this;
         }
-        ThingIndex copy = (ThingIndex) clone();
+        ThingIndex copy = clone();
         copy._things = _things.copyWeighted(preferences);
         copy._byrare = _byrare.clone();
         for (Map.Entry<Rarity, ThingList> entry : copy._byrare.entrySet()) {
@@ -290,8 +290,8 @@ public class ThingIndex
         return _attractors.containsKey(thingId);
     }
 
-    // "from" Cloneable
-    public Object clone ()
+    @Override // "from" Cloneable
+    public ThingIndex clone ()
     {
         try {
             ThingIndex copy = (ThingIndex) super.clone();
