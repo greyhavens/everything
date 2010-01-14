@@ -29,25 +29,27 @@ public class ThingDialog
 {
     /**
      * Creates a click handler that displays a "I got this card" dialog.
+     * The specified callback will be called with 'true' if they ended up posting the story.
      */
-    public static ClickHandler makeGotHandler (Context ctx, Card card, boolean completed)
+    public static ClickHandler makeGotHandler (
+        Context ctx, Card card, boolean completed, AsyncCallback<Boolean> callback)
     {
         if (completed) {
             return makeHandler(ctx, "got_comp", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                        " card and completed the " + card.getSeries() +
                                        " series in Everything!",
-                               "Celebrate your completed series:");
+                               "Celebrate your completed series:", callback);
         } else if (card.giver != null) {
             return makeHandler(ctx, "got_gift", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                        " card from " + card.giver + " in Everything.",
-                               "Thank your friend for this great gift:");
+                               "Thank your friend for this great gift:", callback);
         } else {
             return makeHandler(ctx, "got_card", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                    " card in Everything.",
-                               "Tell your friends about this awesome card:");
+                               "Tell your friends about this awesome card:", callback);
         }
     }
 
@@ -59,7 +61,7 @@ public class ThingDialog
         return makeHandler(ctx, "want_card", card,
                            "" + ctx.getMe() + " wants the " + card.thing.name +
                                    " card in Everything.",
-                           "Let your friends know you want this card:");
+                           "Let your friends know you want this card:", null);
     }
 
     /**
@@ -71,7 +73,7 @@ public class ThingDialog
                    "" + ctx.getMe() + " gave the " + card.thing.name + " card to " + target +
                             " in Everything.",
                    card,
-                   target, "Tell your friends why you gave " + target.name + " this card:");
+                   target, "Tell your friends why you gave " + target.name + " this card:", null);
     }
 
     /**
@@ -108,20 +110,21 @@ public class ThingDialog
                    });
     }
 
-    protected static ClickHandler makeHandler (final Context ctx, final String vec,
-                                               final Card card, final String title,
-                                               final String prompt)
+    protected static ClickHandler makeHandler (
+        final Context ctx, final String vec, final Card card, final String title,
+        final String prompt, final AsyncCallback<Boolean> callback)
     {
         return new ClickHandler() {
             public void onClick (ClickEvent event) {
                 String targetId = (card.giver == null) ? null : (""+card.giver.facebookId);
-                showDialog(ctx, vec, targetId, title, card, card.owner, prompt);
+                showDialog(ctx, vec, targetId, title, card, card.owner, prompt, callback);
             }
         };
     }
 
-    protected static void showDialog (Context ctx, String vec, String targetId, String title,
-                                      Card card, PlayerName owner, String prompt)
+    protected static void showDialog (
+        Context ctx, String vec, String targetId, String title, Card card, PlayerName owner,
+        String prompt, final AsyncCallback<Boolean> callback)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
         String cardURL = ctx.getEverythingURL(
@@ -140,11 +143,16 @@ public class ThingDialog
                                        "tracking", tracking, cause);
                                }
                            });
+                           if (callback != null) {
+                               callback.onSuccess(Boolean.TRUE);
+                           }
                        }
                    },
                    new Command() { // incomplete callback
                        public void execute () {
-                           // nada
+                           if (callback != null) {
+                               callback.onSuccess(Boolean.FALSE);
+                           }
                        }
                    });
     }

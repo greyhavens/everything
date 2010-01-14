@@ -239,8 +239,25 @@ public class CardPopup extends PopupPanel
 
         boolean completed = (_haveCount == 0 && _thingsRemaining == 0);
         boolean wasGift = (card.giver != null);
+        AsyncCallback<Boolean> postCallback = new AsyncCallback<Boolean>() {
+            public void onFailure (Throwable t) { }
+            public void onSuccess (Boolean result) {
+                if (result) {
+                    Value<Boolean> like = _ctx.getLike(card.getSeries().categoryId);
+                    if (like.get() == null) {
+                        _gamesvc.setLike(card.getSeries().categoryId, Boolean.TRUE,
+                            new AsyncCallback<Void>() {
+                                public void onFailure (Throwable err) {}
+                                public void onSuccess (Void result) {}
+                            });
+                        like.update(Boolean.TRUE);
+                    }
+                }
+            }
+        };
         PushButton share = ButtonUI.newButton(wasGift ? "Thank" : "Share",
-            Handlers.chain(ThingDialog.makeGotHandler(_ctx, card, completed), onHide()));
+            Handlers.chain(ThingDialog.makeGotHandler(_ctx, card, completed, postCallback),
+                onHide()));
         if (wasGift) {
             share.setTitle("Thank your friend for the awesome gift!");
         } else {
