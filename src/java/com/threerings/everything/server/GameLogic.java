@@ -76,41 +76,13 @@ public class GameLogic
     public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
         throws ServiceException
     {
-        // Build a map of the player's category weightings
-        IntMap<Float> preferences = IntMaps.newHashIntMap();
-        for (LikeRecord likeRec : _playerRepo.loadLikes(player.userId)) {
-            preferences.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
-        }
-        // Factor in friend weightings
-        // TODO: if not enough friends, go global??
-        Collection<Integer> friendIds = _playerRepo.loadFriendIds(player.userId);
-        IntIntMap friendLikes = _playerRepo.loadCollectiveLikes(friendIds, preferences.keySet());
-        for (IntIntMap.IntIntEntry entry : friendLikes.entrySet()) {
-            int val = entry.getIntValue();
-            float weight;
-            if (val == 0) {
-                weight = 1;
-
-            } else if (val > 0) {
-                weight = 1f + (.5f * val);
-
-            } else {
-                weight = -1f / val; // 1 friend dislikes doesn't adjust..
-            }
-            if (weight != 1) {
-                preferences.put(entry.getIntKey(), Float.valueOf(weight));
-            }
-        }
-//        // Let's dump the weightings:
-//        for (IntMap.IntEntry<Float> entry : preferences.intEntrySet()) {
-//            System.err.println("\t" + entry.getIntKey() + " => " + entry.getValue());
-//        }
+        IntMap<Float> weights = generateSeriesWeights(player.userId);
 
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
         grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
         grid.status = GridStatus.NORMAL;
-        grid.thingIds = selectGridThings(player, pup, preferences);
+        grid.thingIds = selectGridThings(player, pup, weights);
         grid.expires = player.calculateNextExpires();
 
         // now that we successfully selected things for our grid, consume the powerup
@@ -311,10 +283,10 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    public int[] selectGridThings (PlayerRecord player, Powerup pup, IntMap<Float> preferences)
+    public int[] selectGridThings (PlayerRecord player, Powerup pup, IntMap<Float> weights)
         throws ServiceException
     {
-        ThingIndex index = _thingLogic.getThingIndex().copyWeighted(preferences);
+        ThingIndex index = _thingLogic.getThingIndex().copyWeighted(weights);
         IntSet thingIds = IntSets.create();
 
         // load up this player's collection summary, identify incomplete series
@@ -414,6 +386,44 @@ public class GameLogic
             }
         }
         return ownedCats;
+    }
+
+    /**
+     * Generate weightings to apply to seriesIds for the specified user.
+     */
+    protected IntMap<Float> generateSeriesWeights (int userId)
+    {
+        // Build a map of the player's category weightings
+        IntMap<Float> weights = IntMaps.newHashIntMap();
+        for (LikeRecord likeRec : _playerRepo.loadLikes(userId)) {
+            weights.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
+        }
+        // Factor in friend weightings
+        // TODO: if not enough friends, go global??
+        Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
+        Collection<Integer> excludeCategories = weights.keySet();
+        IntIntMap friendLikes = _playerRepo.loadCollectiveLikes(friendIds, excludeCategories);
+        for (IntIntMap.IntIntEntry entry : friendLikes.entrySet()) {
+            int val = entry.getIntValue();
+            float weight;
+            if (val == 0) {
+                weight = 1;
+
+            } else if (val > 0) {
+                weight = 1f + (.5f * val);
+
+            } else {
+                weight = -1f / val; // 1 friend dislikes doesn't adjust..
+            }
+            if (weight != 1) {
+                weights.put(entry.getIntKey(), Float.valueOf(weight));
+            }
+        }
+//        // Let's dump the weightings:
+//        for (IntMap.IntEntry<Float> entry : weights.intEntrySet()) {
+//            System.err.println("\t" + entry.getIntKey() + " => " + entry.getValue());
+//        }
+        return weights;
     }
 
     /**
