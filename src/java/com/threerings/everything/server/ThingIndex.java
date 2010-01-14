@@ -390,9 +390,7 @@ public class ThingIndex
         public ThingInfo copyWeighted (IntMap<Float> weights)
         {
             Float adjust = weights.get(categoryId);
-            return ((adjust == null) || (adjust.floatValue() == 1f))
-                ? this
-                : new ThingInfo(this, adjust);
+            return ((adjust == null) || (adjust == 1f)) ? this : new ThingInfo(this, adjust);
         }
 
         public String toString () {
