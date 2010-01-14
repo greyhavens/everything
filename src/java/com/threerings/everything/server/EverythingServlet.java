@@ -35,6 +35,8 @@ import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
 import com.samskivert.util.IntMap;
 import com.samskivert.util.IntMaps;
+import com.samskivert.util.IntSet;
+import com.samskivert.util.IntSets;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -367,14 +369,15 @@ public class EverythingServlet extends EveryServiceServlet
                         fbFriendIds.add(uid.toString());
                     }
                     // map those friends to Samsara user ids
-                    Set<Integer> allFriendIds =
-                        Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    IntSet allFriendIds =
+                        IntSets.create(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    // retain only those that have Everything accounts
+                    allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).intKeySet());
                     // load our current friends
-                    Set<Integer> curFriendIds =
-                        Sets.newHashSet(_playerRepo.loadFriendIds(prec.userId));
+                    IntSet curFriendIds = IntSets.create(_playerRepo.loadFriendIds(prec.userId));
                     // figure out new and old friends
-                    Set<Integer> newFriendIds = Sets.difference(allFriendIds, curFriendIds);
-                    Set<Integer> oldFriendIds = Sets.difference(curFriendIds, allFriendIds);
+                    IntSet newFriendIds = IntSets.difference(allFriendIds, curFriendIds);
+                    IntSet oldFriendIds = IntSets.difference(curFriendIds, allFriendIds);
                     // add any newly-acquired friends
                     if (!newFriendIds.isEmpty()) {
                         log.info("Wiring up friends", "who", prec.who(), "friends", newFriendIds);

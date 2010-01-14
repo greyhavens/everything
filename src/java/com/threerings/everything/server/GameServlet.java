@@ -292,14 +292,10 @@ public class GameServlet extends EveryServiceServlet
         // determine which friends do not have a card with this thing on it,
         // including friends who have it as a pending gift
         Set<Integer> friendIds = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
-        friendIds.removeAll(_gameRepo.countCardHoldings(
-                                friendIds, Collections.singleton(thingId), true).keySet());
-
+        friendIds.removeAll(
+            _gameRepo.countCardHoldings(friendIds, Collections.singleton(thingId), true).keySet());
         // load up the names of those friends
         IntMap<PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
-        // remove anyone that doesn't have a name
-        // (some friends may be samsara users but not everything players)
-        friendIds.retainAll(names.keySet());
 
         // count up how many of the cards in this series are held by these friends
         // Note that here we do NOT count pending gifts, as that may encourage a friend to
