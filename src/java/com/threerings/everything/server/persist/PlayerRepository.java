@@ -340,28 +340,30 @@ public class PlayerRepository extends DepotRepository
     public IntMap<Boolean> loadLikes (Collection<Integer> userIds, int categoryId)
     {
         IntMap<Boolean> result = IntMaps.newHashIntMap();
-        for (LikeRecord rec : findAll(LikeRecord.class,
-                new Where(Ops.and(
-                        LikeRecord.USER_ID.in(userIds), LikeRecord.CATEGORY_ID.eq(categoryId))))) {
+        for (LikeRecord rec : findAll(LikeRecord.class, new Where(
+                Ops.and(LikeRecord.USER_ID.in(userIds),
+                        LikeRecord.CATEGORY_ID.eq(categoryId))))) {
             result.put(rec.userId, Boolean.valueOf(rec.like));
         }
         return result;
     }
 
-//    /**
-//     * Load the like preferences of all this user's friends.
-//     *
-//     * @return a mapping from categoryId to the count of likes minus the count of dislikes.
-//     */
-//    public IntIntMap loadFriendLikes (int userId)
-//    {
-//        IntIntMap likes = new IntIntMap();
-//        for (LikeRecord rec : findAll(LikeRecord.class,
-//                                      new Where(LikeRecord.USER_ID.in(loadFriendIds(userId))))) {
-//            likes.increment(rec.categoryId, rec.like ? 1 : -1);
-//        }
-//        return likes;
-//    }
+    /**
+     * Load the like preferences of all this user's friends.
+     *
+     * @return a mapping from categoryId to the count of likes minus the count of dislikes.
+     */
+    public IntIntMap loadCollectiveLikes (
+        Collection<Integer> userIds, Collection<Integer> excludeCategories)
+    {
+        IntIntMap likes = new IntIntMap();
+        for (LikeRecord rec : findAll(LikeRecord.class, new Where(
+                Ops.and(LikeRecord.USER_ID.in(userIds),
+                        Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))))) {
+            likes.increment(rec.categoryId, rec.like ? 1 : -1);
+        }
+        return likes;
+    }
 
     /**
      * Get the user's "like" preference for the specified category.

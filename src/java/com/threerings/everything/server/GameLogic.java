@@ -76,11 +76,35 @@ public class GameLogic
     public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
         throws ServiceException
     {
+        // Build a map of the player's category weightings
         IntMap<Float> preferences = IntMaps.newHashIntMap();
-        // TODO: use friend (or global) weightings for categories for which we have no pref
         for (LikeRecord likeRec : _playerRepo.loadLikes(player.userId)) {
             preferences.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
         }
+        // Factor in friend weightings
+        // TODO: if not enough friends, go global??
+        Collection<Integer> friendIds = _playerRepo.loadFriendIds(player.userId);
+        IntIntMap friendLikes = _playerRepo.loadCollectiveLikes(friendIds, preferences.keySet());
+        for (IntIntMap.IntIntEntry entry : friendLikes.entrySet()) {
+            int val = entry.getIntValue();
+            float weight;
+            if (val == 0) {
+                weight = 1;
+
+            } else if (val > 0) {
+                weight = 1f + (.5f * val);
+
+            } else {
+                weight = -1f / val; // 1 friend dislikes doesn't adjust..
+            }
+            if (weight != 1) {
+                preferences.put(entry.getIntKey(), Float.valueOf(weight));
+            }
+        }
+//        // Let's dump the weightings:
+//        for (IntMap.IntEntry<Float> entry : preferences.intEntrySet()) {
+//            System.err.println("\t" + entry.getIntKey() + " => " + entry.getValue());
+//        }
 
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
