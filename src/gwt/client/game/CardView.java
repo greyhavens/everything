@@ -97,18 +97,17 @@ public abstract class CardView extends FlowPanel
     {
         public Right (Context ctx, Card card, boolean showLike)
         {
-            // TODO: make the alignment here not fucking suck
-            // TODO: cleanup a bit, never should have liked == null
+            Widget cat = Widgets.newLabel(
+                Category.getHierarchy(card.categories), "Categories",
+                getCategoriesSize(card.categories));
             if (showLike) {
-                add(Widgets.newRow("Series",
-                    Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                     getCategoriesSize(card.categories)),
-                    new LikeWidget(ctx, card.getSeries().categoryId)));
-            } else {
-                // no liked data
-                add(Widgets.newLabel(Category.getHierarchy(card.categories), "Categories",
-                                     getCategoriesSize(card.categories)));
+                LikeWidget like = new LikeWidget(ctx, card.getSeries().categoryId);
+                FluentTable table = new FluentTable();
+                table.add().setWidget(cat)
+                    .right().setWidget(like).alignBottom().alignLeft();
+                cat = table;
             }
+            add(cat);
             FlowPanel info = Widgets.newFlowPanel(
                 "Info", Widgets.newLabel(card.thing.descrip),
                 Widgets.newLabel("Facts:", "FactsTitle"),
