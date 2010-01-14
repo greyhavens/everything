@@ -33,10 +33,12 @@ public class SeriesPanel extends FluentTable
 
         Widget title = Widgets.newLabel(series.name, "Title");
         if (ownerId == ctx.getMe().userId) {
-            // add in the like widget if needed
-            title = Widgets.newRow(title, new LikeWidget(ctx, series.categoryId));
+            FluentTable table = new FluentTable();
+            table.add().alignRight().setWidget(title)
+                .right().alignLeft().setWidget(new LikeWidget(ctx, series.categoryId));
+            title = table;
         }
-        add().setWidget(title).setColSpan(COLUMNS);
+        add().setWidget(title).setColSpan(COLUMNS).alignCenter();
         for (int ii = 0; ii < series.things.length; ii++) {
             final SlotView slot = new SlotView();
             final ThingCard card = series.things[ii];

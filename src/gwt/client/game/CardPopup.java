@@ -30,7 +30,6 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
 
 import client.ui.ButtonUI;
-import client.ui.LikeWidget;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
