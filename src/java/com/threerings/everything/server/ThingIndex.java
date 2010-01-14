@@ -82,19 +82,19 @@ public class ThingIndex
     /**
      * Make a copy of this ThingIndex, with category weightings applied.
      *
-     * @param preferences a mapping of categoryId -> weighting adjustment. Categories not specified
+     * @param weights a mapping of categoryId -> weighting adjustment. Categories not specified
      * will not be adjusted.
      */
-    public ThingIndex copyWeighted (IntMap<Float> preferences)
+    public ThingIndex copyWeighted (IntMap<Float> weights)
     {
-        if (preferences.isEmpty()) {
+        if (weights.isEmpty()) {
             return this;
         }
         ThingIndex copy = clone();
-        copy._things = _things.copyWeighted(preferences);
+        copy._things = _things.copyWeighted(weights);
         copy._byrare = _byrare.clone();
         for (Map.Entry<Rarity, ThingList> entry : copy._byrare.entrySet()) {
-            entry.setValue(entry.getValue().copyWeighted(preferences));
+            entry.setValue(entry.getValue().copyWeighted(weights));
         }
         return copy;
     }
@@ -387,10 +387,10 @@ public class ThingIndex
             weight = Math.round(rarity.weight() * adjust);
         }
 
-        public ThingInfo copyWeighted (IntMap<Float> preferences)
+        public ThingInfo copyWeighted (IntMap<Float> weights)
         {
-            Float adjust = preferences.get(categoryId);
-            return (adjust == null) ? this : new ThingInfo(this, adjust);
+            Float adjust = weights.get(categoryId);
+            return ((adjust == null) || (adjust == 1f)) ? this : new ThingInfo(this, adjust);
         }
 
         public String toString () {
@@ -401,30 +401,38 @@ public class ThingIndex
     protected static class ThingList
         implements Iterable<ThingInfo>
     {
-        public void add (ThingInfo info) {
-            _things.add(info);
-            _totalWeight += info.weight;
+        public void add (ThingInfo info)
+        {
+            if (info.weight > 0) {
+                _things.add(info);
+                _totalWeight += info.weight;
+            }
         }
 
-        public int totalWeight () {
+        public int totalWeight ()
+        {
             return _totalWeight;
         }
 
-        public void shuffle () {
+        public void shuffle ()
+        {
             Collections.shuffle(_things);
         }
 
-        public int size () {
+        public int size ()
+        {
             return _things.size();
         }
 
         // from Iterable
-        public Iterator<ThingInfo> iterator () {
+        public Iterator<ThingInfo> iterator ()
+        {
             return Iterators.unmodifiableIterator(_things.iterator());
         }
 
         @Override
-        public String toString () {
+        public String toString ()
+        {
             return _things.toString();
         }
 
@@ -458,14 +466,14 @@ public class ThingIndex
             return that;
         }
 
-        public ThingList copyWeighted (IntMap<Float> preferences)
+        public ThingList copyWeighted (IntMap<Float> weights)
         {
-            if (preferences.isEmpty()) {
+            if (weights.isEmpty()) {
                 return this;
             }
             ThingList that = new ThingList();
             for (ThingInfo info : this) {
-                that.add(info.copyWeighted(preferences));
+                that.add(info.copyWeighted(weights));
             }
             return that;
         }
