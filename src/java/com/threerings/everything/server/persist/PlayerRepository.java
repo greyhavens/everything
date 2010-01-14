@@ -363,16 +363,16 @@ public class PlayerRepository extends DepotRepository
 //        return likes;
 //    }
 
-//    /**
-//     * Get the user's "like" preference for the specified category.
-//     *
-//     * @return null if the user has no preference.
-//     */
-//    public Boolean getLike (int userId, int categoryId)
-//    {
-//        LikeRecord rec = load(LikeRecord.getKey(userId, categoryId));
-//        return (rec == null) ? null : rec.like;
-//    }
+    /**
+     * Get the user's "like" preference for the specified category.
+     *
+     * @return null if the user has no preference.
+     */
+    public Boolean getLike (int userId, int categoryId)
+    {
+        LikeRecord rec = load(LikeRecord.getKey(userId, categoryId));
+        return (rec == null) ? null : rec.like;
+    }
 
     /**
      * Set the "like" preference for the specified category.

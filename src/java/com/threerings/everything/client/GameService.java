@@ -140,6 +140,16 @@ public interface GameService extends RemoteService
         public Map<Powerup, Integer> powerups;
     }
 
+    /** Provides results for {@link #sellCard}. */
+    public static class SellResult implements IsSerializable
+    {
+        /** The player's new coin balance. */
+        public int coins;
+
+        /** If true, selling this card caused the series to be automatically disliked. */
+        public boolean wasDisliked;
+    }
+
     /**
      * Returns the collection of the specified player.
      */
@@ -168,7 +178,7 @@ public interface GameService extends RemoteService
     /**
      * Requests to sell the specified card. Returns the caller's new coin balance.
      */
-    int sellCard (int thingId, long created) throws ServiceException;
+    SellResult sellCard (int thingId, long created) throws ServiceException;
 
     /**
      * Requests data on this player's friends who do not already have the specified card.

@@ -45,7 +45,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#sellCard}.
      */
-    void sellCard (int thingId, long created, AsyncCallback<Integer> callback);
+    void sellCard (int thingId, long created, AsyncCallback<GameService.SellResult> callback);
 
     /**
      * The async version of {@link GameService#getGiftCardInfo}.

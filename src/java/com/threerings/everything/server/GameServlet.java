@@ -242,7 +242,7 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public int sellCard (int thingId, long received) throws ServiceException
+    public SellResult sellCard (int thingId, long received) throws ServiceException
     {
         PlayerRecord player = requirePlayer();
         CardRecord card = requireCard(player.userId, thingId, received);
@@ -262,7 +262,17 @@ public class GameServlet extends EveryServiceServlet
         _gameLogic.noteCardStatus(card, SlotStatus.SOLD);
 
         // return their new coin balance (this doesn't have to be absolutely correct)
-        return player.coins + coins;
+        SellResult result = new SellResult();
+        result.coins = player.coins + coins;
+
+        // if the user had no preference in this series, and they have no other cards, mark
+        // that they dislike the series
+        if ((null == _playerRepo.getLike(player.userId, thing.categoryId)) &&
+                _gameRepo.loadCards(player.userId, thing.categoryId).isEmpty()) {
+            _playerRepo.setLike(player.userId, thing.categoryId, false);
+            result.wasDisliked = true;
+        }
+        return result;
     }
 
     // from interface GameService

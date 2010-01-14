@@ -88,15 +88,19 @@ public class CardPopup extends PopupPanel
     {
         PushButton sell = ButtonUI.newButton("Sell");
         sell.setTitle("Sell this card back for half its value.");
-        new ClickCallback<Integer>(sell) {
+        new ClickCallback<GameService.SellResult>(sell) {
             protected boolean callService () {
                 gameSvc.sellCard(card.thing.thingId, card.received.getTime(), this);
                 return true;
             }
-            protected boolean gotResult (Integer result) {
+            protected boolean gotResult (GameService.SellResult result) {
                 // let the client know we have an updated coins value
-                ctx.getCoins().update(result);
+                ctx.getCoins().update(result.coins);
                 status.update(SlotStatus.SOLD);
+                // if the series was automatically disliked because of this sale, note that
+                if (result.wasDisliked) {
+                    ctx.getLike(card.getSeries().categoryId).update(Boolean.FALSE);
+                }
                 onSold.run();
                 return false;
             }
