@@ -5,7 +5,8 @@ package com.threerings.everything.tests;
 
 import com.google.inject.Inject;
 
-import com.samskivert.util.IntMaps;
+import com.google.common.collect.Maps;
+
 import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.client.ServiceException;
@@ -53,7 +54,7 @@ public class TestSelectGridThings extends TestBase
         log.info("Selecting grid", "for", player.who(), "pup", pup);
         try {
             log.info("Selected grid",
-                "grid", _gameLogic.selectGridThings(player, pup, IntMaps.<Float>newHashIntMap()));
+                "grid", _gameLogic.selectGridThings(player, pup, Maps.<Integer, Float>newHashMap()));
         } catch (ServiceException se) {
             log.warning("Failed to select grid", "cause", se.getMessage());
         }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -17,13 +18,9 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
-import com.samskivert.util.Interator;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntSet;
-import com.samskivert.util.IntSets;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.data.Rarity;
@@ -85,7 +82,7 @@ public class ThingIndex
      * @param weights a mapping of categoryId -> weighting adjustment. Categories not specified
      * will not be adjusted.
      */
-    public ThingIndex copyWeighted (IntMap<Float> weights)
+    public ThingIndex copyWeighted (Map<Integer, Float> weights)
     {
         if (weights.isEmpty()) {
             return this;
@@ -129,9 +126,9 @@ public class ThingIndex
      * Computes the set of all needed thing ids given the supplied collection. Needed is a card in
      * a series the player is collecting but do not have.
      */
-    public IntSet computeNeeded (Multimap<Integer, Integer> collection)
+    public Set<Integer> computeNeeded (Multimap<Integer, Integer> collection)
     {
-        IntSet needed = IntSets.create();
+        Set<Integer> needed = Sets.newHashSet();
         for (Map.Entry<Integer, Collection<Integer>> entry : collection.asMap().entrySet()) {
             int catId = entry.getKey();
             Collection<Integer> heldIds = entry.getValue();
@@ -148,7 +145,7 @@ public class ThingIndex
      * Selects the specified number of things from the index weighted properly according to their
      * rarity. Things in the supplied exclusion set will not be chosen.
      */
-    public void selectThings (int count, IntSet excludeIds, IntSet into)
+    public void selectThings (int count, Set<Integer> excludeIds, Set<Integer> into)
     {
         log.debug("Selecting " + count + " things from entire collection " + _things.size());
         selectThings(_things, count, excludeIds, into);
@@ -158,16 +155,17 @@ public class ThingIndex
      * Selects the specified number of things from the subset of things in the specified set of
      * categories.
      */
-    public void selectThingsFrom (IntSet catIds, int count, IntSet into)
+    public void selectThingsFrom (Set<Integer> catIds, int count, Set<Integer> into)
     {
-        selectThingsFrom(catIds, count, IntSets.create(), into);
+        selectThingsFrom(catIds, count, Sets.<Integer>newHashSet(), into);
     }
 
     /**
      * Selects the specified number of things from the subset of things in the specified set of
      * categories, excluding any things in the supplied exclusion set.
      */
-    public void selectThingsFrom (IntSet catIds, int count, IntSet excludeIds, IntSet into)
+    public void selectThingsFrom (
+        Set<Integer> catIds, int count, Set<Integer> excludeIds, Set<Integer> into)
     {
         ThingList things = getCategoryThings(catIds, Rarity.I);
         log.debug("Selecting " + count + " things from " + catIds, "things", things.size(),
@@ -179,7 +177,7 @@ public class ThingIndex
      * Returns one thing of the specified rarity (must be V or higher). If possible, the thing will
      * be selected from those in the supplied set.
      */
-    public void pickThingOf (Rarity rarity, IntSet fromIds, IntSet into)
+    public void pickThingOf (Rarity rarity, Set<Integer> fromIds, Set<Integer> into)
     {
         ThingList rareList = _byrare.get(rarity);
         ThingList selected = rareList.copyWith(fromIds);
@@ -197,7 +195,7 @@ public class ThingIndex
      * Returns one thing of at least the specified rarity (must be V or higher) and which also must
      * be in the contained set of ids.
      */
-    public void pickBonusThing (IntSet fromIds, IntSet into)
+    public void pickBonusThing (Set<Integer> fromIds, Set<Integer> into)
     {
         ThingList things = new ThingList();
         for (Rarity rare : Rarity.BONUS) {
@@ -215,9 +213,9 @@ public class ThingIndex
     /**
      * Selects a birthday thing to give to a player who is collecting the specified series.
      */
-    public int pickBirthdayThing (IntSet ownedCats, IntSet heldRares)
+    public int pickBirthdayThing (Set<Integer> ownedCats, Set<Integer> heldRares)
     {
-        IntSet into = IntSets.create();
+        Set<Integer> into = Sets.newHashSet();
         // pick a rare gift from a category they collect
         ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
         if (things.size() >= 1) {
@@ -226,19 +224,19 @@ public class ThingIndex
 
         // if that didn't work, pick a random rarity X item
         if (into.isEmpty()) {
-            pickThingOf(Rarity.X, IntSets.create(), into);
+            pickThingOf(Rarity.X, Sets.<Integer>newHashSet(), into);
         }
 
         // cope if we've got nothing
-        return into.isEmpty() ? 0 : into.interator().nextInt();
+        return into.isEmpty() ? 0 : into.iterator().next();
     }
 
     /**
      * Pick a thing to use as a recruitment gift from among the specified things.
      */
-    public IntSet pickRecruitmentThings (IntSet playerThingIds)
+    public Set<Integer> pickRecruitmentThings (Set<Integer> playerThingIds)
     {
-        IntSet giftIds = IntSets.create();
+        Set<Integer> giftIds = Sets.newHashSet();
         // try 10 times to pick a Rarity II or less fully-random thing
         for (int ii = 0; ii < 10; ii++) {
             int thingId = pickWeightedThing(_things);
@@ -277,12 +275,12 @@ public class ThingIndex
         if (_attractorThings.size() == 0) {
             return null;
         }
-        IntSet pick = IntSets.create();
+        Set<Integer> pick = Sets.newHashSet();
         selectThings(_attractorThings, 1, pick, pick);
         if (pick.isEmpty()) {
             return null;
         }
-        return _attractors.get(pick.interator().nextInt());
+        return _attractors.get(pick.iterator().next());
     }
 
     public boolean isAttractor (int thingId)
@@ -303,16 +301,16 @@ public class ThingIndex
         }
     }
 
-    protected ThingList getThings (IntSet thingIds)
+    protected ThingList getThings (Set<Integer> thingIds)
     {
         ThingList things = new ThingList();
-        for (Interator it = thingIds.interator(); it.hasNext();) {
-            things.add(_byid.get(it.nextInt()));
+        for (Iterator it = thingIds.iterator(); it.hasNext();) {
+            things.add(_byid.get(it.next()));
         }
         return things;
     }
 
-    protected ThingList getCategoryThings (IntSet catIds, Rarity minRarity)
+    protected ThingList getCategoryThings (Set<Integer> catIds, Rarity minRarity)
     {
         ThingList things = new ThingList();
         for (int catId : catIds) {
@@ -325,11 +323,12 @@ public class ThingIndex
         return things;
     }
 
-    protected void selectThings (ThingList things, int count, IntSet excludeIds, IntSet into)
+    protected void selectThings (
+        ThingList things, int count, Set<Integer> excludeIds, Set<Integer> into)
     {
         if ((excludeIds.size() / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD) {
             things = things.copyWithout(excludeIds);
-            excludeIds = IntSets.create();
+            excludeIds = Sets.newHashSet();
         }
 
         // select the requested number of random things
@@ -387,7 +386,7 @@ public class ThingIndex
             weight = Math.round(rarity.weight() * adjust);
         }
 
-        public ThingInfo copyWeighted (IntMap<Float> weights)
+        public ThingInfo copyWeighted (Map<Integer, Float> weights)
         {
             Float adjust = weights.get(categoryId);
             return ((adjust == null) || (adjust == 1f)) ? this : new ThingInfo(this, adjust);
@@ -439,7 +438,7 @@ public class ThingIndex
         /**
          * Create a copy of this ThingList with the specified excluded items removed.
          */
-        public ThingList copyWithout (IntSet withoutIds)
+        public ThingList copyWithout (Set<Integer> withoutIds)
         {
             if (withoutIds.isEmpty()) {
                 return this;
@@ -453,7 +452,7 @@ public class ThingIndex
             return that;
         }
 
-        public ThingList copyWith (IntSet withIds)
+        public ThingList copyWith (Set<Integer> withIds)
         {
             ThingList that = new ThingList();
             if (!withIds.isEmpty()) { // optimize for common case
@@ -466,7 +465,7 @@ public class ThingIndex
             return that;
         }
 
-        public ThingList copyWeighted (IntMap<Float> weights)
+        public ThingList copyWeighted (Map<Integer, Float> weights)
         {
             if (weights.isEmpty()) {
                 return this;
@@ -483,11 +482,11 @@ public class ThingIndex
     }
 
     protected ThingList _things = new ThingList();
-    protected IntMap<ThingInfo> _byid = IntMaps.newHashIntMap();
+    protected Map<Integer, ThingInfo> _byid = Maps.newHashMap();
     protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
     protected EnumMap<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
-    protected IntMap<AttractorInfo> _attractors = IntMaps.newHashIntMap();
+    protected Map<Integer, AttractorInfo> _attractors = Maps.newHashMap();
     protected ThingList _attractorThings = new ThingList();
 
     { // initialize the _byrare map

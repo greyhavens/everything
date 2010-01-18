@@ -34,8 +34,6 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntMaps;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
@@ -94,9 +92,9 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads and returns the names for the supplied set of players, mapped by user id.
      */
-    public IntMap<PlayerName> loadPlayerNames (Collection<Integer> userIds)
+    public Map<Integer, PlayerName> loadPlayerNames (Collection<Integer> userIds)
     {
-        IntMap<PlayerName> names = IntMaps.newHashIntMap();
+        Map<Integer, PlayerName> names = Maps.newHashMap();
         for (PlayerRecord prec : loadPlayers(userIds)) {
             names.put(prec.userId, PlayerRecord.TO_NAME.apply(prec));
         }
@@ -337,13 +335,13 @@ public class PlayerRepository extends DepotRepository
      * Load a mapping of userId to the like preference for the specified category.
      * Users that have no like preference will be omitted from the mapping.
      */
-    public IntMap<Boolean> loadLikes (Collection<Integer> userIds, int categoryId)
+    public Map<Integer, Boolean> loadLikes (Collection<Integer> userIds, int categoryId)
     {
-        IntMap<Boolean> result = IntMaps.newHashIntMap();
+        Map<Integer, Boolean> result = Maps.newHashMap();
         for (LikeRecord rec : findAll(LikeRecord.class, new Where(
                 Ops.and(LikeRecord.USER_ID.in(userIds),
                         LikeRecord.CATEGORY_ID.eq(categoryId))))) {
-            result.put(rec.userId, (Boolean)rec.like);
+            result.put(rec.userId, rec.like);
         }
         return result;
     }

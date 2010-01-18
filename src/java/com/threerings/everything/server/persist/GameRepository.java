@@ -108,7 +108,7 @@ public class GameRepository extends DepotRepository
     /**
      * Loads all cards owned by the specified player of the specified things.
      */
-    public List<CardRecord> loadCards (int ownerId, Set<Integer> thingIds, boolean useCache)
+    public List<CardRecord> loadCards (int ownerId, Collection<Integer> thingIds, boolean useCache)
     {
         return findAll(CardRecord.class, useCache ? CacheStrategy.BEST : CacheStrategy.NONE,
                        new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),

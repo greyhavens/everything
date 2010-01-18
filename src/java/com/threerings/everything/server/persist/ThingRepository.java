@@ -6,11 +6,13 @@ package com.threerings.everything.server.persist;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,10 +31,6 @@ import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntSet;
-import com.samskivert.util.IntSets;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
@@ -111,7 +109,7 @@ public class ThingRepository extends DepotRepository
     public Iterable<Category> loadCategoriesBy (int creatorId)
     {
         // load all categories created by this player (will include non-leaves)
-        IntMap<Category> cats = IntMaps.newHashIntMap();
+        Map<Integer, Category> cats = Maps.newHashMap();
         Set<Integer> parentIds = Sets.newHashSet();
         for (CategoryRecord crec : findAll(CategoryRecord.class,
                                            new Where(CategoryRecord.CREATOR_ID.eq(creatorId)))) {
@@ -243,7 +241,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns the specified things.
      */
-    public Collection<Thing> loadThings (Set<Integer> thingIds)
+    public Collection<Thing> loadThings (Collection<Integer> thingIds)
     {
         return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds)))
             .map(ThingRecord.TO_THING);
@@ -331,7 +329,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Load all the thing ids owned by this player.
      */
-    public IntSet loadPlayerThings (int ownerId)
+    public Set<Integer> loadPlayerThings (int ownerId)
     {
         return loadPlayerThings(ownerId, null, null);
     }
@@ -339,7 +337,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads the thing ids of this player's things that are the specified rarity or higher.
      */
-    public IntSet loadPlayerThings (int ownerId, Rarity minRarity)
+    public Set<Integer> loadPlayerThings (int ownerId, Rarity minRarity)
     {
         return loadPlayerThings(ownerId, minRarity, null);
     }
@@ -347,7 +345,7 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads the thing ids of this player's things, with optional min and max rarities.
      */
-    public IntSet loadPlayerThings (int ownerId, Rarity minRarity, Rarity maxRarity)
+    public Set<Integer> loadPlayerThings (int ownerId, Rarity minRarity, Rarity maxRarity)
     {
         List<SQLExpression> whereConds = Lists.newArrayList();
         whereConds.add(CardRecord.OWNER_ID.eq(ownerId));
@@ -357,7 +355,7 @@ public class ThingRepository extends DepotRepository
         if (maxRarity != null) {
             whereConds.add(ThingRecord.RARITY.lessEq(maxRarity));
         }
-        return IntSets.create(
+        return Sets.newHashSet(
             findAllKeys(ThingRecord.class, false,
                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
                         new Where(Ops.and(whereConds)))

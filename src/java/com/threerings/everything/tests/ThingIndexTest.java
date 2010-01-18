@@ -5,14 +5,14 @@ package com.threerings.everything.tests;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntSet;
-import com.samskivert.util.IntSets;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,22 +31,22 @@ public class ThingIndexTest
     {
         ThingIndex index = createTestIndex();
         for (Rarity rarity : Rarity.BONUS) {
-            IntSet into = IntSets.create();
-            index.pickThingOf(rarity, IntSets.create(), into);
+            Set<Integer> into = Sets.newHashSet();
+            index.pickThingOf(rarity, Sets.<Integer>newHashSet(), into);
             assertTrue(into.size() > 0);
         }
     }
 
     @Test public void testPickBirthdayThing ()
     {
-        IntMap<ThingInfoRecord> things = createThings();
+        Map<Integer, ThingInfoRecord> things = createThings();
         List<AttractorRecord> attractors = Collections.emptyList();
         ThingIndex index = new ThingIndex(mapCategories(things), things.values(), attractors);
         // create a random collection
-        IntSet ids = IntSets.create(), exclude = IntSets.create();
+        Set<Integer> ids = Sets.newHashSet(), exclude = Sets.newHashSet();
         index.selectThings(25, ids, exclude);
         // compute owned categories and held rares
-        IntSet ownedCats = IntSets.create(), heldRares = IntSets.create();
+        Set<Integer> ownedCats = Sets.newHashSet(), heldRares = Sets.newHashSet();
         for (int thingId : ids) {
             ThingInfoRecord info = things.get(thingId);
             ownedCats.add(info.categoryId);
@@ -64,21 +64,21 @@ public class ThingIndexTest
 
     protected ThingIndex createTestIndex ()
     {
-        IntMap<ThingInfoRecord> things = createThings();
+        Map<Integer, ThingInfoRecord> things = createThings();
         List<AttractorRecord> attractors = Collections.emptyList();
         return new ThingIndex(mapCategories(things), things.values(), attractors);
     }
 
-    protected IntMap<ThingInfoRecord> createThings ()
+    protected Map<Integer, ThingInfoRecord> createThings ()
     {
-        IntMap<ThingInfoRecord> things = IntMaps.newHashIntMap();
+        Map<Integer, ThingInfoRecord> things = Maps.newHashMap();
         for (int ii = 0; ii < 25; ii++) {
             addCategory(things);
         }
         return things;
     }
 
-    protected IntIntMap mapCategories (IntMap<ThingInfoRecord> things)
+    protected IntIntMap mapCategories (Map<Integer, ThingInfoRecord> things)
     {
         IntIntMap catmap = new IntIntMap();
         for (ThingInfoRecord thing : things.values()) {
@@ -88,7 +88,7 @@ public class ThingIndexTest
         return catmap;
     }
 
-    protected void addCategory (IntMap<ThingInfoRecord> things)
+    protected void addCategory (Map<Integer, ThingInfoRecord> things)
     {
         int categoryId = ++_nextCategoryId;
         List<Rarity> series;

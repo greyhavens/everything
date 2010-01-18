@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -33,10 +34,6 @@ import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntSet;
-import com.samskivert.util.IntSets;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -252,7 +249,7 @@ public class EverythingServlet extends EveryServiceServlet
             }
             _playerLogic.resolveNames(result.comments, player.getName());
 // TODO: resolve names, where do we put them?
-//             IntMap<Category> cats = IntMaps.newHashIntMap();
+//             Map<Integer, Category> cats = Maps.newHashMap();
 //             for (Category cat : _thingRepo.loadCategories(catIds)) {
 //                 cats.put(cat.categoryId, cat);
 //             }
@@ -292,7 +289,7 @@ public class EverythingServlet extends EveryServiceServlet
         PlayerRecord player = requirePlayer();
         Set<Integer> ids = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
         ids.add(player.userId);
-        IntMap<PlayerStats> stats = IntMaps.newHashIntMap();
+        Map<Integer, PlayerStats> stats = Maps.newHashMap();
         for (PlayerStats pstat : _gameRepo.loadCollectionStats(ids, _thingLogic.getThingIndex())) {
             stats.put(pstat.name.userId, pstat);
         }
@@ -369,15 +366,16 @@ public class EverythingServlet extends EveryServiceServlet
                         fbFriendIds.add(uid.toString());
                     }
                     // map those friends to Samsara user ids
-                    IntSet allFriendIds =
-                        IntSets.create(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    Set<Integer> allFriendIds =
+                        Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
                     // retain only those that have Everything accounts
-                    allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).intKeySet());
+                    allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).keySet());
                     // load our current friends
-                    IntSet curFriendIds = IntSets.create(_playerRepo.loadFriendIds(prec.userId));
+                    Set<Integer> curFriendIds =
+                        Sets.newHashSet(_playerRepo.loadFriendIds(prec.userId));
                     // figure out new and old friends
-                    IntSet newFriendIds = IntSets.difference(allFriendIds, curFriendIds);
-                    IntSet oldFriendIds = IntSets.difference(curFriendIds, allFriendIds);
+                    Set<Integer> newFriendIds = Sets.difference(allFriendIds, curFriendIds);
+                    Set<Integer> oldFriendIds = Sets.difference(curFriendIds, allFriendIds);
                     // add any newly-acquired friends
                     if (!newFriendIds.isEmpty()) {
                         log.info("Wiring up friends", "who", prec.who(), "friends", newFriendIds);
@@ -443,8 +441,8 @@ public class EverythingServlet extends EveryServiceServlet
             int[] gifts;
             if (giveGifts) {
                 // load all the player's things of rarity II or less.
-                gifts = _thingLogic.getThingIndex().pickRecruitmentThings(
-                    _thingRepo.loadPlayerThings(player.userId, null, Rarity.II)).toIntArray();
+                gifts = Ints.toArray(_thingLogic.getThingIndex().pickRecruitmentThings(
+                    _thingRepo.loadPlayerThings(player.userId, null, Rarity.II)));
                 ArrayUtil.shuffle(gifts);
             } else {
                 gifts = new int[0];

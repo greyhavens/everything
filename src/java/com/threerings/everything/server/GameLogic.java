@@ -16,15 +16,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.IntIntMap;
-import com.samskivert.util.IntMap;
-import com.samskivert.util.IntMaps;
-import com.samskivert.util.IntSet;
-import com.samskivert.util.IntSets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
@@ -76,7 +73,7 @@ public class GameLogic
     public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
         throws ServiceException
     {
-        IntMap<Float> weights = generateSeriesWeights(player.userId);
+        Map<Integer, Float> weights = generateSeriesWeights(player.userId);
 
         GridRecord grid = new GridRecord();
         grid.userId = player.userId;
@@ -102,8 +99,8 @@ public class GameLogic
         Grid grid = GridRecord.TO_GRID.apply(record);
 
         // load up all the cards in the grid
-        IntMap<Thing> things = IntMaps.newHashIntMap();
-        for (Thing thing : _thingRepo.loadThings(IntSets.create(record.thingIds))) {
+        Map<Integer, Thing> things = Maps.newHashMap();
+        for (Thing thing : _thingRepo.loadThings(Ints.asList(record.thingIds))) {
             things.put(thing.thingId, thing);
         }
 
@@ -113,7 +110,7 @@ public class GameLogic
         long[] stamps = slots.toStamps();
 
         // if our grid status is non-normal, we need to resolve category data
-        IntMap<String> reveal = null;
+        Map<Integer, String> reveal = null;
         switch (grid.status) {
         case CAT_REVEALED: reveal = resolveReveal(things.values(), 2); break;
         case SUBCAT_REVEALED: reveal = resolveReveal(things.values(), 1); break;
@@ -283,16 +280,16 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    public int[] selectGridThings (PlayerRecord player, Powerup pup, IntMap<Float> weights)
+    public int[] selectGridThings (PlayerRecord player, Powerup pup, Map<Integer, Float> weights)
         throws ServiceException
     {
         ThingIndex index = _thingLogic.getThingIndex().copyWeighted(weights);
-        IntSet thingIds = IntSets.create();
+        Set<Integer> thingIds = Sets.newHashSet();
 
         // load up this player's collection summary, identify incomplete series
         Multimap<Integer, Integer> collection = _gameRepo.loadCollection(player.userId, index);
-        IntSet haveIds = IntSets.create(collection.values());
-        IntSet haveCats = IntSets.create();
+        Set<Integer> haveIds = Sets.newHashSet(collection.values());
+        Set<Integer> haveCats = Sets.newHashSet();
         for (int categoryId : collection.keySet()) {
             if (index.getCategorySize(categoryId) > collection.get(categoryId).size()) {
                 haveCats.add(categoryId);
@@ -300,7 +297,7 @@ public class GameLogic
         }
 
         // determine which cards this player needs to complete their collections
-        IntSet needed = index.computeNeeded(collection);
+        Set<Integer> needed = index.computeNeeded(collection);
 
         // we want to give them one card of high rarity that they need, if they used a powerup that
         // guarantees a card of a particular rarity, attempt to satisfy that with a needed card
@@ -346,7 +343,8 @@ public class GameLogic
         }
 
         // if they requested all new cards, load up the things they own
-        IntSet excludeIds = (pup == Powerup.ALL_NEW_CARDS) ? haveIds : IntSets.create();
+        Set<Integer> excludeIds =
+            (pup == Powerup.ALL_NEW_CARDS) ? haveIds : Sets.<Integer>newHashSet();
 
         // now select the remainder randomly from all possible things
         int randoCount = Grid.GRID_SIZE - thingIds.size();
@@ -362,12 +360,12 @@ public class GameLogic
                         "pup", pup, "fromCollected", fromCollected, "randoCount", randoCount,
                         "excludes", excludeIds.size());
             while (thingIds.size() > Grid.GRID_SIZE) {
-                thingIds.remove(thingIds.interator().nextInt());
+                thingIds.remove(thingIds.iterator().next());
             }
         }
 
         // shuffle the resulting thing ids for maximum randosity
-        int[] ids = thingIds.toIntArray();
+        int[] ids = Ints.toArray(thingIds);
         ArrayUtil.shuffle(ids);
         return ids;
     }
@@ -376,10 +374,10 @@ public class GameLogic
      * Returns a set of categories the player is collecting (ie. they have at least one card in the
      * category but have not completed it).
      */
-    protected IntSet resolveOwnedCats (int userId, ThingIndex index)
+    protected Set<Integer> resolveOwnedCats (int userId, ThingIndex index)
     {
         IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(userId);
-        IntSet ownedCats = IntSets.create();
+        Set<Integer> ownedCats = Sets.newHashSet();
         for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
             if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
                 ownedCats.add(entry.getIntKey());
@@ -391,10 +389,10 @@ public class GameLogic
     /**
      * Generate weightings to apply to seriesIds for the specified user.
      */
-    protected IntMap<Float> generateSeriesWeights (int userId)
+    protected Map<Integer, Float> generateSeriesWeights (int userId)
     {
         // Build a map of the player's category weightings
-        IntMap<Float> weights = IntMaps.newHashIntMap();
+        Map<Integer, Float> weights = Maps.newHashMap();
         for (LikeRecord likeRec : _playerRepo.loadLikes(userId)) {
             weights.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
         }
@@ -420,8 +418,8 @@ public class GameLogic
             }
         }
 //        // Let's dump the weightings:
-//        for (IntMap.IntEntry<Float> entry : weights.intEntrySet()) {
-//            System.err.println("\t" + entry.getIntKey() + " => " + entry.getValue());
+//        for (Map.Entry<Integer, Float> entry : weights.EntrySet()) {
+//            System.err.println("\t" + entry.getKey() + " => " + entry.getValue());
 //        }
         return weights;
     }
@@ -430,10 +428,10 @@ public class GameLogic
      * Resolves either nothing, the series, the sub-category or the category for the specified
      * collection of things. Returns a map from thing id to the resolved name.
      */
-    protected IntMap<String> resolveReveal (Collection<Thing> things, int reductions)
+    protected Map<Integer, String> resolveReveal (Collection<Thing> things, int reductions)
     {
         // first create a mapping from thing to category
-        IntMap<Category> cats = loadCategoryMap(
+        Map<Integer, Category> cats = loadCategoryMap(
             Sets.newHashSet(Iterables.transform(things, EFuncs.CATEGORY_ID)));
         Map<Integer, Category> thingcat = Maps.newHashMap();
         for (Thing thing : things) {
@@ -451,16 +449,16 @@ public class GameLogic
         }
 
         // finally extract the names of these categories
-        IntMap<String> reveals = IntMaps.newHashIntMap();
+        Map<Integer, String> reveals = Maps.newHashMap();
         for (Map.Entry<Integer, Category> entry : thingcat.entrySet()) {
             reveals.put(entry.getKey(), entry.getValue().name);
         }
         return reveals;
     }
 
-    protected IntMap<Category> loadCategoryMap (Set<Integer> catIds)
+    protected Map<Integer, Category> loadCategoryMap (Set<Integer> catIds)
     {
-        IntMap<Category> cats = IntMaps.newHashIntMap();
+        Map<Integer, Category> cats = Maps.newHashMap();
         for (Category cat : _thingRepo.loadCategories(catIds)) {
             cats.put(cat.categoryId, cat);
         }
@@ -473,7 +471,7 @@ public class GameLogic
     protected void processBirthday (PlayerRecord user)
     {
         ThingIndex index = _thingLogic.getThingIndex();
-        IntSet heldRares = _thingRepo.loadPlayerThings(user.userId, Rarity.MIN_GIFT_RARITY);
+        Set<Integer> heldRares = _thingRepo.loadPlayerThings(user.userId, Rarity.MIN_GIFT_RARITY);
         int thingId = index.pickBirthdayThing(resolveOwnedCats(user.userId, index), heldRares);
         Thing thing = _thingRepo.loadThing(thingId);
 
