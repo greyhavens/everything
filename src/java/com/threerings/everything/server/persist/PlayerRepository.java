@@ -343,7 +343,7 @@ public class PlayerRepository extends DepotRepository
         for (LikeRecord rec : findAll(LikeRecord.class, new Where(
                 Ops.and(LikeRecord.USER_ID.in(userIds),
                         LikeRecord.CATEGORY_ID.eq(categoryId))))) {
-            result.put(rec.userId, Boolean.valueOf(rec.like));
+            result.put(rec.userId, (Boolean)rec.like);
         }
         return result;
     }

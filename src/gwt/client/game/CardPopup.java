@@ -99,7 +99,7 @@ public class CardPopup extends PopupPanel
                 status.update(SlotStatus.SOLD);
                 // if the series was automatically disliked because of this sale, note that
                 if (result.wasDisliked) {
-                    ctx.getLike(card.getSeries().categoryId).update(Boolean.FALSE);
+                    ctx.getLike(card.getSeries().categoryId).update(false);
                 }
                 onSold.run();
                 return false;
@@ -245,12 +245,12 @@ public class CardPopup extends PopupPanel
                 if (result) {
                     Value<Boolean> like = _ctx.getLike(card.getSeries().categoryId);
                     if (like.get() == null) {
-                        _gamesvc.setLike(card.getSeries().categoryId, Boolean.TRUE,
+                        _gamesvc.setLike(card.getSeries().categoryId, true,
                             new AsyncCallback<Void>() {
                                 public void onFailure (Throwable err) {}
                                 public void onSuccess (Void result) {}
                             });
-                        like.update(Boolean.TRUE);
+                        like.update(true);
                     }
                 }
             }

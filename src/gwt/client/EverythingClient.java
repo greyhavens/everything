@@ -328,10 +328,10 @@ public class EverythingClient
         _pupsmodel = new PowerupsModel(data.powerups);
         _likes = new HashMap<Integer, Value<Boolean>>();
         for (Integer like : data.likes) {
-            _likes.put(like, Value.create(Boolean.TRUE));
+            _likes.put(like, Value.create(true));
         }
         for (Integer dislike : data.dislikes) {
-            _likes.put(dislike, Value.create(Boolean.FALSE));
+            _likes.put(dislike, Value.create(false));
         }
 
         setContent(null);

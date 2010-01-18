@@ -100,12 +100,12 @@ public class ThingDialog
                                        "tracking", tracking, cause);
                                }
                            });
-                           callback.onSuccess(Boolean.TRUE);
+                           callback.onSuccess(true);
                        }
                    },
                    new Command() { // incomplete callback
                        public void execute () {
-                           callback.onSuccess(Boolean.FALSE);
+                           callback.onSuccess(false);
                        }
                    });
     }
@@ -144,14 +144,14 @@ public class ThingDialog
                                }
                            });
                            if (callback != null) {
-                               callback.onSuccess(Boolean.TRUE);
+                               callback.onSuccess(true);
                            }
                        }
                    },
                    new Command() { // incomplete callback
                        public void execute () {
                            if (callback != null) {
-                               callback.onSuccess(Boolean.FALSE);
+                               callback.onSuccess(false);
                            }
                        }
                    });
