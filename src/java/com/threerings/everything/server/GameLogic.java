@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.util.ArrayUtil;
-import com.samskivert.util.IntIntMap;
+import com.samskivert.util.CountMap;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
@@ -374,17 +374,28 @@ public class GameLogic
      * Returns a set of categories the player is collecting (ie. they have at least one card in the
      * category but have not completed it).
      */
-    protected Set<Integer> resolveOwnedCats (int userId, ThingIndex index)
+    protected Set<Integer> resolveOwnedCats (int userId, final ThingIndex index)
     {
-        IntIntMap owned = _thingRepo.loadPlayerSeriesInfo(userId);
+        Map<Integer, Integer> owned = _thingRepo.loadPlayerSeriesInfo(userId);
         Set<Integer> ownedCats = Sets.newHashSet();
-        for (IntIntMap.IntIntEntry entry : owned.entrySet()) {
-            if (entry.getIntValue() < index.getCategorySize(entry.getIntKey())) {
-                ownedCats.add(entry.getIntKey());
+        for (Map.Entry<Integer, Integer> entry : owned.entrySet()) {
+            if (entry.getValue() < index.getCategorySize(entry.getKey())) {
+                ownedCats.add(entry.getKey());
             }
         }
         return ownedCats;
     }
+//        Predicate<Map.Entry<Integer, Integer>> neededSeriesIdFilter =
+//            new Predicate<Map.Entry<Integer, Integer>>() {
+//                public boolean apply (Map.Entry<Integer, Integer> entry) {
+//                    return (entry.getValue() < index.getCategorySize(entry.getKey()));
+//                }
+//            };
+//        return sets.newHashSet(
+//            Collections2.transform(
+//                Maps.filterEntries(_thingRepo.loadPlayerSeriesInfo(userId), neededSeriesIdFilter),
+//                EFuncs.ENTRY_TO_KEY));
+//    }
 
     /**
      * Generate weightings to apply to seriesIds for the specified user.
@@ -400,9 +411,10 @@ public class GameLogic
         // TODO: if not enough friends, go global??
         Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
         Collection<Integer> excludeCategories = weights.keySet();
-        IntIntMap friendLikes = _playerRepo.loadCollectiveLikes(friendIds, excludeCategories);
-        for (IntIntMap.IntIntEntry entry : friendLikes.entrySet()) {
-            int val = entry.getIntValue();
+        CountMap<Integer> friendLikes =
+            _playerRepo.loadCollectiveLikes(friendIds, excludeCategories);
+        for (Map.Entry<Integer, Integer> entry : friendLikes.entrySet()) {
+            int val = entry.getValue();
             float weight;
             if (val == 0) {
                 weight = 1;
@@ -414,7 +426,7 @@ public class GameLogic
                 weight = -1f / val; // 1 friend dislikes doesn't adjust..
             }
             if (weight != 1) {
-                weights.put(entry.getIntKey(), Float.valueOf(weight));
+                weights.put(entry.getKey(), weight);
             }
         }
 //        // Let's dump the weightings:

@@ -17,7 +17,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.samskivert.util.IntIntMap;
+import com.samskivert.util.CountMap;
 import com.samskivert.util.StringUtil;
 
 import com.samskivert.depot.DepotRepository;
@@ -292,7 +292,7 @@ public class GameRepository extends DepotRepository
      * Counts up and returns the number of cards in the supplied set of things that are held by
      * each of the specified owners.
      */
-    public IntIntMap countCardHoldings (
+    public CountMap<Integer> countCardHoldings (
         Set<Integer> ownerIds, Set<Integer> thingIds, boolean includeUnopenedGifts)
     {
         if (includeUnopenedGifts) {
@@ -303,14 +303,14 @@ public class GameRepository extends DepotRepository
             }
             ownerIds = ids;
         }
-        IntIntMap data = new IntIntMap();
+        CountMap<Integer> data = new CountMap<Integer>();
         for (OwnerRecord orec : findAll(OwnerRecord.class,
                                         new FieldOverride(OwnerRecord.COUNT,
                                                           Funcs.countDistinct(CardRecord.THING_ID)),
                                         new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
                                                           CardRecord.THING_ID.in(thingIds))),
                                         new GroupBy(CardRecord.OWNER_ID))) {
-            data.increment(Math.abs(orec.ownerId), orec.count);
+            data.add(Math.abs(orec.ownerId), orec.count);
         }
         return data;
     }

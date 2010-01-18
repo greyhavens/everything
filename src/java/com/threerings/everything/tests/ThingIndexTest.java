@@ -12,8 +12,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import com.samskivert.util.IntIntMap;
-
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -78,9 +76,9 @@ public class ThingIndexTest
         return things;
     }
 
-    protected IntIntMap mapCategories (Map<Integer, ThingInfoRecord> things)
+    protected Map<Integer, Integer> mapCategories (Map<Integer, ThingInfoRecord> things)
     {
-        IntIntMap catmap = new IntIntMap();
+        Map<Integer, Integer> catmap = Maps.newHashMap();
         for (ThingInfoRecord thing : things.values()) {
             catmap.put(thing.categoryId, thing.categoryId/10);
             catmap.put(thing.categoryId/10, thing.categoryId/100);

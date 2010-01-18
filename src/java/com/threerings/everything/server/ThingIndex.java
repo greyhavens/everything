@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import com.samskivert.util.IntIntMap;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.data.Rarity;
@@ -37,7 +36,8 @@ public class ThingIndex
     implements Cloneable
 {
     public ThingIndex (
-        IntIntMap catmap, Iterable<ThingInfoRecord> things, Iterable<AttractorRecord> attractors)
+        Map<Integer, Integer> catmap, Iterable<ThingInfoRecord> things,
+        Iterable<AttractorRecord> attractors)
     {
         for (ThingInfoRecord thing : things) {
             ThingInfo info = new ThingInfo(thing);
@@ -45,7 +45,8 @@ public class ThingIndex
             int categoryId = thing.categoryId;
             while (categoryId != 0) {
                 _bycat.put(categoryId, info);
-                categoryId = catmap.getOrElse(categoryId, 0);
+                Integer parentId = catmap.get(categoryId);
+                categoryId = (parentId == null) ? 0 : parentId;
             }
             if (Rarity.BONUS.contains(thing.rarity)) {
                 _byrare.get(thing.rarity).add(info);

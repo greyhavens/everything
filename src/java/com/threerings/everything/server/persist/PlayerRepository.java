@@ -33,7 +33,7 @@ import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
-import com.samskivert.util.IntIntMap;
+import com.samskivert.util.CountMap;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
@@ -351,14 +351,14 @@ public class PlayerRepository extends DepotRepository
      *
      * @return a mapping from categoryId to the count of likes minus the count of dislikes.
      */
-    public IntIntMap loadCollectiveLikes (
+    public CountMap<Integer> loadCollectiveLikes (
         Collection<Integer> userIds, Collection<Integer> excludeCategories)
     {
-        IntIntMap likes = new IntIntMap();
+        CountMap<Integer> likes = new CountMap<Integer>();
         for (LikeRecord rec : findAll(LikeRecord.class, new Where(
                 Ops.and(LikeRecord.USER_ID.in(userIds),
                         Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))))) {
-            likes.increment(rec.categoryId, rec.like ? 1 : -1);
+            likes.add(rec.categoryId, rec.like ? 1 : -1);
         }
         return likes;
     }

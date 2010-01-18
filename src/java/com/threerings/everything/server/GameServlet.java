@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
-import com.samskivert.util.IntIntMap;
+import com.samskivert.util.CountMap;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -300,7 +300,7 @@ public class GameServlet extends EveryServiceServlet
         // give you a second card in the same series when aren't *really* collecting it yet-
         // you may opt to sell the first gift and there's no reason to make it look like
         // you are a "collector" of that series...
-        IntIntMap holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
+        CountMap<Integer> holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
 
         // load up the likes for these friends
         Map<Integer, Boolean> likes = _playerRepo.loadLikes(friendIds, categoryId);
@@ -311,7 +311,7 @@ public class GameServlet extends EveryServiceServlet
         for (Integer friendId : friendIds) {
             FriendCardInfo info = new FriendCardInfo();
             info.friend = names.get(friendId);
-            info.hasThings = holdings.getOrElse(friendId, 0);
+            info.hasThings = holdings.getCount(friendId);
             info.like = likes.get(friendId);
             result.friends.add(info);
         }
@@ -564,18 +564,18 @@ public class GameServlet extends EveryServiceServlet
         SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
 
         // load up the count of each card in this series held by the player
-        IntIntMap holdings = new IntIntMap();
+        CountMap<Integer> holdings = new CountMap<Integer>();
         for (CardRecord crec : _gameRepo.loadCards(
                  player.userId, Sets.newHashSet(Iterables.transform(things, EFuncs.THING_ID)),
                  false /* don't use the cache */)) {
-            holdings.increment(crec.thingId, 1);
+            holdings.increment(crec.thingId);
         }
 
         // include the number of cards we already have with this thing
-        result.haveCount = holdings.getOrElse(thing.thingId, 0);
+        result.haveCount = holdings.getCount(thing.thingId);
 
         // now note this holding in our mapping and determine how many things remain
-        holdings.increment(thing.thingId, 1);
+        holdings.increment(thing.thingId);
         result.thingsRemaining = things.size() - holdings.size();
 
         CardRecord card;

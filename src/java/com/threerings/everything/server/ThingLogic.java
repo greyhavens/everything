@@ -3,10 +3,11 @@
 
 package com.threerings.everything.server;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import com.samskivert.util.IntIntMap;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -47,7 +48,7 @@ public class ThingLogic
      */
     protected ThingIndex createThingIndex ()
     {
-        IntIntMap catmap = new IntIntMap();
+        Map<Integer, Integer> catmap = Maps.newHashMap();
         for (Category cat : _thingRepo.loadAllCategories()) {
             if (cat.parentId != 0) {
                 catmap.put(cat.categoryId, cat.parentId);

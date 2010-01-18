@@ -33,7 +33,7 @@ import com.samskivert.servlet.util.CookieUtil;
 import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
-import com.samskivert.util.IntIntMap;
+import com.samskivert.util.CountMap;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -317,12 +317,12 @@ public class EverythingServlet extends EveryServiceServlet
         result.art = _playerRepo.loadPlayerName(30); // josh
         result.code = Lists.newArrayList(
             _playerRepo.loadPlayerName(2), _playerRepo.loadPlayerName(25)); // mdb & ray
-        final IntIntMap edinfo = _thingRepo.loadEditorInfo();
+        final CountMap<Integer> edinfo = _thingRepo.loadEditorInfo();
         result.editors = Lists.newArrayList(_playerRepo.loadPlayerNames(edinfo.keySet()).values());
         Collections.sort(result.editors, new Comparator<PlayerName>() {
             public int compare (PlayerName one, PlayerName two) {
-                return Comparators.compare(edinfo.getOrElse(two.userId, 0),
-                                           edinfo.getOrElse(one.userId, 0));
+                return Comparators.compare(edinfo.getCount(two.userId),
+                                           edinfo.getCount(one.userId));
             }
         });
         return result;
