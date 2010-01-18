@@ -49,15 +49,15 @@ public class LikeWidget extends HorizontalPanel
         _categoryId = categoryId;
         _liked = ctx.getLike(categoryId);
 
-        add(_pos = createImage(Boolean.TRUE));
-        add(_neg = createImage(Boolean.FALSE));
+        add(_pos = createImage(true));
+        add(_neg = createImage(false));
     }
 
     // from ValueListener
     public void valueChanged (Boolean liked)
     {
-        proto(Boolean.TRUE, liked).applyTo(_pos);
-        proto(Boolean.FALSE, liked).applyTo(_neg);
+        proto(true, liked).applyTo(_pos);
+        proto(false, liked).applyTo(_neg);
     }
 
     protected void onLoad ()
@@ -78,13 +78,10 @@ public class LikeWidget extends HorizontalPanel
         img.setTitle(buttonValue ? "I like this series" : "I dislike this series");
         Widgets.makeActionable(img, new ClickHandler() {
             public void onClick (ClickEvent event) {
-                updateLike(buttonValue);
+                // clicking while selected deselects and returns to no pref
+                updateLike((_liked.get() == buttonValue) ? null : buttonValue);
             }
-        }, _liked.map(new Function<Boolean, Boolean>() {
-            public Boolean apply (Boolean liked) {
-                return !_disarmed && (liked != buttonValue);
-            }
-        }));
+        }, _armed);
         return img;
     }
 
@@ -95,30 +92,29 @@ public class LikeWidget extends HorizontalPanel
             : ((liked == buttonValue) ? _images.neg_selected() : _images.neg());
     }
 
-    protected void updateLike (final Boolean like)
+    protected void updateLike (final Boolean newLike)
     {
-        _disarmed = true;
-        // jiggle liked to disable our buttons
-        _liked.update(_liked.get());
+        // disable the button
+        _armed.update(false);
 
-        _gamesvc.setLike(_categoryId, like, new AsyncCallback<Void>() {
+        _gamesvc.setLike(_categoryId, newLike, new AsyncCallback<Void>() {
             public void onFailure (Throwable err) {
                 // nada
             }
 
             public void onSuccess (Void result) {
-                _disarmed = false;
-                _liked.update(like);
+                _liked.update(newLike);
+                _armed.update(true);
             }
         });
     }
 
     protected int _categoryId;
-    protected boolean _disarmed;
     protected Value<Boolean> _liked;
 
     protected Image _pos, _neg;
+    protected Value<Boolean> _armed = Value.create(true);
 
-    protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
     protected static final LikeImages _images = GWT.create(LikeImages.class);
+    protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
