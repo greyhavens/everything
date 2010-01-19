@@ -96,11 +96,8 @@ public class CardPopup extends PopupPanel
             protected boolean gotResult (GameService.SellResult result) {
                 // let the client know we have an updated coins value
                 ctx.getCoins().update(result.coins);
+                ctx.getLike(card.getSeries().categoryId).update(result.newLike);
                 status.update(SlotStatus.SOLD);
-                // if the series was automatically disliked because of this sale, note that
-                if (result.wasDisliked) {
-                    ctx.getLike(card.getSeries().categoryId).update(false);
-                }
                 onSold.run();
                 return false;
             }

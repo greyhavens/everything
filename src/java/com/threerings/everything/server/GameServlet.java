@@ -263,13 +263,15 @@ public class GameServlet extends EveryServiceServlet
         SellResult result = new SellResult();
         result.coins = player.coins + coins;
 
-        // if the user had no preference in this series, and they have no other cards, mark
-        // that they dislike the series
-        if ((null == _playerRepo.getLike(player.userId, thing.categoryId)) &&
+        // If they sold the last card in a series, downgrade their 'like' preference
+        Boolean like = _playerRepo.getLike(player.userId, thing.categoryId);
+        if ((like == null || like == true) &&
                 _gameRepo.loadCards(player.userId, thing.categoryId).isEmpty()) {
-            _playerRepo.setLike(player.userId, thing.categoryId, false);
-            result.wasDisliked = true;
+            like = (like == null) ? false : null; // downgrade
+            _playerRepo.setLike(player.userId, thing.categoryId, like);
         }
+        result.newLike = like;
+
         return result;
     }
 

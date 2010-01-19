@@ -146,8 +146,8 @@ public interface GameService extends RemoteService
         /** The player's new coin balance. */
         public int coins;
 
-        /** If true, selling this card caused the series to be automatically disliked. */
-        public boolean wasDisliked;
+        /** The new 'like' value for this category. */
+        public Boolean newLike;
     }
 
     /**
