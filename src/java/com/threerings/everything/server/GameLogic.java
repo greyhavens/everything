@@ -408,29 +408,24 @@ public class GameLogic
             weights.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
         }
         // Factor in friend weightings
-        // TODO: if not enough friends, go global??
         Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
         Collection<Integer> excludeCategories = weights.keySet();
+        // TODO: if not many friends, go global
         CountMap<Integer> friendLikes =
             _playerRepo.loadCollectiveLikes(friendIds, excludeCategories);
         for (Map.Entry<Integer, Integer> entry : friendLikes.entrySet()) {
             int val = entry.getValue();
-            float weight;
-            if (val == 0) {
-                weight = 1;
-
-            } else if (val > 0) {
-                weight = 1f + (.5f * val);
-
-            } else {
-                weight = -1f / val; // 1 friend dislikes doesn't adjust..
-            }
+            float adjustBy = 1 - (1f / (1 + Math.abs(val)));
+            // adjustBy now contains 0, .5, .666, .75... approaching 1
+            float weight = (val < 0) ? (1f / (1 + adjustBy)) : (1 + adjustBy);
+            // weight is now between DISLIKE (.5) and LIKE (2), centered on 1, approaching
+            // the extremes asymptotically
             if (weight != 1) {
                 weights.put(entry.getKey(), weight);
             }
         }
 //        // Let's dump the weightings:
-//        for (Map.Entry<Integer, Float> entry : weights.EntrySet()) {
+//        for (Map.Entry<Integer, Float> entry : weights.entrySet()) {
 //            System.err.println("\t" + entry.getKey() + " => " + entry.getValue());
 //        }
         return weights;
