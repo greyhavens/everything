@@ -5,7 +5,6 @@ package com.threerings.everything.server;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.Random;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,7 +42,11 @@ public class ThingIndex
             // resolve the categories of which this thing is a member
             int categoryId = thing.categoryId;
             while (categoryId != 0) {
-                _bycat.put(categoryId, info);
+                ThingList catList = _bycat.get(categoryId);
+                if (catList == null) {
+                    _bycat.put(categoryId, catList = new ThingList());
+                }
+                catList.add(info);
                 Integer parentId = catmap.get(categoryId);
                 categoryId = (parentId == null) ? 0 : parentId;
             }
@@ -90,9 +92,17 @@ public class ThingIndex
         }
         ThingIndex copy = clone();
         copy._things = _things.copyWeighted(weights);
-        copy._byrare = _byrare.clone();
-        for (Map.Entry<Rarity, ThingList> entry : copy._byrare.entrySet()) {
-            entry.setValue(entry.getValue().copyWeighted(weights));
+        copy._byrare = Maps.newEnumMap(Rarity.class);
+        for (Map.Entry<Rarity, ThingList> entry : _byrare.entrySet()) {
+            copy._byrare.put(entry.getKey(), entry.getValue().copyWeighted(weights));
+        }
+        copy._bycat = Maps.newHashMap();
+        for (Map.Entry<Integer, ThingList> entry : _bycat.entrySet()) {
+            copy._bycat.put(entry.getKey(), entry.getValue().copyWeighted(weights));
+        }
+        copy._byid = Maps.newHashMap();
+        for (Map.Entry<Integer, ThingInfo> entry : _byid.entrySet()) {
+            copy._byid.put(entry.getKey(), entry.getValue().copyWeighted(weights));
         }
         return copy;
     }
@@ -484,8 +494,8 @@ public class ThingIndex
 
     protected ThingList _things = new ThingList();
     protected Map<Integer, ThingInfo> _byid = Maps.newHashMap();
-    protected Multimap<Integer, ThingInfo> _bycat = ArrayListMultimap.create();
-    protected EnumMap<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
+    protected Map<Integer, ThingList> _bycat = Maps.newHashMap();
+    protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
     protected Map<Integer, AttractorInfo> _attractors = Maps.newHashMap();
     protected ThingList _attractorThings = new ThingList();
