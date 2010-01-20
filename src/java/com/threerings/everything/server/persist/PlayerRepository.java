@@ -27,7 +27,6 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.GroupBy;
-import com.samskivert.depot.clause.Join;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -362,24 +361,15 @@ public class PlayerRepository extends DepotRepository
     /**
      * Load the like preferences of all this user's friends.
      */
-    public CountMap<Integer> loadCollectiveLikes (
+    public Map<Integer, int[]> loadCollectiveLikes (
         Collection<Integer> userIds, Collection<Integer> excludeCategories)
     {
-        CountMap<Integer> likes = new CountMap<Integer>();
-        for (LikeRecord rec : findAll(LikeRecord.class, new Where(
+        return generateLikes(
+            findAll(LikeCountRecord.class,
+            new Where(
                 Ops.and(LikeRecord.USER_ID.in(userIds),
-                        Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))))) {
-            likes.add(rec.categoryId, rec.like ? 1 : -1);
-        }
-        return likes;
-// ACK
-//        return generateLikes(
-//            findAll(LikeCountRecord.class,
-//            new Join(LikeCountRecord.CATEGORY_ID, LikeRecord.CATEGORY_ID),
-//            new Where(
-//                Ops.and(LikeRecord.USER_ID.in(userIds),
-//                    Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))),
-//            new GroupBy(LikeCountRecord.CATEGORY_ID, LikeCountRecord.LIKE)));
+                    Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))),
+            new GroupBy(LikeCountRecord.CATEGORY_ID, LikeCountRecord.LIKE)));
     }
 
     /**
@@ -602,7 +592,12 @@ public class PlayerRepository extends DepotRepository
      */
     protected static Map<Integer, int[]> generateLikes (Iterable<LikeCountRecord> recs)
     {
-        DefaultMap<Integer, int[]> likes = DefaultMap.newHashMap(CREATE_BLANK_LIKES);
+        DefaultMap<Integer, int[]> likes = DefaultMap.newHashMap(
+            new Function<Integer, int[]>() {
+                public int[] apply (Integer categoryId) {
+                    return new int[2];
+                }
+            });
         for (LikeCountRecord rec : recs) {
             likes.fetch(rec.categoryId)[rec.like ? 0 : 1] = rec.count;
         }
@@ -617,10 +612,4 @@ public class PlayerRepository extends DepotRepository
         Calendar cal = Calendars.at(when).asCalendar();
         return (cal.get(Calendar.MONTH)+1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
     }
-
-    protected static Function<Integer, int[]> CREATE_BLANK_LIKES = new Function<Integer, int[]>() {
-        public int[] apply (Integer categoryId) {
-            return new int[2];
-        }
-    };
 }

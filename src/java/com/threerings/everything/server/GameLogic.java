@@ -385,17 +385,6 @@ public class GameLogic
         }
         return ownedCats;
     }
-//        Predicate<Map.Entry<Integer, Integer>> neededSeriesIdFilter =
-//            new Predicate<Map.Entry<Integer, Integer>>() {
-//                public boolean apply (Map.Entry<Integer, Integer> entry) {
-//                    return (entry.getValue() < index.getCategorySize(entry.getKey()));
-//                }
-//            };
-//        return sets.newHashSet(
-//            Collections2.transform(
-//                Maps.filterEntries(_thingRepo.loadPlayerSeriesInfo(userId), neededSeriesIdFilter),
-//                EFuncs.ENTRY_TO_KEY));
-//    }
 
     /**
      * Generate weightings to apply to seriesIds for the specified user.
@@ -409,27 +398,27 @@ public class GameLogic
         }
         // Factor in friend weightings
         Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
-        CountMap<Integer> friendLikes =
-            _playerRepo.loadCollectiveLikes(friendIds, weights.keySet());
-        for (Map.Entry<Integer, Integer> entry : friendLikes.entrySet()) {
-            int val = entry.getValue();
-            // TODO: More like global...
-            float adjustBy = 1 - (1f / (1 + Math.abs(val)));
-            // adjustBy now contains 0, .5, .666, .75... approaching 1
-            float weight = (val < 0) ? (1f / (1 + adjustBy)) : (1 + adjustBy);
-            // weight is now between DISLIKE (.5) and LIKE (2), centered on 1, approaching
-            // the extremes asymptotically
-            if (weight != 1) {
+        int numFriends = friendIds.size();
+        if (numFriends > 0) {
+            Map<Integer, int[]> friendLikes =
+                _playerRepo.loadCollectiveLikes(friendIds, weights.keySet());
+            for (Map.Entry<Integer, int[]> entry : friendLikes.entrySet()) {
+                int[] like = entry.getValue();
+                float weight = 1 + ((like[0] - like[1]) / (float)(like[0] + like[1]));
+                if (weight < 1) {
+                    // friend weights can only scale down to DISLIKE_WEIGHT, so adjust a value
+                    // in (0 : 1) to (DISLIKE_WEIGHT : 1)
+                    weight = 1 - ((1 - weight) * (1 - DISLIKE_WEIGHT));
+                }
                 weights.put(entry.getKey(), weight);
             }
         }
-        // finally, factor in global weightings
+        // finally, factor in global weightings, which can go all the way down to 0
         for (Map.Entry<Integer, Float> entry : _thingLogic.getGlobalWeights().entrySet()) {
             if (!weights.containsKey(entry.getKey())) {
                 weights.put(entry.getKey(), entry.getValue());
             }
         }
-
 //        // Let's dump the weightings:
 //        for (Map.Entry<Integer, Float> entry : weights.entrySet()) {
 //            System.err.println("\t" + entry.getKey() + " => " + entry.getValue());
