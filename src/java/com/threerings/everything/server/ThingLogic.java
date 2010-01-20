@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -68,13 +69,13 @@ public class ThingLogic
         }
 
         // now create a map that scales from 2 to 0, centered on 1, for each category
-        Map<Integer, Float> weights = Maps.newHashMap();
+        ImmutableMap.Builder<Integer, Float> builder = ImmutableMap.builder();
         for (Map.Entry<Integer, int[]> entry : likes.entrySet()) {
             int[] like = entry.getValue();
             float weight = 1 + ((like[0] - like[1]) / (float)maxVotes);
-            weights.put(entry.getKey(), weight);
+            builder.put(entry.getKey(), weight);
         }
-        return weights;
+        return builder.build();
     }
 
     /** Supplies ThingIndex. */
