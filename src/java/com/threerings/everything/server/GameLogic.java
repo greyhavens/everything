@@ -409,12 +409,11 @@ public class GameLogic
         }
         // Factor in friend weightings
         Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
-        Collection<Integer> excludeCategories = weights.keySet();
-        // TODO: if not many friends, go global
         CountMap<Integer> friendLikes =
-            _playerRepo.loadCollectiveLikes(friendIds, excludeCategories);
+            _playerRepo.loadCollectiveLikes(friendIds, weights.keySet());
         for (Map.Entry<Integer, Integer> entry : friendLikes.entrySet()) {
             int val = entry.getValue();
+            // TODO: More like global...
             float adjustBy = 1 - (1f / (1 + Math.abs(val)));
             // adjustBy now contains 0, .5, .666, .75... approaching 1
             float weight = (val < 0) ? (1f / (1 + adjustBy)) : (1 + adjustBy);
@@ -424,6 +423,13 @@ public class GameLogic
                 weights.put(entry.getKey(), weight);
             }
         }
+        // finally, factor in global weightings
+        for (Map.Entry<Integer, Float> entry : _thingLogic.getGlobalWeights().entrySet()) {
+            if (!weights.containsKey(entry.getKey())) {
+                weights.put(entry.getKey(), entry.getValue());
+            }
+        }
+
 //        // Let's dump the weightings:
 //        for (Map.Entry<Integer, Float> entry : weights.entrySet()) {
 //            System.err.println("\t" + entry.getKey() + " => " + entry.getValue());

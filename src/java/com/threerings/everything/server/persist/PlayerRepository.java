@@ -27,6 +27,7 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.GroupBy;
+import com.samskivert.depot.clause.Join;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
@@ -34,6 +35,8 @@ import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.CountMap;
+
+import com.threerings.util.DefaultMap;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
@@ -347,9 +350,17 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Load the global likes for everyone in the entire game.
+     */
+    public Map<Integer, int[]> loadGlobalLikes ()
+    {
+        return generateLikes(
+            findAll(LikeCountRecord.class,
+            new GroupBy(LikeCountRecord.CATEGORY_ID, LikeCountRecord.LIKE)));
+    }
+
+    /**
      * Load the like preferences of all this user's friends.
-     *
-     * @return a mapping from categoryId to the count of likes minus the count of dislikes.
      */
     public CountMap<Integer> loadCollectiveLikes (
         Collection<Integer> userIds, Collection<Integer> excludeCategories)
@@ -361,6 +372,14 @@ public class PlayerRepository extends DepotRepository
             likes.add(rec.categoryId, rec.like ? 1 : -1);
         }
         return likes;
+// ACK
+//        return generateLikes(
+//            findAll(LikeCountRecord.class,
+//            new Join(LikeCountRecord.CATEGORY_ID, LikeRecord.CATEGORY_ID),
+//            new Where(
+//                Ops.and(LikeRecord.USER_ID.in(userIds),
+//                    Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))),
+//            new GroupBy(LikeCountRecord.CATEGORY_ID, LikeCountRecord.LIKE)));
     }
 
     /**
@@ -579,6 +598,18 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
+     * Convert LikeCountRecords into a mapping indicating the counts of likes and dislikes.
+     */
+    protected static Map<Integer, int[]> generateLikes (Iterable<LikeCountRecord> recs)
+    {
+        DefaultMap<Integer, int[]> likes = DefaultMap.newHashMap(CREATE_BLANK_LIKES);
+        for (LikeCountRecord rec : recs) {
+            likes.fetch(rec.categoryId)[rec.like ? 0 : 1] = rec.count;
+        }
+        return likes;
+    }
+
+    /**
      * Converts a date to MMDD format.
      */
     protected static int toDateVal (long when)
@@ -586,4 +617,10 @@ public class PlayerRepository extends DepotRepository
         Calendar cal = Calendars.at(when).asCalendar();
         return (cal.get(Calendar.MONTH)+1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
     }
+
+    protected static Function<Integer, int[]> CREATE_BLANK_LIKES = new Function<Integer, int[]>() {
+        public int[] apply (Integer categoryId) {
+            return new int[2];
+        }
+    };
 }
