@@ -527,9 +527,11 @@ public class GameLogic
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 
+    // Twice the normal weight (NOTE: if you change this, some assumptions in code must change...)
     protected static final Float LIKE_WEIGHT = 2f;
 
-    protected static final Float DISLIKE_WEIGHT = .5f;
+    // the minimum weighting such that every card still has a nonzero chance of appearing
+    protected static final Float DISLIKE_WEIGHT = 1f / Rarity.X.weight();
 
     /** We'll try 10 times to pick a bonus card before giving up. */
     protected static final int MAX_BONUS_ATTEMPTS = 10;
