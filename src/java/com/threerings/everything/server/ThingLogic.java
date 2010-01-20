@@ -5,12 +5,18 @@ package com.threerings.everything.server;
 
 import java.util.Map;
 
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.server.persist.ThingRepository;
+import com.threerings.everything.server.persist.PlayerRepository;
+
+import com.threerings.everything.util.LazyExpiringMemoizingSupplier;
 
 /**
  * Thing related server logic.
@@ -23,24 +29,7 @@ public class ThingLogic
      */
     public ThingIndex getThingIndex ()
     {
-        long now = System.currentTimeMillis();
-        synchronized (this) {
-            if (_index != null && now < _nextIndexUpdate) {
-                return _index;
-            }
-            _nextIndexUpdate = now + THING_INDEX_UPDATE_INTERVAL;
-            // before the first thing index is generated, all callers must block
-            if (_index == null) {
-                return (_index = createThingIndex());
-            }
-            // otherwise other callers can use the old index until we've generated the new one
-        }
-
-        ThingIndex index = createThingIndex();
-        synchronized (this) {
-            _index = index;
-        }
-        return index;
+        return _indexSupplier.get();
     }
 
     /**
@@ -57,11 +46,14 @@ public class ThingLogic
         return new ThingIndex(catmap, _thingRepo.loadActiveThings(), _thingRepo.loadAttractors());
     }
 
-    protected ThingIndex _index;
-    protected long _nextIndexUpdate;
+    /** Supplies ThingIndex. */
+    protected final Supplier<ThingIndex> _indexSupplier =
+        new LazyExpiringMemoizingSupplier(
+            new Supplier<ThingIndex>() {
+                public ThingIndex get () {
+                    return createThingIndex();
+                }
+            }, 5, TimeUnit.MINUTES);
 
     @Inject protected ThingRepository _thingRepo;
-
-    /** Recompute our thing index every five minutes. */
-    protected static final long THING_INDEX_UPDATE_INTERVAL = 5 * 60 * 1000L;
 }
