@@ -630,7 +630,7 @@ public class GameServlet extends EveryServiceServlet
         }
         // OK! pick a card
         ThingIndex index = _thingLogic.getThingIndex();
-        AttractorInfo att = index.pickAttractor();
+        AttractorInfo att = index.pickAttractor(_thingLogic.getGlobalWeights());
         if (att == null) {
             return null; // nothing to pick!
         }

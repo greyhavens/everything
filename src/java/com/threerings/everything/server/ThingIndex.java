@@ -281,13 +281,14 @@ public class ThingIndex
     /**
      * Pick an attractor card.
      */
-    public AttractorInfo pickAttractor ()
+    public AttractorInfo pickAttractor (Map<Integer, Float> weights)
     {
-        if (_attractorThings.size() == 0) {
+        ThingList atts = _attractorThings.copyWeighted(weights);
+        if (atts.size() == 0) {
             return null;
         }
         Set<Integer> pick = Sets.newHashSet();
-        selectThings(_attractorThings, 1, pick, pick);
+        selectThings(atts, 1, pick, pick);
         if (pick.isEmpty()) {
             return null;
         }
@@ -497,6 +498,8 @@ public class ThingIndex
     protected Map<Integer, ThingList> _bycat = Maps.newHashMap();
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
     protected Random _rando = new Random();
+
+    /** Attractors are never stored weighted, but weighted when used. */
     protected Map<Integer, AttractorInfo> _attractors = Maps.newHashMap();
     protected ThingList _attractorThings = new ThingList();
 
