@@ -6,6 +6,9 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+//import com.google.gwt.event.shared.HandlerRegistration;
+//import com.google.gwt.event.logical.shared.CloseEvent;
+//import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -16,6 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
+import com.threerings.gwt.ui.WidgetUtil;
 import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Handlers;
 import com.threerings.gwt.util.StringUtil;
@@ -261,6 +265,33 @@ public class CardPopup extends PopupPanel
             share.setTitle("Tell your friends about this awesome card.");
         }
 
+        if (completed) {
+            final int heightFudge = 50;
+            Widget fireworks = WidgetUtil.createTransparentFlashContainer(
+                "fireworks", "SetCompletion.swf",
+                Window.getClientWidth(), Window.getClientHeight() + heightFudge, null);
+            _fireworks = Popups.newPopup("fireworks", fireworks);
+            _fireworks.center();
+// DOESN'T WORK
+//            final HandlerRegistration scrollReg = Window.addWindowScrollHandler(
+//                new Window.ScrollHandler() {
+//                    public void onWindowScroll (Window.ScrollEvent event)
+//                    {
+//                        Console.log("recentering...");
+//                        _fireworks.center();
+//                    }
+//                });
+//            _fireworks.addCloseHandler(
+//                new CloseHandler<PopupPanel>() {
+//                    public void onClose (CloseEvent<PopupPanel> event)
+//                    {
+//                        scrollReg.removeHandler();
+//                    }
+//                });
+//            Console.log("Created fireworks: " + Window.getClientWidth() + " x " +
+//                Window.getClientHeight());
+        }
+
         // only "incentivize" sharing if you just completed a series or you just received a gift
         // (not when you are looking at a card gifted previously)
         Widget[] buttons = (completed || (wasGift && (_title != null)))
@@ -275,6 +306,9 @@ public class CardPopup extends PopupPanel
             public void onClick (ClickEvent event) {
                 if (_msgPop != null) {
                     _msgPop.hide();
+                }
+                if (_fireworks != null) {
+                    _fireworks.hide();
                 }
                 int tx = -getOffsetWidth(), ty = getAbsoluteTop();
                 FX.move(CardPopup.this).to(tx, ty).onComplete(new Command() {
@@ -301,6 +335,8 @@ public class CardPopup extends PopupPanel
 
     protected Command _onAnimComplete;
     protected PopupPanel _msgPop;
+
+    protected PopupPanel _fireworks;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }

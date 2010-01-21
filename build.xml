@@ -263,9 +263,9 @@
       <arg value="488"/>
       <arg value="-incremental=true"/>
       <arg value="-output"/>
-      <arg value="${deploy.dir}/${app.ident}-ui.swf"/>
+      <arg value="${deploy.dir}/SetCompletion.swf"/>
       <arg value="-file-specs"/>
-      <arg value="${asrc.dir}/com/threerings/everything/EverythingUI.as"/>
+      <arg value="${asrc.dir}/com/threerings/everything/SetCompletion.as"/>
     </java>
   </target>
 
@@ -307,7 +307,7 @@
     <copy todir="${instroot.dir}/web" preservelastmodified="true">
       <fileset dir="${wsrc.dir}" includes="**"/>
       <fileset dir="${deploy.dir}/gwt/${app.ident}" includes="**"/>
-      <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
+      <fileset dir="${deploy.dir}" includes="SetCompletion.swf"/>
     </copy>
     <manifest file="${instroot.dir}/MANIFEST.MF">
       <attribute name="Main-Class" value="com.threerings.everything.server.EverythingApp$Module"/>
@@ -325,7 +325,7 @@
     <copy todir="${local_samsara_dir}/apps/${app.ident}/candidate/web/" preservelastmodified="true">
       <fileset dir="${wsrc.dir}" includes="**"/>
       <fileset dir="${gsrc.dir}/public" includes="**"/>
-      <fileset dir="${deploy.dir}" includes="everything-ui.swf"/>
+      <fileset dir="${deploy.dir}" includes="SetCompletion.swf"/>
     </copy>
   </target>
 
