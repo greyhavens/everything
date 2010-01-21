@@ -74,13 +74,9 @@ public class LandingPage extends FlowPanel
             // show extra help for a new player that arrived via an attractor
             addInstructions();
             add(Widgets.newShim(10, 10));
-            //addBookmarkTip();
 
-        } else if (ctx.isNewbie()) {
-            // don't confuse newbies with too many options
-            //addBookmarkTip();
-
-        } else if (news != null && news.get() != null) {
+        } else if (!ctx.isNewbie() && //don't confuse newbies with too many options
+                (news != null) && (news.get() != null)) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
@@ -119,16 +115,6 @@ public class LandingPage extends FlowPanel
             right().setText("\u2023", "Arrow").
             right().setText(_msgs.introStepFour(), "machine");
         add(intro);
-    }
-
-    protected void addBookmarkTip ()
-    {
-        add(Widgets.newLabel(_msgs.introBookmark(), "Title", "machine"));
-        FluentTable intro = new FluentTable(5, 0);
-        intro.add().setWidget(Widgets.newImage("images/bookmark_tip.png")).
-            right().setText(_msgs.introBookmarkTip(), "Text");
-        add(intro);
-        add(Widgets.newShim(10, 10));
     }
 
     protected void addBigFlip ()
