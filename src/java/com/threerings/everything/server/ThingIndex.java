@@ -130,7 +130,8 @@ public class ThingIndex
      */
     public int getCategorySize (int categoryId)
     {
-        return _bycat.get(categoryId).size();
+        ThingList list = _bycat.get(categoryId);
+        return (list == null) ? 0 : list.size();
     }
 
     /**
