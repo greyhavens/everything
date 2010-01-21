@@ -130,8 +130,8 @@ public class ThingIndex
      */
     public int getCategorySize (int categoryId)
     {
-        ThingList list = _bycat.get(categoryId);
-        return (list == null) ? 0 : list.size();
+        ThingList catList = _bycat.get(categoryId);
+        return (catList == null) ? 0 : catList.size();
     }
 
     /**
@@ -143,10 +143,13 @@ public class ThingIndex
         Set<Integer> needed = Sets.newHashSet();
         for (Map.Entry<Integer, Collection<Integer>> entry : collection.asMap().entrySet()) {
             int catId = entry.getKey();
-            Collection<Integer> heldIds = entry.getValue();
-            for (ThingInfo info : _bycat.get(catId)) {
-                if (!heldIds.contains(info.thingId)) {
-                    needed.add(info.thingId);
+            ThingList catList = _bycat.get(catId);
+            if (catList != null) {
+                Collection<Integer> heldIds = entry.getValue();
+                for (ThingInfo info : catList) {
+                    if (!heldIds.contains(info.thingId)) {
+                        needed.add(info.thingId);
+                    }
                 }
             }
         }
@@ -270,8 +273,12 @@ public class ThingIndex
      */
     public int pickSeedThing (int seedCat)
     {
+        ThingList catList = _bycat.get(seedCat);
+        if (catList == null) {
+            return 0;
+        }
         ThingList things = new ThingList();
-        for (ThingInfo info : _bycat.get(seedCat)) {
+        for (ThingInfo info : catList) {
             if (info.rarity == Rarity.I) {
                 things.add(info);
             }
@@ -327,9 +334,12 @@ public class ThingIndex
     {
         ThingList things = new ThingList();
         for (int catId : catIds) {
-            for (ThingInfo info : _bycat.get(catId)) {
-                if (info.rarity.ordinal() >= minRarity.ordinal()) {
-                    things.add(info);
+            ThingList catList = _bycat.get(catId);
+            if (catList != null) {
+                for (ThingInfo info : catList) {
+                    if (info.rarity.ordinal() >= minRarity.ordinal()) {
+                        things.add(info);
+                    }
                 }
             }
         }
