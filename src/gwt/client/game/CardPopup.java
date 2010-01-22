@@ -264,14 +264,12 @@ public class CardPopup extends PopupPanel
         }
 
         if (completed) {
-            final int heightFudge = 50;
+            RootPanel root = RootPanel.get("client"); // EverythingClient.CLIENT_DIV
             Widget fireworks = WidgetUtil.createTransparentFlashContainer(
                 "fireworks", "SetCompletion.swf",
-                //RootPanel.get().getOffsetWidth(), RootPanel.get().getOffsetHeight(), null);
-                //1000, 1000, null);
-                Window.getClientWidth(), Window.getClientHeight() + heightFudge, null);
+                root.getOffsetWidth(), root.getOffsetHeight(), null);
             _fireworks = Popups.newPopup("setCompletionPopup", fireworks);
-            _fireworks.center();
+            _fireworks.show();
         }
 
         // only "incentivize" sharing if you just completed a series or you just received a gift
