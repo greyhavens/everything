@@ -465,6 +465,10 @@
   padding: 0px;
 }
 
+.setCompletionPopup {
+ z-index: 3;
+}
+
 /** GiftCardPopup styles */
 .giftCard {
   min-width: 600px;

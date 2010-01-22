@@ -6,14 +6,12 @@ package client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-//import com.google.gwt.event.shared.HandlerRegistration;
-//import com.google.gwt.event.logical.shared.CloseEvent;
-//import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FX;
@@ -269,27 +267,11 @@ public class CardPopup extends PopupPanel
             final int heightFudge = 50;
             Widget fireworks = WidgetUtil.createTransparentFlashContainer(
                 "fireworks", "SetCompletion.swf",
+                //RootPanel.get().getOffsetWidth(), RootPanel.get().getOffsetHeight(), null);
+                //1000, 1000, null);
                 Window.getClientWidth(), Window.getClientHeight() + heightFudge, null);
-            _fireworks = Popups.newPopup("fireworks", fireworks);
+            _fireworks = Popups.newPopup("setCompletionPopup", fireworks);
             _fireworks.center();
-// DOESN'T WORK
-//            final HandlerRegistration scrollReg = Window.addWindowScrollHandler(
-//                new Window.ScrollHandler() {
-//                    public void onWindowScroll (Window.ScrollEvent event)
-//                    {
-//                        Console.log("recentering...");
-//                        _fireworks.center();
-//                    }
-//                });
-//            _fireworks.addCloseHandler(
-//                new CloseHandler<PopupPanel>() {
-//                    public void onClose (CloseEvent<PopupPanel> event)
-//                    {
-//                        scrollReg.removeHandler();
-//                    }
-//                });
-//            Console.log("Created fireworks: " + Window.getClientWidth() + " x " +
-//                Window.getClientHeight());
         }
 
         // only "incentivize" sharing if you just completed a series or you just received a gift
