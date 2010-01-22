@@ -5,6 +5,7 @@ package com.threerings.everything {
 
 import flash.events.Event;
 
+import flash.display.Shape;
 import flash.display.Sprite;
 
 import flash.utils.getTimer; // function import
@@ -36,8 +37,17 @@ public class SetCompletion extends Sprite
     public static const MIN_SPARKS :int = 20;
     public static const MAX_SPARKS :int = 30;
 
+    public static const BLACK_FADE :int = 2000;
+
     public function SetCompletion ()
     {
+        _background = new Shape();
+        _background.graphics.beginFill(0);
+        _background.graphics.drawRect(0, 0, WIDTH, HEIGHT);
+        _background.graphics.endFill();
+        _background.alpha = 0;
+        addChild(_background);
+        _start = getTimer();
         addEventListener(Event.ENTER_FRAME, handleFrame);
     }
 
@@ -52,6 +62,8 @@ public class SetCompletion extends Sprite
     protected function handleFrame (... ignored) :void
     {
         var now :Number = getTimer();
+
+        _background.alpha = Math.min(1, (now - _start) / BLACK_FADE);
 
         if (now > _nextWork) {
             addWork(now);
@@ -82,6 +94,8 @@ public class SetCompletion extends Sprite
         addChild(work);
     }
 
+    protected var _background :Shape;
+    protected var _start :Number;
     protected var _nextWork :Number = 0;
     protected var _works :Array = [];
 }
@@ -107,14 +121,14 @@ class Work extends Sprite
 
         var g :Graphics;
         for (var ii :int = 0; ii < sparks; ii++) {
-            var spark :Sprite = new Sprite();
+            var spark :Shape = new Shape();
             g = spark.graphics;
             g.beginFill(color);
             g.drawCircle(0, 0, 1.8);
             g.endFill();
             _sparks.push(spark);
 
-            var trail :Sprite = new Sprite();
+            var trail :Shape = new Shape();
             g = trail.graphics;
             g.beginFill(color);
             g.drawRect(-1, -1, 1, 1);
@@ -147,10 +161,10 @@ class Work extends Sprite
         var trailAlpha :Number = .8 - (complete * .8);
         var trailScale :Number = (1 - cubicOut) * sparkY;
 
-        for each (var spark :Sprite in _sparks) {
+        for each (var spark :Shape in _sparks) {
             spark.y = sparkY;
         }
-        for each (var trail :Sprite in _trails) {
+        for each (var trail :Shape in _trails) {
             trail.alpha = trailAlpha;
             trail.y = sparkY;
             trail.scaleY = trailScale;
