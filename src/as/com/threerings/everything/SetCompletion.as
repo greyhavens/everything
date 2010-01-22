@@ -7,6 +7,8 @@ import flash.events.Event;
 
 import flash.display.Shape;
 import flash.display.Sprite;
+import flash.display.StageAlign;
+import flash.display.StageScaleMode;
 
 import flash.utils.getTimer; // function import
 
@@ -18,9 +20,6 @@ public class SetCompletion extends Sprite
 {
     public static const MIN_FREQUENCY :int = 100;
     public static const MAX_FREQUENCY :int = 500;
-
-    public static const WIDTH :int = 500;
-    public static const HEIGHT :int = 500;
 
     public static const MIN_RADIUS :int = 100;
     public static const MAX_RADIUS :int = 200;
@@ -42,11 +41,12 @@ public class SetCompletion extends Sprite
     public function SetCompletion ()
     {
         _background = new Shape();
-        _background.graphics.beginFill(0);
-        _background.graphics.drawRect(0, 0, WIDTH, HEIGHT);
-        _background.graphics.endFill();
         _background.alpha = 0;
         addChild(_background);
+        stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
+        stage.addEventListener(Event.RESIZE, handleStageResize);
+        handleStageResize();
         _start = getTimer();
         addEventListener(Event.ENTER_FRAME, handleFrame);
     }
@@ -57,6 +57,14 @@ public class SetCompletion extends Sprite
     public static function random (min :int, max :int) :int
     {
         return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    protected function handleStageResize (... ignored) :void
+    {
+        _background.graphics.clear();
+        _background.graphics.beginFill(0x000000);
+        _background.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+        _background.graphics.endFill();
     }
 
     protected function handleFrame (... ignored) :void
@@ -88,8 +96,8 @@ public class SetCompletion extends Sprite
         var radius :Number = random(MIN_RADIUS, MAX_RADIUS);
 
         var work :Work = new Work(now, duration, radius, color, sparks);
-        work.x = random(radius, WIDTH - radius);
-        work.y = random(radius, HEIGHT - radius);
+        work.x = random(radius, stage.stageWidth - radius);
+        work.y = random(radius, stage.stageHeight - radius);
         _works.push(work);
         addChild(work);
     }
