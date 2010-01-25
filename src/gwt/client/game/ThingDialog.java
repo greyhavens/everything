@@ -90,7 +90,8 @@ public class ThingDialog
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog("", title, message,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   imageURL, joinURL, joinURL, "Recruit your friends:",
+                   imageURL, joinURL, joinURL, "Start your collection with this card!",
+                   "Recruit your friends:",
                    new Command() { // complete callback
                        public void execute () {
                            _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
@@ -133,7 +134,7 @@ public class ThingDialog
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
-                   imageURL, cardURL, everyURL, prompt,
+                   imageURL, cardURL, everyURL, "Start your own Everything collection!", prompt,
                    new Command() { // complete callback
                        public void execute () {
                            _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
@@ -159,7 +160,8 @@ public class ThingDialog
 
     protected static native void showDialog (String targetId, String title, String descrip,
                                              String categories, String rarity,
-                                             String imageURL, String cardURL, String everyURL,
+                                             String imageURL, String cardURL,
+                                             String everyURL, String everyURLText,
                                              String prompt,
                                              Command onComplete, Command onIncomplete) /*-{
         var attachment = {
@@ -171,7 +173,7 @@ public class ThingDialog
                         'href': cardURL }],
             'properties': {'Category': categories,
                            'Rarity': rarity,
-                           'Join the fun': {'text': 'Start your own Everything collection!',
+                           'Join the fun': {'text': everyURLText,
                                             'href': everyURL }},
         };
         var actions = [{ "text": "Collect Everything",
