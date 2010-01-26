@@ -22,6 +22,7 @@
     <file name="extlibs/flash/tweener.swc"/>
     <file name="extlibs/java/jetty6/jetty.jar"/>
     <file name="extlibs/java/jetty6/jetty-util.jar"/>
+    <file name="extlibs/java/json.jar"/>
 
     <!-- these are for unit tests and mocking -->
     <file name="extlibs/java/easymock/easymock.jar"/>
@@ -109,6 +110,7 @@
       <dependency groupId="com.threerings" artifactId="samsara-shared" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="pulse" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
