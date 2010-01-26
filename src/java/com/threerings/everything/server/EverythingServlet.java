@@ -83,6 +83,8 @@ public class EverythingServlet extends EveryServiceServlet
         data.powerups = Maps.newHashMap();
         data.everythingURL = _app.getFacebookAppURL();
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
+        data.likes = Lists.newArrayList();
+        data.dislikes = Lists.newArrayList();
 
         OOOUser user = getUser();
         if (user == null) {
@@ -209,8 +211,6 @@ public class EverythingServlet extends EveryServiceServlet
         data.isMaintainer = user.holdsToken(OOOUser.MAINTAINER);
         data.coins = player.coins;
         data.powerups = _gameRepo.loadPowerups(player.userId);
-        data.likes = Lists.newArrayList();
-        data.dislikes = Lists.newArrayList();
         for (LikeRecord rec : _playerRepo.loadLikes(player.userId)) {
             (rec.like ? data.likes : data.dislikes).add(rec.categoryId);
         }
