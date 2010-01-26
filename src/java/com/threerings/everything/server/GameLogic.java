@@ -394,29 +394,26 @@ public class GameLogic
         // Build a map of the player's category weightings
         Map<Integer, Float> weights = Maps.newHashMap();
         for (LikeRecord likeRec : _playerRepo.loadLikes(userId)) {
-            weights.put(likeRec.categoryId, likeRec.like ? LIKE_WEIGHT : DISLIKE_WEIGHT);
+            weights.put(likeRec.categoryId,
+                likeRec.like ? ThingLogic.LIKE_WEIGHT : ThingLogic.DISLIKE_WEIGHT);
         }
-        // Factor in friend weightings
+
+        // load friend likings and decide how much they matter
         Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
-        int numFriends = friendIds.size();
-        if (numFriends > 0) {
-            Map<Integer, int[]> friendLikes =
-                _playerRepo.loadCollectiveLikes(friendIds, weights.keySet());
-            for (Map.Entry<Integer, int[]> entry : friendLikes.entrySet()) {
-                int[] like = entry.getValue();
-                float weight = 1 + ((like[0] - like[1]) / (float)(like[0] + like[1]));
-                if (weight < 1) {
-                    // friend weights can only scale down to DISLIKE_WEIGHT, so adjust a value
-                    // in (0 : 1) to (DISLIKE_WEIGHT : 1)
-                    weight = 1 - ((1 - weight) * (1 - DISLIKE_WEIGHT));
-                }
-                weights.put(entry.getKey(), weight);
-            }
-        }
-        // finally, factor in global weightings, which can go all the way down to 0
-        for (Map.Entry<Integer, Float> entry : _thingLogic.getGlobalWeights().entrySet()) {
-            if (!weights.containsKey(entry.getKey())) {
-                weights.put(entry.getKey(), entry.getValue());
+        Map<Integer, Float> friendLikes = friendIds.isEmpty()
+            ? Collections.<Integer, Float>emptyMap()
+            : _playerRepo.loadCollectiveLikes(friendIds);
+        // calculate a factor for our friends' weightings according to how many we have:
+        // from .2 (1 friend) to .8 (9 or more friends). Don't worry about the 0 friend case.
+        float friendFactor = .2f + (Math.min(8, friendIds.size() - 1) / 8f) * .6f;
+
+        // go through global weights and factor them with friend weights...
+        for (Map.Entry<Integer, Float> entry : _thingLogic.getGlobalLikes().entrySet()) {
+            Integer catId = entry.getKey();
+            if (!weights.containsKey(catId)) {
+                // only for categories we don't already have personally weighted
+                weights.put(catId, ThingLogic.LIKABILITY_TO_WEIGHT.apply(
+                    combineLikability(entry.getValue(), friendLikes.get(catId), friendFactor)));
             }
         }
 //        // Let's dump the weightings:
@@ -424,6 +421,16 @@ public class GameLogic
 //            System.err.println("\t" + entry.getKey() + " => " + entry.getValue());
 //        }
         return weights;
+    }
+
+    /**
+     * Helper for generateSeriesWeights: combine global and friend likability.
+     */
+    protected Float combineLikability (Float globalLiking, Float friendLiking, float friendFactor)
+    {
+        return (friendLiking == null)
+            ? globalLiking
+            : ((friendLiking * friendFactor) + ((1 - friendFactor) * globalLiking));
     }
 
     /**
@@ -526,15 +533,6 @@ public class GameLogic
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
-
-    // Twice the normal weight (NOTE: if you change this, some assumptions in code must change...)
-    protected static final Float LIKE_WEIGHT = 2f;
-
-    // the minimum weighting such that every card still has a nonzero chance of appearing
-    protected static final Float DISLIKE_WEIGHT = 1f / Rarity.X.weight();
-
-    /** We'll try 10 times to pick a bonus card before giving up. */
-    protected static final int MAX_BONUS_ATTEMPTS = 10;
 
     /** One hour in milliseconds. */
     protected static final long HOUR = 60*60*1000L;

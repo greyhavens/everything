@@ -7,13 +7,14 @@ import java.util.Map;
 
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.ThingRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
 
@@ -25,6 +26,26 @@ import com.threerings.everything.util.LazyExpiringMemoizingSupplier;
 @Singleton
 public class ThingLogic
 {
+    /** Twice the normal weight. */
+    public static final Float LIKE_WEIGHT = 2f;
+
+    /** The minimum weighting such that every card still has a nonzero chance of appearing. */
+    public static final Float DISLIKE_WEIGHT = 1f / Rarity.X.weight();
+
+    /** Converts a (-1 : 1) likability into a (DISLIKE_WEIGHT : LIKE_WEIGHT) weighting. */
+    public static final Function<Float, Float> LIKABILITY_TO_WEIGHT =
+        new Function<Float, Float>() {
+            public Float apply (Float likability)
+            {
+                if (likability >= 0f) {
+                    return 1 + (likability * (LIKE_WEIGHT - 1));
+
+                } else {
+                    return 1 - (-likability * (1 - DISLIKE_WEIGHT));
+                }
+            }
+        };
+
     /**
      * Returns a recently computed thing index. May block if the index needs updating.
      */
@@ -34,12 +55,20 @@ public class ThingLogic
     }
 
     /**
-     * Get the global weights for each series, as determined by the entire user population's
-     * likes/dislikes.
+     * Get the global likes for each series, expressed as a value from -1 to 1.
+     */
+    public Map<Integer, Float> getGlobalLikes ()
+    {
+        return _likeSupplier.get();
+    }
+
+    /**
+     * Get the weightings computed from the global likes.
      */
     public Map<Integer, Float> getGlobalWeights ()
     {
-        return _weightSupplier.get();
+        // go ahead and copy to a new one...
+        return Maps.newHashMap(Maps.transformValues(getGlobalLikes(), LIKABILITY_TO_WEIGHT));
     }
 
     /**
@@ -56,28 +85,6 @@ public class ThingLogic
         return new ThingIndex(catmap, _thingRepo.loadActiveThings(), _thingRepo.loadAttractors());
     }
 
-    /**
-     * Creates a new global weights map.
-     */
-    protected Map<Integer, Float> createGlobalWeights ()
-    {
-        Map<Integer, int[]> likes = _playerRepo.loadGlobalLikes();
-        // first, let's figure out the maximum number of votes on any particular issue
-        int maxVotes = 0;
-        for (int[] like : likes.values()) {
-            maxVotes = Math.max(maxVotes, like[0] + like[1]);
-        }
-
-        // now create a map that scales from 2 to 0, centered on 1, for each category
-        ImmutableMap.Builder<Integer, Float> builder = ImmutableMap.builder();
-        for (Map.Entry<Integer, int[]> entry : likes.entrySet()) {
-            int[] like = entry.getValue();
-            float weight = 1 + ((like[0] - like[1]) / (float)maxVotes);
-            builder.put(entry.getKey(), weight);
-        }
-        return builder.build();
-    }
-
     /** Supplies ThingIndex. */
     protected final Supplier<ThingIndex> _indexSupplier =
         new LazyExpiringMemoizingSupplier<ThingIndex>(
@@ -88,11 +95,11 @@ public class ThingLogic
             }, 5, TimeUnit.MINUTES);
 
     /** Supplies weights. */
-    protected final Supplier<Map<Integer, Float>> _weightSupplier =
+    protected final Supplier<Map<Integer, Float>> _likeSupplier =
         new LazyExpiringMemoizingSupplier<Map<Integer, Float>>(
             new Supplier<Map<Integer, Float>>() {
                 public Map<Integer, Float> get () {
-                    return createGlobalWeights();
+                    return _playerRepo.loadGlobalLikes();
                 }
             }, 18, TimeUnit.MINUTES);
 

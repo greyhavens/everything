@@ -3,6 +3,8 @@
 
 package com.threerings.everything.server.persist;
 
+import com.google.common.base.Function;
+
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
@@ -42,4 +44,13 @@ public class FriendRecord extends PersistentRecord
                 new Comparable[] { userId, friendId });
     }
     // AUTO-GENERATED: METHODS END
+
+    /** A function for converting a FriendRecord to an Integer representing the friend's id. */
+    public static Function<FriendRecord, Integer> TO_FRIEND_ID =
+        new Function<FriendRecord, Integer>() {
+            public Integer apply (FriendRecord record)
+            {
+                return record.friendId;
+            }
+        };
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -33,9 +34,6 @@ import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.util.Calendars;
-import com.samskivert.util.CountMap;
-
-import com.threerings.util.DefaultMap;
 
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.data.FeedItem;
@@ -294,11 +292,7 @@ public class PlayerRepository extends DepotRepository
     public Collection<Integer> loadFriendIds (int userId)
     {
         return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId)))
-            .map(new Function<FriendRecord, Integer>() {
-                public Integer apply (FriendRecord record) {
-                    return record.friendId;
-                }
-            });
+            .map(FriendRecord.TO_FRIEND_ID);
     }
 
     /**
@@ -350,8 +344,10 @@ public class PlayerRepository extends DepotRepository
 
     /**
      * Load the global likes for everyone in the entire game.
+     *
+     * @return a Map from categoryId to a measure of likability between -1 and 1.
      */
-    public Map<Integer, int[]> loadGlobalLikes ()
+    public Map<Integer, Float> loadGlobalLikes ()
     {
         return generateLikes(
             findAll(LikeCountRecord.class,
@@ -361,14 +357,14 @@ public class PlayerRepository extends DepotRepository
     /**
      * Load the like preferences of all this user's friends.
      */
-    public Map<Integer, int[]> loadCollectiveLikes (
-        Collection<Integer> userIds, Collection<Integer> excludeCategories)
+    public Map<Integer, Float> loadCollectiveLikes (Collection<Integer> userIds)
     {
+        // Note: I used to exclude categories we weren't going to use because the user had
+        // his own like/dislike for it, but now I include them to assist in computing a
+        // useful denominator
         return generateLikes(
             findAll(LikeCountRecord.class,
-            new Where(
-                Ops.and(LikeRecord.USER_ID.in(userIds),
-                    Ops.not(LikeRecord.CATEGORY_ID.in(excludeCategories)))),
+            new Where(LikeRecord.USER_ID.in(userIds)),
             new GroupBy(LikeCountRecord.CATEGORY_ID, LikeCountRecord.LIKE)));
     }
 
@@ -588,20 +584,34 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * Convert LikeCountRecords into a mapping indicating the counts of likes and dislikes.
+     * Convert LikeCountRecords into a mapping indicating 'likedness', measured between -1 and 1.
      */
-    protected static Map<Integer, int[]> generateLikes (Iterable<LikeCountRecord> recs)
+    protected static Map<Integer, Float> generateLikes (Iterable<LikeCountRecord> recs)
     {
-        DefaultMap<Integer, int[]> likes = DefaultMap.newHashMap(
-            new Function<Integer, int[]>() {
-                public int[] apply (Integer categoryId) {
-                    return new int[2];
-                }
-            });
+        // first simply build a map of the likes vs dislikes
+        Map<Integer, int[]> countMap = Maps.newHashMap();
         for (LikeCountRecord rec : recs) {
-            likes.fetch(rec.categoryId)[rec.like ? 0 : 1] = rec.count;
+            int[] counts = countMap.get(rec.categoryId);
+            if (counts == null) {
+                countMap.put(rec.categoryId, counts = new int[2]);
+            }
+            counts[rec.like ? 0 : 1] = rec.count;
         }
-        return likes;
+
+        // figure out the maximum total for any category
+        int maxVotes = 0;
+        for (int[] counts : countMap.values()) {
+            maxVotes = Math.max(maxVotes, counts[0] + counts[1]);
+        }
+
+        // generate a map the scales from -1 to 1, centered on 0, for each category
+        ImmutableMap.Builder<Integer, Float> builder = ImmutableMap.builder();
+        for (Map.Entry<Integer, int[]> entry : countMap.entrySet()) {
+            int[] counts = entry.getValue();
+            float weight = (counts[0] - counts[1]) / (float)maxVotes;
+            builder.put(entry.getKey(), weight);
+        }
+        return builder.build();
     }
 
     /**
