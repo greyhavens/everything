@@ -372,7 +372,7 @@ public class ThingIndex
 
         // if the thing list is now empty, there's no point in continuing
         if (things.size() == 0) {
-            log.info("Failed to select things", "desired", count, "into.size()", into.size(),
+            log.warning("Failed to select things", "desired", count, "into.size()", into.size(),
                 new Exception("DON'T PANIC"));
             return;
         }
@@ -384,6 +384,13 @@ public class ThingIndex
                 added++;
 
             } else if (++missed >= MAX_SELECT_ITERS) {
+                if (added == 0) {
+                    log.warning("Spinning while not selecting things!", "forceCopy", forceCopy);
+                    if (forceCopy) {
+                        // oh, that's bad
+                        return;
+                    }
+                }
                 // we're spinning our wheels trying to pick something, let's try again
                 // with a copy of the ThingList that excludes stuff we can't use
                 selectThings(things, count - added, excludeIds, into, true);
