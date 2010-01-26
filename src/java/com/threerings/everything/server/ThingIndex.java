@@ -346,30 +346,47 @@ public class ThingIndex
         return things;
     }
 
+    /**
+     * Select things from the specified list.
+     */
     protected void selectThings (
         ThingList things, int count, Set<Integer> excludeIds, Set<Integer> into)
     {
-        if ((excludeIds.size() / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD) {
-            things = things.copyWithout(excludeIds);
+        selectThings(things, count, excludeIds, into, false);
+    }
+
+    /**
+     * Select things from the specified list, optionally forcing the list to copy itself
+     * excluding the ids already in excludeIds or into.
+     */
+    protected void selectThings (
+        ThingList things, int count, Set<Integer> excludeIds, Set<Integer> into, boolean forceCopy)
+    {
+        if (forceCopy ||
+                (((excludeIds.size() + into.size()) / (float)things.size()) >=
+                     EXCLUDE_COPY_THRESHOLD)) {
+            // make a copy without the stuff we've already excluded or selected
+            things = things.copyWithout(excludeIds).copyWithout(into);
             excludeIds = Sets.newHashSet();
         }
 
+        // if the thing list is now empty, there's no point in continuing
+        if (things.size() == 0) {
+            log.info("Failed to select things", "desired", count);
+            return;
+        }
+
         // select the requested number of random things
-        int iters = 0, added = 0;
-        while (added < count) {
-            if (iters++ >= MAX_SELECT_ITERS) {
-                // let's only log a warning if we were trying to select more than 3
-                if (count > 3) {
-                    log.warning("Failed to select things",
-                        "setSize", things.size(), "excludedSize", excludeIds.size(),
-                        "count", count, "added", added, "into.size()", into.size(),
-                        new Exception("DON'T PANIC"));
-                }
-                break;
-            }
+        for (int added = 0, missed = 0; added < count; ) {
             int thingId = pickWeightedThing(things);
             if (!excludeIds.contains(thingId) && into.add(thingId)) {
                 added++;
+
+            } else if (++missed >= MAX_SELECT_ITERS) {
+                // we're spinning our wheels trying to pick something, let's try again
+                // with a copy of the ThingList that excludes stuff we can't use
+                selectThings(things, count - added, excludeIds, into, true);
+                return;
             }
         }
     }
@@ -521,7 +538,7 @@ public class ThingIndex
     }
 
     /** Used to avoid infinite loopage. */
-    protected static final int MAX_SELECT_ITERS = 1024;
+    protected static final int MAX_SELECT_ITERS = 256;
 
     /** If we're selecting things and excluding more than this percentage of things, make a copy. */
     protected static final float EXCLUDE_COPY_THRESHOLD = 0.5f;
