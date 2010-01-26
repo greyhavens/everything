@@ -372,7 +372,8 @@ public class ThingIndex
 
         // if the thing list is now empty, there's no point in continuing
         if (things.size() == 0) {
-            log.info("Failed to select things", "desired", count);
+            log.info("Failed to select things", "desired", count, "into.size()", into.size(),
+                new Exception("DON'T PANIC"));
             return;
         }
 
