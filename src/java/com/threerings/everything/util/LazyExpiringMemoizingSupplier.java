@@ -32,6 +32,7 @@ public class LazyExpiringMemoizingSupplier<T>
                 return setValue(_delegate.get());
 
             case CACHED: // check the expiration and return the value if it's good
+            default:
                 if (System.nanoTime() - _expirationNanos < 0) {
                     return _value;
                 }

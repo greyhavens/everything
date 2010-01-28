@@ -21,7 +21,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.samskivert.util.ArrayUtil;
-import com.samskivert.util.CountMap;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.data.Card;
