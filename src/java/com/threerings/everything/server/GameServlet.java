@@ -43,6 +43,7 @@ import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.data.TrophyData;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -68,11 +69,18 @@ public class GameServlet extends EveryServiceServlet
             throw new ServiceException(E_UNKNOWN_USER);
         }
 
+        Set<Integer> completedSets = Sets.newHashSet();
+
         // first load up all of the series
         Multimap<Integer, SeriesCard> series = HashMultimap.create();
         // TODO: use loadPlayerThings and resolve category data from memory
         for (SeriesCard card : _thingRepo.loadPlayerSeries(ownerId)) {
             series.put(card.parentId, card);
+
+            // track the players completed sets
+            if (card.owned == card.things) {
+                completedSets.add(card.categoryId);
+            }
         }
 
         // load up the series' parents, the sub-categories
@@ -91,6 +99,14 @@ public class GameServlet extends EveryServiceServlet
                 scats.put(scat.name, slist);
             }
             coll.series.put(cat.name, scats);
+        }
+
+        // now let's populate their trophies
+        coll.trophies = Lists.newArrayList();
+        for (Map.Entry<Set<Integer>, TrophyData> entry : _thingLogic.getTrophies().entrySet()) {
+            if (completedSets.containsAll(entry.getKey())) {
+                coll.trophies.add(entry.getValue());
+            }
         }
 
         return coll;
@@ -592,9 +608,10 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // note that this player completed this series and if appropriate report to their feed
-        if (result.thingsRemaining == 0) {
+        if (result.thingsRemaining == 0 && result.haveCount == 0) {
             _gameLogic.maybeReportCompleted(player, result.card.getSeries(),
                                             result.getClass().getSimpleName());
+            // TODO: inform the user of any newly-earned trophies
         }
 
         return card;
@@ -658,5 +675,5 @@ public class GameServlet extends EveryServiceServlet
     protected static final Set<Integer> OLD_ATTRACTORS = Sets.newHashSet(648); // Crack
 
     /** The percent chance that a free flip will find a bonanza card. */
-    protected static final double BONANZA_CHANCE = 0.2; // 20%
+    protected static final double BONANZA_CHANCE = 0.1; // 10% (TODO: raise back up)
 }

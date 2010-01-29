@@ -20,6 +20,9 @@ public class PlayerCollection
     /** A mapping from category -> sub-category -> series card(s) for the entire collection. */
     public Map<String, Map<String, List<SeriesCard>>> series;
 
+    /** The trophies this player has earned, ordered from most-recently earned. */
+    public List<TrophyData> trophies;
+
     /**
      * Returns the number of (unique) cards in this collection.
      */

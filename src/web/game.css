@@ -306,6 +306,10 @@
   width: 390px;
 }
 
+.browse .Trophy {
+  font-weight: bold;
+}
+
 .browse .Header .Links {
   font-size: 12px;
 }

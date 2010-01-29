@@ -30,10 +30,12 @@ import com.threerings.everything.client.GameServiceAsync;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
+import com.threerings.everything.data.TrophyData;
 
 import client.ui.DataPanel;
 import client.ui.XFBML;
 import client.ui.lines.LineImages;
+import client.ui.trophies.TrophyImages;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -74,16 +76,19 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _series = Value.create(coll.countSeries());
             _completed = Value.create(coll.countCompletedSeries());
 
-            _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded").
-                setRowSpan(3);
+            _header.at(0, 0).setWidget(XFBML.newProfilePic(coll.owner.facebookId), "Padded")
+                .setRowSpan(3);
             _header.at(0, 1).setText(coll.owner.toString() + "'s Collection", "Title", "machine");
             _header.at(2, 0).setText("");
-            _header.at(0, 2).setText("Total things:", "Padded", "right", "handwriting").
-                right().setWidget(ValueLabel.create(_cards), "right", "handwriting");
-            _header.at(1, 1).setText("Total series:", "Padded", "right", "handwriting").
-                right().setWidget(ValueLabel.create(_series), "right", "handwriting");
-            _header.at(2, 1).setText("Completed:", "Padded", "right", "handwriting").
-                right().setWidget(ValueLabel.create(_completed), "right", "handwriting");
+            _header.at(0, 2).setText("Total things:", "Padded", "right", "handwriting")
+                .right().setWidget(ValueLabel.create(_cards), "right", "handwriting");
+            _header.at(1, 1).setText("Total series:", "Padded", "right", "handwriting")
+                .right().setWidget(ValueLabel.create(_series), "right", "handwriting");
+            _header.at(2, 1).setText("Completed:", "Padded", "right", "handwriting")
+                .right().setWidget(ValueLabel.create(_completed), "right", "handwriting");
+
+            _header.at(3, 0).setWidget(createTrophyTable(coll)).setColSpan(3).alignCenter();
+
             XFBML.parse(this);
         }
         _coll = coll;
@@ -296,6 +301,27 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         });
     }
 
+    protected Widget createTrophyTable (PlayerCollection coll)
+    {
+        FluentTable panel = new FluentTable(10, 0, "Trophies");
+
+        int count = 0;
+        for (TrophyData trophy : coll.trophies) {
+            FluentTable tab = new FluentTable();
+            // TODO: according to name of trophy, create a different image:
+            // trophy.trophyId;
+            Image img = _trophies.trophy().createImage();
+            img.setTitle(trophy.description);
+//            tab.add().alignCenter().setWidget(img);
+//            tab.add().alignCenter().setText(trophy.name);
+//            panel.add(tab);
+            panel.at(count / 5, count % 5).alignCenter().alignBottom()
+                .setWidgets(img, Widgets.newLabel(trophy.name, "Trophy"));
+            count++;
+        }
+        return panel;
+    }
+
     protected static Image createLine (boolean up, boolean down, boolean left, boolean right)
     {
         String key = "";
@@ -320,6 +346,8 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected Command _clearSeries;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
+
+    protected static final TrophyImages _trophies = GWT.create(TrophyImages.class);
 
     protected static final LineImages _lines = GWT.create(LineImages.class);
     protected static Map<String, AbstractImagePrototype> _linemap =
