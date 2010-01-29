@@ -30,6 +30,12 @@
   border: 1px solid #442D17;
 }
 
+/** Trophy styles */
+.Trophy {
+  font-weight: bold;
+  font-family: Helvetia, Arial, sans-serif;
+}
+
 /** CardView styles */
 .cardView {
   width: 603px;
@@ -304,10 +310,6 @@
 .browse .Header .Title {
   font-size: 16px;
   width: 390px;
-}
-
-.browse .Trophy {
-  font-weight: bold;
 }
 
 .browse .Header .Links {
