@@ -172,8 +172,7 @@ public class EditorServlet extends EveryServiceServlet
     // from interface EditorService
     public int createThing (Thing thing) throws ServiceException
     {
-        OOOUser user = requireUser();
-        PlayerRecord editor = requireEditor(user);
+        PlayerRecord editor = requireEditor();
 
         // make sure the series exists, they own it and that it's not active (these should be
         // checked on the client as well)
@@ -181,7 +180,7 @@ public class EditorServlet extends EveryServiceServlet
         if (series == null) {
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
-        if (series.isActive() || (series.getCreatorId() != editor.userId && !user.isAdmin())) {
+        if (series.isActive() || (series.getCreatorId() != editor.userId && !getUser().isAdmin())) {
             throw new ServiceException(AppCodes.E_ACCESS_DENIED);
         }
 
@@ -239,12 +238,12 @@ public class EditorServlet extends EveryServiceServlet
     protected PlayerRecord checkEditor (Created created)
         throws ServiceException
     {
-        OOOUser user = requireUser();
-        PlayerRecord editor = requireEditor(user);
+        PlayerRecord editor = requireEditor();
         if (created == null) {
             log.warning("Requested to edit non-existent object", "who", editor.who());
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
         }
+        OOOUser user = getUser();
         if (!user.isAdmin() && created.getCreatorId() != user.userId) {
             throw new ServiceException(AppCodes.E_ACCESS_DENIED);
         }

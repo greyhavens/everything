@@ -23,29 +23,30 @@ import static com.threerings.everything.Log.log;
 public abstract class EveryServiceServlet extends AppServiceServlet
 {
     @Override // from RemoteServiceServlet
-    public String processCall (String payload) throws SerializationException
+    public String processCall (String payload)
+        throws SerializationException
     {
-        return super.processCall(payload);
+        try {
+            return super.processCall(payload);
+
+        } finally {
+            _perThreadPlayerRecord.remove();
+        }
     }
 
     protected PlayerRecord getPlayer ()
     {
-        OOOUser user = getUser();
-        return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
+        return _perThreadPlayerRecord.get();
     }
 
     protected PlayerRecord requirePlayer ()
         throws ServiceException
     {
-        return requirePlayer(requireUser());
-    }
-
-    protected PlayerRecord requirePlayer (OOOUser user)
-        throws ServiceException
-    {
-        PlayerRecord player = _playerRepo.loadPlayer(user.userId);
+        PlayerRecord player = getPlayer();
         if (player == null) {
-            log.warning("Missing player record for user in requirePlayer?", "who", user.userId);
+            OOOUser user = getUser();
+            log.warning("Missing player record for user in requirePlayer?",
+                "who", (user != null) ? user.userId : null);
             throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
         }
         return player;
@@ -54,18 +55,22 @@ public abstract class EveryServiceServlet extends AppServiceServlet
     protected PlayerRecord requireEditor ()
         throws ServiceException
     {
-        return requireEditor(requireUser());
-    }
-
-    protected PlayerRecord requireEditor (OOOUser user)
-        throws ServiceException
-    {
-        PlayerRecord record = requirePlayer(user);
-        if (!record.isEditor && !user.isAdmin()) {
+        PlayerRecord record = requirePlayer();
+        if (!record.isEditor && !getUser().isAdmin()) {
             throw new ServiceException(AppCodes.E_ACCESS_DENIED);
         }
         return record;
     }
+
+    /** Provides the PlayerRecord corresponding to the current request. */
+    protected transient ThreadLocal<PlayerRecord> _perThreadPlayerRecord =
+        new ThreadLocal<PlayerRecord>() {
+            @Override protected PlayerRecord initialValue ()
+            {
+                OOOUser user = getUser();
+                return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
+            }
+        };
 
     @Inject protected EverythingApp _app;
     @Inject protected PlayerRepository _playerRepo;
