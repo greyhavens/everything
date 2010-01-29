@@ -336,6 +336,26 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Notes that the player in question has earned the specified trophy.
+     *
+     * @return true if this should be reported to the feed, false if they had already earned the
+     * trophy and must have just sold off a card and obtained it again.
+     */
+    public boolean noteTrophyEarned (int userId, String trophyId)
+    {
+        try {
+            TrophyRecord record = new TrophyRecord();
+            record.userId = userId;
+            record.trophyId = trophyId;
+            record.when = new Timestamp(System.currentTimeMillis());
+            insert(record);
+            return true;
+        } catch (DuplicateKeyException dke) {
+            return false;
+        }
+    }
+
+    /**
      * Loads the specified player's current grid.
      */
     public GridRecord loadGrid (int userId)
@@ -600,5 +620,6 @@ public class GameRepository extends DepotRepository
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
         classes.add(AttractorGrantedRecord.class);
+        classes.add(TrophyRecord.class);
     }
 }

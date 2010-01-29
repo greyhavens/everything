@@ -20,6 +20,7 @@ import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
+import com.threerings.everything.data.TrophyData;
 
 /**
  * Provides game services to the client.
@@ -88,6 +89,9 @@ public interface GameService extends RemoteService
 
         /** Number of things remaining in this set not held by this player. */
         public int thingsRemaining;
+
+        /** Trophies newly earned, or null. */
+        public List<TrophyData> trophies;
     }
 
     /** Contains information on a "bonanza card" that a player may flip on their grid. */

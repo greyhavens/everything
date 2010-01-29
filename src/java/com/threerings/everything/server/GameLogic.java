@@ -35,6 +35,7 @@ import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
+import com.threerings.everything.data.TrophyData;
 import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.server.persist.CardRecord;
@@ -229,6 +230,22 @@ public class GameLogic
         if (_gameRepo.noteCompletedSeries(user.userId, series.categoryId)) {
             log.info("Series completed!", "who", user.who(), "series", series.name, "how", how);
             _playerRepo.recordFeedItem(user.userId, FeedItem.Type.COMPLETED, 0, series.name);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Records and reports that the specified player earned the specified trophy if they hadn't
+     * already earned this trophy.
+     *
+     * @return true if we reported the trophy earning, false if not.
+     */
+    public boolean maybeReportTrophy (PlayerRecord user, TrophyData trophy, String how)
+    {
+        if (_gameRepo.noteTrophyEarned(user.userId, trophy.trophyId)) {
+            log.info("Trophy earned!", "who", user.who(), "trophy", trophy.trophyId, "how", how);
+            _playerRepo.recordFeedItem(user.userId, FeedItem.Type.TROPHY, 0, trophy.name);
             return true;
         }
         return false;
