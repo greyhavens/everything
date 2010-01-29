@@ -10,15 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
-import com.threerings.everything.data.TrophyData;
 import com.threerings.everything.server.persist.ThingRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
 
@@ -56,15 +53,6 @@ public class ThingLogic
     public ThingIndex getThingIndex ()
     {
         return _indexSupplier.get();
-    }
-
-    /**
-     * Get the info on valid trophies.
-     */
-    public Map<Set<Integer>, TrophyData> getTrophies ()
-    {
-        // TODO: this will eventually probably be loaded from the db
-        return _trophies;
     }
 
     /**
@@ -115,26 +103,6 @@ public class ThingLogic
                     return _playerRepo.loadGlobalLikes();
                 }
             }, 18, TimeUnit.MINUTES);
-
-    /** Trophies */
-    protected final Map<Set<Integer>, TrophyData> _trophies =
-        new ImmutableMap.Builder<Set<Integer>, TrophyData>()
-        .put(ImmutableSet.of(311, 315, 322, 332),
-            new TrophyData("presidents", "U.S. Presidents", "Collect all U.S. Presidents"))
-        .put(ImmutableSet.of(430, 432, 434),
-            new TrophyData("carnivore", "Carnivore", "Collect all the cuts of meat"))
-        .put(ImmutableSet.of(154, 155, 156, 157, 158, 159, 160),
-            new TrophyData("consoles", "Game Consoles", "Collect every generation of game console"))
-        .put(ImmutableSet.of(184, 188, 189, 199, 205, 211, 273),
-            new TrophyData("sevens", "Sevens", "Collect all 'Seven' series"))
-        .put(ImmutableSet.of(350, 351, 352, 353),
-            new TrophyData("us_states", "All 50 States", "Collect every US State"))
-        .put(ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
-            new TrophyData("mammals", "Mammals", "Collect all the mammals"))
-        // and so on....
-//        .put(ImmutableSet.of(232),
-//            new TrophyData("seasons", "Seasons", "This is a fake for testing"))
-        .build();
 
     @Inject protected ThingRepository _thingRepo;
     @Inject protected PlayerRepository _playerRepo;

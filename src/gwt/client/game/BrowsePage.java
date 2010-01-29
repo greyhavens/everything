@@ -87,7 +87,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _header.at(2, 1).setText("Completed:", "Padded", "right", "handwriting")
                 .right().setWidget(ValueLabel.create(_completed), "right", "handwriting");
 
-            _header.at(3, 0).setWidget(createTrophyTable(coll)).setColSpan(3).alignCenter();
+            if (coll.trophies != null) {
+                _header.at(3, 0).setColSpan(3).alignCenter()
+                    .setWidget(createTrophyTable(coll.trophies));
+            }
 
             XFBML.parse(this);
         }
@@ -301,11 +304,11 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         });
     }
 
-    protected Widget createTrophyTable (PlayerCollection coll)
+    protected Widget createTrophyTable (List<TrophyData> trophies)
     {
         FluentTable panel = new FluentTable(10, 0, "Trophies");
         int count = 0;
-        for (TrophyData trophy : coll.trophies) {
+        for (TrophyData trophy : trophies) {
             panel.at(count / 5, count % 5).alignCenter().alignBottom()
                 .setWidget(TrophyUI.create(trophy));
             count++;

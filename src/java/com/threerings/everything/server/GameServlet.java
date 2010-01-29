@@ -5,6 +5,7 @@ package com.threerings.everything.server;
 
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,15 +71,11 @@ public class GameServlet extends EveryServiceServlet
         }
 
         // first load up all of the series
-        Set<Integer> completedSets = Sets.newHashSet();
+        List<SeriesCard> seriesCards = _thingRepo.loadPlayerSeries(ownerId);
         Multimap<Integer, SeriesCard> series = HashMultimap.create();
         // TODO: use loadPlayerThings and resolve category data from memory
-        for (SeriesCard card : _thingRepo.loadPlayerSeries(ownerId)) {
+        for (SeriesCard card : seriesCards) {
             series.put(card.parentId, card);
-            // track the player's completed sets
-            if (card.owned == card.things) {
-                completedSets.add(card.categoryId);
-            }
         }
 
         // load up the series' parents, the sub-categories
@@ -99,13 +96,8 @@ public class GameServlet extends EveryServiceServlet
             coll.series.put(cat.name, scats);
         }
 
-        // now let's populate their trophies
-        coll.trophies = Lists.newArrayList();
-        for (Map.Entry<Set<Integer>, TrophyData> entry : _thingLogic.getTrophies().entrySet()) {
-            if (completedSets.containsAll(entry.getKey())) {
-                coll.trophies.add(entry.getValue());
-            }
-        }
+        // populate their trophies
+        coll.trophies = _gameLogic.getTrophies(seriesCards);
 
         return coll;
     }
@@ -609,22 +601,13 @@ public class GameServlet extends EveryServiceServlet
         if (result.thingsRemaining == 0 && result.haveCount == 0) {
             String how = result.getClass().getSimpleName();
             _gameLogic.maybeReportCompleted(player, result.card.getSeries(), how);
-            // inform the user of any newly-earned trophies
-            // TODO: this could probably be made to be more efficient
-            Set<Integer> completedSets = Sets.newHashSet();
-            for (SeriesCard series : _thingRepo.loadPlayerSeries(player.userId)) {
-                if (series.owned == series.things) {
-                    completedSets.add(series.categoryId);
-                }
-            }
-            // look to see which trophies are *newly* earned (they must contain this categoryId)
-            result.trophies = Lists.newArrayList();
-            for (Map.Entry<Set<Integer>, TrophyData> entry : _thingLogic.getTrophies().entrySet()) {
-                Set<Integer> setIds = entry.getKey();
-                if (setIds.contains(thing.categoryId) && completedSets.containsAll(setIds)) {
-                    TrophyData trophy = entry.getValue();
-                    if (_gameLogic.maybeReportTrophy(player, trophy, how)) {
-                        result.trophies.add(trophy);
+
+            result.trophies = _gameLogic.getNewTrophies(player.userId, thing.categoryId);
+            // make sure each returned trophy has never been earned before...
+            if (result.trophies != null) {
+                for (Iterator<TrophyData> it = result.trophies.iterator(); it.hasNext(); ) {
+                    if (!_gameLogic.maybeReportTrophy(player, it.next(), how)) {
+                        it.remove();
                     }
                 }
             }

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,6 +34,7 @@ import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
+import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
@@ -275,6 +278,27 @@ public class GameLogic
     }
 
     /**
+     * Return any new trophies to be awarded this player based on their completion of the specified
+     * series.
+     *
+     * @return null if there are no new trophies to report
+     */
+    public List<TrophyData> getNewTrophies (int userId, int completedSeriesId)
+    {
+        return getTrophies(_thingRepo.loadPlayerSeries(userId), completedSeriesId);
+    }
+
+    /**
+     * Return all the trophies awarded this player, based purely on their series ownerships.
+     *
+     * @return null if there are no qualifying trophies.
+     */
+    public List<TrophyData> getTrophies (List<SeriesCard> seriesCards)
+    {
+        return getTrophies(seriesCards, 0);
+    }
+
+    /**
      * Called every hour to grant a gift to anyone who's birthday has arrived and has not yet
      * received a gift.
      */
@@ -384,6 +408,35 @@ public class GameLogic
         int[] ids = Ints.toArray(thingIds);
         ArrayUtil.shuffle(ids);
         return ids;
+    }
+
+    /**
+     * Get all the qualifying trophies.
+     *
+     * @param completedSeriesId if nonzero, a seriesId that must be present in any
+     * trophy requirement.
+     */
+    protected List<TrophyData> getTrophies (List<SeriesCard> seriesCards, int completedSeriesId)
+    {
+        Set<Integer> completedSets = Sets.newHashSet();
+        for (SeriesCard series : seriesCards) {
+            if (series.owned == series.things) {
+                completedSets.add(series.categoryId);
+            }
+        }
+
+        List<TrophyData> result = null;
+        for (Map.Entry<Set<Integer>, TrophyData> entry : _trophies.entrySet()) {
+            Set<Integer> setIds = entry.getKey();
+            if (((completedSeriesId == 0) || setIds.contains(completedSeriesId)) &&
+                    completedSets.containsAll(setIds)) {
+                if (result == null) {
+                    result = Lists.newArrayList();
+                }
+                result.add(entry.getValue());
+            }
+        }
+        return result;
     }
 
     /**
@@ -541,6 +594,26 @@ public class GameLogic
         }
         return card;
     }
+
+    /** Trophies */
+    protected final Map<Set<Integer>, TrophyData> _trophies =
+        new ImmutableMap.Builder<Set<Integer>, TrophyData>()
+        .put(ImmutableSet.of(311, 315, 322, 332),
+            new TrophyData("presidents", "U.S. Presidents", "Collect all U.S. Presidents"))
+        .put(ImmutableSet.of(430, 432, 434),
+            new TrophyData("carnivore", "Carnivore", "Collect all the cuts of meat"))
+        .put(ImmutableSet.of(154, 155, 156, 157, 158, 159, 160),
+            new TrophyData("consoles", "Game Consoles", "Collect every generation of game console"))
+        .put(ImmutableSet.of(184, 188, 189, 199, 205, 211, 273),
+            new TrophyData("sevens", "Sevens", "Collect all 'Seven' series"))
+        .put(ImmutableSet.of(350, 351, 352, 353),
+            new TrophyData("us_states", "All 50 States", "Collect every US State"))
+        .put(ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
+            new TrophyData("mammals", "Mammals", "Collect all the mammals"))
+        // and so on....
+//        .put(ImmutableSet.of(232),
+//            new TrophyData("seasons", "Seasons", "This is a fake for testing"))
+        .build();
 
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
