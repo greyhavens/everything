@@ -4,7 +4,6 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Map;
@@ -156,7 +155,7 @@ public class InviteServlet extends AppServlet
         throws IOException
     {
         // we're in an iframe so we have to send down some JavaScript that jimmies
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(rsp.getOutputStream()));
+        PrintWriter out = rsp.getWriter();
         out.println("<html><head><script language=\"JavaScript\">");
         out.println("window.parent.closePopup(" + completed + ");");
         out.println("</script></head></html>");

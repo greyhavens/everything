@@ -113,7 +113,7 @@ public class ShowInviteServlet extends AppServlet
             template = template.replaceAll(entry.getKey(), entry.getValue());
         }
 
-        PrintWriter out = new PrintWriter(rsp.getOutputStream());
+        PrintWriter out = rsp.getWriter();
         out.println(template);
         out.close();
     }
