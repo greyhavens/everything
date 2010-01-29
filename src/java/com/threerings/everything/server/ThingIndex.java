@@ -372,7 +372,9 @@ public class ThingIndex
 
         // if the thing list is now empty, there's no point in continuing
         if (things.size() == 0) {
-            log.warning("Failed to select things", "desired", count, "into.size()", into.size(),
+            log.warning("Failed to select things",
+                "desired", count, "into.size()", into.size(),
+                "player", EveryServiceServlet.getLoadedPlayer().who(),
                 new Exception("DON'T PANIC"));
             return;
         }
@@ -385,7 +387,9 @@ public class ThingIndex
 
             } else if (++missed >= MAX_SELECT_ITERS) {
                 if (added == 0) {
-                    log.warning("Spinning while not selecting things!", "forceCopy", forceCopy);
+                    log.warning("Spinning while not selecting things!",
+                        "forceCopy", forceCopy,
+                        "player", EveryServiceServlet.getLoadedPlayer().who());
                     if (forceCopy) {
                         // oh, that's bad
                         return;
