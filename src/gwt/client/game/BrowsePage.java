@@ -33,9 +33,9 @@ import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.TrophyData;
 
 import client.ui.DataPanel;
+import client.ui.TrophyUI;
 import client.ui.XFBML;
 import client.ui.lines.LineImages;
-import client.ui.trophies.TrophyImages;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -304,19 +304,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected Widget createTrophyTable (PlayerCollection coll)
     {
         FluentTable panel = new FluentTable(10, 0, "Trophies");
-
         int count = 0;
         for (TrophyData trophy : coll.trophies) {
-            FluentTable tab = new FluentTable();
-            // TODO: according to name of trophy, create a different image:
-            // trophy.trophyId;
-            Image img = _trophies.trophy().createImage();
-            img.setTitle(trophy.description);
-//            tab.add().alignCenter().setWidget(img);
-//            tab.add().alignCenter().setText(trophy.name);
-//            panel.add(tab);
             panel.at(count / 5, count % 5).alignCenter().alignBottom()
-                .setWidgets(img, Widgets.newLabel(trophy.name, "Trophy"));
+                .setWidget(TrophyUI.create(trophy));
             count++;
         }
         return panel;
@@ -346,8 +337,6 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected Command _clearSeries;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
-
-    protected static final TrophyImages _trophies = GWT.create(TrophyImages.class);
 
     protected static final LineImages _lines = GWT.create(LineImages.class);
     protected static Map<String, AbstractImagePrototype> _linemap =

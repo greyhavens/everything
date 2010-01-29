@@ -3,6 +3,8 @@
 
 package client.game;
 
+import java.util.List;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,9 +16,11 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
+import com.threerings.everything.data.TrophyData;
 
 import client.ui.LikeWidget;
 import client.ui.ShadowPanel;
+import client.ui.TrophyUI;
 import client.util.Context;
 import client.util.ImageUtil;
 
@@ -29,7 +33,8 @@ public abstract class CardView extends FlowPanel
      * Creates a view for the specified card.
      */
     public static Widget create (
-        Context ctx, Card card, boolean showLike, String header, String status, Widget... buttons)
+        Context ctx, Card card, boolean showLike, String header, String status,
+        List<TrophyData> trophies, Widget... buttons)
     {
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
         String bgimage = "images/info_card.png";
@@ -39,7 +44,7 @@ public abstract class CardView extends FlowPanel
             bgimage = "images/info_card_tall.png";
         }
         box.add().setWidget(new CardView.Left(ctx, card), "Left").
-            right().setWidget(new CardView.Right(ctx, card, showLike), "Right");
+            right().setWidget(new CardView.Right(ctx, card, showLike, trophies), "Right");
         if (header != null) { // if we have a header, we always need a status
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
@@ -95,7 +100,7 @@ public abstract class CardView extends FlowPanel
 
     protected static class Right extends CardView
     {
-        public Right (Context ctx, Card card, boolean showLike)
+        public Right (Context ctx, Card card, boolean showLike, List<TrophyData> trophies)
         {
             Widget cat = Widgets.newLabel(
                 Category.getHierarchy(card.categories), "Categories",
@@ -125,6 +130,11 @@ public abstract class CardView extends FlowPanel
             } else {
                 info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
                 info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+            }
+            if (trophies != null) {
+                for (TrophyData trophy : trophies) {
+                    info.add(TrophyUI.create(trophy));
+                }
             }
             add(info);
         }

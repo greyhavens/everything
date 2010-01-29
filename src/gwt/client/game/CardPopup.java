@@ -3,6 +3,9 @@
 
 package client.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,6 +33,7 @@ import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
+import com.threerings.everything.data.TrophyData;
 
 import client.ui.ButtonUI;
 import client.ui.XFBML;
@@ -128,6 +132,7 @@ public class CardPopup extends PopupPanel
         }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
+        _trophies = result.trophies;
         setWidget(createContents(result.card));
     }
 
@@ -191,7 +196,7 @@ public class CardPopup extends PopupPanel
             }
         });
         PushButton cancel = ButtonUI.newButton("Cancel", onHide());
-        return CardView.create(_ctx, card, false, _title, null, cancel, gift);
+        return CardView.create(_ctx, card, false, _title, null, null, cancel, gift);
     }
 
     protected Widget createFriendCardContents (Card card)
@@ -199,7 +204,7 @@ public class CardPopup extends PopupPanel
         PushButton want = ButtonUI.newButton("Want", ThingDialog.makeWantHandler(_ctx, card));
         want.setTitle("Post to your Facebook feed that you want this card.");
         return CardView.create(
-            _ctx, card, false, _title, null, want, ButtonUI.newButton("Close", onHide()));
+            _ctx, card, false, _title, null, null, want, ButtonUI.newButton("Close", onHide()));
     }
 
     protected Widget createOwnCardContents (final Card card)
@@ -277,7 +282,7 @@ public class CardPopup extends PopupPanel
         Widget[] buttons = (completed || (wasGift && (_title != null)))
             ? new Widget[] { sell, gift, keep, share }
             : new Widget[] { sell, gift, share, keep };
-        return CardView.create(_ctx, card, true, _title, status, buttons);
+        return CardView.create(_ctx, card, true, _title, status, _trophies, buttons);
     }
 
     protected ClickHandler onHide ()
@@ -311,6 +316,7 @@ public class CardPopup extends PopupPanel
     protected Context _ctx;
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
+    protected List<TrophyData> _trophies;
     protected Value<SlotStatus> _status;
 
     protected Command _onAnimComplete;
