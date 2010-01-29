@@ -80,6 +80,10 @@ public abstract class FeedPanel<T> extends DataPanel<T>
         case JOINED:
             action.add(Widgets.newHTML(" started playing Everything. Yay!", "inline"));
             break;
+        case TROPHY:
+            objmsg = format(item.objects, "trophy", "trophies");
+            action.add(Widgets.newHTML(" earned the " + objmsg + "!", "inline"));
+            break;
         default:
             action.add(Widgets.newInlineLabel(" did something mysterious."));
             break;
