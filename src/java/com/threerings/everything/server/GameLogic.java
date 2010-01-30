@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -600,31 +601,26 @@ public class GameLogic
 
     public static class TrophyRecord
     {
-        public Set<Integer> sets;
+        public ImmutableSet<Integer> sets;
 
-        public Map<Integer, TrophyData> trophies = Maps.newHashMap();
+        public ImmutableMap<Integer, TrophyData> trophies;
 
-        /** Construct a simple TrophyRecord requiring all the sets specified. */
-        protected TrophyRecord (TrophyData trophy, Integer... sets)
+        protected TrophyRecord (
+            ImmutableSet<Integer> sets, String trophyId, String name, String desc, int... sizes)
         {
-            this.sets = Sets.newHashSet(sets);
-            this.trophies.put(this.sets.size(), trophy);
-        }
-
-        /**
-         * Construct a more complicated TrophyRecord requiring various subsets of the
-         * sets specified.
-         */
-        protected TrophyRecord (TrophyData proto, int[] sizes, Integer... sets)
-        {
-            this.sets = Sets.newHashSet(sets);
-            for (int ii = 0; ii < sizes.length; ii++) {
-                this.trophies.put(sizes[ii],
-                    new TrophyData(
-                        replace(proto.trophyId, ii + 1, sizes[ii]),
-                        replace(proto.name, ii + 1, sizes[ii]),
-                        replace(proto.description, ii + 1, sizes[ii])));
+            this.sets = sets;
+            if (sizes.length == 0) {
+                sizes = new int[] { sets.size() };
             }
+            ImmutableMap.Builder<Integer, TrophyData> builder = ImmutableMap.builder();
+            for (int ii = 0; ii < sizes.length; ii++) {
+                builder.put(sizes[ii],
+                    new TrophyData(
+                        replace(trophyId, ii + 1, sizes[ii]),
+                        replace(name, ii + 1, sizes[ii]),
+                        replace(desc, ii + 1, sizes[ii])));
+            }
+            trophies = builder.build();
         }
 
         protected static String replace (String s, int ordinal, int number)
@@ -636,30 +632,33 @@ public class GameLogic
     }
 
     /** Trophy data. TODO: from database... */
-    protected final List<TrophyRecord> _trophies = Lists.newArrayList(
+    protected final List<TrophyRecord> _trophies = ImmutableList.of(
         // simple trophies requiring complete collection
         new TrophyRecord(
-            new TrophyData("presidents", "U.S. Presidents", "Collect all U.S. Presidents"),
-            311, 315, 322, 332),
+            ImmutableSet.of(311, 315, 322, 332),
+            "presidents", "U.S. Presidents", "Collect all U.S. Presidents"),
         new TrophyRecord(
-            new TrophyData("carnivore", "Carnivore", "Collect all the cuts of meat"),
-            430, 432, 434),
+            ImmutableSet.of(430, 432, 434),
+            "carnivore", "Carnivore", "Collect all the cuts of meat"),
         new TrophyRecord(
-            new TrophyData("consoles", "Game Consoles", "Collect every generation of game console"),
-            154, 155, 156, 157, 158, 159, 160),
+            ImmutableSet.of(154, 155, 156, 157, 158, 159, 160),
+            "consoles", "Game Consoles", "Collect every generation of game console"),
         new TrophyRecord(
-            new TrophyData("us_states", "All 50 States", "Collect every US State"),
-            350, 351, 352, 353),
+            ImmutableSet.of(350, 351, 352, 353),
+            "us_states", "All 50 States", "Collect every US State"),
         // more complex trophies requiring subsets of the sets
         new TrophyRecord(
-            new TrophyData("sevens", "Sevens", "Collect seven 'Seven' series"),
-            new int[] { 7 }, 114, 184, 188, 189, 199, 205, 211, 273), // need 7 of 8
+            ImmutableSet.of(114, 184, 188, 189, 199, 205, 211, 273),
+            "sevens", "Sevens", "Collect seven 'Seven' series",
+            7), // need 7 of 8
         new TrophyRecord(
-            new TrophyData("mammals%n", "Mammals %o", "Collect %n sets of mammals"),
-            new int[] { 3, 5, 8, 12 }, 17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362)
+            ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
+            "mammals%n", "Mammals %o", "Collect %n sets of mammals",
+            3, 5, 8, 12)
 //        new TrophyRecord( // TEST
-//            new TrophyData("birds%n", "Birds %o", "Collect %n sets of birds"),
-//            new int[] { 0, 1, 2, 3, 4, 5 }, 57, 97, 244, 312, 433, 441)
+//            ImmutableSet.of(57, 97, 244, 312, 433, 441),
+//            "birds%n", "Birds %o", "Collect %n sets of birds",
+//            0, 1, 2, 3, 4, 5),
     );
 
     @Inject protected EverythingApp _app;
