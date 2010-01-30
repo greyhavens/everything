@@ -426,14 +426,17 @@ public class GameLogic
         }
 
         List<TrophyData> result = null;
-        for (Map.Entry<Set<Integer>, TrophyData> entry : _trophies.entrySet()) {
-            Set<Integer> setIds = entry.getKey();
-            if (((completedSeriesId == 0) || setIds.contains(completedSeriesId)) &&
-                    completedSets.containsAll(setIds)) {
-                if (result == null) {
-                    result = Lists.newArrayList();
+        for (TrophyRecord rec : _trophies) {
+            if ((completedSeriesId == 0) || rec.sets.contains(completedSeriesId)) {
+                int have = Sets.intersection(completedSets, rec.sets).size();
+                for (Map.Entry<Integer, TrophyData> entry : rec.trophies.entrySet()) {
+                    if (have >= entry.getKey()) {
+                        if (result == null) {
+                            result = Lists.newArrayList();
+                        }
+                        result.add(entry.getValue());
+                    }
                 }
-                result.add(entry.getValue());
             }
         }
         return result;
@@ -595,25 +598,69 @@ public class GameLogic
         return card;
     }
 
-    /** Trophies */
-    protected final Map<Set<Integer>, TrophyData> _trophies =
-        new ImmutableMap.Builder<Set<Integer>, TrophyData>()
-        .put(ImmutableSet.of(311, 315, 322, 332),
-            new TrophyData("presidents", "U.S. Presidents", "Collect all U.S. Presidents"))
-        .put(ImmutableSet.of(430, 432, 434),
-            new TrophyData("carnivore", "Carnivore", "Collect all the cuts of meat"))
-        .put(ImmutableSet.of(154, 155, 156, 157, 158, 159, 160),
-            new TrophyData("consoles", "Game Consoles", "Collect every generation of game console"))
-        .put(ImmutableSet.of(184, 188, 189, 199, 205, 211, 273),
-            new TrophyData("sevens", "Sevens", "Collect all 'Seven' series"))
-        .put(ImmutableSet.of(350, 351, 352, 353),
-            new TrophyData("us_states", "All 50 States", "Collect every US State"))
-        .put(ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
-            new TrophyData("mammals", "Mammals", "Collect all the mammals"))
-        // and so on....
-//        .put(ImmutableSet.of(232),
-//            new TrophyData("seasons", "Seasons", "This is a fake for testing"))
-        .build();
+    public static class TrophyRecord
+    {
+        public Set<Integer> sets;
+
+        public Map<Integer, TrophyData> trophies = Maps.newHashMap();
+
+        /** Construct a simple TrophyRecord requiring all the sets specified. */
+        protected TrophyRecord (TrophyData trophy, Integer... sets)
+        {
+            this.sets = Sets.newHashSet(sets);
+            this.trophies.put(this.sets.size(), trophy);
+        }
+
+        /**
+         * Construct a more complicated TrophyRecord requiring various subsets of the
+         * sets specified.
+         */
+        protected TrophyRecord (TrophyData proto, int[] sizes, Integer... sets)
+        {
+            this.sets = Sets.newHashSet(sets);
+            for (int ii = 0; ii < sizes.length; ii++) {
+                this.trophies.put(sizes[ii],
+                    new TrophyData(
+                        replace(proto.trophyId, ii + 1, sizes[ii]),
+                        replace(proto.name, ii + 1, sizes[ii]),
+                        replace(proto.description, ii + 1, sizes[ii])));
+            }
+        }
+
+        protected static String replace (String s, int ordinal, int number)
+        {
+            s = s.replace("%o", String.valueOf(ordinal));
+            s = s.replace("%n", String.valueOf(number));
+            return s;
+        }
+    }
+
+    /** Trophy data. TODO: from database... */
+    protected final List<TrophyRecord> _trophies = Lists.newArrayList(
+        // simple trophies requiring complete collection
+        new TrophyRecord(
+            new TrophyData("presidents", "U.S. Presidents", "Collect all U.S. Presidents"),
+            311, 315, 322, 332),
+        new TrophyRecord(
+            new TrophyData("carnivore", "Carnivore", "Collect all the cuts of meat"),
+            430, 432, 434),
+        new TrophyRecord(
+            new TrophyData("consoles", "Game Consoles", "Collect every generation of game console"),
+            154, 155, 156, 157, 158, 159, 160),
+        new TrophyRecord(
+            new TrophyData("us_states", "All 50 States", "Collect every US State"),
+            350, 351, 352, 353),
+        // more complex trophies requiring subsets of the sets
+        new TrophyRecord(
+            new TrophyData("sevens", "Sevens", "Collect seven 'Seven' series"),
+            new int[] { 7 }, 114, 184, 188, 189, 199, 205, 211, 273), // need 7 of 8
+        new TrophyRecord(
+            new TrophyData("mammals%n", "Mammals %o", "Collect %n sets of mammals"),
+            new int[] { 3, 5, 8, 12 }, 17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362)
+//        new TrophyRecord( // TEST
+//            new TrophyData("birds%n", "Birds %o", "Collect %n sets of birds"),
+//            new int[] { 0, 1, 2, 3, 4, 5 }, 57, 97, 244, 312, 433, 441)
+    );
 
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
