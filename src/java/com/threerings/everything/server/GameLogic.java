@@ -651,14 +651,23 @@ public class GameLogic
             ImmutableSet.of(114, 184, 188, 189, 199, 205, 211, 273),
             "sevens", "Sevens", "Collect seven 'Seven' series",
             7), // need 7 of 8
+        // standard "bla 1", "bla 2", "bla 3" series collections
         new TrophyRecord(
             ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
             "mammals%n", "Mammals %o", "Collect %n sets of mammals",
+            3, 5, 8, 12),
+        new TrophyRecord(
+            ImmutableSet.of(57, 97, 244, 312, 433, 441),
+            "birds%n", "Birds %o", "Collect %n sets of birds",
+            3, 5, 8, 12),
+        new TrophyRecord(
+            ImmutableSet.of(56, 71, 126, 127, 128),
+            "insects%n", "Insects %o", "Collect %n sets of insects",
+            3, 5, 8, 12),
+        new TrophyRecord(
+            ImmutableSet.of(317, 318, 319, 323, 324, 333, 334, 335, 336, 337, 338, 339, 340),
+            "chemistry%n", "Chemistry %o", "Collect %n sets of chemicals",
             3, 5, 8, 12)
-//        new TrophyRecord( // TEST
-//            ImmutableSet.of(57, 97, 244, 312, 433, 441),
-//            "birds%n", "Birds %o", "Collect %n sets of birds",
-//            0, 1, 2, 3, 4, 5),
     );
 
     @Inject protected EverythingApp _app;
