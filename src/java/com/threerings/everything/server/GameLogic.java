@@ -428,8 +428,11 @@ public class GameLogic
 
         List<TrophyData> result = null;
         for (TrophyRecord rec : _trophies) {
-            if ((completedSeriesId == 0) || rec.sets.contains(completedSeriesId)) {
-                int have = Sets.intersection(completedSets, rec.sets).size();
+            if ((completedSeriesId == 0) || (rec.sets == null) ||
+                    rec.sets.contains(completedSeriesId)) {
+                int have = (rec.sets == null)
+                    ? completedSets.size()
+                    :Sets.intersection(completedSets, rec.sets).size();
                 for (Map.Entry<Integer, TrophyData> entry : rec.trophies.entrySet()) {
                     if (have >= entry.getKey()) {
                         if (result == null) {
@@ -601,9 +604,9 @@ public class GameLogic
 
     public static class TrophyRecord
     {
-        public ImmutableSet<Integer> sets;
+        public final ImmutableSet<Integer> sets;
 
-        public ImmutableMap<Integer, TrophyData> trophies;
+        public final ImmutableMap<Integer, TrophyData> trophies;
 
         protected TrophyRecord (
             ImmutableSet<Integer> sets, String trophyId, String name, String desc, int... sizes)
@@ -633,6 +636,10 @@ public class GameLogic
 
     /** Trophy data. TODO: from database... */
     protected final List<TrophyRecord> _trophies = ImmutableList.of(
+        // a series of trophies awarded purely for completing numbers of sets?
+        new TrophyRecord(null,
+            "sets%n", "Completed %n", "Complete %n sets of any kind",
+            1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200, 250),
         // simple trophies requiring complete collection
         new TrophyRecord(
             ImmutableSet.of(311, 315, 322, 332),
