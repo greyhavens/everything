@@ -89,7 +89,7 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
             if (coll.trophies != null) {
                 _header.at(3, 0).setColSpan(3).alignCenter()
-                    .setWidget(createTrophyTable(coll.trophies));
+                    .setWidget(createTrophyTable(coll.trophies, coll.owner.equals(_ctx.getMe())));
             }
 
             XFBML.parse(this);
@@ -304,13 +304,13 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         });
     }
 
-    protected Widget createTrophyTable (List<TrophyData> trophies)
+    protected Widget createTrophyTable (List<TrophyData> trophies, boolean isMine)
     {
         FluentTable panel = new FluentTable(10, 0, "Trophies");
         int count = 0;
         for (TrophyData trophy : trophies) {
-            panel.at(count / 5, count % 5).alignCenter().alignBottom()
-                .setWidget(TrophyUI.create(trophy));
+            panel.at(count / 5, count % 5).alignCenter().alignTop()
+                .setWidget(TrophyUI.create(_ctx, trophy, isMine));
             count++;
         }
         return panel;

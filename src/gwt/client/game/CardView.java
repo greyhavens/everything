@@ -133,7 +133,7 @@ public abstract class CardView extends FlowPanel
             }
             if (trophies != null) {
                 for (TrophyData trophy : trophies) {
-                    info.add(TrophyUI.create(trophy));
+                    info.add(TrophyUI.create(ctx, trophy, true));
                 }
             }
             add(info);

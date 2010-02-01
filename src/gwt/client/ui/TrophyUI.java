@@ -11,7 +11,8 @@ import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.data.TrophyData;
 
-import client.ui.trophies.TrophyImages;
+import client.game.TrophyDialog;
+import client.util.Context;
 
 /**
  * Utility for displaying trophies.
@@ -21,12 +22,13 @@ public class TrophyUI
     /**
      * Create a Trophy display widget.
      */
-    public static Widget create (TrophyData trophy)
+    public static Widget create (Context ctx, TrophyData trophy, boolean isMine)
     {
-        Image img = _trophies.trophy().createImage(); // TODO: one for each kind of trophy?
+        Image img = new Image("images/trophies/trophy.png"); // TODO: one for each kind of trophy
         img.setTitle(trophy.description);
+        if (isMine) {
+            Widgets.makeActionable(img, TrophyDialog.makeHandler(ctx, trophy), null);
+        }
         return Widgets.newFlowPanel(img, Widgets.newLabel(trophy.name, "Trophy"));
     }
-
-    protected static final TrophyImages _trophies = GWT.create(TrophyImages.class);
 }
