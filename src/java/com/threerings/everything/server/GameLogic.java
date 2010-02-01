@@ -609,6 +609,13 @@ public class GameLogic
 
         public final ImmutableMap<Integer, TrophyData> trophies;
 
+        /**
+         * Construct a set of related trophies.
+         *
+         * Replacements: %n - number (of sets)
+         *               %o - ordinal (position of trophy, starting with 1)
+         *               %r - roman (oridnal in roman numerals)
+         */
         protected TrophyRecord (
             ImmutableSet<Integer> sets, String trophyId, String name, String desc, int... sizes)
         {
@@ -631,16 +638,46 @@ public class GameLogic
         {
             s = s.replace("%o", String.valueOf(ordinal));
             s = s.replace("%n", String.valueOf(number));
+            s = s.replace("%r", toRoman(ordinal));
             return s;
         }
+
+        protected static String toRoman (int number)
+        {
+            String roman = "";
+            for (int ii = 0; ii < ROMAN_TIERS.length; ii++) {
+                while (number >= ROMAN_TIERS[ii]) {
+                    roman += ROMAN_NUMERALS[ii];
+                    number -= ROMAN_TIERS[ii];
+                }
+            }
+            return roman;
+        }
+
+        /** Standard roman numerals support up to 3999, but it is extremely unlikely that we ever
+         * have more than 20 or so levels. */
+        //protected static final int[] ROMAN_TIERS = { 10, 9, 5, 4, 1 };
+        //protected static final String[] ROMAN_NUMERALS = { "X", "IX", "V", "IV", "I" };
+        /** Look ma, unicode characters for the precision. */
+        protected static final int[] ROMAN_TIERS = {
+            11, 10, 9, 8, 7, 6, 5, 4,
+            3, 2, 1 };
+        protected static final String[] ROMAN_NUMERALS = {
+            "\u216a", "\u2169", "\u2168", "\u2167", "\u2166", "\u2165", "\u2164", "\u2163",
+            "\u2162", "\u2161", "\u2160" };
     }
 
-    /** Trophy data. TODO: from database... */
+    /**
+     * Trophy data. TODO: from database...
+     */
     protected final List<TrophyRecord> _trophies = ImmutableList.of(
         // a series of trophies awarded purely for completing numbers of sets?
         new TrophyRecord(null,
             "sets%n", "Completed %n", "Complete %n sets of any kind",
             1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200, 250),
+//        new TrophyRecord(null,
+//            "test%n", "Test %r", "Test test %n sets",
+//            0, 1, 2, 3),
         // simple trophies requiring complete collection
         new TrophyRecord(
             ImmutableSet.of(311, 315, 322, 332),
@@ -662,19 +699,19 @@ public class GameLogic
         // standard "bla 1", "bla 2", "bla 3" series collections
         new TrophyRecord(
             ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
-            "mammals%n", "Mammals %o", "Collect %n sets of mammals",
+            "mammals%n", "Mammals %r", "Collect %n sets of mammals",
             3, 5, 8, 12),
         new TrophyRecord(
             ImmutableSet.of(57, 97, 244, 312, 433, 441),
-            "birds%n", "Birds %o", "Collect %n sets of birds",
+            "birds%n", "Birds %r", "Collect %n sets of birds",
             3, 5, 8, 12),
         new TrophyRecord(
             ImmutableSet.of(56, 71, 126, 127, 128),
-            "insects%n", "Insects %o", "Collect %n sets of insects",
+            "insects%n", "Insects %r", "Collect %n sets of insects",
             3, 5, 8, 12),
         new TrophyRecord(
             ImmutableSet.of(317, 318, 319, 323, 324, 333, 334, 335, 336, 337, 338, 339, 340),
-            "chemistry%n", "Chemistry %o", "Collect %n sets of chemicals",
+            "chemistry%n", "Chemistry %r", "Collect %n sets of chemicals",
             3, 5, 8, 12)
     );
 
