@@ -191,7 +191,8 @@ public class GameLogic
         while (categoryId != 0) {
             Category cat = _thingRepo.loadCategory(categoryId);
             if (cat == null) {
-                log.warning("Missing category in chain",  "cats", cats, "categoryId", categoryId);
+                log.warning("Missing category in chain",  "cats", cats, "categoryId", categoryId,
+                    new Exception("PANIC?")); // TEMP so I can see where this is coming from
                 categoryId = 0;
             } else {
                 cats.add(cat);
