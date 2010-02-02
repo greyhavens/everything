@@ -37,7 +37,7 @@ public class TrophyDialog
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
 
-        String title = ctx.getMe() + " got the " + trophy.name + " trophy in Everything.";
+        String title = ctx.getMe() + " got the '" + trophy.name + "' trophy in Everything.";
         String desc = "Through persistent collecting, " + ctx.getMe() + " has earned " +
             "a trophy while learning much about the world.";
         String imageURL = GWT.getModuleBaseURL() + "images/trophies/trophy.png";
