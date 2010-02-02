@@ -306,10 +306,18 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected Widget createTrophyTable (List<TrophyData> trophies, boolean isMine)
     {
+        final int COLS = 5;
+
         FluentTable panel = new FluentTable(10, 0, "Trophies");
+        if (isMine) {
+            panel.add().alignCenter().setColSpan(COLS).setText("Your trophies", "Title", "machine");
+            panel.add().alignCenter().setColSpan(COLS).setText("(click to post to your wall)");
+        }
+
         int count = 0;
+        int rowStart = isMine ? 2 : 0;
         for (TrophyData trophy : trophies) {
-            panel.at(count / 5, count % 5).alignCenter().alignTop()
+            panel.at(rowStart + (count / COLS), count % COLS).alignCenter().alignTop()
                 .setWidget(TrophyUI.create(_ctx, trophy, isMine));
             count++;
         }
