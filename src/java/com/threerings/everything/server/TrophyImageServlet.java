@@ -23,6 +23,8 @@ import static com.threerings.everything.Log.log;
 
 /**
  * Generates trophy snapshot images for Facebook feed posts, etc.
+ *
+ * TODO: this is not actually in-use yet, as we just use the trophy image.
  */
 public class TrophyImageServlet extends AppServlet
 {
