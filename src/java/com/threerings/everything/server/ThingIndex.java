@@ -22,6 +22,7 @@ import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.persist.AttractorRecord;
+import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
 import static com.threerings.everything.Log.log;
@@ -77,8 +78,6 @@ public class ThingIndex
             "things", _things.size(), "tweight", _things.totalWeight());
     }
 
-    // TODO: support category or other limitations on thing selection
-
     /**
      * Make a copy of this ThingIndex, with category weightings applied.
      *
@@ -99,10 +98,6 @@ public class ThingIndex
         copy._bycat = Maps.newHashMap();
         for (Map.Entry<Integer, ThingList> entry : _bycat.entrySet()) {
             copy._bycat.put(entry.getKey(), entry.getValue().copyWeighted(weights));
-        }
-        copy._byid = Maps.newHashMap();
-        for (Map.Entry<Integer, ThingInfo> entry : _byid.entrySet()) {
-            copy._byid.put(entry.getKey(), entry.getValue().copyWeighted(weights));
         }
         return copy;
     }
@@ -172,7 +167,7 @@ public class ThingIndex
      */
     public void selectThingsFrom (Set<Integer> catIds, int count, Set<Integer> into)
     {
-        selectThingsFrom(catIds, count, Sets.<Integer>newHashSet(), into);
+        selectThingsFrom(catIds, count, Collections.<Integer>emptySet(), into);
     }
 
     /**
@@ -249,21 +244,35 @@ public class ThingIndex
     /**
      * Pick a thing to use as a recruitment gift from among the specified things.
      */
-    public Set<Integer> pickRecruitmentThings (Set<Integer> playerThingIds)
+    public Set<Integer> pickRecruitmentThings (List<LikeRecord> likes)
     {
-        Set<Integer> giftIds = Sets.newHashSet();
-        // try 10 times to pick a Rarity II or less fully-random thing
-        for (int ii = 0; ii < 10; ii++) {
-            int thingId = pickWeightedThing(_things);
-            if (getRarity(thingId).ordinal() <= Rarity.II.ordinal()) {
-                giftIds.add(thingId);
-                break;
-            }
+        Set<Integer> disliked = Sets.newHashSet();
+        Set<Integer> liked = Sets.newHashSet();
+        for (LikeRecord rec : likes) {
+            (rec.like ? liked : disliked).add(rec.categoryId);
         }
-        // then select up to 1 or 2 more from the player's collection
-        int count = Math.min(1 + _rando.nextInt(2), playerThingIds.size() - giftIds.size());
-        if (count > 0) {
-            selectThings(getThings(playerThingIds), count, giftIds, giftIds);
+
+        // if they have at least 5 'like' categories, select from only those, else just exclude
+        // their dislikes
+        ThingList things = (liked.size() >= 5)
+            ? _things.copyWith(catsToThings(liked))
+            : _things.copyWithout(catsToThings(disliked));
+
+        if (things.size() == 0) {
+            return Collections.emptySet(); // what the hell? They dislike everything?
+        }
+
+        int count = 1 + _rando.nextInt(3);
+        Set<Integer> giftIds = Sets.newHashSet();
+        for (int pick = 0; pick < count; pick++) {
+            // try 10 times to pick something Rarity II or less
+            for (int ii = 0; ii < 10; ii++) {
+                int thingId = pickWeightedThing(things);
+                if (getRarity(thingId).ordinal() <= Rarity.II.ordinal()) {
+                    giftIds.add(thingId);
+                    break;
+                }
+            }
         }
         return giftIds;
     }
@@ -321,13 +330,21 @@ public class ThingIndex
         }
     }
 
-    protected ThingList getThings (Set<Integer> thingIds)
+    /**
+     * Convert the categoryIds to the thingIds contained in all of them.
+     */
+    protected Set<Integer> catsToThings (Set<Integer> catIds)
     {
-        ThingList things = new ThingList();
-        for (Iterator it = thingIds.iterator(); it.hasNext();) {
-            things.add(_byid.get(it.next()));
+        if (catIds.isEmpty()) {
+            return Collections.emptySet();
         }
-        return things;
+        Set<Integer> thingIds = Sets.newHashSet();
+        for (Integer catId : catIds) {
+            for (ThingInfo info : _bycat.get(catId)) {
+                thingIds.add(info.thingId);
+            }
+        }
+        return thingIds;
     }
 
     protected ThingList getCategoryThings (Set<Integer> catIds, Rarity minRarity)
@@ -367,7 +384,7 @@ public class ThingIndex
                      EXCLUDE_COPY_THRESHOLD)) {
             // make a copy without the stuff we've already excluded or selected
             things = things.copyWithout(excludeIds).copyWithout(into);
-            excludeIds = Sets.newHashSet();
+            excludeIds = Collections.emptySet();
         }
 
         // if the thing list is now empty, there's no point in continuing
@@ -447,7 +464,7 @@ public class ThingIndex
         public String toString () {
             return StringUtil.fieldsToString(this);
         }
-    }
+    } // end: class ThingInfo
 
     protected static class ThingList
         implements Iterable<ThingInfo>
@@ -531,12 +548,20 @@ public class ThingIndex
 
         protected int _totalWeight;
         protected List<ThingInfo> _things = Lists.newArrayList();
-    }
+    } // end: class ThingList
 
+    /** The complete list of things. May be weighted. */
     protected ThingList _things = new ThingList();
+
+    /** Things by thingId. Never weighted. */
     protected Map<Integer, ThingInfo> _byid = Maps.newHashMap();
+
+    /** ThingLists by categoryId. May be weighted. */
     protected Map<Integer, ThingList> _bycat = Maps.newHashMap();
+
+    /** ThingLists by rarity (BONUS rarities only). May be weighted. */
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
+
     protected Random _rando = new Random();
 
     /** Attractors are never stored weighted, but weighted when used. */

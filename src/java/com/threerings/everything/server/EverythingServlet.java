@@ -30,7 +30,6 @@ import com.google.code.facebookapi.schema.User;
 import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 
 import com.samskivert.servlet.util.CookieUtil;
-import com.samskivert.util.ArrayUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
 import com.samskivert.util.CountMap;
@@ -440,10 +439,8 @@ public class EverythingServlet extends EveryServiceServlet
                 ((recruit == null) || !recruit.isUnused());
             int[] gifts;
             if (giveGifts) {
-                // load all the player's things of rarity II or less.
                 gifts = Ints.toArray(_thingLogic.getThingIndex().pickRecruitmentThings(
-                    _thingRepo.loadPlayerThings(player.userId, null, Rarity.II)));
-                ArrayUtil.shuffle(gifts);
+                    _playerRepo.loadLikes(player.userId)));
             } else {
                 gifts = new int[0];
             }

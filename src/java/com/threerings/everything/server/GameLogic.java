@@ -386,7 +386,7 @@ public class GameLogic
 
         // if they requested all new cards, load up the things they own
         Set<Integer> excludeIds =
-            (pup == Powerup.ALL_NEW_CARDS) ? haveIds : Sets.<Integer>newHashSet();
+            (pup == Powerup.ALL_NEW_CARDS) ? haveIds : Collections.<Integer>emptySet();
 
         // now select the remainder randomly from all possible things
         int randoCount = Grid.GRID_SIZE - thingIds.size();
