@@ -131,8 +131,8 @@ public class GameRepository extends DepotRepository
     {
         TreeMultimap<Integer, Integer> collection = TreeMultimap.create();
         for (Integer thingId : findAllKeys(CardRecord.class, false,
-                                           new Where(CardRecord.OWNER_ID.eq(userId))).
-                 map(Key.<CardRecord,Integer>extract(1))) {
+                                           new Where(CardRecord.OWNER_ID.eq(userId)))
+                 .map(Key.<CardRecord,Integer>extract(1))) {
             collection.put(index.getCategory(thingId), thingId);
         }
         return collection;
