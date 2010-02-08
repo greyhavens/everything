@@ -22,11 +22,6 @@ import static com.threerings.everything.Log.log;
  */
 public abstract class EveryServiceServlet extends AppServiceServlet
 {
-    public static PlayerRecord getLoadedPlayer ()
-    {
-        return _loadedPlayer.get();
-    }
-
     @Override // from RemoteServiceServlet
     public String processCall (String payload)
         throws SerializationException
@@ -36,7 +31,6 @@ public abstract class EveryServiceServlet extends AppServiceServlet
 
         } finally {
             _perThreadPlayerRecord.remove();
-            _loadedPlayer.remove();
         }
     }
 
@@ -74,15 +68,9 @@ public abstract class EveryServiceServlet extends AppServiceServlet
             @Override protected PlayerRecord initialValue ()
             {
                 OOOUser user = getUser();
-                PlayerRecord record = (user == null) ? null : _playerRepo.loadPlayer(user.userId);
-                _loadedPlayer.set(record);
-                return record;
+                return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
             }
         };
-
-    /** A static copy of the PlayerRecord, accessible anywhere. */
-    protected static transient ThreadLocal<PlayerRecord> _loadedPlayer =
-        new ThreadLocal<PlayerRecord>();
 
     @Inject protected EverythingApp _app;
     @Inject protected PlayerRepository _playerRepo;
