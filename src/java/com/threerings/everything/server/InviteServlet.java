@@ -67,7 +67,7 @@ public class InviteServlet extends AppServlet
             targetFBIds = ParameterUtil.getParameters(req, "ids[]");
             if (targetFBIds.size() == 0) { // they chose to skip
                 log.info("No targets, skipping", "who", player.who());
-                writeClose(rsp, true);
+                writeClose(rsp, false);
                 return;
             }
 
