@@ -73,7 +73,10 @@ public class InviteServlet extends AppServlet
 
             thingId = Integer.parseInt(ParameterUtil.getParameter(req, "thing", "0"));
             if (thingId > 0) {
-                processThingGift(req, player, targetFBIds.iterator().next(), thingId);
+                if (!processThingGift(req, player, targetFBIds.iterator().next(), thingId)) {
+                    writeClose(rsp, false);
+                    return;
+                }
             }
 
             // report to kontagent that we sent one or more invites
@@ -96,8 +99,8 @@ public class InviteServlet extends AppServlet
         writeClose(rsp, true);
     }
 
-    protected void processThingGift (HttpServletRequest req, PlayerRecord player, String targetFBId,
-                                     int thingId)
+    protected boolean processThingGift (
+        HttpServletRequest req, PlayerRecord player, String targetFBId, int thingId)
         throws Exception
     {
         long received = Long.parseLong(requireParameter(req, "received"));
@@ -116,7 +119,7 @@ public class InviteServlet extends AppServlet
             log.warning("Unable to find gift",
                 "player", player.who(), "thingId", thingId, "received", received,
                 "targetFBId", targetFBId);
-            throw new Exception("no such card");
+            return false;
         }
 
         // see if the recipient in question is already a player
@@ -139,6 +142,7 @@ public class InviteServlet extends AppServlet
             _playerLogic.sendGiftNotification(player, Long.parseLong(targetFBId),
                                               _thingRepo.loadCategory(thing.categoryId));
         }
+        return true;
     }
 
     protected String requireParameter (HttpServletRequest req, String name)
