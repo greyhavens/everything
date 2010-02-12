@@ -9,17 +9,24 @@ import com.google.gwt.core.client.GWT;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.shared.HandlerManager;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.Card;
 
 import client.ui.like.LikeImages;
 import client.util.Context;
@@ -41,6 +48,25 @@ public class LikeWidget extends HorizontalPanel
     }
 
     /**
+     * Return a LikeWidget ensconced in a buttony border.
+     */
+    public static Widget asFakeButton (Context ctx, Card card)
+    {
+        final AbsolutePanel pan = new AbsolutePanel();
+        PushButton fake = ButtonUI.newButton("");
+        fake.setEnabled(false);
+        new HandlerManager(fake).addHandler(ResizeEvent.getType(), new ResizeHandler() {
+            public void onResize (ResizeEvent event) {
+                pan.setWidth(event.getWidth() + "px");
+                pan.setHeight(event.getHeight() + "px");
+            }
+        });
+        pan.add(fake);
+        pan.add(new LikeWidget(ctx, card), 22, 12);
+        return pan;
+    }
+
+    /**
      * Construct a LikeWidget that displays the user's like preference and allows it to
      * be edited.
      */
@@ -49,8 +75,14 @@ public class LikeWidget extends HorizontalPanel
         _categoryId = categoryId;
         _liked = ctx.getLike(categoryId);
 
+        setSpacing(2);
         add(_pos = createImage(true));
         add(_neg = createImage(false));
+    }
+
+    public LikeWidget (Context ctx, Card card)
+    {
+        this(ctx, card.getSeries().categoryId);
     }
 
     // from ValueListener

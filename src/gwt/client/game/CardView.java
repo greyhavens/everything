@@ -106,7 +106,7 @@ public abstract class CardView extends FlowPanel
                 Category.getHierarchy(card.categories), "Categories",
                 getCategoriesSize(card.categories));
             if (showLike) {
-                LikeWidget like = new LikeWidget(ctx, card.getSeries().categoryId);
+                LikeWidget like = new LikeWidget(ctx, card);
                 FluentTable table = new FluentTable();
                 table.add().setWidget(cat)
                     .right().setWidget(like).alignBottom().alignLeft();

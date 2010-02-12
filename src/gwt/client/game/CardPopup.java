@@ -36,6 +36,7 @@ import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.TrophyData;
 
 import client.ui.ButtonUI;
+import client.ui.LikeWidget;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -279,9 +280,10 @@ public class CardPopup extends PopupPanel
 
         // only "incentivize" sharing if you just completed a series or you just received a gift
         // (not when you are looking at a card gifted previously)
+        Widget likeButton = LikeWidget.asFakeButton(_ctx, card);
         Widget[] buttons = (completed || (wasGift && (_title != null)))
-            ? new Widget[] { sell, gift, keep, share }
-            : new Widget[] { sell, gift, share, keep };
+            ? new Widget[] { likeButton, sell, gift, keep, share }
+            : new Widget[] { likeButton, sell, gift, share, keep };
         return CardView.create(_ctx, card, true, _title, status, _trophies, buttons);
     }
 
