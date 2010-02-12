@@ -70,13 +70,12 @@ public class LandingPage extends FlowPanel
             add(Widgets.newShim(10, 10));
         }
 
-        if (attractorId != 0 && ctx.isNewbie()) {
-            // show extra help for a new player that arrived via an attractor
+        if (ctx.isNewbie()) {
+            // show extra help for a new players
             addInstructions();
             add(Widgets.newShim(10, 10));
 
-        } else if (!ctx.isNewbie() && //don't confuse newbies with too many options
-                (news != null) && (news.get() != null)) {
+        } else if ((news != null) && (news.get() != null)) {
             add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
