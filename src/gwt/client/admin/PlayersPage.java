@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
-import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.NumberTextBox;
 import com.threerings.gwt.ui.Popups;
@@ -65,7 +64,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
 
         // display our find player interface
         final TextBox search = Widgets.newTextBox("", 128, 20);
-        DefaultTextListener.configure(search, "<find player>");
+        Widgets.setPlaceholderText(search, "<find player>");
         contents.at(0, 2).alignTop().setWidgets(Widgets.newLabel("Find Player", "machine"), search);
         new ClickCallback<List<PlayerName>>(new Button("fake"), search) {
             protected boolean callService () {

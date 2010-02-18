@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
@@ -92,7 +91,7 @@ public class EditCatsPage extends FluentTable
             add(_input = Widgets.newTextBox("", Category.MAX_NAME_LENGTH, 15));
             add(_contents = Widgets.newFlowPanel("List"));
             add(_empty = Widgets.newLabel("<empty>"));
-            DefaultTextListener.configure(_input, "<add new>");
+            Widgets.setPlaceholderText(_input, "<add new>");
 
             // wire up our create callback
             new ClickCallback<Category>(new Button("dummy"), _input) {

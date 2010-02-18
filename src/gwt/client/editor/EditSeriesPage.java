@@ -23,7 +23,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Bindings;
-import com.threerings.gwt.ui.DefaultTextListener;
 import com.threerings.gwt.ui.EnumListBox;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.LimitedTextArea;
@@ -191,7 +190,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         // finally add a UI for creating new things
         add(Widgets.newHTML("Add Things", "Header", "machine"));
         final TextBox thing = Widgets.newTextBox("", Thing.MAX_NAME_LENGTH, 15);
-        DefaultTextListener.configure(thing, "<new thing name>");
+        Widgets.setPlaceholderText(thing, "<new thing name>");
         final Button create = new Button("Add Thing");
         new ClickCallback<Integer>(create, thing) {
             protected boolean callService () {
@@ -319,7 +318,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             });
             String uptip = "Upload an image from your computer";
             final TextBox imgurl = Widgets.newTextBox("", -1, 25);
-            DefaultTextListener.configure(imgurl, "<paste image url, press enter>");
+            Widgets.setPlaceholderText(imgurl, "<paste image url, press enter>");
             new ClickCallback<String>(new Button("dummy"), imgurl) {
                 protected boolean callService () {
                     _editorsvc.slurpImage(imgurl.getText().trim(), this);
@@ -349,7 +348,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
 
             final TextBox source = Widgets.newTextBox(card.thing.source, 255, -1);
             final String defsource = "<source URL, e.g. http://en.wikipedia.org/wiki/Everything>";
-            DefaultTextListener.configure(source, defsource);
+            Widgets.setPlaceholderText(source, defsource);
             _ctrl.add().setText("Source", "right").right().setWidget(source, "Wide").setColSpan(3);
 
             Button cancel = new Button("Cancel", new ClickHandler() {
@@ -389,7 +388,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                     card.thing.name = name.getText().trim();
                     card.thing.descrip = descrip.getText().trim();
                     card.thing.facts = facts.getText().trim();
-                    card.thing.source = DefaultTextListener.getText(source, defsource);
+                    card.thing.source = Widgets.getText(source, defsource);
                     updateCard(card);
                 }
             };
