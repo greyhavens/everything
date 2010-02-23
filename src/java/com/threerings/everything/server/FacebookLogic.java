@@ -29,9 +29,12 @@ public class FacebookLogic
      */
     public FacebookJaxbRestClient getFacebookClient (String sessionKey)
     {
-        return new FacebookJaxbRestClient(
-            SERVER_URL, _app.getFacebookKey(), _app.getFacebookSecret(), sessionKey,
-            CONNECT_TIMEOUT, READ_TIMEOUT);
+        FacebookJaxbRestClient cli = new FacebookJaxbRestClient(
+            _app.getFacebookKey(), _app.getFacebookSecret(), sessionKey);
+        cli.setServerUrl(SERVER_URL);
+        cli.setConnectTimeout(CONNECT_TIMEOUT);
+        cli.setReadTimeout(READ_TIMEOUT);
+        return cli;
     }
 
     @Inject protected EverythingApp _app;

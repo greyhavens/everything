@@ -115,7 +115,7 @@ public class EverythingServlet extends EveryServiceServlet
                 ProfileField.SEX, ProfileField.CURRENT_LOCATION);
             UsersGetInfoResponse uinfo;
             try {
-                uinfo = (UsersGetInfoResponse)fbclient.users_getInfo(ids, fields);
+                uinfo = fbclient.users_getInfo(ids, fields);
             } catch (FacebookException fbe) {
                 log.warning("Failed to load Facebook profile info", "who", user.userId,
                             "fbinfo", fbinfo, fbe);
@@ -397,7 +397,7 @@ public class EverythingServlet extends EveryServiceServlet
                     EnumSet<ProfileField> fields = EnumSet.of(ProfileField.BIRTHDAY);
                     UsersGetInfoResponse uinfo;
                     try {
-                        uinfo = (UsersGetInfoResponse)fbclient.users_getInfo(ids, fields);
+                        uinfo = fbclient.users_getInfo(ids, fields);
                     } catch (FacebookException fbe) {
                         log.warning("Failed to load Facebook profile info", "who", prec.who(), fbe);
                         return;
