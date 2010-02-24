@@ -30,6 +30,7 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.SQLExpression;
+import com.samskivert.depot.util.Sequence;
 import com.samskivert.util.CountMap;
 
 import com.threerings.everything.data.Category;
@@ -76,31 +77,32 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns all category records with the specified parent id.
      */
-    public Collection<Category> loadCategories (int parentId)
+    public Sequence<Category> loadCategories (int parentId)
     {
-        return findAll(CategoryRecord.class, new Where(CategoryRecord.PARENT_ID.eq(parentId)))
-            .map(CategoryRecord.TO_CATEGORY);
+        return map(findAll(CategoryRecord.class,
+            new Where(CategoryRecord.PARENT_ID.eq(parentId))),
+            CategoryRecord.TO_CATEGORY);
     }
 
     /**
      * Loads all categories with ids in the supplied set.
      */
-    public Collection<Category> loadCategories (Set<Integer> ids)
+    public Sequence<Category> loadCategories (Set<Integer> ids)
     {
-        return findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids)))
-            .map(CategoryRecord.TO_CATEGORY);
+        return map(findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))),
+            CategoryRecord.TO_CATEGORY);
     }
 
     /**
      * Loads all categories that are not yet marked active.
      */
-    public Collection<Category> loadPendingCategories ()
+    public Sequence<Category> loadPendingCategories ()
     {
-        return findAll(CategoryRecord.class,
-                       CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
-                       new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
-                       new GroupBy(CategoryRecord.CATEGORY_ID))
-            .map(CategoryRecord.TO_CATEGORY);
+        List<CategoryRecord> records = findAll(CategoryRecord.class,
+            CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
+            new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
+            new GroupBy(CategoryRecord.CATEGORY_ID));
+        return map(records, CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -138,10 +140,9 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns all categories.
      */
-    public Collection<Category> loadAllCategories ()
+    public Sequence<Category> loadAllCategories ()
     {
-        return findAll(CategoryRecord.class)
-            .map(CategoryRecord.TO_CATEGORY);
+        return map(findAll(CategoryRecord.class), CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -193,27 +194,27 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads all comments made on the specified category, ordered from most to least recent.
      */
-    public Collection<CategoryComment> loadComments (int categoryId)
+    public Sequence<CategoryComment> loadComments (int categoryId)
     {
-        return findAll(CategoryCommentRecord.class,
-                       new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
-                       OrderBy.descending(CategoryCommentRecord.WHEN))
-            .map(CategoryCommentRecord.TO_COMMENT);
+        List<CategoryCommentRecord> records = findAll(CategoryCommentRecord.class,
+            new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
+            OrderBy.descending(CategoryCommentRecord.WHEN));
+        return map(records, CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
      * Loads all comments made since the specified cutoff in any category created by the specified
      * user, ordered from most to least recent.
      */
-    public Collection<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
+    public Sequence<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
     {
         Timestamp since = new Timestamp(sinceStamp);
-        return findAll(CategoryCommentRecord.class,
-                       CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
-                       new Where(Ops.and(CategoryRecord.CREATOR_ID.eq(creatorId),
-                                         CategoryCommentRecord.WHEN.greaterEq(since))),
-                       OrderBy.descending(CategoryCommentRecord.WHEN))
-            .map(CategoryCommentRecord.TO_COMMENT);
+        List<CategoryCommentRecord> records = findAll(CategoryCommentRecord.class,
+            CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
+            new Where(Ops.and(CategoryRecord.CREATOR_ID.eq(creatorId),
+                              CategoryCommentRecord.WHEN.greaterEq(since))),
+            OrderBy.descending(CategoryCommentRecord.WHEN));
+        return map(records, CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
@@ -241,28 +242,28 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads and returns the specified things.
      */
-    public Collection<Thing> loadThings (Collection<Integer> thingIds)
+    public Sequence<Thing> loadThings (Collection<Integer> thingIds)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds)))
-            .map(ThingRecord.TO_THING);
+        return map(findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))),
+            ThingRecord.TO_THING);
     }
 
     /**
      * Loads and returns all things in the specified category.
      */
-    public Collection<Thing> loadThings (int categoryId)
+    public Sequence<Thing> loadThings (int categoryId)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId)))
-            .map(ThingRecord.TO_THING);
+        return map(findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))),
+            ThingRecord.TO_THING);
     }
 
     /**
      * Loads and returns cards for all things in the specified category.
      */
-    public Collection<ThingCard> loadThingCards (int categoryId)
+    public Sequence<ThingCard> loadThingCards (int categoryId)
     {
-        return findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId)))
-            .map(ThingRecord.TO_CARD);
+        return map(findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))),
+            ThingRecord.TO_CARD);
     }
 
     /**
@@ -355,11 +356,9 @@ public class ThingRepository extends DepotRepository
         if (maxRarity != null) {
             whereConds.add(ThingRecord.RARITY.lessEq(maxRarity));
         }
-        return Sets.newHashSet(
-            findAllKeys(ThingRecord.class, false,
-                        ThingRecord.THING_ID.join(CardRecord.THING_ID),
-                        new Where(Ops.and(whereConds)))
-            .map(Key.<ThingRecord>toInt()));
+        return Sets.newHashSet(map(findAllKeys(ThingRecord.class, false,
+            ThingRecord.THING_ID.join(CardRecord.THING_ID),
+            new Where(Ops.and(whereConds))), Key.<ThingRecord>toInt()));
     }
 
     /**

@@ -230,8 +230,7 @@ public class EverythingServlet extends EveryServiceServlet
         FeedResult result = new FeedResult();
 
         // load up their friends' recent activiteis
-        List<FeedItem> items = Lists.newArrayList(
-            _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS));
+        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS).toList();
         aggregateFeed(player.userId, items);
         result.items = _playerLogic.resolveNames(items, player.getName());
 
@@ -277,8 +276,7 @@ public class EverythingServlet extends EveryServiceServlet
         if (target == null) {
             throw new ServiceException(E_UNKNOWN_USER);
         }
-        List<FeedItem> items = Lists.newArrayList(
-            _playerRepo.loadUserFeed(target.userId, USER_FEED_ITEMS));
+        List<FeedItem> items = _playerRepo.loadUserFeed(target.userId, USER_FEED_ITEMS).toList();
         aggregateFeed(caller == null ? 0 : caller.userId, items);
         return _playerLogic.resolveNames(items, target.getName());
     }

@@ -476,7 +476,7 @@ public class GameLogic
         }
 
         // load friend likings and decide how much they matter
-        Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId);
+        Collection<Integer> friendIds = _playerRepo.loadFriendIds(userId).toList();
         Map<Integer, Float> friendLikes = friendIds.isEmpty()
             ? Collections.<Integer, Float>emptyMap()
             : _playerRepo.loadCollectiveLikes(friendIds);

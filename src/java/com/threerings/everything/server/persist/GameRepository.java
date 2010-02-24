@@ -32,6 +32,7 @@ import com.samskivert.depot.clause.GroupBy;
 import com.samskivert.depot.clause.Limit;
 import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
+import com.samskivert.depot.util.Sequence;
 
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
@@ -56,12 +57,11 @@ public class GameRepository extends DepotRepository
     /**
      * Loads up the latest news. The supplied array will contain zero or one elements.
      */
-    public Collection<News> loadLatestNews ()
+    public List<News> loadLatestNews ()
     {
-        return findAll(NewsRecord.class,
-                       OrderBy.descending(NewsRecord.REPORTED),
-                       new Limit(0, 1))
-            .map(NewsRecord.TO_NEWS);
+        List<NewsRecord> records = findAll(NewsRecord.class,
+            OrderBy.descending(NewsRecord.REPORTED), new Limit(0, 1));
+        return map(records, NewsRecord.TO_NEWS).toList();
     }
 
     /**
@@ -130,9 +130,8 @@ public class GameRepository extends DepotRepository
     public Multimap<Integer, Integer> loadCollection (int userId, ThingIndex index)
     {
         TreeMultimap<Integer, Integer> collection = TreeMultimap.create();
-        for (Integer thingId : findAllKeys(CardRecord.class, false,
-                                           new Where(CardRecord.OWNER_ID.eq(userId)))
-                 .map(Key.<CardRecord,Integer>extract(1))) {
+        for (Integer thingId : map(findAllKeys(CardRecord.class, false,
+                new Where(CardRecord.OWNER_ID.eq(userId))), Key.<CardRecord,Integer>extract(1))) {
             collection.put(index.getCategory(thingId), thingId);
         }
         return collection;
@@ -556,7 +555,7 @@ public class GameRepository extends DepotRepository
         for (Integer updaterId : updates) {
             stats.put(updaterId, updateCollectionStats(updaterId, index));
         }
-        return Lists.newArrayList(Iterables.transform(stats.values(), CollectionRecord.TO_STATS));
+        return map(stats.values(), CollectionRecord.TO_STATS).toList();
     }
 
     /**

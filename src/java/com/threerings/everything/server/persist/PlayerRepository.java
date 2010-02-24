@@ -33,6 +33,7 @@ import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.ColumnExp;
 import com.samskivert.depot.expression.SQLExpression;
+import com.samskivert.depot.util.Sequence;
 import com.samskivert.util.Calendars;
 
 import com.threerings.everything.client.GameCodes;
@@ -104,11 +105,11 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads players that have recently joined.
      */
-    public Collection<PlayerName> loadRecentPlayers (int count)
+    public Sequence<PlayerName> loadRecentPlayers (int count)
     {
-        return findAll(PlayerRecord.class, OrderBy.descending(PlayerRecord.USER_ID),
-                       new Limit(0, count))
-            .map(PlayerRecord.TO_NAME);
+        List<PlayerRecord> records = findAll(PlayerRecord.class,
+            OrderBy.descending(PlayerRecord.USER_ID), new Limit(0, count));
+        return map(records, PlayerRecord.TO_NAME);
     }
 
     /**
@@ -156,12 +157,12 @@ public class PlayerRepository extends DepotRepository
     /**
      * Searches for players by first or last name.
      */
-    public Collection<PlayerName> findPlayers (String query)
+    public Sequence<PlayerName> findPlayers (String query)
     {
         // TODO: none of this is indexed nor is it case insensitive, change to full text
-        return findAll(PlayerRecord.class, new Where(Ops.or(PlayerRecord.NAME.eq(query),
-                                                            PlayerRecord.SURNAME.eq(query))))
-            .map(PlayerRecord.TO_NAME);
+        List<PlayerRecord> records = findAll(PlayerRecord.class,
+            new Where(Ops.or(PlayerRecord.NAME.eq(query), PlayerRecord.SURNAME.eq(query))));
+        return map(records, PlayerRecord.TO_NAME);
     }
 
     /**
@@ -277,22 +278,23 @@ public class PlayerRepository extends DepotRepository
     /**
      * Loads this status of this user's friends.
      */
-    public Collection<FriendStatus> loadFriendStatus (int userId)
+    public Sequence<FriendStatus> loadFriendStatus (int userId)
     {
-        return findAll(PlayerRecord.class,
-                       PlayerRecord.USER_ID.join(FriendRecord.FRIEND_ID),
-                       new Where(FriendRecord.USER_ID.eq(userId)),
-                       OrderBy.descending(PlayerRecord.LAST_SESSION))
-            .map(PlayerRecord.TO_FRIEND_STATUS);
+        List<PlayerRecord> records = findAll(PlayerRecord.class,
+            PlayerRecord.USER_ID.join(FriendRecord.FRIEND_ID),
+            new Where(FriendRecord.USER_ID.eq(userId)),
+            OrderBy.descending(PlayerRecord.LAST_SESSION));
+        return map(records, PlayerRecord.TO_FRIEND_STATUS);
     }
 
     /**
      * Loads the ids of all friends of the specified user.
      */
-    public Collection<Integer> loadFriendIds (int userId)
+    public Sequence<Integer> loadFriendIds (int userId)
     {
-        return findAll(FriendRecord.class, new Where(FriendRecord.USER_ID.eq(userId)))
-            .map(FriendRecord.TO_FRIEND_ID);
+        List<FriendRecord> records = findAll(FriendRecord.class,
+            new Where(FriendRecord.USER_ID.eq(userId)));
+        return map(records, FriendRecord.TO_FRIEND_ID);
     }
 
     /**
@@ -528,29 +530,27 @@ public class PlayerRepository extends DepotRepository
     /**
      * Returns up to the specified maximum number of feed items for the specified player.
      */
-    public Collection<FeedItem> loadRecentFeed (int userId, int maxItems)
+    public Sequence<FeedItem> loadRecentFeed (int userId, int maxItems)
     {
         // load up this player's friends and add them to the list of actors
         Set<Integer> actorIds = Sets.newHashSet(loadFriendIds(userId));
         actorIds.add(userId);
-        return findAll(FeedItemRecord.class,
-                       new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
-                       OrderBy.descending(FeedItemRecord.WHEN),
-                       new Limit(0, maxItems))
-            .map(FeedItemRecord.TO_FEED_ITEM);
+        List<FeedItemRecord> records = findAll(FeedItemRecord.class,
+            new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),
+            OrderBy.descending(FeedItemRecord.WHEN), new Limit(0, maxItems));
+        return map(records, FeedItemRecord.TO_FEED_ITEM);
     }
 
     /**
      * Returns up to the specified maximum number of feed items for which the specified player is
      * the actor.
      */
-    public Collection<FeedItem> loadUserFeed (int userId, int maxItems)
+    public Sequence<FeedItem> loadUserFeed (int userId, int maxItems)
     {
-        return findAll(FeedItemRecord.class,
-                       new Where(FeedItemRecord.ACTOR_ID.eq(userId)),
-                       OrderBy.descending(FeedItemRecord.WHEN),
-                       new Limit(0, maxItems))
-            .map(FeedItemRecord.TO_FEED_ITEM);
+        List<FeedItemRecord> records = findAll(FeedItemRecord.class,
+            new Where(FeedItemRecord.ACTOR_ID.eq(userId)),
+            OrderBy.descending(FeedItemRecord.WHEN), new Limit(0, maxItems));
+        return map(records, FeedItemRecord.TO_FEED_ITEM);
     }
 
     /**

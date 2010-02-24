@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -36,7 +35,7 @@ public class AdminServlet extends EveryServiceServlet
 
         StatsResult result = new StatsResult();
         result.stats = _thingRepo.loadStats();
-        result.pendingCategories = Lists.newArrayList(_thingRepo.loadPendingCategories());
+        result.pendingCategories = _thingRepo.loadPendingCategories().toList();
         Collections.sort(result.pendingCategories);
         return result;
     }
@@ -47,7 +46,7 @@ public class AdminServlet extends EveryServiceServlet
         requireAdmin();
         RegiStatsResult result = new RegiStatsResult();
         result.regcounts = _playerRepo.summarizeRegis(REG_COUNT_DAYS);
-        result.players = Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
+        result.players = _playerRepo.loadRecentPlayers(MAX_RECENTS).toList();
         return result;
     }
 
@@ -55,7 +54,7 @@ public class AdminServlet extends EveryServiceServlet
     public List<PlayerName> getRecentPlayers () throws ServiceException
     {
         requireAdmin();
-        return Lists.newArrayList(_playerRepo.loadRecentPlayers(MAX_RECENTS));
+        return _playerRepo.loadRecentPlayers(MAX_RECENTS).toList();
     }
 
     // from interface AdminService
@@ -79,7 +78,7 @@ public class AdminServlet extends EveryServiceServlet
     public List<PlayerName> findPlayers (String query) throws ServiceException
     {
         requireAdmin();
-        return Lists.newArrayList(_playerRepo.findPlayers(query));
+        return _playerRepo.findPlayers(query).toList();
     }
 
     // from interface AdminService

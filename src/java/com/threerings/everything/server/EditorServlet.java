@@ -40,7 +40,7 @@ public class EditorServlet extends EveryServiceServlet
     {
         PlayerRecord editor = requireEditor();
         // load up the categories in question and resolve their names
-        List<Category> cats = sort(Lists.newArrayList(_thingRepo.loadCategories(parentId)));
+        List<Category> cats = sort(_thingRepo.loadCategories(parentId).toList());
         return _playerLogic.resolveNames(cats, editor.getName());
     }
 
@@ -163,9 +163,9 @@ public class EditorServlet extends EveryServiceServlet
         result.categories = _gameLogic.resolveCategories(categoryId);
         Category series = result.categories[result.categories.length-1];
         series.creator = _playerRepo.loadPlayerName(series.creator.userId);
-        result.comments = Lists.newArrayList(_thingRepo.loadComments(categoryId));
+        result.comments = _thingRepo.loadComments(categoryId).toList();
         _playerLogic.resolveNames(result.comments, series.creator, editor.getName());
-        result.things = sort(Lists.newArrayList(_thingRepo.loadThings(categoryId)));
+        result.things = sort(_thingRepo.loadThings(categoryId).toList());
         return result;
     }
 
