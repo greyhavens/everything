@@ -656,15 +656,15 @@ public class GameLogic
 
         /** Standard roman numerals support up to 3999, but it is extremely unlikely that we ever
          * have more than 20 or so levels. */
-        //protected static final int[] ROMAN_TIERS = { 10, 9, 5, 4, 1 };
-        //protected static final String[] ROMAN_NUMERALS = { "X", "IX", "V", "IV", "I" };
-        /** Look ma, unicode characters for the precision. */
-        protected static final int[] ROMAN_TIERS = {
-            11, 10, 9, 8, 7, 6, 5, 4,
-            3, 2, 1 };
-        protected static final String[] ROMAN_NUMERALS = {
-            "\u216a", "\u2169", "\u2168", "\u2167", "\u2166", "\u2165", "\u2164", "\u2163",
-            "\u2162", "\u2161", "\u2160" };
+        protected static final int[] ROMAN_TIERS = { 10, 9, 5, 4, 1 };
+        protected static final String[] ROMAN_NUMERALS = { "X", "IX", "V", "IV", "I" };
+//        /** Look ma, unicode characters for the precision. */
+//        protected static final int[] ROMAN_TIERS = {
+//            11, 10, 9, 8, 7, 6, 5, 4,
+//            3, 2, 1 };
+//        protected static final String[] ROMAN_NUMERALS = {
+//            "\u216a", "\u2169", "\u2168", "\u2167", "\u2166", "\u2165", "\u2164", "\u2163",
+//            "\u2162", "\u2161", "\u2160" };
     }
 
     /**
