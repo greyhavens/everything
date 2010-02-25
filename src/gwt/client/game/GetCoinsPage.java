@@ -71,8 +71,8 @@ public class GetCoinsPage extends FlowPanel
             path = Build.billingURL("paypal/choosecoins.jspx");
         } else if (action.equals("ooocard")) {
             path = Build.billingURL("threeringscard/check.jspx?mode=coins");
-        } else if (action.equals("mobill")) {
-            path = Build.billingURL("mobill/choosecoins.jspx");
+        } else if (action.equals("boku")) {
+            path = Build.billingURL("boku/choosecoins.jspx");
         } else if (action.equals("paysafecard")) {
             path = Build.billingURL("paysafecard/choosecoins.jspx");
         } else if (action.equals("other")) {
@@ -116,7 +116,7 @@ public class GetCoinsPage extends FlowPanel
         new Method(_images.ooo_card_default(), _images.ooo_card_over(), _images.ooo_card_down(),
                    _msgs.selectOOOCardTip(), "ooocard"),
         new Method(_images.sms_default(), _images.sms_over(), _images.sms_down(),
-                   _msgs.selectSMSTip(), "mobill"),
+                   _msgs.selectSMSTip(), "boku"),
 //         new Method(_images.paysafe_default(), _images.paysafe_over(), _images.paysafe_down(),
 //                    _msgs.selectPaysafeTip(), "paysafecard"),
 //         new Method(_images.other_default(), _images.other_over(), _images.other_down(),
