@@ -17,6 +17,8 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+//import com.google.code.facebookapi.BundleActionLink;
+//import com.google.code.facebookapi.DashboardNewsItem;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
 import com.samskivert.util.Calendars;
@@ -109,17 +111,30 @@ public class PlayerLogic
     public void sendGiftNotification (PlayerRecord sender, long toFBId, Category series)
     {
         String tracking = _kontLogic.generateUniqueId(sender.userId);
+        String url = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
+
+//        // new way
+//        BundleActionLink link = new BundleActionLink();
+//        link.setText("View");
+//        link.setHref(url);
+//        DashboardNewsItem item = new DashBoardNewsItem();
+//        item.setMessage(sender + " gave you a card in the " + series.name + " series.");
+//        item.setActionLink(link);
+//
+        // old way
         String feedmsg = String.format( // TODO: localization?
-            "gave you a card in the <a href=\"%s\">%s</a> series.",
-            _app.getHelloURL(Kontagent.NOTIFICATION, tracking), series.name);
-        sendFacebookNotification(sender, toFBId, feedmsg, tracking);
+            "gave you a card in the <a href=\"%s\">%s</a> series.", url, series.name);
+
+        // send both for now
+        sendFacebookNotification(sender, toFBId, feedmsg /* item */, tracking);
     }
 
     /**
      * Delivers a notification to the specified Facebook user from the specified sender.
      */
-    public void sendFacebookNotification (PlayerRecord from, final long toFBId,
-                                          final String fbml, final String tracking)
+    public void sendFacebookNotification (
+        PlayerRecord from, final long toFBId, final String fbml, //final DashboardNewsItem item,
+        final String tracking)
     {
         if (toFBId == 0) {
             return; // noop, some day we'll support players who aren't on Facebook
@@ -139,6 +154,8 @@ public class PlayerLogic
                     log.debug("Sending FB notification", "id", toFBId, "fbml", fbml);
                     // send the notification to Facebook
                     fbclient.notifications_send(Collections.singleton(toFBId), fbml);
+                    // TODO: new way: fbclient.dashboard_addNews(toFBId, item);
+
                     // tell Kontagent that we sent a notification
                     _kontLogic.reportAction(
                         Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
