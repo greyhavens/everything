@@ -358,12 +358,14 @@ public class EverythingServlet extends EveryServiceServlet
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 try {
-                    // ask Facebook for the list of friends playing this app
-                    Set<Integer> allFriendIds = Sets.newHashSet(
-                        _userLogic.mapFacebookIds(
-                            Lists.transform(fbclient.friends_getAppUsers().getUid(),
-                                Functions.toStringFunction())
-                        ).values());
+                    // ask Facebook for their list of friends
+                    List<String> fbFriendIds = Lists.transform(
+                        fbclient.friends_get().getUid(), Functions.toStringFunction());
+                    // map those friends to Samsara user ids
+                    Set<Integer> allFriendIds =
+                        Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    // retain only those that have Everything accounts
+                    allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).keySet());
                     // load our current friends
                     Set<Integer> curFriendIds =
                         Sets.newHashSet(_playerRepo.loadFriendIds(prec.userId));
