@@ -356,9 +356,10 @@ public class ThingRepository extends DepotRepository
         if (maxRarity != null) {
             whereConds.add(ThingRecord.RARITY.lessEq(maxRarity));
         }
-        return Sets.newHashSet(map(findAllKeys(ThingRecord.class, false,
-            ThingRecord.THING_ID.join(CardRecord.THING_ID),
-            new Where(Ops.and(whereConds))), Key.<ThingRecord>toInt()));
+        return map(findAllKeys(ThingRecord.class, false,
+                               ThingRecord.THING_ID.join(CardRecord.THING_ID),
+                               new Where(Ops.and(whereConds))),
+                   Key.<ThingRecord>toInt()).toSet();
     }
 
     /**

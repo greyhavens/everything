@@ -16,7 +16,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -533,7 +532,7 @@ public class PlayerRepository extends DepotRepository
     public Sequence<FeedItem> loadRecentFeed (int userId, int maxItems)
     {
         // load up this player's friends and add them to the list of actors
-        Set<Integer> actorIds = Sets.newHashSet(loadFriendIds(userId));
+        Set<Integer> actorIds = loadFriendIds(userId).toSet();
         actorIds.add(userId);
         List<FeedItemRecord> records = findAll(FeedItemRecord.class,
             new Where(FeedItemRecord.ACTOR_ID.in(actorIds)),

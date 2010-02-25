@@ -297,7 +297,7 @@ public class GameServlet extends EveryServiceServlet
 
         // determine which friends do not have a card with this thing on it,
         // including friends who have it as a pending gift
-        Set<Integer> friendIds = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
+        Set<Integer> friendIds = _playerRepo.loadFriendIds(player.userId).toSet();
         friendIds.removeAll(
             _gameRepo.countCardHoldings(friendIds, Collections.singleton(thingId), true).keySet());
         // load up the names of those friends

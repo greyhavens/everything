@@ -285,7 +285,7 @@ public class EverythingServlet extends EveryServiceServlet
     public List<PlayerStats> getFriends () throws ServiceException
     {
         PlayerRecord player = requirePlayer();
-        Set<Integer> ids = Sets.newHashSet(_playerRepo.loadFriendIds(player.userId));
+        Set<Integer> ids = _playerRepo.loadFriendIds(player.userId).toSet();
         ids.add(player.userId);
         Map<Integer, PlayerStats> stats = Maps.newHashMap();
         for (PlayerStats pstat : _gameRepo.loadCollectionStats(ids, _thingLogic.getThingIndex())) {
@@ -367,8 +367,7 @@ public class EverythingServlet extends EveryServiceServlet
                     // retain only those that have Everything accounts
                     allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).keySet());
                     // load our current friends
-                    Set<Integer> curFriendIds =
-                        Sets.newHashSet(_playerRepo.loadFriendIds(prec.userId));
+                    Set<Integer> curFriendIds = _playerRepo.loadFriendIds(prec.userId).toSet();
                     // figure out new and old friends
                     Set<Integer> newFriendIds = Sets.difference(allFriendIds, curFriendIds);
                     Set<Integer> oldFriendIds = Sets.difference(curFriendIds, allFriendIds);
