@@ -88,7 +88,7 @@ public class ThingDialog
         String joinURL = ctx.getFacebookAddURL(
             Kontagent.POST, tracking, Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
-        showDialog("", card.thing.name, card.thing.descrip,
+        showDialog("", card.thing.name, card.thing.descrip + "\nFacts: " + card.thing.facts,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, joinURL, joinURL, "Start your collection with this card!",
                    "Tell your friends why Everthing is fun:",
