@@ -230,7 +230,8 @@ public class EverythingServlet extends EveryServiceServlet
         FeedResult result = new FeedResult();
 
         // load up their friends' recent activiteis
-        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS).toList();
+        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS)
+            .toList();
         aggregateFeed(player.userId, items);
         result.items = _playerLogic.resolveNames(items, player.getName());
 
