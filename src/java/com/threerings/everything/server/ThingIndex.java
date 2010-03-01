@@ -35,8 +35,7 @@ public class ThingIndex
     implements Cloneable
 {
     public ThingIndex (
-        Map<Integer, Integer> catmap, Iterable<ThingInfoRecord> things,
-        Iterable<AttractorRecord> attractors)
+        Map<Integer, Integer> catmap, Iterable<ThingInfoRecord> things)
     {
         for (ThingInfoRecord thing : things) {
             ThingInfo info = new ThingInfo(thing);
@@ -63,17 +62,6 @@ public class ThingIndex
         for (ThingList rareList : _byrare.values()) {
             rareList.shuffle();
         }
-
-        for (AttractorRecord attractor : attractors) {
-            ThingInfo info = _byid.get(attractor.thingId);
-            if (info == null) {
-                log.warning("Dropping attractor for inactive thing", "thingId", attractor.thingId);
-                continue;
-            }
-            _attractorThings.add(info);
-            _attractors.put(attractor.thingId, attractor.toInfo());
-        }
-
         log.info("Updated things index",
             "things", _things.size(), "tweight", _things.totalWeight());
     }
@@ -293,28 +281,6 @@ public class ThingIndex
             }
         }
         return (things.size() == 0) ? 0 : pickWeightedThing(things);
-    }
-
-    /**
-     * Pick an attractor card.
-     */
-    public AttractorInfo pickAttractor (Map<Integer, Float> weights)
-    {
-        ThingList atts = _attractorThings.copyWeighted(weights);
-        if (atts.size() == 0) {
-            return null;
-        }
-        Set<Integer> pick = Sets.newHashSet();
-        selectThings(atts, 1, pick, pick);
-        if (pick.isEmpty()) {
-            return null;
-        }
-        return _attractors.get(pick.iterator().next());
-    }
-
-    public boolean isAttractor (int thingId)
-    {
-        return _attractors.containsKey(thingId);
     }
 
     @Override // "from" Cloneable
@@ -559,10 +525,6 @@ public class ThingIndex
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
 
     protected Random _rando = new Random();
-
-    /** Attractors are never stored weighted, but weighted when used. */
-    protected Map<Integer, AttractorInfo> _attractors = Maps.newHashMap();
-    protected ThingList _attractorThings = new ThingList();
 
     { // initialize the _byrare map
         for (Rarity rarity : Rarity.BONUS) {

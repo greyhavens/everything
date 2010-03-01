@@ -559,6 +559,28 @@ public class GameRepository extends DepotRepository
     }
 
     /**
+     * Has the specified user posted this attractor before?
+     */
+    public boolean hasPostedAttractor (int userId, int thingId)
+    {
+        return (null != load(AttractorPostedRecord.getKey(userId, thingId)));
+    }
+
+    /**
+     * Note that a user has posted an attractor.
+     */
+    public void notePostedAttractor (int userId, int thingId)
+    {
+        // TODO: make sure they haven't posted another attractor within the last day or so
+        // (to prevent cheating)
+        AttractorPostedRecord rec = new AttractorPostedRecord();
+        rec.userId = userId;
+        rec.thingId = thingId;
+        rec.when = new Timestamp(System.currentTimeMillis());
+        insert(rec); // go ahead and puke if they've already posted this
+    }
+
+    /**
      * Note that the user will be granted the specified attractor card.
      * @return true if they haven't previously been granted this card.
      */
@@ -618,6 +640,7 @@ public class GameRepository extends DepotRepository
         classes.add(PowerupRecord.class);
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
+        classes.add(AttractorPostedRecord.class);
         classes.add(AttractorGrantedRecord.class);
         classes.add(TrophyRecord.class);
     }

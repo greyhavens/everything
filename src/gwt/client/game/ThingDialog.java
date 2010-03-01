@@ -81,17 +81,17 @@ public class ThingDialog
      * The specified callback will be called with 'true' if they ended up posting the story.
      */
     public static void showAttractor (
-        Context ctx, Card card, String title, String message, final AsyncCallback<Boolean> callback)
+        Context ctx, Card card, final AsyncCallback<Boolean> callback)
     {
         final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
 //        String joinURL = ctx.getEverythingURL(
         String joinURL = ctx.getFacebookAddURL(
             Kontagent.POST, tracking, Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
         String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
-        showDialog("", title, message,
+        showDialog("", card.thing.name, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, joinURL, joinURL, "Start your collection with this card!",
-                   "Recruit your friends:",
+                   "Tell your friends why Everthing is fun:",
                    new Command() { // complete callback
                        public void execute () {
                            _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {

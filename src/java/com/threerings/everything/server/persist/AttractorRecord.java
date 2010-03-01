@@ -18,6 +18,8 @@ import com.threerings.everything.server.AttractorInfo;
 
 /**
  * Contains cute upselly text for particularly cool things in our database.
+ *
+ * TODO: remove. No longer used.
  */
 public class AttractorRecord extends PersistentRecord
 {

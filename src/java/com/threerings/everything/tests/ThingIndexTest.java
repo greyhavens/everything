@@ -3,7 +3,6 @@
 
 package com.threerings.everything.tests;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +37,7 @@ public class ThingIndexTest
     @Test public void testPickBirthdayThing ()
     {
         Map<Integer, ThingInfoRecord> things = createThings();
-        List<AttractorRecord> attractors = Collections.emptyList();
-        ThingIndex index = new ThingIndex(mapCategories(things), things.values(), attractors);
+        ThingIndex index = new ThingIndex(mapCategories(things), things.values());
         // create a random collection
         Set<Integer> ids = Sets.newHashSet(), exclude = Sets.newHashSet();
         index.selectThings(25, ids, exclude);
@@ -63,8 +61,7 @@ public class ThingIndexTest
     protected ThingIndex createTestIndex ()
     {
         Map<Integer, ThingInfoRecord> things = createThings();
-        List<AttractorRecord> attractors = Collections.emptyList();
-        return new ThingIndex(mapCategories(things), things.values(), attractors);
+        return new ThingIndex(mapCategories(things), things.values());
     }
 
     protected Map<Integer, ThingInfoRecord> createThings ()

@@ -19,6 +19,7 @@ import com.threerings.gwt.ui.Widgets;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.Card;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.SlotStatus;
 
@@ -28,8 +29,7 @@ import client.util.Context;
 
 public class BonanzaPopup extends PopupPanel
 {
-    public BonanzaPopup (
-        Context ctx, GameService.BonanzaInfo bonanzaInfo, AsyncCallback<GameStatus> callback)
+    public BonanzaPopup (Context ctx, Card card, AsyncCallback<GameStatus> callback)
     {
         setStyleName("popup");
         _ctx = ctx;
@@ -37,26 +37,24 @@ public class BonanzaPopup extends PopupPanel
         FluentTable box = new FluentTable(0, 0, "bonanza");
         box.add().alignCenter().setHTML("It's a card Bonanza!", "Title");
         box.add().setHTML(
-            "You found an extra card while flipping! It just wouldn't be fair for you " +
-            "to keep it, but you can earn an <b>extra free flip</b> if you post it to your feed. " +
+            "You found a duplicate copy of this card! It wouldn't be right to keep it, but " +
+            "you can earn an <b>extra free flip</b> if you post it to your feed. "+
             "Any of your friends that join the game by clicking on this post will start their " +
             "collections with this card!");
 
-
         FluentTable whiteBox = new FluentTable(0, 0, "attractorPreview");
-        whiteBox.add().setColSpan(2).alignCenter().setHTML(bonanzaInfo.title);
+        whiteBox.add().setColSpan(2).alignCenter().setHTML(card.thing.name);
         SlotView slot = new SlotView();
         slot.setStatus(SlotStatus.FLIPPED);
-        slot.setCard(ctx, bonanzaInfo.card.toThingCard(), false, new ClickHandler() {
+        slot.setCard(ctx, card.toThingCard(), false, new ClickHandler() {
             public void onClick (ClickEvent event) {
                 // nada
-                // TODO?
             }
         });
-        whiteBox.add().setWidget(slot).right().setHTML(bonanzaInfo.message);
+        whiteBox.add().setWidget(slot).right().setText(card.thing.descrip);
 
         box.add().setWidget(whiteBox);
-        box.add().alignCenter().setWidget(makeButtons(bonanzaInfo, callback));
+        box.add().alignCenter().setWidget(makeButtons(card, callback));
 
         setWidget(box);
 
@@ -66,18 +64,17 @@ public class BonanzaPopup extends PopupPanel
         FX.move(this).from(-getOffsetWidth(), getAbsoluteTop()).run(500);
     }
 
-    protected Widget makeButtons (
-        final GameService.BonanzaInfo bonanzaInfo, final AsyncCallback<GameStatus> callback)
+    protected Widget makeButtons (final Card card, final AsyncCallback<GameStatus> callback)
     {
         PushButton post = ButtonUI.newButton("Post", new ClickHandler() {
             public void onClick (ClickEvent event) {
-                ThingDialog.showAttractor(_ctx, bonanzaInfo.card, bonanzaInfo.title,
-                    bonanzaInfo.message, new AsyncCallback<Boolean>() {
-                        public void onSuccess (Boolean posted) {
-                            if (!posted) {
-                                return; // just leave the dialog up
-                            }
-                            _gamesvc.bonanzaViewed(true, new AsyncCallback<GameStatus>() {
+                ThingDialog.showAttractor(_ctx, card, new AsyncCallback<Boolean>() {
+                    public void onSuccess (Boolean posted) {
+                        if (!posted) {
+                            return; // just leave the dialog up
+                        }
+                        _gamesvc.bonanzaViewed(card.thing.thingId,
+                            new AsyncCallback<GameStatus>() {
                                 public void onSuccess (GameStatus status) {
                                     callback.onSuccess(status);
                                 }
@@ -86,18 +83,18 @@ public class BonanzaPopup extends PopupPanel
                                     // TODO (shouldn't happen)
                                 }
                             });
-                            onHide().onClick(null);
-                        }
-                        public void onFailure (Throwable cause) {
-                            // TODO (shouldn't happen)
-                        }
-                    });
+                        onHide().onClick(null);
+                    }
+                    public void onFailure (Throwable cause) {
+                        // TODO (shouldn't happen)
+                    }
+                });
             }
         });
         PushButton cancel = ButtonUI.newButton("Skip", onHide());
         new ClickCallback<GameStatus>(cancel) {
             protected boolean callService () {
-                _gamesvc.bonanzaViewed(false, this);
+                _gamesvc.bonanzaViewed(-1, this);
                 return true;
             }
             protected boolean gotResult (GameStatus status) {

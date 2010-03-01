@@ -244,7 +244,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 // display the flipped card in the grid
                 _slots[position].setCard(_ctx, result.card.toThingCard(), false, null);
 
-                if (result.bonanza != null) {
+//                if (result.bonanza) {
                     // TODO: work out how to display the bonanza card on the grid...
                     // 1) A little behind and shifted on the card you clicked.
                     // 2) Squeeze it in. Shift the whole row around so that it's crowded.
@@ -270,18 +270,18 @@ public class FlipPage extends DataPanel<GameService.GridResult>
 //                        _cards.getWidgetTop(_slots[position]));
                     // TODO: mutherfuck! We need to put the bonanza card "behind"
                     //_cards.adjustIndex(_bonanza, 0);
-                }
+//                }
 
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup popup = CardPopup.display(
                     _ctx, result, _slots[position].status, _slots[position], null);
-                if (result.bonanza != null) {
+                if (result.bonanza) {
                     popup.addCloseHandler(new CloseHandler<PopupPanel>() {
                         public void onClose (CloseEvent<PopupPanel> event) {
                             if (event.isAutoClosed()) {
                                 return; // wait until it's closed manually...
                             }
-                            new BonanzaPopup(_ctx, result.bonanza,
+                            new BonanzaPopup(_ctx, result.card,
                                 new AsyncCallback<GameStatus>() {
                                 public void onSuccess (GameStatus status) {
                                     updateGameStatus(_data.status = status);

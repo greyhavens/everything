@@ -39,6 +39,7 @@ import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
+import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.Series;
 import com.threerings.everything.data.SeriesCard;
 import com.threerings.everything.data.SlotStatus;
@@ -239,7 +240,7 @@ public class GameServlet extends EveryServiceServlet
 
         // on a free flip, there's a chance they'll get a bonanza card
         if (expectedCost == 0) {
-            result.bonanza = maybePickBonanza(player);
+            result.bonanza = maybePickBonanza(player, result.card);
         }
 
         return result;
@@ -351,13 +352,14 @@ public class GameServlet extends EveryServiceServlet
     }
 
     // from interface GameService
-    public GameStatus bonanzaViewed (boolean posted)
+    public GameStatus bonanzaViewed (int thingId)
         throws ServiceException
     {
         PlayerRecord player = requirePlayer();
         if (!player.eligibleForAttractor()) {
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
         }
+        boolean posted = (thingId > 0);
         // if they posted the attractor, give them another one 2 days from now, otherwise 5 days..
         _playerRepo.setNextAttractor(player,
             new Timestamp(player.calculateNextExpires().getTime() +
@@ -365,6 +367,7 @@ public class GameServlet extends EveryServiceServlet
         if (!posted) {
             return null; // that's it, they turned us down, screw them.
         }
+        _gameRepo.notePostedAttractor(player.userId, thingId);
         // otherwise, grant them a free flip
         _playerRepo.grantFreeFlips(player, 1);
         // return their game status
@@ -381,7 +384,7 @@ public class GameServlet extends EveryServiceServlet
 
         // validate that the thingId is an 'attractor'
         if (!OLD_ATTRACTORS.contains(thingId) &&
-                !_thingLogic.getThingIndex().isAttractor(thingId)) {
+                !_gameRepo.hasPostedAttractor(friendId, thingId)) {
             throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
         }
 
@@ -637,42 +640,61 @@ public class GameServlet extends EveryServiceServlet
     }
 
     /**
-     * Maybe pick an attractor card to return as a "bonanza card".
+     * Return true if the specified card should be shown as a duplicate bonanza card.
      */
-    protected BonanzaInfo maybePickBonanza (PlayerRecord player)
+    protected boolean maybePickBonanza (PlayerRecord player, Card card)
     {
+        // must be a I or II rarity
+        if ((card.thing.rarity != Rarity.I) && (card.thing.rarity != Rarity.II)) {
+            return false;
+        }
+        // see if they're eligible to be bothered
         if (!player.eligibleForAttractor() || (Math.random() >= BONANZA_CHANCE)) {
-            return null;
+            return false;
         }
-        // OK! pick a card
-        ThingIndex index = _thingLogic.getThingIndex();
-        AttractorInfo att = index.pickAttractor(_thingLogic.getGlobalWeights());
-        if (att == null) {
-            return null; // nothing to pick!
+        // make sure they haven't posted this same attractor before
+        if (_gameRepo.hasPostedAttractor(player.userId, card.thing.thingId)) {
+            return false;
         }
-
-        BonanzaInfo info = new BonanzaInfo();
-        info.card = _gameLogic.resolveCard(att.thingId);
-        info.title = feedReplacements(att.title, player);
-        info.message = feedReplacements(att.message, player);
-        return info;
+        // make sure they don't hate this series
+        if (Boolean.FALSE.equals(_playerRepo.getLike(player.userId, card.thing.categoryId))) {
+            return false;
+        }
+        // it's good!
+        return true;
     }
 
-    protected String feedReplacements (String source, PlayerRecord player)
-    {
-        // for now we simply replace "%n" with the first name
-        return source.replace("%n", player.name);
-    }
+//    protected String feedReplacements (String source, PlayerRecord player)
+//    {
+//        // for now we simply replace "%n" with the first name
+//        return source.replace("%n", player.name);
+//    }
 
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
+    @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;
 
     /** Old attractors that are no longer in the database but
      * which we still allow to be received. */
-    protected static final Set<Integer> OLD_ATTRACTORS = Sets.newHashSet(648); // Crack
+    protected static final Set<Integer> OLD_ATTRACTORS = Sets.newHashSet(
+        648, // Crack    (Really old, can be deleted sooner)
+        2119, // Voldemort
+        767, // Beer
+        232, // Little Penguin
+        1170, // Chocolate cake
+        1928, // maguro nigiri
+        233, // siamese cat
+        1801, // thin mints
+        881, // wombat
+        729, // Abbey Road
+        1522, // breakdancing
+        463, // miss piggy
+        462, // kermit the frog
+        2120, // sarumoan
+        962); // statue of zeuss
 
     /** The percent chance that a free flip will find a bonanza card. */
-    protected static final double BONANZA_CHANCE = 0.1; // 10% (TODO: raise back up)
+    protected static final double BONANZA_CHANCE = 0.2; // 20%
 }

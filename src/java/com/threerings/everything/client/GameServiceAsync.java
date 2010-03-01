@@ -65,7 +65,7 @@ public interface GameServiceAsync
     /**
      * The async version of {@link GameService#bonanzaViewed}.
      */
-    void bonanzaViewed (boolean posted, AsyncCallback<GameStatus> callback);
+    void bonanzaViewed (int thingId, AsyncCallback<GameStatus> callback);
 
     /**
      * The async version of {@link GameService#getAttractor}.
