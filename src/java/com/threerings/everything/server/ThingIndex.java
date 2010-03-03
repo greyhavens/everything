@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.everything.data.Rarity;
-import com.threerings.everything.server.persist.AttractorRecord;
 import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 

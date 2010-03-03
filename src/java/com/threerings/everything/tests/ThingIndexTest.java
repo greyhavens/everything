@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
 
 import com.threerings.everything.data.Rarity;
 import com.threerings.everything.server.ThingIndex;
-import com.threerings.everything.server.persist.AttractorRecord;
 import com.threerings.everything.server.persist.ThingInfoRecord;
 
 /**

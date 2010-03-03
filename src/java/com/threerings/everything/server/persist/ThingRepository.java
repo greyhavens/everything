@@ -319,14 +319,6 @@ public class ThingRepository extends DepotRepository
                        new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE)));
     }
 
-//    /**
-//     * Loads information on currently-configured "attractor cards".
-//     */
-//    public Collection<AttractorRecord> loadAttractors ()
-//    {
-//        return findAll(AttractorRecord.class);
-//    }
-
     /**
      * Load all the thing ids owned by this player.
      */
@@ -408,6 +400,5 @@ public class ThingRepository extends DepotRepository
         classes.add(CategoryCommentRecord.class);
         classes.add(CategoryRecord.class);
         classes.add(ThingRecord.class);
-//        classes.add(AttractorRecord.class);
     }
 }
