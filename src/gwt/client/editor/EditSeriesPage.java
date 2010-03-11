@@ -351,6 +351,16 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             Widgets.setPlaceholderText(source, defsource);
             _ctrl.add().setText("Source", "right").right().setWidget(source, "Wide").setColSpan(3);
 
+            final Runnable updateCard = new Runnable() {
+                public void run () {
+                    card.thing.name = name.getText().trim();
+                    card.thing.descrip = descrip.getText().trim();
+                    card.thing.facts = facts.getText().trim();
+                    card.thing.source = Widgets.getText(source, defsource);
+                    updateCard(card);
+                }
+            };
+
             Button cancel = new Button("Cancel", new ClickHandler() {
                 public void onClick (ClickEvent event) {
                     setEditing(false);
@@ -371,6 +381,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             final Button save = new Button("Save");
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
+                    updateCard.run();
                     _editorsvc.updateThing(card.thing, this);
                     return true;
                 }
@@ -382,14 +393,10 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             };
             _ctrl.add().right().setWidget(Widgets.newRow(cancel, delete, save)).
                 setColSpan(3).alignRight();
-                    
+
             final Timer updater = new Timer() {
                 @Override public void run () {
-                    card.thing.name = name.getText().trim();
-                    card.thing.descrip = descrip.getText().trim();
-                    card.thing.facts = facts.getText().trim();
-                    card.thing.source = Widgets.getText(source, defsource);
-                    updateCard(card);
+                    updateCard.run();
                 }
             };
 
