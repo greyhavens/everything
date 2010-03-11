@@ -703,28 +703,50 @@ public class GameLogic
         new TrophyRecord(
             ImmutableSet.of(350, 351, 352, 353),
             "us_states", "All 50 States", "Collect every US State"),
+        new TrophyRecord(
+            ImmutableSet.of(486, 488, 489, 490, 493),
+            "simpsons", "All Simpsons", "Collect every Simpsons character"),
+        new TrophyRecord(
+            ImmutableSet.of(465, 479, 480, 481, 482, 483),
+            "start_trek", "All Star Trek", "Collect every Star Trek set"),
+        new TrophyRecord(
+            ImmutableSet.of(526, 527, 528),
+            "herbs", "All Herbs and Spices", "Collect all the Herbs and Spices"),
         // more complex trophies requiring subsets of the sets
         new TrophyRecord(
             ImmutableSet.of(114, 184, 188, 189, 199, 205, 211, 273),
             "sevens", "Sevens", "Collect seven 'Seven' series",
             7), // need 7 of 8
-        // standard "bla 1", "bla 2", "bla 3" series collections
+        // standard "bla I", "bla II", "bla III" series collections
+        new TrophyRecord(
+            ImmutableSet.of(145, 146, 495, 540),
+            "bands%n", "Bands %r", "Collect %n Music Band sets",
+            3, 5, 8, 12, 17),
+        new TrophyRecord(
+            ImmutableSet.of(234, 437, 487),
+            "albums%n", "Albums %r", "Collect %n Music Album sets",
+            3, 5, 8, 12, 17),
+        new TrophyRecord(
+            ImmutableSet.of(166, 177, 219, 231, 274, 276, 283, 290, 449, 461, 465, 479, 480, 481,
+                482, 483, 486, 488, 489, 490, 493),
+            "television%n", "Television %r", "Collect %n Television sets",
+            3, 5, 8, 12, 17),
         new TrophyRecord(
             ImmutableSet.of(17, 98, 181, 235, 249, 257, 285, 289, 306, 355, 357, 362),
             "mammals%n", "Mammals %r", "Collect %n sets of mammals",
-            3, 5, 8, 12),
+            3, 5, 8, 12, 17),
         new TrophyRecord(
             ImmutableSet.of(57, 97, 244, 312, 433, 441),
             "birds%n", "Birds %r", "Collect %n sets of birds",
-            3, 5, 8, 12),
+            3, 5, 8, 12, 17),
         new TrophyRecord(
             ImmutableSet.of(56, 71, 126, 127, 128),
             "insects%n", "Insects %r", "Collect %n sets of insects",
-            3, 5, 8, 12),
+            3, 5, 8, 12, 17),
         new TrophyRecord(
             ImmutableSet.of(317, 318, 319, 323, 324, 333, 334, 335, 336, 337, 338, 339, 340),
             "chemistry%n", "Chemistry %r", "Collect %n sets of chemicals",
-            3, 5, 8, 12)
+            3, 5, 8, 12, 17)
     );
 
     @Inject protected EverythingApp _app;
