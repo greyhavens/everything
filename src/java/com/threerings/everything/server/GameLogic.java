@@ -325,18 +325,30 @@ public class GameLogic
     public int[] selectGridThings (PlayerRecord player, Powerup pup, Map<Integer, Float> weights)
         throws ServiceException
     {
-        ThingIndex index = _thingLogic.getThingIndex().copyWeighted(weights);
+        ThingIndex index = _thingLogic.getThingIndex();
         Set<Integer> thingIds = Sets.newHashSet();
 
         // load up this player's collection summary, identify incomplete series
         Multimap<Integer, Integer> collection = _gameRepo.loadCollection(player.userId, index);
         Set<Integer> haveIds = Sets.newHashSet(collection.values());
         Set<Integer> haveCats = Sets.newHashSet();
-        for (int categoryId : collection.keySet()) {
-            if (index.getCategorySize(categoryId) > collection.get(categoryId).size()) {
+        for (Map.Entry<Integer, Collection<Integer>> entry : collection.asMap().entrySet()) {
+            int categoryId = entry.getKey();
+            int collCatCount = entry.getValue().size(); // player's collection size for this cat
+            int categorySize = index.getCategorySize(categoryId);
+            if (categorySize > collCatCount) {
                 haveCats.add(categoryId);
+
+            } else if (categorySize == collCatCount) { // only other possibility, actually...
+                // The player has completed this collection. Nix any upwards weightings.
+                Float weight = weights.get(categoryId);
+                if (weight != null && weight >= 1f) {
+                    weights.remove(categoryId);
+                }
             }
         }
+        // then, copy the index to one that's been weighted according to the user's preferences
+        index = index.copyWeighted(weights);
 
         // determine which cards this player needs to complete their collections
         Set<Integer> needed = index.computeNeeded(collection);
