@@ -559,11 +559,12 @@ public class GameRepository extends DepotRepository
     }
 
     /**
-     * Has the specified user posted this attractor before?
+     * Return the Timestamp at which the specified user posted the specified attractor, or null.
      */
-    public boolean hasPostedAttractor (int userId, int thingId)
+    public Timestamp getAttractorPostTime (int userId, int thingId)
     {
-        return (null != load(AttractorPostedRecord.getKey(userId, thingId)));
+        AttractorPostedRecord rec = load(AttractorPostedRecord.getKey(userId, thingId));
+        return (rec == null) ? null : rec.when;
     }
 
     /**

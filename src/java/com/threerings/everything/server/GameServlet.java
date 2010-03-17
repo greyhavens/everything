@@ -381,11 +381,24 @@ public class GameServlet extends EveryServiceServlet
         throws ServiceException
     {
         PlayerRecord player = requirePlayer();
+        long now = System.currentTimeMillis();
 
-        // validate that the thingId is an 'attractor'
-        if (!OLD_ATTRACTORS.contains(thingId) &&
-                !_gameRepo.hasPostedAttractor(friendId, thingId)) {
-            throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+        boolean isOldAttractor;
+        if (OLD_ATTRACTORS.contains(thingId)) {
+            isOldAttractor = true;
+
+        } else {
+            Timestamp stamp = _gameRepo.getAttractorPostTime(friendId, thingId);
+            if (stamp == null) {
+                throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
+            }
+            // it's old if it's more than 5 days old
+            isOldAttractor = stamp.getTime() < (now - (GameUtil.ONE_DAY * 5));
+        }
+
+        // old attractors are only valid for brand-new (first 2 days) players
+        if (isOldAttractor && (player.joined.getTime() < (now - (GameUtil.ONE_DAY * 2)))) {
+            throw new ServiceException("This card is only free for new players. Sorry!");
         }
 
         // get information on the thing
@@ -653,7 +666,7 @@ public class GameServlet extends EveryServiceServlet
             return false;
         }
         // make sure they haven't posted this same attractor before
-        if (_gameRepo.hasPostedAttractor(player.userId, card.thing.thingId)) {
+        if (null != _gameRepo.getAttractorPostTime(player.userId, card.thing.thingId)) {
             return false;
         }
         // make sure they don't hate this series
