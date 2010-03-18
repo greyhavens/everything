@@ -29,6 +29,9 @@ public class EditFAQPage extends FlowPanel
         add(Widgets.newLabel(_msgs.faqFactsTitle(), "machine"));
         add(Widgets.newHTML(_msgs.faqFacts()));
 
+        add(Widgets.newLabel(_msgs.faqGrammarTitle(), "machine"));
+        add(Widgets.newHTML(_msgs.faqGrammar()));
+
         add(Widgets.newLabel(_msgs.faqSizeTitle(), "machine"));
         add(Widgets.newHTML(_msgs.faqSize()));
 
