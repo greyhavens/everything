@@ -355,7 +355,7 @@ public class ThingIndex
         // if the thing list is now empty, there's no point in continuing
         if (things.size() == 0) {
             log.warning("Failed to select things (usually non-critical)",
-                "desired", count, "from.size()", things.size(), "into.size()", into.size());
+                "desired", count, "into.size()", into.size());
             return;
         }
 
