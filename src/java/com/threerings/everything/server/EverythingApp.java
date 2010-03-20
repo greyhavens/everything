@@ -18,7 +18,7 @@ import com.google.inject.name.Named;
 import com.samskivert.util.StringUtil;
 import com.threerings.user.OOOUser;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AbstractSamsaraApp;
+import com.threerings.samsara.app.facebook.server.AbstractFacebookApp;
 import com.threerings.samsara.app.server.AbstractSamsaraAppModule;
 import com.threerings.samsara.shared.App;
 import com.threerings.everything.client.Kontagent;
@@ -30,7 +30,7 @@ import static com.threerings.everything.Log.log;
  * The main entry point for the Everything app.
  */
 @Singleton
-public class EverythingApp extends AbstractSamsaraApp
+public class EverythingApp extends AbstractFacebookApp
 {
     /** Our app identifier. */
     public static final String IDENT = "everything";
@@ -102,22 +102,6 @@ public class EverythingApp extends AbstractSamsaraApp
     }
 
     /**
-     * Returns our Facebook API key.
-     */
-    public String getFacebookKey ()
-    {
-        return _config.getValue(getFacebookKey("facebook_key"), (String)null);
-    }
-
-    /**
-     * Returns our Facebook app secret.
-     */
-    public String getFacebookSecret ()
-    {
-        return _config.getValue(getFacebookKey("facebook_secret"), (String)null);
-    }
-
-    /**
      * Returns a URL to our Facebook app that we can put out in the wide world.
      *
      * @param type the vector in which this URL is being embedded, e.g. {@link Kontagent#INVITE}).
@@ -145,15 +129,6 @@ public class EverythingApp extends AbstractSamsaraApp
             url += "&token=" + Joiner.on("~").join(args);
         }
         return url;
-    }
-
-    /**
-     * Returns the bare URL to our Facebook app. You probably want {@link #getHelloURL}.
-     */
-    public String getFacebookAppURL ()
-    {
-        String appname = _config.getValue(getFacebookKey("facebook_appname"), "missing_appname");
-        return "http://apps.facebook.com/" + appname + "/";
     }
 
     /**
@@ -229,12 +204,6 @@ public class EverythingApp extends AbstractSamsaraApp
     }
 
     @Override // from App
-    public String getFacebookSecret (String uri)
-    {
-        return getFacebookSecret(); // we don't do per-uri secrets
-    }
-
-    @Override // from App
     public void coinsPurchased (int userId, int coins)
     {
         log.info("Player purchased coins, yay!", "user", userId, "coins", coins);
@@ -255,11 +224,6 @@ public class EverythingApp extends AbstractSamsaraApp
         _executor.shutdown();
         // TODO: we want to wait for all of our pending servlets to finish before shutdown
         shutdown();
-    }
-
-    protected String getFacebookKey (String key)
-    {
-        return (_candidate ? "candidate_" : "") + key;
     }
 
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
