@@ -16,6 +16,8 @@ import com.google.inject.name.Named;
 import com.samskivert.servlet.util.ParameterUtil;
 import com.samskivert.util.StringUtil;
 
+import com.threerings.facebook.FBParam;
+
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.server.AppServlet;
@@ -139,11 +141,10 @@ public class AuthServlet extends AppServlet
     protected void reportLanding (
         HttpServletRequest req, Kontagent type, String ltype, String tracking)
     {
-        String appAdded = (ParameterUtil.isSet(req, "fb_sig") &&
-                           ParameterUtil.isSet(req, "fb_sig_session_key")) ? "1" : "0";
+        String appAdded = (FBParam.SIG.isSet(req) && FBParam.SESSION_KEY.isSet(req)) ?  "1" : "0";
         String rkey = (type == Kontagent.OTHER_RESPONSE) ? "s" : "r"; // retarded
-        String recipId = StringUtil.getOr(req.getParameter("fb_sig_user"),
-                                          req.getParameter("fb_sig_canvas_user"));
+        String recipId = StringUtil.getOr(FBParam.USER.getStringValue(req),
+                                          FBParam.CANVAS_USER.getStringValue(req));
         String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
         _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
     }
