@@ -392,8 +392,8 @@ public class GameServlet extends EveryServiceServlet
             if (stamp == null) {
                 throw new ServiceException(AppCodes.E_INTERNAL_ERROR); // TODO: better error?
             }
-            // it's old if it's more than 5 days old
-            isOldAttractor = stamp.getTime() < (now - (GameUtil.ONE_DAY * 5));
+            // it's old if it's more than 2 days old
+            isOldAttractor = stamp.getTime() < (now - (GameUtil.ONE_DAY * 2));
         }
 
         // old attractors are only valid for brand-new (first 2 days) players
