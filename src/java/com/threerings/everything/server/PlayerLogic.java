@@ -17,8 +17,8 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-//import com.google.code.facebookapi.BundleActionLink;
-//import com.google.code.facebookapi.DashboardNewsItem;
+import com.google.code.facebookapi.BundleActionLink;
+import com.google.code.facebookapi.DashboardNewsItem;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
 import com.samskivert.util.Calendars;
@@ -113,28 +113,21 @@ public class PlayerLogic
         String tracking = _kontLogic.generateUniqueId(sender.userId);
         String url = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
 
-//        // new way
-//        BundleActionLink link = new BundleActionLink();
-//        link.setText("View");
-//        link.setHref(url);
-//        DashboardNewsItem item = new DashBoardNewsItem();
-//        item.setMessage(sender + " gave you a card in the " + series.name + " series.");
-//        item.setActionLink(link);
-//
-        // old way
-        String feedmsg = String.format( // TODO: localization?
-            "gave you a card in the <a href=\"%s\">%s</a> series.", url, series.name);
+        BundleActionLink link = new BundleActionLink();
+        link.setText("Open gift");
+        link.setHref(url);
+        DashboardNewsItem item = new DashboardNewsItem();
+        item.setMessage(sender.name + " gave you a card in the " + series.name + " series.");
+        item.setActionLink(link);
 
-        // send both for now
-        sendFacebookNotification(sender, toFBId, feedmsg /* item */, tracking);
+        sendFacebookNotification(sender, toFBId, item, tracking);
     }
 
     /**
      * Delivers a notification to the specified Facebook user from the specified sender.
      */
     public void sendFacebookNotification (
-        PlayerRecord from, final long toFBId, final String fbml, //final DashboardNewsItem item,
-        final String tracking)
+        PlayerRecord from, final long toFBId, final DashboardNewsItem item, final String tracking)
     {
         if (toFBId == 0) {
             return; // noop, some day we'll support players who aren't on Facebook
@@ -151,17 +144,17 @@ public class PlayerLogic
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 try {
-                    log.debug("Sending FB notification", "id", toFBId, "fbml", fbml);
+                    log.debug("Sending FB notification", "id", toFBId, "item", item);
                     // send the notification to Facebook
-                    fbclient.notifications_send(Collections.singleton(toFBId), fbml);
-                    // TODO: new way: fbclient.dashboard_addNews(toFBId, item);
+                    fbclient.dashboard_multiAddNews(
+                        Collections.singleton(toFBId), Collections.singleton(item));
 
                     // tell Kontagent that we sent a notification
                     _kontLogic.reportAction(
                         Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
                 } catch (Exception e) {
                     log.info("Failed to send Facebook notification", "to", toFBId,
-                             "fbml", fbml, "error", e.getMessage());
+                             "item", item, "error", e.getMessage());
                 }
             }
         });
@@ -204,20 +197,23 @@ public class PlayerLogic
             return; // noop!
         }
 
-        String everyURL = _app.getHelloURL("reminder" + idleDays);
         int flips = GameCodes.DAILY_FREE_FLIPS + idleDays - 1; // reasonable estimate
-        final String fbml = String.format(
-            "You have <a href=\"%s\">%d free flips</a> waiting for you in " +
-            "<a href=\"%s\">The Everything Game</a>.", everyURL, flips, everyURL);
+
+        BundleActionLink link = new BundleActionLink();
+        link.setText("Flip cards");
+        link.setHref(_app.getHelloURL("reminder" + idleDays));
+        final DashboardNewsItem item = new DashboardNewsItem();
+        item.setMessage("You have " + flips + " free flips waiting for you in The Everything Game");
+        item.setActionLink(link);
 
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 for (List<Long> ids : Iterables.partition(fbids, 50)) {
                     try {
-                        fbclient.notifications_send(ids, fbml, true);
+                        fbclient.dashboard_multiAddNews(ids, Collections.nCopies(ids.size(), item));
                     } catch (Exception e) {
-                        log.info("Failed to send Facebook reminder notification", "fbml", fbml,
+                        log.info("Failed to send Facebook reminder notification", "item", item,
                                  "error", e.getMessage());
                     }
                 }
