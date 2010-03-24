@@ -87,29 +87,28 @@ public class BrowsePage extends DataPanel<PlayerCollection>
             _header.at(2, 1).setText("Completed:", "Padded", "right", "handwriting")
                 .right().setWidget(ValueLabel.create(_completed), "right", "handwriting");
 
-            if (coll.trophies != null) {
-                _header.at(3, 0).setColSpan(3).alignCenter()
-                    .setWidget(createTrophyTable(coll.trophies, coll.owner.equals(_ctx.getMe())));
-            }
-
             XFBML.parse(this);
         }
         _coll = coll;
 
         // update our links every time as we may have switched between feed and collection
-        Widget view;
-        if (FEED_CAT.equals(_selcat)) {
-            view = Args.createLink("View Collection", Page.BROWSE, coll.owner.userId);
-        } else {
-            view = Args.createLink("View Feed", Page.BROWSE, coll.owner.userId, FEED_CAT);
-        }
-        Widget links = _ctx.getMe().equals(coll.owner) ? Widgets.newRow("Links", view) :
-            Widgets.newRow("Links", view, Args.createMessageAnchor(coll.owner));
-        _header.at(1, 0).setWidget(links, "machine");
+        boolean onFeed = FEED_CAT.equals(_selcat), onTrophies = TROPHIES_CAT.equals(_selcat);
+        Widget clink =  !(onFeed || onTrophies) ? Widgets.newLabel("Collection") :
+            Args.createLink("Collection", Page.BROWSE, coll.owner.userId);
+        Widget flink = onFeed ? Widgets.newLabel("Feed") :
+            Args.createLink("Feed", Page.BROWSE, coll.owner.userId, FEED_CAT);
+        Widget tlink = onTrophies ? Widgets.newLabel("Trophies") :
+            Args.createLink("Trophies", Page.BROWSE, coll.owner.userId, TROPHIES_CAT);
+        Widget mlink = _ctx.getMe().equals(coll.owner) ? Widgets.newLabel("") : // blank!
+            Args.createMessageAnchor(coll.owner);
+        _header.at(1, 0).setWidget(Widgets.newRow("Links", clink, flink, tlink, mlink), "machine");
 
-        // if we're viewing the feed, show that
-        if (FEED_CAT.equals(_selcat)) {
+        // if we're viewing the feed or trophies, show that
+        if (onFeed) {
             setContents(new UserFeedPanel(_ctx, _coll.owner.userId));
+            return;
+        } else if (onTrophies) {
+            setContents(createTrophyTable(coll.trophies, coll.owner.equals(_ctx.getMe())));
             return;
         }
 
@@ -306,14 +305,13 @@ public class BrowsePage extends DataPanel<PlayerCollection>
 
     protected Widget createTrophyTable (List<TrophyData> trophies, boolean isMine)
     {
-        final int COLS = 5;
-
-        FluentTable panel = new FluentTable(10, 0, "Trophies");
-        if (isMine) {
-            panel.add().alignCenter().setColSpan(COLS).setText("Your trophies", "Title", "machine");
-            panel.add().alignCenter().setColSpan(COLS).setText("(click to post to your wall)");
+        FluentTable panel = new FluentTable(10, 0);
+        if (trophies == null) {
+            panel.at(0, 0).setText("No trophies earned.");
+            return panel;
         }
 
+        final int COLS = 5;
         int count = 0;
         int rowStart = isMine ? 2 : 0;
         for (TrophyData trophy : trophies) {
@@ -321,6 +319,10 @@ public class BrowsePage extends DataPanel<PlayerCollection>
                 .setWidget(TrophyUI.create(_ctx, trophy, isMine));
             count++;
         }
+        if (isMine) {
+            panel.add().alignCenter().setColSpan(COLS).setText("(click to post to your wall)");
+        }
+
         return panel;
     }
 
@@ -367,4 +369,5 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     };
 
     protected static final String FEED_CAT = "Feed";
+    protected static final String TROPHIES_CAT = "Trophies";
 }

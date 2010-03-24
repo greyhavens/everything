@@ -316,14 +316,6 @@
   font-size: 12px;
 }
 
-.browse .Trophies {
-  border: 2px solid;
-}
-
-.browse .Header .Trophies .Title {
-  font-size: 24px;
-}
-
 .browse .Codons {
   font-size: 13px;
   letter-spacing: -1px;
