@@ -211,7 +211,7 @@ public class PlayerLogic
             public void run () {
                 for (List<Long> ids : Iterables.partition(fbids, 50)) {
                     try {
-                        fbclient.dashboard_multiAddNews(ids, Collections.nCopies(ids.size(), item));
+                        fbclient.dashboard_multiAddNews(ids, Collections.singleton(item));
                     } catch (Exception e) {
                         log.info("Failed to send Facebook reminder notification", "item", item,
                                  "error", e.getMessage());
