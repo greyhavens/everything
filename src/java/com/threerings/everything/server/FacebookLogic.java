@@ -8,6 +8,7 @@ import java.net.URL;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import com.google.code.facebookapi.DefaultCommunicationStrategy;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
 /**
@@ -32,8 +33,8 @@ public class FacebookLogic
         FacebookJaxbRestClient cli = new FacebookJaxbRestClient(
             _app.getFacebookKey(), _app.getFacebookSecret(), sessionKey);
         cli.setServerUrl(SERVER_URL);
-        cli.setConnectTimeout(CONNECT_TIMEOUT);
-        cli.setReadTimeout(READ_TIMEOUT);
+        cli.setCommunicationStrategy(
+            new DefaultCommunicationStrategy(CONNECT_TIMEOUT, READ_TIMEOUT));
         return cli;
     }
 
