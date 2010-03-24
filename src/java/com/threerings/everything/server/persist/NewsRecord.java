@@ -62,10 +62,10 @@ public class NewsRecord extends PersistentRecord
      */
     public static Key<NewsRecord> getKey (Timestamp reported)
     {
-        return new Key<NewsRecord>(
-                NewsRecord.class,
-                new ColumnExp[] { REPORTED },
-                new Comparable[] { reported });
+        return newKey(_R, reported);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(REPORTED); }
     // AUTO-GENERATED: METHODS END
 }

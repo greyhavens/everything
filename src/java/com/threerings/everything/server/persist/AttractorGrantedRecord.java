@@ -45,10 +45,10 @@ public class AttractorGrantedRecord extends PersistentRecord
      */
     public static Key<AttractorGrantedRecord> getKey (int userId, int thingId)
     {
-        return new Key<AttractorGrantedRecord>(
-                AttractorGrantedRecord.class,
-                new ColumnExp[] { USER_ID, THING_ID },
-                new Comparable[] { userId, thingId });
+        return newKey(_R, userId, thingId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID, THING_ID); }
     // AUTO-GENERATED: METHODS END
 }

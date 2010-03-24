@@ -82,10 +82,10 @@ public class GridRecord extends PersistentRecord
      */
     public static Key<GridRecord> getKey (int userId)
     {
-        return new Key<GridRecord>(
-                GridRecord.class,
-                new ColumnExp[] { USER_ID },
-                new Comparable[] { userId });
+        return newKey(_R, userId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID); }
     // AUTO-GENERATED: METHODS END
 }

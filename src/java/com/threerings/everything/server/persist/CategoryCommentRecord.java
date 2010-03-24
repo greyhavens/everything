@@ -64,10 +64,10 @@ public class CategoryCommentRecord extends PersistentRecord
      */
     public static Key<CategoryCommentRecord> getKey (int categoryId, Timestamp when)
     {
-        return new Key<CategoryCommentRecord>(
-                CategoryCommentRecord.class,
-                new ColumnExp[] { CATEGORY_ID, WHEN },
-                new Comparable[] { categoryId, when });
+        return newKey(_R, categoryId, when);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(CATEGORY_ID, WHEN); }
     // AUTO-GENERATED: METHODS END
 }

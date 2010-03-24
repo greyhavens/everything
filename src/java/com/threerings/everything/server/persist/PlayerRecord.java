@@ -212,11 +212,11 @@ public class PlayerRecord extends PersistentRecord
      */
     public static Key<PlayerRecord> getKey (int userId)
     {
-        return new Key<PlayerRecord>(
-                PlayerRecord.class,
-                new ColumnExp[] { USER_ID },
-                new Comparable[] { userId });
+        return newKey(_R, userId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID); }
     // AUTO-GENERATED: METHODS END
 
     /** The minimum allowed lifespan for a grid (and recruitment gifts) (2 hours). */

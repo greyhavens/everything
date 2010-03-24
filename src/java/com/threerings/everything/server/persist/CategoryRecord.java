@@ -116,10 +116,10 @@ public class CategoryRecord extends PersistentRecord
      */
     public static Key<CategoryRecord> getKey (int categoryId)
     {
-        return new Key<CategoryRecord>(
-                CategoryRecord.class,
-                new ColumnExp[] { CATEGORY_ID },
-                new Comparable[] { categoryId });
+        return newKey(_R, categoryId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(CATEGORY_ID); }
     // AUTO-GENERATED: METHODS END
 }

@@ -38,11 +38,11 @@ public class FriendRecord extends PersistentRecord
      */
     public static Key<FriendRecord> getKey (int userId, int friendId)
     {
-        return new Key<FriendRecord>(
-                FriendRecord.class,
-                new ColumnExp[] { USER_ID, FRIEND_ID },
-                new Comparable[] { userId, friendId });
+        return newKey(_R, userId, friendId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID, FRIEND_ID); }
     // AUTO-GENERATED: METHODS END
 
     /** A function for converting a FriendRecord to an Integer representing the friend's id. */

@@ -44,10 +44,10 @@ public class GiftMessageRecord extends PersistentRecord
      */
     public static Key<GiftMessageRecord> getKey (int ownerId, int thingId, long received)
     {
-        return new Key<GiftMessageRecord>(
-                GiftMessageRecord.class,
-                new ColumnExp[] { OWNER_ID, THING_ID, RECEIVED },
-                new Comparable[] { ownerId, thingId, received });
+        return newKey(_R, ownerId, thingId, received);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(OWNER_ID, THING_ID, RECEIVED); }
     // AUTO-GENERATED: METHODS END
 }

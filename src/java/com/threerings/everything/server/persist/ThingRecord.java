@@ -124,10 +124,10 @@ public class ThingRecord extends PersistentRecord
      */
     public static Key<ThingRecord> getKey (int thingId)
     {
-        return new Key<ThingRecord>(
-                ThingRecord.class,
-                new ColumnExp[] { THING_ID },
-                new Comparable[] { thingId });
+        return newKey(_R, thingId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(THING_ID); }
     // AUTO-GENERATED: METHODS END
 }

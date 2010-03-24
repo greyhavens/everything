@@ -66,10 +66,10 @@ public class RecruitGiftRecord extends PersistentRecord
      */
     public static Key<RecruitGiftRecord> getKey (int userId)
     {
-        return new Key<RecruitGiftRecord>(
-                RecruitGiftRecord.class,
-                new ColumnExp[] { USER_ID },
-                new Comparable[] { userId });
+        return newKey(_R, userId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID); }
     // AUTO-GENERATED: METHODS END
 }

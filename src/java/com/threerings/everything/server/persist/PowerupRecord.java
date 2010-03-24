@@ -42,10 +42,10 @@ public class PowerupRecord extends PersistentRecord
      */
     public static Key<PowerupRecord> getKey (int ownerId, Powerup type)
     {
-        return new Key<PowerupRecord>(
-                PowerupRecord.class,
-                new ColumnExp[] { OWNER_ID, TYPE },
-                new Comparable[] { ownerId, type });
+        return newKey(_R, ownerId, type);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(OWNER_ID, TYPE); }
     // AUTO-GENERATED: METHODS END
 }

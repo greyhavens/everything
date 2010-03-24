@@ -38,10 +38,10 @@ public class AttractorPostedRecord extends PersistentRecord
      */
     public static Key<AttractorPostedRecord> getKey (int userId, int thingId)
     {
-        return new Key<AttractorPostedRecord>(
-                AttractorPostedRecord.class,
-                new ColumnExp[] { USER_ID, THING_ID },
-                new Comparable[] { userId, thingId });
+        return newKey(_R, userId, thingId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID, THING_ID); }
     // AUTO-GENERATED: METHODS END
 }

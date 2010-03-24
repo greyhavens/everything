@@ -46,10 +46,10 @@ public class EscrowedCardRecord extends PersistentRecord
      */
     public static Key<EscrowedCardRecord> getKey (String externalId, int thingId, Timestamp created)
     {
-        return new Key<EscrowedCardRecord>(
-                EscrowedCardRecord.class,
-                new ColumnExp[] { EXTERNAL_ID, THING_ID, CREATED },
-                new Comparable[] { externalId, thingId, created });
+        return newKey(_R, externalId, thingId, created);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(EXTERNAL_ID, THING_ID, CREATED); }
     // AUTO-GENERATED: METHODS END
 }

@@ -94,10 +94,10 @@ public class FeedItemRecord extends PersistentRecord
      */
     public static Key<FeedItemRecord> getKey (int actorId, Timestamp when)
     {
-        return new Key<FeedItemRecord>(
-                FeedItemRecord.class,
-                new ColumnExp[] { ACTOR_ID, WHEN },
-                new Comparable[] { actorId, when });
+        return newKey(_R, actorId, when);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(ACTOR_ID, WHEN); }
     // AUTO-GENERATED: METHODS END
 }

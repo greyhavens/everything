@@ -76,10 +76,10 @@ public class CollectionRecord extends PersistentRecord
      */
     public static Key<CollectionRecord> getKey (int userId)
     {
-        return new Key<CollectionRecord>(
-                CollectionRecord.class,
-                new ColumnExp[] { USER_ID },
-                new Comparable[] { userId });
+        return newKey(_R, userId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID); }
     // AUTO-GENERATED: METHODS END
 }

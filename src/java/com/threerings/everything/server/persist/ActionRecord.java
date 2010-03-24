@@ -59,10 +59,10 @@ public class ActionRecord extends PersistentRecord
      */
     public static Key<ActionRecord> getKey (int userId, Timestamp when)
     {
-        return new Key<ActionRecord>(
-                ActionRecord.class,
-                new ColumnExp[] { USER_ID, WHEN },
-                new Comparable[] { userId, when });
+        return newKey(_R, userId, when);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID, WHEN); }
     // AUTO-GENERATED: METHODS END
 }

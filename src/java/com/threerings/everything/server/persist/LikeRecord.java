@@ -42,10 +42,10 @@ public class LikeRecord extends PersistentRecord
      */
     public static Key<LikeRecord> getKey (int userId, int categoryId)
     {
-        return new Key<LikeRecord>(
-                LikeRecord.class,
-                new ColumnExp[] { USER_ID, CATEGORY_ID },
-                new Comparable[] { userId, categoryId });
+        return newKey(_R, userId, categoryId);
     }
+
+    /** Register the key fields in an order matching the getKey() factory. */
+    static { registerKeyFields(USER_ID, CATEGORY_ID); }
     // AUTO-GENERATED: METHODS END
 }
