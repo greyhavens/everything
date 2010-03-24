@@ -114,7 +114,7 @@
   background: url(images/category/default.png) top center no-repeat;
   width: 290px;
   height: 347px;
-  overflow: auto;
+  overflow: hidden;
   padding-right: 5px;
 }
 
