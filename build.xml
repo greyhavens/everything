@@ -15,52 +15,18 @@
   <!-- bring in our standard build support -->
   <import file="build/etc/build-support.xml"/>
 
-  <!-- we need these libraries to build -->
-  <filelist dir="." id="build.libs">
-    <file name="extlibs/flash/corelib.swc"/>
-    <file name="extlibs/flash/flexlib.swc"/>
-    <file name="extlibs/flash/tweener.swc"/>
-    <file name="extlibs/java/jetty6/jetty.jar"/>
-    <file name="extlibs/java/jetty6/jetty-util.jar"/>
-    <file name="extlibs/java/json.jar"/>
-
-    <!-- these are for unit tests and mocking -->
-    <file name="extlibs/java/easymock/easymock.jar"/>
-    <file name="extlibs/java/junit4.jar"/>
-  </filelist>
-
-  <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
-  <filelist dir="." id="runtime.libs">
-    <file name="extlibs/java/activation.jar"/>
-    <file name="extlibs/java/commons-collections.jar"/>
-    <file name="extlibs/java/commons-fileupload.jar"/>
-    <file name="extlibs/java/commons-io.jar"/>
-    <file name="extlibs/java/commons-lang.jar"/>
-    <file name="extlibs/java/commons-logging.jar"/>
-    <file name="extlibs/java/facebook-java-api.jar"/>
-    <file name="extlibs/java/facebook-java-api-schema.jar"/>
-    <file name="extlibs/java/guava.jar"/>
-    <file name="extlibs/java/gwt-user-2.0.jar"/>
-    <file name="extlibs/java/jvnet-runtime.jar"/>
-    <file name="extlibs/java/json.jar"/>
-    <file name="extlibs/java/log4j.jar"/>
-    <file name="extlibs/java/mail.jar"/>
-    <file name="extlibs/java/postgresql-jdbc4.jar"/>
-    <file name="extlibs/java/s3lib.jar"/>
-    <file name="extlibs/java/servlet-api.jar"/>
-    <file name="extlibs/java/velocity-1.5-dev.jar"/>
-  </filelist>
-
-
   <path id="build.classpath">
     <pathelement location="${classes.dir}"/>
     <fileset dir="${deploy.dir}/lib" includes="*.jar"/>
+    <fileset dir="${deploy.dir}/build" includes="*.jar"/>
   </path>
 
   <target name="prepare">
     <mkdir dir="${deploy.dir}"/>
     <mkdir dir="${candidate.dir}"/>
     <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${deploy.dir}/lib"/>
+    <mkdir dir="${deploy.dir}/build"/>
 
     <!-- obtain our configuration files -->
     <gatherconfiguration app="${app.ident}" distribution="${ooo.distribution}" dest="${deploy.dir}">
@@ -76,8 +42,8 @@
     <!-- copy our distribution-specific but otherwise uncustomized configuration files -->
     <copy file="etc/log4j-${ooo.distribution}.properties" tofile="${classes.dir}/log4j.properties"/>
 
-    <!-- copy the candidate-specific distribution-specific log configuration file if it exists, otherwise use
-    the standard one -->
+    <!-- copy the candidate-specific distribution-specific log configuration -->
+    <!-- file if it exists, otherwise use the standard one -->
     <if>
         <available file="etc/candidate-log4j-${ooo.distribution}.properties"/>
         <then>
@@ -89,17 +55,11 @@
                 tofile="${candidate.dir}/log4j.properties"/>
         </else>
     </if>
-
-    <!-- copy our build dependencies into place -->
-    <mkdir dir="${deploy.dir}/lib"/>
-    <copyfilelist dest="${deploy.dir}/lib">
-      <filelist refid="build.libs"/>
-      <filelist refid="runtime.libs"/>
-    </copyfilelist>
   </target>
 
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
-    <artifact:dependencies filesetId="dependency.fileset">
+    <!-- these libraries are needed at runtime -->
+    <artifact:dependencies filesetId="rundeps.fileset">
       <remoteRepository refid="ooo.maven.depends.repo"/>
       <dependency groupId="com.samskivert" artifactId="depot" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.samskivert" artifactId="samskivert-gwt" version="0.0-SNAPSHOT"/>
@@ -108,15 +68,54 @@
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
 
       <dependency groupId="extern" artifactId="guice" version="2.0"/>
       <dependency groupId="extern" artifactId="guice-multibindings" version="2.0"/>
+
+      <dependency groupId="extern" artifactId="activation" version="1.0"/>
+      <dependency groupId="extern" artifactId="commons-collections" version="1.0"/>
+      <dependency groupId="extern" artifactId="commons-fileupload" version="1.2"/>
+      <dependency groupId="extern" artifactId="commons-io" version="1.4"/>
+      <dependency groupId="extern" artifactId="commons-lang" version="1.0"/>
+      <dependency groupId="extern" artifactId="commons-logging" version="1.0"/>
+
+      <dependency groupId="extern" artifactId="facebook-java-api" version="3.0"/>
+
+      <dependency groupId="extern" artifactId="guava" version="1.0"/>
+      <dependency groupId="extern" artifactId="gwt-user" version="2.0"/>
+      <dependency groupId="extern" artifactId="jvnet-runtime" version="1.0"/>
+      <dependency groupId="extern" artifactId="json" version="1.0"/>
+      <dependency groupId="extern" artifactId="log4j" version="1.2"/>
+      <dependency groupId="extern" artifactId="mail" version="1.4"/>
+      <dependency groupId="extern" artifactId="postgresql-jdbc4" version="8.3"/>
+
+      <dependency groupId="extern" artifactId="s3lib" version="1.0"/>
+      <dependency groupId="extern" artifactId="servlet-api" version="2.5"/>
+      <dependency groupId="extern" artifactId="velocity-dev" version="1.5"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
-      <fileset refid="dependency.fileset"/>
+      <fileset refid="rundeps.fileset"/>
       <mapper type="flatten"/>
     </copy>
+
+    <!-- these libraries are *only* needed at build and testing time -->
+    <artifact:dependencies filesetId="builddeps.fileset">
+      <remoteRepository refid="ooo.maven.depends.repo"/>
+      <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
+      <dependency groupId="extern" artifactId="corelib" version="1.0" type="swc"/>
+      <dependency groupId="extern" artifactId="flexlib" version="1.0" type="swc"/>
+      <dependency groupId="extern" artifactId="tweener" version="1.0" type="swc"/>
+      <dependency groupId="extern" artifactId="jetty" version="6.0"/>
+      <dependency groupId="extern" artifactId="easymock" version="1.0"/>
+      <dependency groupId="extern" artifactId="junit4" version="4.0"/>
+      <dependency groupId="extern" artifactId="gwt-asyncgen" version="1.0"/>
+      <dependency groupId="extern" artifactId="gwt-dev" version="2.0"/>
+    </artifact:dependencies>
+    <copy todir="${deploy.dir}/build">
+      <fileset refid="builddeps.fileset"/>
+      <mapper type="flatten"/>
+    </copy>
+
   </target>
 
   <target name="version" depends="prepare">
@@ -177,7 +176,9 @@
     <!-- invoke the GWT compiler and grindy grindy grindy -->
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
-        <fileset dir="extlibs/java" includes="gwt-dev-2.0.jar"/> <!-- the GWT compiler -->
+        <fileset dir="${deploy.dir}/build">
+          <include name="gwt-dev-2.0.jar"/> <!-- the GWT compiler -->
+        </fileset>
         <fileset dir="${deploy.dir}/lib">
           <include name="gwt-user-2.0.jar"/>
           <include name="gwt-utils*.jar"/>
@@ -213,7 +214,7 @@
   <target name="gdevmode" depends="gclient" description="Runs development mode.">
     <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
-        <pathelement path="extlibs/java/gwt-dev-2.0.jar"/>
+        <pathelement path="${deploy.dir}/build/gwt-dev-2.0.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-user-2.0.jar"/>
         <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
         <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
@@ -381,7 +382,7 @@
 
   <target name="genasync" depends="compile" description="Regenerates GWT Async interfaces.">
     <taskdef name="genasync" classname="com.samskivert.asyncgen.AsyncGenTask"
-             classpath="extlibs/java/gwt-asyncgen.jar"/>
+             classpath="${deploy.dir}/build/gwt-asyncgen-1.0.jar"/>
     <genasync classpathref="build.classpath">
       <fileset dir="${src.dir}" includes="**/*Service.java"/>
     </genasync>
