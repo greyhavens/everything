@@ -46,7 +46,12 @@ public class AuthServlet extends AppServlet
         if (username != null && passwd != null) {
             try {
                 _servletLogic.logon(_app, req, rsp, username, StringUtil.md5hex(passwd), 2);
-                rsp.sendRedirect("index.html");
+                // preserve a special argument that GWT needs to make devmode work
+                String gwtbits = ParameterUtil.getParameter(req, GWT_DEVPARAM, false);
+                if (gwtbits.length() > 0) {
+                    gwtbits = "?" + GWT_DEVPARAM + "=" + gwtbits;
+                }
+                rsp.sendRedirect("index.html" + gwtbits);
                 return;
             } catch (ServiceException se) {
                 log.warning("Failed to logon", "user", username, "pass", passwd, "se", se);
@@ -154,4 +159,6 @@ public class AuthServlet extends AppServlet
     @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected EverythingApp _app;
     @Inject protected KontagentLogic _kontLogic;
+
+    protected static final String GWT_DEVPARAM = "gwt.codesvr";
 }
