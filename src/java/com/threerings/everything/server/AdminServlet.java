@@ -32,7 +32,6 @@ public class AdminServlet extends EveryServiceServlet
     public StatsResult getStats () throws ServiceException
     {
         requireAdmin();
-
         StatsResult result = new StatsResult();
         result.stats = _thingRepo.loadStats();
         result.pendingCategories = _thingRepo.loadPendingCategories().toList();

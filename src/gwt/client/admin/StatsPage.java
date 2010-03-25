@@ -49,7 +49,8 @@ public class StatsPage extends DataPanel<AdminService.StatsResult>
 
         final NumberTextBox flips = NumberTextBox.newIntBox(2, 2);
         final Button grant = new Button("Grant");
-        stats.add(Widgets.newRow(Widgets.newLabel("Grant free flips:"), flips, grant));
+        stats.add(Widgets.newLabel("Grant free flips:"));
+        stats.add(Widgets.newRow(flips, grant));
         new ClickCallback<Void>(grant, flips) {
             protected boolean callService () {
                 int togrant = flips.getNumber().intValue();
