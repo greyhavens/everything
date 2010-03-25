@@ -20,15 +20,25 @@ import client.util.Context;
 public class TrophyUI
 {
     /**
-     * Create a Trophy display widget.
+     * Returns the image to display for the supplied trophy. If the trophy belongs to the caller
+     * (isMine) it may be clicked to post to their feed.
      */
-    public static Widget create (Context ctx, TrophyData trophy, boolean isMine)
+    public static Image getTrophyImage (Context ctx, TrophyData trophy, boolean isMine)
     {
         Image img = new Image("images/trophies/trophy.png"); // TODO: one for each kind of trophy
         img.setTitle(trophy.description);
         if (isMine) {
             Widgets.makeActionable(img, TrophyDialog.makeHandler(ctx, trophy), null);
         }
+        return img;
+    }
+
+    /**
+     * Creates a simple UI to display a trophy.
+     */
+    public static Widget create (Context ctx, TrophyData trophy, boolean isMine)
+    {
+        Image img = getTrophyImage(ctx, trophy, isMine);
         return Widgets.newFlowPanel(img, Widgets.newLabel(trophy.name, "Trophy"));
     }
 }

@@ -33,8 +33,7 @@ public abstract class CardView extends FlowPanel
      * Creates a view for the specified card.
      */
     public static Widget create (
-        Context ctx, Card card, boolean showLike, String header, String status,
-        List<TrophyData> trophies, Widget... buttons)
+        Context ctx, Card card, boolean showLike, String header, String status, Widget... buttons)
     {
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
         String bgimage = "images/info_card.png";
@@ -44,7 +43,7 @@ public abstract class CardView extends FlowPanel
             bgimage = "images/info_card_tall.png";
         }
         box.add().setWidget(new CardView.Left(ctx, card), "Left").
-            right().setWidget(new CardView.Right(ctx, card, showLike, trophies), "Right");
+            right().setWidget(new CardView.Right(ctx, card, showLike), "Right");
         if (header != null) { // if we have a header, we always need a status
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
@@ -100,7 +99,7 @@ public abstract class CardView extends FlowPanel
 
     protected static class Right extends CardView
     {
-        public Right (Context ctx, Card card, boolean showLike, List<TrophyData> trophies)
+        public Right (Context ctx, Card card, boolean showLike)
         {
             Widget cat = Widgets.newLabel(
                 Category.getHierarchy(card.categories), "Categories",
@@ -130,11 +129,6 @@ public abstract class CardView extends FlowPanel
             } else {
                 info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
                 info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
-            }
-            if (trophies != null) {
-                for (TrophyData trophy : trophies) {
-                    info.add(TrophyUI.create(ctx, trophy, true));
-                }
             }
             add(info);
         }

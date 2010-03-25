@@ -37,6 +37,7 @@ import com.threerings.everything.data.TrophyData;
 
 import client.ui.ButtonUI;
 import client.ui.LikeWidget;
+import client.ui.TrophyUI;
 import client.ui.XFBML;
 import client.util.ClickCallback;
 import client.util.Context;
@@ -75,12 +76,14 @@ public class CardPopup extends PopupPanel
     }
 
     public static CardPopup display (Context ctx, GameService.CardResult result,
-                                     Value<SlotStatus> status, Widget centerOn,
-                                     final String message)
+                                     Value<SlotStatus> status, Widget centerOn, String message)
     {
         final CardPopup popup = new CardPopup(ctx, result, status);
-        if (!StringUtil.isBlank(message)) {
-            popup.setGiftInfo(result.card.giver, message);
+        result.trophies = new java.util.ArrayList<TrophyData>();
+        result.trophies.add(new TrophyData("foo", "Test Foo", "This is a test."));
+        result.trophies.add(new TrophyData("bar", "Test Bar", "This is another test."));
+        if (!StringUtil.isBlank(message) || result.trophies != null) {
+            popup.setPopupInfo(result.card.giver, message, result.trophies);
         }
         display(ctx, popup, centerOn);
         return popup;
@@ -133,7 +136,6 @@ public class CardPopup extends PopupPanel
         }
         _haveCount = result.haveCount;
         _thingsRemaining = result.thingsRemaining;
-        _trophies = result.trophies;
         setWidget(createContents(result.card));
     }
 
@@ -145,11 +147,22 @@ public class CardPopup extends PopupPanel
         _status = status;
     }
 
-    protected void setGiftInfo (PlayerName giver, String message)
+    protected void setPopupInfo (PlayerName giver, String message, List<TrophyData> trophies)
     {
         final FluentTable table = new FluentTable(5, 0);
-        table.at(0, 0).setWidget(XFBML.newProfilePic(giver.facebookId));
-        table.at(0, 1).setText("'" + message + "'").alignTop();
+        if (giver != null) {
+            table.at(0, 0).setWidget(XFBML.newProfilePic(giver.facebookId));
+            table.at(0, 1).setText("'" + message + "'", "Title").alignTop();
+        }
+        if (trophies != null) {
+            String title = (trophies.size() == 1) ? _msgs.trophyEarned() : _msgs.trophiesEarned();
+            table.add().setText(title, "Title", "machine").setColSpan(2);
+            for (TrophyData trophy : trophies) {
+                table.add().setWidget(TrophyUI.getTrophyImage(_ctx, trophy, true)).setRowSpan(2).
+                    right().setText(trophy.name, "machine");
+                table.add().setText(trophy.description, "handwriting").alignTop();
+            }
+        }
         _onAnimComplete = new Command() {
             public void execute () {
                 _msgPop = Popups.newPopup("popup", table);
@@ -284,7 +297,7 @@ public class CardPopup extends PopupPanel
         Widget[] buttons = (completed || (wasGift && (_title != null)))
             ? new Widget[] { likeButton, sell, gift, keep, share }
             : new Widget[] { likeButton, sell, gift, share, keep };
-        return CardView.create(_ctx, card, true, _title, status, _trophies, buttons);
+        return CardView.create(_ctx, card, true, _title, status, buttons);
     }
 
     protected ClickHandler onHide ()
@@ -318,7 +331,6 @@ public class CardPopup extends PopupPanel
     protected Context _ctx;
     protected String _title;
     protected int _haveCount, _thingsRemaining = -1;
-    protected List<TrophyData> _trophies;
     protected Value<SlotStatus> _status;
 
     protected Command _onAnimComplete;
@@ -327,4 +339,5 @@ public class CardPopup extends PopupPanel
     protected PopupPanel _fireworks;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
+    protected GameMessages _msgs = GWT.create(GameMessages.class);
 }

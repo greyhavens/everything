@@ -157,8 +157,11 @@
 
 .cardMessagePopup {
   z-index: 4;
-  font-size: 18px;
   max-width: 550px;
+}
+
+.cardMessagePopup .Title {
+  font-size: 18px;
 }
 
 .cardMessagePopup img {
@@ -184,7 +187,6 @@
 }
 
 /** Attractor (bonanza landing) */
-
 .attractor .Title {
   font-size: 18px;
 }
