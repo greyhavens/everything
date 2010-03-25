@@ -36,7 +36,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     protected void init (EverythingService.FeedResult result)
     {
         if (result.recruitGifts.size() > 0) {
-            add(Widgets.newLabel("Send Free Gifts to your friends!", "Title"));
+            add(Widgets.newLabel("Send Free Gifts to your friends!", "Title", "machine"));
             add(Widgets.newLabel("More players means more things!"));
             FluentTable cards = new FluentTable(0, 0);
             int col = 0;
@@ -56,7 +56,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
         }
 
         if (!result.gifts.isEmpty()) {
-            add(Widgets.newLabel("Unopened Gifts", "Title"));
+            add(Widgets.newLabel("Unopened Gifts", "Title", "machine"));
             FluentTable cards = new FluentTable(0, 0);
             int row = 0, col = 0;
             for (final ThingCard card : result.gifts) {
@@ -82,14 +82,14 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
 //             }
 //         }
 //         if (!highlights.isEmpty()) {
-//             add(Widgets.newLabel("Highlights", "Title"));
+//             add(Widgets.newLabel("Highlights", "Title", "machine"));
 //             while (highlights.size() > 0) {
 //                 add(formatItem(highlights.remove(0), highlights, Mode.HIGHLIGHT));
 //             }
 //             add(Widgets.newShim(5, 5));
 //         }
 
-        add(Widgets.newLabel("Recent Happenings", "Title"));
+        add(Widgets.newLabel("Recent Happenings", "Title", "machine"));
         while (!result.items.isEmpty()) {
             add(formatItem(result.items.remove(0), result.items, Mode.NORMAL));
         }

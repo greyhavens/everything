@@ -67,7 +67,7 @@ public class LandingPage extends FlowPanel
         int expLevel = ctx.getGridsConsumed() - Context.EXPERIENCED_GRIDS;
         if (!ctx.isEditor() && (expLevel == 0 || expLevel == 1)) {
             add(Widgets.newShim(20, 20));
-            add(Widgets.newLabel("Experienced Player!", "Title"));
+            add(Widgets.newLabel("Experienced Player!", "Title", "machine"));
             add(Widgets.newLabel(_msgs.experiencedMsg(), "Text"));
             add(Widgets.newShim(10, 10));
         }
