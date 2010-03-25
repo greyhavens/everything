@@ -79,9 +79,6 @@ public class CardPopup extends PopupPanel
                                      Value<SlotStatus> status, Widget centerOn, String message)
     {
         final CardPopup popup = new CardPopup(ctx, result, status);
-        result.trophies = new java.util.ArrayList<TrophyData>();
-        result.trophies.add(new TrophyData("foo", "Test Foo", "This is a test."));
-        result.trophies.add(new TrophyData("bar", "Test Bar", "This is another test."));
         if (!StringUtil.isBlank(message) || result.trophies != null) {
             popup.setPopupInfo(result.card.giver, message, result.trophies);
         }
