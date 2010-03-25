@@ -32,7 +32,6 @@ public class EditNewsPage extends FlowPanel
         _ctx = ctx;
         _news = news;
 
-        add(Widgets.newLabel("Latest News", "machine"));
         final LimitedTextArea onews = new LimitedTextArea(News.MAX_NEWS_LENGTH, 80, 5);
         final Button upnews = new Button("Update");
         new ClickCallback<Void>(upnews) {
@@ -47,13 +46,7 @@ public class EditNewsPage extends FlowPanel
                 return true;
             }
         };
-        add(onews);
-        add(upnews);
-        setLatestNews(onews, upnews, news.get());
 
-        add(Widgets.newShim(10, 10));
-
-        add(Widgets.newLabel("Add News", "machine"));
         final LimitedTextArea nnews = new LimitedTextArea(News.MAX_NEWS_LENGTH, 80, 5);
         final Button post = new Button("Post");
         new ClickCallback<Long>(post) {
@@ -77,8 +70,17 @@ public class EditNewsPage extends FlowPanel
                 return true;
             }
         };
+
+        add(Widgets.newLabel("Add News", "machine"));
         add(nnews);
         add(post);
+
+        add(Widgets.newShim(10, 10));
+
+        add(Widgets.newLabel("Latest News", "machine"));
+        add(onews);
+        add(upnews);
+        setLatestNews(onews, upnews, news.get());
     }
 
     protected void setLatestNews (LimitedTextArea text, Button action, News news)
