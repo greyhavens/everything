@@ -28,6 +28,7 @@ import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
 
@@ -351,13 +352,13 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             Widgets.setPlaceholderText(source, defsource);
             _ctrl.add().setText("Source", "right").right().setWidget(source, "Wide").setColSpan(3);
 
-            final Runnable updateCard = new Runnable() {
-                public void run () {
+            final Function<Void, Boolean> updateCard = new Function<Void, Boolean>() {
+                public Boolean apply (Void unused) {
                     card.thing.name = name.getText().trim();
                     card.thing.descrip = descrip.getText().trim();
                     card.thing.facts = facts.getText().trim();
                     card.thing.source = Widgets.getText(source, defsource);
-                    updateCard(card);
+                    return updateCard(card);
                 }
             };
 
@@ -381,7 +382,10 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             final Button save = new Button("Save");
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
-                    updateCard.run();
+                    if (!updateCard.apply(null)) {
+                        Popups.infoNear(_msgs.textTooLong(), facts);
+                        return false;
+                    }
                     _editorsvc.updateThing(card.thing, this);
                     return true;
                 }
@@ -396,7 +400,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
 
             final Timer updater = new Timer() {
                 @Override public void run () {
-                    updateCard.run();
+                    updateCard.apply(null);
                 }
             };
 
@@ -423,11 +427,13 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             _edit.setEnabled(!editing);
         }
 
-        protected void updateCard (Card card) {
+        protected boolean updateCard (Card card) {
             if (getWidgetCount() > 0) {
                 remove(0);
             }
-            insert(CardView.create(_ctx, card, false, null, null, null, _edit), 0);
+            CardView view = CardView.create(_ctx, card, false, null, null, null, _edit);
+            insert(view, 0);
+            return view.checkInfoHeight();
         }
 
         protected FluentTable _ctrl;
@@ -439,5 +445,6 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
     }
 
     protected static final EditorServiceAsync _editorsvc = GWT.create(EditorService.class);
+    protected static final EditorMessages _msgs = GWT.create(EditorMessages.class);
     protected static final int BRIEF_COMMENT_COUNT = 3;
 }

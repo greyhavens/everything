@@ -5,12 +5,15 @@ package client.game;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
+import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
 
@@ -27,12 +30,12 @@ import client.util.ImageUtil;
 /**
  * Handles the display of a card.
  */
-public abstract class CardView extends FlowPanel
+public class CardView extends ShadowPanel
 {
     /**
      * Creates a view for the specified card.
      */
-    public static Widget create (
+    public static CardView create (
         Context ctx, Card card, boolean showLike, String header, String status, Widget... buttons)
     {
         FluentTable box = new FluentTable(0, 0, "cardView", "handwriting");
@@ -42,13 +45,24 @@ public abstract class CardView extends FlowPanel
             box.addStyleName("cardViewTall");
             bgimage = "images/info_card_tall.png";
         }
-        box.add().setWidget(new CardView.Left(ctx, card), "Left").
-            right().setWidget(new CardView.Right(ctx, card, showLike), "Right");
+        Right right = new Right(ctx, card, showLike);
+        box.add().setWidget(new Left(ctx, card), "Left").right().setWidget(right, "Right");
         if (header != null) { // if we have a header, we always need a status
             box.add().setHTML(StringUtil.getOr(status, ""), "Status", "machine").setColSpan(2);
         }
         box.add().setWidget(Widgets.newRow(buttons), "Buttons").setColSpan(2).alignCenter();
-        return new ShadowPanel(box, bgimage, "#EFE3C4", 2, 5, 6, 3);
+        return new CardView(box, bgimage, right);
+    }
+
+    public boolean checkInfoHeight ()
+    {
+        return _right.checkInfoHeight();
+    }
+
+    protected CardView (FluentTable box, String bgimage, Right right)
+    {
+        super(box, bgimage, "#EFE3C4", 2, 5, 6, 3);
+        _right = right;
     }
 
     protected static String nameSource (String source)
@@ -83,7 +97,7 @@ public abstract class CardView extends FlowPanel
         return buf.append("</ul>").toString();
     }
 
-    protected static class Left extends CardView
+    protected static class Left extends FlowPanel
     {
         public Left (Context ctx, Card card)
         {
@@ -97,7 +111,7 @@ public abstract class CardView extends FlowPanel
         }
     }
 
-    protected static class Right extends CardView
+    protected static class Right extends FlowPanel
     {
         public Right (Context ctx, Card card, boolean showLike)
         {
@@ -112,29 +126,38 @@ public abstract class CardView extends FlowPanel
                 cat = table;
             }
             add(cat);
-            FlowPanel info = Widgets.newFlowPanel(
+            _info = Widgets.newFlowPanel(
                 "Info", Widgets.newLabel(card.thing.descrip),
                 Widgets.newLabel("Facts:", "FactsTitle"),
                 Widgets.newHTML(formatFacts(card.thing.facts)),
                 Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source"));
-            info.addStyleName(card.categories[0].name);
+            _info.addStyleName(card.categories[0].name);
             if (card.giver == null) {
                 if (card.received != null) {
-                    info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received),
-                                              "When"));
+                    _info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received),
+                                               "When"));
                 }
             } else if (card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
-                info.add(Widgets.newLabel("A birthday present from Everything", "Giver"));
-                info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                _info.add(Widgets.newLabel("A birthday present from Everything", "Giver"));
+                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
             } else {
-                info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
-                info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                _info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
+                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
             }
-            add(info);
+            add(_info);
         }
+
+        public boolean checkInfoHeight ()
+        {
+            return scrollHeight(_info.getElement()) - _info.getOffsetHeight() <
+                CROSS_PLATFORM_FUDGE;
+        }
+
+        protected final FlowPanel _info;
+        protected static final int CROSS_PLATFORM_FUDGE = 10; // pixels
     }
 
-    protected String getTitleSize (String name)
+    protected static String getTitleSize (String name)
     {
         if (name.length() < 20) {
             return "NormalTitle";
@@ -145,7 +168,7 @@ public abstract class CardView extends FlowPanel
         }
     }
 
-    protected String getCategoriesSize (Category[] categories)
+    protected static String getCategoriesSize (Category[] categories)
     {
         int length = 0;
         for (Category cat : categories) {
@@ -158,5 +181,10 @@ public abstract class CardView extends FlowPanel
         }
     }
 
+    protected static native int scrollHeight (Element e) /*-{
+        return e.scrollHeight;
+    }-*/;
+
+    protected Right _right;
     protected static final DateTimeFormat _dfmt = DateTimeFormat.getLongDateFormat();
 }
