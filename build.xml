@@ -162,16 +162,17 @@
     </javac>
   </target>
 
-  <target name="gclient" depends="prepare,genasync" description="Builds our GWT client.">
-    <!-- blow away our old app -->
-    <delete dir="${deploy.dir}/gwt/${app.ident}"/>
-
-    <!-- regenerates our i18n messages classes -->
+  <target name="gmsgs" depends="prepare" description="Updates our GWT i18n messages.">
     <taskdef name="i18nsync" classname="com.threerings.gwt.tools.I18nSyncTask"
              classpathref="build.classpath"/>
     <i18nsync srcdir="${gsrc.dir}">
       <fileset dir="${gsrc.dir}" includes="**/*Messages.properties"/>
     </i18nsync>
+  </target>
+
+  <target name="gclient" depends="prepare,genasync,gmsgs" description="Builds our GWT client.">
+    <!-- blow away our old app -->
+    <delete dir="${deploy.dir}/gwt/${app.ident}"/>
 
     <!-- invoke the GWT compiler and grindy grindy grindy -->
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
