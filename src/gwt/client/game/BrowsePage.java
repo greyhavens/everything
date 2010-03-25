@@ -95,13 +95,13 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         boolean onFeed = FEED_CAT.equals(_selcat), onTrophies = TROPHIES_CAT.equals(_selcat);
         Widget clink =  !(onFeed || onTrophies) ? Widgets.newLabel("Collection") :
             Args.createLink("Collection", Page.BROWSE, coll.owner.userId);
-        Widget flink = onFeed ? Widgets.newLabel("Feed") :
-            Args.createLink("Feed", Page.BROWSE, coll.owner.userId, FEED_CAT);
         Widget tlink = onTrophies ? Widgets.newLabel("Trophies") :
             Args.createLink("Trophies", Page.BROWSE, coll.owner.userId, TROPHIES_CAT);
+        Widget flink = onFeed ? Widgets.newLabel("Feed") :
+            Args.createLink("Feed", Page.BROWSE, coll.owner.userId, FEED_CAT);
         Widget mlink = _ctx.getMe().equals(coll.owner) ? Widgets.newLabel("") : // blank!
             Args.createMessageAnchor(coll.owner);
-        _header.at(1, 0).setWidget(Widgets.newRow("Links", clink, flink, tlink, mlink), "machine");
+        _header.at(1, 0).setWidget(Widgets.newRow("Links", clink, tlink, flink, mlink), "machine");
 
         // if we're viewing the feed or trophies, show that
         if (onFeed) {
