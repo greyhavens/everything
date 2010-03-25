@@ -265,6 +265,10 @@
   font-size: 18px;
 }
 
+.landing .Bookmark {
+  float: right;
+}
+
 .landing .CTA {
   font-size: 24px;
   border: 2px solid;

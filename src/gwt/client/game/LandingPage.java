@@ -59,7 +59,9 @@ public class LandingPage extends FlowPanel
         }
 
         // TODO: use FQL to determine if they've bookmarked or not and provide additional prompting
-        add(XFBML.newInlineTag("bookmark"));
+        Widget book = XFBML.newTag("bookmark");
+        book.addStyleName("Bookmark");
+        add(book);
 
         // maybe tell them about how it all works
         int expLevel = ctx.getGridsConsumed() - Context.EXPERIENCED_GRIDS;
