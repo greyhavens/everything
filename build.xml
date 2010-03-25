@@ -31,7 +31,6 @@
 
   <!-- and these libraries to build and at runtime (the rest are provided by samsara) -->
   <filelist dir="." id="runtime.libs">
-    <file name="extlibs/java/aopalliance.jar"/>
     <file name="extlibs/java/activation.jar"/>
     <file name="extlibs/java/commons-collections.jar"/>
     <file name="extlibs/java/commons-fileupload.jar"/>
@@ -41,8 +40,6 @@
     <file name="extlibs/java/facebook-java-api.jar"/>
     <file name="extlibs/java/facebook-java-api-schema.jar"/>
     <file name="extlibs/java/guava.jar"/>
-    <file name="extlibs/java/guice.jar"/>
-    <file name="extlibs/java/guice-multibindings.jar"/>
     <file name="extlibs/java/gwt-user-2.0.jar"/>
     <file name="extlibs/java/jvnet-runtime.jar"/>
     <file name="extlibs/java/json.jar"/>
@@ -112,6 +109,9 @@
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
+
+      <dependency groupId="extern" artifactId="guice" version="2.0"/>
+      <dependency groupId="extern" artifactId="guice-multibindings" version="2.0"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
       <fileset refid="dependency.fileset"/>
