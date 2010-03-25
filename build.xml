@@ -211,7 +211,12 @@
     </apply>
   </target>
 
-  <target name="gdevmode" depends="gclient" description="Runs development mode.">
+  <target name="gdevmode" depends="prepare" description="Runs development mode.">
+    <if><istrue value="platform.darwin"/><then>
+      <property name="jvm.thread.arg" value="-XstartOnFirstThread"/>
+    </then><else>
+      <property name="jvm.thread.arg" value="-client"/> <!-- basically noop -->
+    </else></if>
     <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
         <pathelement path="${deploy.dir}/build/gwt-dev-2.0.jar"/>
@@ -222,7 +227,7 @@
         <pathelement path="${src.dir}"/>
         <pathelement path="${gsrc.dir}"/>
       </classpath>
-      <jvmarg value="-XstartOnFirstThread"/>
+      <jvmarg value="${jvm.thread.arg}"/>
       <jvmarg value="-Xmx256M"/>
       <jvmarg value="-d32"/>
       <arg value="-noserver"/>
