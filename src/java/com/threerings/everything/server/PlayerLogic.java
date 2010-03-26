@@ -203,7 +203,7 @@ public class PlayerLogic
         link.setText("Flip cards");
         link.setHref(_app.getHelloURL("reminder" + idleDays));
         final DashboardNewsItem item = new DashboardNewsItem();
-        item.setMessage("You have " + flips + " free flips waiting for you in The Everything Game");
+        item.setMessage("You have " + flips + " free card flips waiting for you.");
         item.setActionLink(link);
 
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
