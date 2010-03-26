@@ -19,6 +19,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
@@ -33,7 +34,6 @@ import com.google.code.facebookapi.schema.UsersGetInfoResponse;
 import com.samskivert.servlet.util.CookieUtil;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Comparators;
-import com.samskivert.util.CountMap;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
@@ -316,12 +316,13 @@ public class EverythingServlet extends EveryServiceServlet
         result.art = _playerRepo.loadPlayerName(30); // josh
         result.code = Lists.newArrayList(
             _playerRepo.loadPlayerName(2), _playerRepo.loadPlayerName(25)); // mdb & ray
-        final CountMap<Integer> edinfo = _thingRepo.loadEditorInfo();
-        result.editors = Lists.newArrayList(_playerRepo.loadPlayerNames(edinfo.keySet()).values());
+        final Multiset<Integer> edinfo = _thingRepo.loadEditorInfo();
+        result.editors = Lists.newArrayList(
+            _playerRepo.loadPlayerNames(edinfo.elementSet()).values());
         Collections.sort(result.editors, new Comparator<PlayerName>() {
             public int compare (PlayerName one, PlayerName two) {
-                return Comparators.compare(edinfo.getCount(two.userId),
-                                           edinfo.getCount(one.userId));
+                return Comparators.compare(edinfo.count(two.userId),
+                                           edinfo.count(one.userId));
             }
         });
         return result;

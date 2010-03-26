@@ -13,15 +13,15 @@ import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
-
-import com.samskivert.util.CountMap;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
@@ -299,18 +299,18 @@ public class GameServlet extends EveryServiceServlet
         // determine which friends do not have a card with this thing on it,
         // including friends who have it as a pending gift
         Set<Integer> friendIds = _playerRepo.loadFriendIds(player.userId).toSet();
-        friendIds.removeAll(
-            _gameRepo.countCardHoldings(friendIds, Collections.singleton(thingId), true).keySet());
-        // load up the names of those friends
-        Map<Integer, PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
+        Multiset<Integer> holdings =
+            _gameRepo.countCardHoldings(friendIds, Collections.singleton(thingId), true);
+        friendIds.removeAll(holdings.elementSet());
 
-        // count up how many of the cards in this series are held by these friends
+        // Now count up how many of the cards in this series are held by these friends
         // Note that here we do NOT count pending gifts, as that may encourage a friend to
         // give you a second card in the same series when aren't *really* collecting it yet-
         // you may opt to sell the first gift and there's no reason to make it look like
         // you are a "collector" of that series...
-        CountMap<Integer> holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
-
+        holdings = _gameRepo.countCardHoldings(friendIds, thingIds, false);
+        // load up the names of those friends
+        Map<Integer, PlayerName> names = _playerRepo.loadPlayerNames(friendIds);
         // load up the likes for these friends
         Map<Integer, Boolean> likes = _playerRepo.loadLikes(friendIds, categoryId);
 
@@ -320,7 +320,7 @@ public class GameServlet extends EveryServiceServlet
         for (Integer friendId : friendIds) {
             FriendCardInfo info = new FriendCardInfo();
             info.friend = names.get(friendId);
-            info.hasThings = holdings.getCount(friendId);
+            info.hasThings = holdings.count(friendId);
             info.like = likes.get(friendId);
             result.friends.add(info);
         }
@@ -588,19 +588,19 @@ public class GameServlet extends EveryServiceServlet
         SortedSet<Thing> things = Sets.newTreeSet(_thingRepo.loadThings(thing.categoryId));
 
         // load up the count of each card in this series held by the player
-        CountMap<Integer> holdings = new CountMap<Integer>();
+        Multiset<Integer> holdings = HashMultiset.create();
         for (CardRecord crec : _gameRepo.loadCards(
                  player.userId, Sets.newHashSet(Iterables.transform(things, EFuncs.THING_ID)),
                  false /* don't use the cache */)) {
-            holdings.increment(crec.thingId);
+            holdings.add(crec.thingId);
         }
 
         // include the number of cards we already have with this thing
-        result.haveCount = holdings.getCount(thing.thingId);
+        result.haveCount = holdings.count(thing.thingId);
 
         // now note this holding in our mapping and determine how many things remain
-        holdings.increment(thing.thingId);
-        result.thingsRemaining = things.size() - holdings.size();
+        holdings.add(thing.thingId);
+        result.thingsRemaining = things.size() - holdings.elementSet().size();
 
         CardRecord card;
         try {

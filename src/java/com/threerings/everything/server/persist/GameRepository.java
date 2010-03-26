@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.samskivert.util.CountMap;
 import com.samskivert.util.StringUtil;
 
 import com.samskivert.depot.DepotRepository;
@@ -291,18 +292,18 @@ public class GameRepository extends DepotRepository
      * Counts up and returns the number of cards in the supplied set of things that are held by
      * each of the specified owners.
      */
-    public CountMap<Integer> countCardHoldings (
+    public Multiset<Integer> countCardHoldings (
         Set<Integer> ownerIds, Set<Integer> thingIds, boolean includeUnopenedGifts)
     {
         if (includeUnopenedGifts) {
-            Set<Integer> ids = Sets.newHashSet();
+            Set<Integer> ids = Sets.newHashSetWithExpectedSize(ownerIds.size() * 2);
             for (Integer id : ownerIds) {
                 ids.add(id);
                 ids.add(-id); // gifts are stored by negative ownerId
             }
             ownerIds = ids;
         }
-        CountMap<Integer> data = new CountMap<Integer>();
+        Multiset<Integer> data = HashMultiset.create();
         for (OwnerRecord orec : findAll(OwnerRecord.class,
                                         new FieldOverride(OwnerRecord.COUNT,
                                                           Funcs.countDistinct(CardRecord.THING_ID)),

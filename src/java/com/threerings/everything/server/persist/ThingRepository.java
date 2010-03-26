@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -31,7 +33,6 @@ import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.expression.SQLExpression;
 import com.samskivert.depot.util.Sequence;
-import com.samskivert.util.CountMap;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
@@ -149,9 +150,9 @@ public class ThingRepository extends DepotRepository
      * Returns a mapping from editor to total number of things in active series created by that
      * editor.
      */
-    public CountMap<Integer> loadEditorInfo ()
+    public Multiset<Integer> loadEditorInfo ()
     {
-        CountMap<Integer> info = new CountMap<Integer>();
+        Multiset<Integer> info = HashMultiset.create();
         Where where = new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE));
         for (CategoryRecord catrec : findAll(CategoryRecord.class, where)) {
             info.add(catrec.creatorId, catrec.things);
@@ -357,9 +358,9 @@ public class ThingRepository extends DepotRepository
     /**
      * Loads the category id and count of unique things owned by the player in each category.
      */
-    public CountMap<Integer> loadPlayerSeriesInfo (int ownerId)
+    public Multiset<Integer> loadPlayerSeriesInfo (int ownerId)
     {
-        CountMap<Integer> owned = new CountMap<Integer>();
+        Multiset<Integer> owned = HashMultiset.create();
         for (OwnedRecord orec : findAll(OwnedRecord.class,
                                         CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
                                         ThingRecord.THING_ID.join(CardRecord.THING_ID),
@@ -377,12 +378,12 @@ public class ThingRepository extends DepotRepository
      */
     public List<SeriesCard> loadPlayerSeries (int ownerId)
     {
-        CountMap<Integer> mySeriesCounts = loadPlayerSeriesInfo(ownerId);
+        Multiset<Integer> mySeriesCounts = loadPlayerSeriesInfo(ownerId);
         List<SeriesCard> cards = Lists.newArrayList();
-        Where where = new Where(CategoryRecord.CATEGORY_ID.in(mySeriesCounts.keySet()));
+        Where where = new Where(CategoryRecord.CATEGORY_ID.in(mySeriesCounts.elementSet()));
         for (CategoryRecord crec : findAll(CategoryRecord.class, where)) {
             SeriesCard card = CategoryRecord.TO_SERIES_CARD.apply(crec);
-            card.owned = mySeriesCounts.getCount(crec.categoryId);
+            card.owned = mySeriesCounts.count(crec.categoryId);
             cards.add(card);
         }
         return cards;

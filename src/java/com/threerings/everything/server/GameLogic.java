@@ -18,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
@@ -465,11 +466,11 @@ public class GameLogic
      */
     protected Set<Integer> resolveOwnedCats (int userId, final ThingIndex index)
     {
-        Map<Integer, Integer> owned = _thingRepo.loadPlayerSeriesInfo(userId);
+        Multiset<Integer> owned = _thingRepo.loadPlayerSeriesInfo(userId);
         Set<Integer> ownedCats = Sets.newHashSet();
-        for (Map.Entry<Integer, Integer> entry : owned.entrySet()) {
-            if (entry.getValue() < index.getCategorySize(entry.getKey())) {
-                ownedCats.add(entry.getKey());
+        for (Multiset.Entry<Integer> entry : owned.entrySet()) {
+            if (entry.getCount() < index.getCategorySize(entry.getElement())) {
+                ownedCats.add(entry.getElement());
             }
         }
         return ownedCats;
