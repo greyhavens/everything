@@ -493,19 +493,24 @@ public class GameRepository extends DepotRepository
     {
         // first try updating an existing record
         if (updatePartial(PowerupRecord.getKey(ownerId, type),
-                          PowerupRecord.CHARGES, PowerupRecord.CHARGES.plus(charges)) > 0) {
-            return;
+                          PowerupRecord.CHARGES, PowerupRecord.CHARGES.plus(charges)) == 0) {
+            // if that fails, insert a new record
+            PowerupRecord record = new PowerupRecord();
+            record.ownerId = ownerId;
+            record.type = type;
+            record.charges = charges;
+            insert(record);
+
+            // note: the above insertion could fail if the player was somehow making a purchase from
+            // two computers at the exact same time, but why would they be doing that?
         }
 
-        // if that fails, insert a new record
-        PowerupRecord record = new PowerupRecord();
-        record.ownerId = ownerId;
-        record.type = type;
-        record.charges = charges;
-        insert(record);
-
-        // note: the above insertion could fail if the player was somehow making a purchase from
-        // two computers at the exact same time, but why would they be doing that?
+        PowerupPurchaseRecord purchRecord = new PowerupPurchaseRecord();
+        purchRecord.ownerId = ownerId;
+        purchRecord.type = type;
+        purchRecord.charges = charges;
+        purchRecord.at = new Timestamp(System.currentTimeMillis());
+        insert(purchRecord);
     }
 
     /**
@@ -640,6 +645,7 @@ public class GameRepository extends DepotRepository
         classes.add(GridRecord.class);
         classes.add(NewsRecord.class);
         classes.add(PowerupRecord.class);
+        classes.add(PowerupPurchaseRecord.class);
         classes.add(SeriesRecord.class);
         classes.add(SlotStatusRecord.class);
         classes.add(AttractorPostedRecord.class);
