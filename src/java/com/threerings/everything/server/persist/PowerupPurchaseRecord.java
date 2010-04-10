@@ -9,6 +9,8 @@ import com.samskivert.depot.Key;
 import com.samskivert.depot.annotation.Id;
 import com.samskivert.depot.expression.ColumnExp;
 
+import com.threerings.everything.data.Powerup;
+
 public class PowerupPurchaseRecord extends PowerupRecord
 {
     // AUTO-GENERATED: FIELDS START
