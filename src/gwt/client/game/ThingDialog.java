@@ -40,16 +40,24 @@ public class ThingDialog
                                        " card and completed the " + card.getSeries() +
                                        " series in Everything!",
                                "Celebrate your completed series:", callback);
-        } else if (card.giver != null) {
-            return makeHandler(ctx, "got_gift", card,
-                               "" + ctx.getMe() + " got the " + card.thing.name +
-                                       " card from " + card.giver + " in Everything.",
-                               "Thank your friend for this great gift:", callback);
-        } else {
+
+        } else if (card.giver == null) {
             return makeHandler(ctx, "got_card", card,
                                "" + ctx.getMe() + " got the " + card.thing.name +
                                    " card in Everything.",
                                "Tell your friends about this awesome card:", callback);
+
+        } else if (card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
+            return makeHandler(ctx, "got_bgift", card,
+                               "" + ctx.getMe() + " got the " + card.thing.name +
+                                       " card as a birthday gift from Everything.",
+                               "Celebrate being born:", callback);
+
+        } else {
+            return makeHandler(ctx, "got_gift", card,
+                               "" + ctx.getMe() + " got the " + card.thing.name +
+                                       " card from " + card.giver + " in Everything.",
+                               "Thank your friend for this great gift:", callback);
         }
     }
 
