@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-$Id$
-
-Classpath information for Eclipse
--->
 <classpath>
 	<classpathentry kind="src" path="src/gwt"/>
 	<classpathentry kind="src" path="src/java"/>
@@ -18,7 +13,7 @@ Classpath information for Eclipse
 	<classpathentry kind="var" path="EXT_LIBS_DIR/junit4.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/servlet-api.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/velocity-1.5-dev.jar"/>
-	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-fileupload.jar"/>
+	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-fileupload.jar" sourcepath="/EXT_SRC_DIR/commons-fileupload.zip"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-io.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-lang.jar"/>
 	<classpathentry kind="var" path="EXT_LIBS_DIR/commons-logging.jar"/>

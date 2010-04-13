@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.apache.commons.io.FileCleaner;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -222,19 +219,10 @@ public class EverythingApp extends AbstractFacebookApp
     public void didDetach ()
     {
         log.info("Everything app detached.", "version", _appvers);
-        shutdownFileCleaner();
         // shut down our executors
         _executor.shutdown();
         // TODO: we want to wait for all of our pending servlets to finish before shutdown
         shutdown();
-    }
-
-    @SuppressWarnings("deprecation")
-    protected void shutdownFileCleaner()
-    {
-        // Fileupload uses this internally to clean up its temp files, and its thread hangs around
-        // forever eating permgen if we don't shut it down
-        FileCleaner.exitWhenFinished();
     }
 
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
