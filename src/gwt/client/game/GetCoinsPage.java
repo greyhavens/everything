@@ -66,7 +66,7 @@ public class GetCoinsPage extends FlowPanel
         if (action.equals("admin")) {
             path = Build.billingURL("admin/");
         } else if (action.equals("credit_card")) {
-            path = Build.billingURL("buy_coins.wm");
+            path = Build.billingURL("creditcard/choosecoins.jspx");
         } else if (action.equals("paypal")) {
             path = Build.billingURL("paypal/choosecoins.jspx");
         } else if (action.equals("ooocard")) {
