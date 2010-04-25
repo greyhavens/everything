@@ -43,3 +43,8 @@
 .editFAQ blockquote {
   margin-left: 15px;
 }
+
+.editIntro .Text {
+  margin: 5px 0px;
+  font-family: Trebuchet MS, sans-serif;
+}

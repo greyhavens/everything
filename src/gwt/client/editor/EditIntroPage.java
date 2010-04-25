@@ -18,7 +18,9 @@ public class EditIntroPage extends FlowPanel
     public EditIntroPage (Context ctx)
     {
         addStyleName("page");
-        add(Widgets.newHTML(_msgs.nonEditor(), "Text"));
+        addStyleName("editIntro");
+        // add(Widgets.newHTML(_msgs.nonEditor(), "Text"));
+        add(Widgets.newHTML(_msgs.notNow(), "Text"));
     }
 
     protected static final EditorMessages _msgs = GWT.create(EditorMessages.class);
