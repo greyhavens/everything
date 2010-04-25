@@ -217,7 +217,7 @@ public class EditCatsPage extends FluentTable
             } else {
                 addCategoryAction(row);
             }
-            row.setTitle(row.cat.creator.toString());
+            row.setTitle(""+row.cat.creator);
             return row;
         }
 
