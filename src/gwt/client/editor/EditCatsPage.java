@@ -164,7 +164,9 @@ public class EditCatsPage extends FluentTable
                 public void onSuccess (List<Category> cats) {
                     _contents.clear();
                     for (Category cat : cats) {
-                        addCat(cat);
+                        if (shouldDisplayCategory(cat)) {
+                            addCat(cat);
+                        }
                     }
                     _empty.setText("<empty>");
                     _empty.setVisible(cats.size() == 0);
@@ -264,6 +266,11 @@ public class EditCatsPage extends FluentTable
             Popups.showNear(popup, trigger);
         }
 
+        protected boolean shouldDisplayCategory (Category cat)
+        {
+            return true;
+        }
+
         protected abstract void addCategoryAction (Row row);
 
         protected int _level;
@@ -340,6 +347,9 @@ public class EditCatsPage extends FluentTable
         protected void addCategoryAction (Row row) {
             row.add(Args.createInlink(row.cat.name, Page.EDIT_SERIES, row.cat.categoryId));
             row.add(Widgets.newInlineLabel(" (" + row.cat.things + ")"));
+        }
+        protected boolean shouldDisplayCategory (Category cat) {
+            return _ctx.isAdmin() || _ctx.getMe().equals(cat.creator) || (cat.things > 0);
         }
     };
 
