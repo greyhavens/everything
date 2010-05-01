@@ -6,6 +6,7 @@ package client.game;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
@@ -39,6 +40,7 @@ public class SeriesPanel extends FluentTable
             title = table;
         }
         add().setWidget(title).setColSpan(COLUMNS).alignCenter();
+
         for (int ii = 0; ii < series.things.length; ii++) {
             final SlotView slot = new SlotView();
             final ThingCard card = series.things[ii];
@@ -57,5 +59,10 @@ public class SeriesPanel extends FluentTable
             slot.setCard(ctx, card, ownerId, false, null);
             setWidget(ii/COLUMNS+1, ii%COLUMNS, slot);
         }
+
+        add().setColSpan(COLUMNS).alignRight().setText(
+            _msgs.seriesCreator(String.valueOf(series.creator)), "Creator", "handwriting");
     }
+
+    protected static final GameMessages _msgs = GWT.create(GameMessages.class);
 }

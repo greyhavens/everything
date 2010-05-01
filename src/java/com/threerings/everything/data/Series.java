@@ -17,6 +17,9 @@ public class Series
     /** The name of the series. */
     public String name;
 
+    /** The creator of this series. */
+    public PlayerName creator;
+
     /** The things in the series, in rarity order. Things not owned by the player will be null. */
     public ThingCard[] things;
 }

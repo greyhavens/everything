@@ -470,6 +470,10 @@
   font-weight: bold;
 }
 
+.series .Creator {
+  font-size: small;
+}
+
 /** CardPopup styles */
 .card {
   background: none;

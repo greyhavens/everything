@@ -134,6 +134,7 @@ public class GameServlet extends EveryServiceServlet
         Series series = new Series();
         series.categoryId = categoryId;
         series.name = category.name;
+        series.creator = _playerRepo.loadPlayerName(category.getCreatorId());
         series.things = cards.toArray(new ThingCard[cards.size()]);
         return series;
     }
