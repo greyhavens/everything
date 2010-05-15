@@ -32,7 +32,7 @@ public class LandingPage extends FlowPanel
 
     public LandingPage (Context ctx, int attractorId, int friendId)
     {
-        this(ctx, null, attractorId, friendId);
+        this(ctx, Value.<News>create(null), attractorId, friendId);
     }
 
     private LandingPage (Context ctx, Value<News> news, int attractorId, int friendId)
@@ -63,30 +63,27 @@ public class LandingPage extends FlowPanel
         book.addStyleName("Bookmark");
         add(book);
 
-        // maybe tell them about how it all works
-        int expLevel = ctx.getGridsConsumed() - Context.EXPERIENCED_GRIDS;
-        if (!ctx.isEditor() && (expLevel == 0 || expLevel == 1)) {
-            add(Widgets.newShim(20, 20));
-            add(Widgets.newLabel("Experienced Player!", "Title", "machine"));
-            add(Widgets.newLabel(_msgs.experiencedMsg(), "Text"));
-            add(Widgets.newShim(10, 10));
-        }
-
         if (ctx.isNewbie()) {
             // show extra help for a new players
             addInstructions();
             add(Widgets.newShim(10, 10));
 
-        } else if ((news != null) && (news.get() != null)) {
-            add(Widgets.newLabel("News: " + DateUtil.formatDateTime(news.get().reported),
+        } else if (newsNotStale(news.get())) {
+            add(Widgets.newLabel(_msgs.newsTitle(DateUtil.formatDateTime(news.get().reported)),
                                  "Title", "machine"));
             add(Widgets.newHTML(formatNews(news.get().text), "Text"));
             add(Widgets.newShim(10, 10));
         }
 
         // at this point, nobody is a guest
-        addBigFlip();
+        Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
+        link.addStyleName("BigFlip");
+        link.addStyleName("machine");
+        add(link);
+        add(Widgets.newShim(10, 10));
+
         add(Widgets.newShim(5, 5));
+
         add(new MyFeedPanel(ctx));
 
         if (ctx.isEditor()) {
@@ -118,15 +115,6 @@ public class LandingPage extends FlowPanel
         add(intro);
     }
 
-    protected void addBigFlip ()
-    {
-        Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
-        link.addStyleName("BigFlip");
-        link.addStyleName("machine");
-        add(link);
-        add(Widgets.newShim(10, 10));
-    }
-
     protected static String formatNews (String text)
     {
         StringBuilder buf = new StringBuilder();
@@ -152,5 +140,14 @@ public class LandingPage extends FlowPanel
         return buf.toString();
     }
 
+    protected static boolean newsNotStale (News news)
+    {
+        return (news != null) &&
+            ((System.currentTimeMillis() - news.reported.getTime()) < STALE_NEWS_MILLIS);
+    }
+
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
+
+    // news is considered stale after it's been up for a week
+    protected static final long STALE_NEWS_MILLIS = 7*24*60*60*1000L;
 }
