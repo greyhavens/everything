@@ -31,6 +31,13 @@
   width: 500px;
 }
 
+/** EditIntroPage styles */
+.editIntro .Text {
+  margin: 5px 0px;
+  font-family: Trebuchet MS, sans-serif;
+}
+
+/** EditFAQPage styles */
 .editFAQ {
   padding: 10px 15px;
 }
@@ -44,7 +51,16 @@
   margin-left: 15px;
 }
 
-.editIntro .Text {
-  margin: 5px 0px;
-  font-family: Trebuchet MS, sans-serif;
+/** EditPendingPage styles */
+.editPending {
+  padding: 10px 15px;
+}
+
+.editPending .TopPadded {
+  padding-top: 10px;
+}
+
+.editPending .Line {
+  height: 1px;
+  background: #000000;
 }

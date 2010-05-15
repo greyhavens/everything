@@ -36,6 +36,7 @@ import client.admin.StatsPage;
 import client.editor.EditCatsPage;
 import client.editor.EditFAQPage;
 import client.editor.EditIntroPage;
+import client.editor.EditPendingPage;
 import client.editor.EditSeriesPage;
 import client.game.BrowsePage;
 import client.game.CreditsPage;
@@ -276,6 +277,9 @@ public class EverythingClient
             }
             ((FriendsPage)_content).setMode(args.get(0, ""));
             return;
+        case EDIT_INTRO:
+            setContent(new EditIntroPage(this));
+            return;
         }
 
         // these are OK for editors
@@ -287,6 +291,9 @@ public class EverythingClient
                 }
                 ((EditCatsPage)_content).setArgs(args);
                 return;
+            case EDIT_PENDING:
+                setContent(new EditPendingPage(this));
+                return;
             case EDIT_FAQ:
                 setContent(new EditFAQPage(this));
                 return;
@@ -294,22 +301,18 @@ public class EverythingClient
                 setContent(new EditSeriesPage(this, args.get(0, 0)));
                 return;
             }
-
-        } else if (args.page == Page.EDIT_CATS) {
-            setContent(new EditIntroPage(this));
-            return;
         }
 
         // these are OK for admins
         if (isAdmin()) {
             switch (args.page) {
-            case STATS:
+            case ADMIN_STATS:
                 setContent(new StatsPage(this));
                 return;
-            case PLAYERS:
+            case ADMIN_PLAYERS:
                 setContent(new PlayersPage(this));
                 return;
-            case NEWS:
+            case ADMIN_NEWS:
                 setContent(new EditNewsPage(this, _news));
                 return;
             }

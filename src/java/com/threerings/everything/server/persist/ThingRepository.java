@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -95,9 +97,20 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads all categories that are not yet marked active.
+     * Loads all categories that have been submitted for review.
      */
     public Sequence<Category> loadPendingCategories ()
+    {
+        List<CategoryRecord> records = findAll(
+            CategoryRecord.class,
+            new Where(CategoryRecord.STATE.eq(Category.State.PENDING_REVIEW)));
+        return map(records, CategoryRecord.TO_CATEGORY);
+    }
+
+    /**
+     * Loads all categories that are not yet marked active.
+     */
+    public Sequence<Category> loadNonActiveCategories ()
     {
         List<CategoryRecord> records = findAll(CategoryRecord.class,
             CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
@@ -190,6 +203,7 @@ public class ThingRepository extends DepotRepository
         delete(CategoryRecord.getKey(category.categoryId));
         deleteAll(CategoryCommentRecord.class,
                   new Where(CategoryCommentRecord.CATEGORY_ID.eq(category.categoryId)), null);
+        clearPendingVotes(category.categoryId);
     }
 
     /**
@@ -389,6 +403,42 @@ public class ThingRepository extends DepotRepository
         return cards;
     }
 
+    /**
+     * Loads all outstanding votes on pending categories.
+     */
+    public Multimap<Integer, Integer> loadPendingVotes ()
+    {
+        Multimap<Integer, Integer> votes = HashMultimap.create();
+        for (PendingVoteRecord record : findAll(PendingVoteRecord.class)) {
+            votes.put(record.categoryId, record.voterId);
+        }
+        return votes;
+    }
+
+    /**
+     * Updates the specified voter's vote for the specified category.
+     */
+    public void updatePendingVote (int categoryId, int voterId, boolean inFavor)
+    {
+        if (inFavor) {
+            PendingVoteRecord record = new PendingVoteRecord();
+            record.categoryId = categoryId;
+            record.voterId = voterId;
+            store(record);
+        } else {
+            delete(PendingVoteRecord.getKey(categoryId, voterId));
+        }
+    }
+
+    /**
+     * Clears out pending votes for the specified category.
+     */
+    public void clearPendingVotes (int categoryId)
+    {
+        deleteAll(PendingVoteRecord.class,
+                  new Where(PendingVoteRecord.CATEGORY_ID.eq(categoryId)), null);
+    }
+
     protected void updateCategoryThingCount (int categoryId)
     {
         updatePartial(CategoryRecord.getKey(categoryId),
@@ -400,6 +450,7 @@ public class ThingRepository extends DepotRepository
     {
         classes.add(CategoryCommentRecord.class);
         classes.add(CategoryRecord.class);
+        classes.add(PendingVoteRecord.class);
         classes.add(ThingRecord.class);
     }
 }

@@ -32,6 +32,9 @@ public class Category
     /** The maximum length of a category name. */
     public static final int MAX_NAME_LENGTH = 64;
 
+    /** The unicode character for the category/subcat/series separator. */
+    public static final String SEP_CHAR = "\u2023";
+
     /** The unique id for this category. */
     public int categoryId;
 
@@ -64,7 +67,7 @@ public class Category
         StringBuilder buf = new StringBuilder();
         for (Category cat : cats) {
             if (buf.length() > 0) {
-                buf.append(" \u2023 ");
+                buf.append(" ").append(SEP_CHAR).append(" ");
             }
             buf.append(cat.name);
         }

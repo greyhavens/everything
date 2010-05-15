@@ -7,8 +7,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 import com.threerings.user.OOOUser;
@@ -22,6 +26,7 @@ import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
 import com.threerings.everything.data.FeedItem;
+import com.threerings.everything.data.PendingSeries;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -50,6 +55,50 @@ public class EditorServlet extends EveryServiceServlet
         PlayerRecord editor = requireEditor();
         return _playerLogic.resolveNames(
             Lists.newArrayList(_thingRepo.loadCategoriesBy(editor.userId)));
+    }
+
+    // from interface EditorService
+    public List<PendingSeries> loadPendingSeries () throws ServiceException
+    {
+        requireEditor();
+
+        Map<Integer, String> names = Maps.newHashMap();
+        Map<Integer, Integer> subcats = Maps.newHashMap();
+        Map<Integer, Integer> topcats = Maps.newHashMap();
+
+        // load up the pending categories themselves
+        Map<Integer, Category> penders = Maps.newHashMap();
+        for (Category cat : _thingRepo.loadPendingCategories()) {
+            penders.put(cat.categoryId, cat);
+            subcats.put(cat.categoryId, cat.parentId);
+        }
+
+        // load up their parents (the subcategories) and their parents (the categories)
+        for (Category cat : _thingRepo.loadCategories(Sets.newHashSet(subcats.values()))) {
+            names.put(cat.categoryId, cat.name);
+            topcats.put(cat.categoryId, cat.parentId);
+        }
+        for (Category cat : _thingRepo.loadCategories(Sets.newHashSet(topcats.values()))) {
+            names.put(cat.categoryId, cat.name);
+        }
+
+        // load up the pending votes
+        Multimap<Integer, Integer> votes = _thingRepo.loadPendingVotes();
+
+        // finally collect everything together into pending series records
+        List<PendingSeries> result = Lists.newArrayList();
+        for (Category cat : penders.values()) {
+            PendingSeries ps = new PendingSeries();
+            ps.categoryId = cat.categoryId;
+            ps.creatorId = cat.getCreatorId();
+            ps.name = cat.name;
+            int subcatId = subcats.get(cat.categoryId);
+            ps.subcategory = names.get(subcatId);
+            ps.category = names.get(topcats.get(subcatId));
+            ps.voters = Sets.newHashSet(votes.get(cat.categoryId));
+            result.add(ps);
+        }
+        return result;
     }
 
     // from interface EditorService
@@ -108,6 +157,10 @@ public class EditorServlet extends EveryServiceServlet
             action = (category.isActive()) ? "activated" : "deactivated";
             // if a category changed active state, queue a reload of the thing index
             log.info("Category active status changed. TODO: reload thing index.");
+            // if this category was just activated, delete its pending votes
+            if (category.isActive()) {
+                _thingRepo.clearPendingVotes(category.categoryId);
+            }
         } else {
             action = "updated";
         }
@@ -235,8 +288,21 @@ public class EditorServlet extends EveryServiceServlet
         }
     }
 
-    protected PlayerRecord checkEditor (Created created)
-        throws ServiceException
+    // from interface EditorService
+    public void updatePendingVote (int categoryId, boolean inFavor) throws ServiceException
+    {
+        PlayerRecord editor = requireEditor();
+        Category cat = _thingRepo.loadCategory(categoryId);
+        if (cat == null) {
+            throw new ServiceException(AppCodes.E_INTERNAL_ERROR);
+        }
+        if (cat.getCreatorId() == editor.userId) {
+            throw new ServiceException(AppCodes.E_ACCESS_DENIED);
+        }
+        _thingRepo.updatePendingVote(categoryId, editor.userId, inFavor);
+    }
+
+    protected PlayerRecord checkEditor (Created created) throws ServiceException
     {
         PlayerRecord editor = requireEditor();
         if (created == null) {

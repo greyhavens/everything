@@ -34,7 +34,7 @@ public class AdminServlet extends EveryServiceServlet
         requireAdmin();
         StatsResult result = new StatsResult();
         result.stats = _thingRepo.loadStats();
-        result.pendingCategories = _thingRepo.loadPendingCategories().toList();
+        result.pendingCategories = _thingRepo.loadNonActiveCategories().toList();
         Collections.sort(result.pendingCategories);
         return result;
     }

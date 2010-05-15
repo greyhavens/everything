@@ -34,9 +34,14 @@ public class HeaderPanel extends FlowPanel
         }
 
         FlowPanel extras = Widgets.newFlowPanel("machine");
-        if ((ctx.getGridsConsumed() >= Context.EXPERIENCED_GRIDS) || ctx.isEditor()) {
+        if (ctx.isEditor()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Editors", Page.EDIT_CATS));
+            extras.add(Args.createInlink("Taxonomy", Page.EDIT_CATS));
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Pending", Page.EDIT_PENDING));
+        } else if (ctx.getGridsConsumed() >= Context.EXPERIENCED_GRIDS) {
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("Editors", Page.EDIT_INTRO));
         }
         if (ctx.isAdmin()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
@@ -44,11 +49,11 @@ public class HeaderPanel extends FlowPanel
         }
         if (ctx.isMaintainer()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Stats", Page.STATS));
+            extras.add(Args.createInlink("Stats", Page.ADMIN_STATS));
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Players", Page.PLAYERS));
+            extras.add(Args.createInlink("Players", Page.ADMIN_PLAYERS));
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("News", Page.NEWS));
+            extras.add(Args.createInlink("News", Page.ADMIN_NEWS));
         }
         // add our kontagent "page request" pixel to the extras
         Image tracker = Widgets.newImage(kontagentHello);

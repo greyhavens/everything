@@ -13,6 +13,7 @@ import com.threerings.samsara.app.client.ServiceException;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
+import com.threerings.everything.data.PendingSeries;
 import com.threerings.everything.data.Thing;
 
 /**
@@ -59,6 +60,11 @@ public interface EditorService extends RemoteService
      * Loads the list of series created by the caller (pending and shipped).
      */
     List<Category> loadMySeries () throws ServiceException;
+
+    /**
+     * Loads the list of series pending approval.
+     */
+    List<PendingSeries> loadPendingSeries () throws ServiceException;
 
     /**
      * Creates a new category with the specified configuration.
@@ -109,4 +115,9 @@ public interface EditorService extends RemoteService
      * and return the path to the slurped media.
      */
     String slurpImage (String imgurl) throws ServiceException;
+
+    /**
+     * Updates callers vote for the specified pending series.
+     */
+    void updatePendingVote (int categoryId, boolean inFavor) throws ServiceException;
 }

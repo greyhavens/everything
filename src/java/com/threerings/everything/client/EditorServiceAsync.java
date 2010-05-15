@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;
+import com.threerings.everything.data.PendingSeries;
 import com.threerings.everything.data.Thing;
 
 /**
@@ -23,6 +24,11 @@ public interface EditorServiceAsync
      * The async version of {@link EditorService#loadMySeries}.
      */
     void loadMySeries (AsyncCallback<List<Category>> callback);
+
+    /**
+     * The async version of {@link EditorService#loadPendingSeries}.
+     */
+    void loadPendingSeries (AsyncCallback<List<PendingSeries>> callback);
 
     /**
      * The async version of {@link EditorService#createCategory}.
@@ -68,4 +74,9 @@ public interface EditorServiceAsync
      * The async version of {@link EditorService#slurpImage}.
      */
     void slurpImage (String imgurl, AsyncCallback<String> callback);
+
+    /**
+     * The async version of {@link EditorService#updatePendingVote}.
+     */
+    void updatePendingVote (int categoryId, boolean inFavor, AsyncCallback<Void> callback);
 }
