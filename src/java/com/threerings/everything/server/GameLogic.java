@@ -366,16 +366,16 @@ public class GameLogic
         log.info("Selected rare thing", "for", player.who(), "rarity", pup.getBonusRarity(),
                  "needed", needed.size(), "gotNeeded", gotNeeded, "ids", thingIds);
 
-        // now ensure that they have 25% cards they need, (one may have been chosen above)
-        int neededGimmes = Grid.GRID_SIZE/4 - (gotNeeded ? 1 : 0);
-        neededGimmes = Math.min(haveCats.size(), neededGimmes); // adjust for small collections
+        // now ensure that half the grid is cards they need, (one may have been chosen above)
+        int neededGimmes = Grid.GRID_SIZE/2 - (gotNeeded ? 1 : 0);
+        neededGimmes = Math.min(2*haveCats.size(), neededGimmes); // adjust for small collections
         if (neededGimmes > 0) {
             index.selectThingsFrom(haveCats, neededGimmes, haveIds, thingIds);
             log.info("Selected needed cards", "for", player.who(), "count", neededGimmes,
                      "ids", thingIds);
         }
 
-        // select up to half of our cards from series we are collecting
+        // select up to 3/4 of our cards from series we are collecting
         int fromCollected;
         switch (pup) {
         case ALL_COLLECTED_SERIES:
@@ -388,7 +388,7 @@ public class GameLogic
             fromCollected = 0;
             break;
         default:
-            fromCollected = Math.min(haveCats.size(), Grid.GRID_SIZE/2) - neededGimmes;
+            fromCollected = Math.min(haveCats.size(), 3*Grid.GRID_SIZE/4) - neededGimmes;
             break;
         }
         if (fromCollected > 0) {
