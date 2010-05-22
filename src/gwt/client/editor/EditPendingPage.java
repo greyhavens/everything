@@ -42,7 +42,7 @@ public class EditPendingPage extends DataPanel<List<PendingSeries>>
 
     protected void init (List<PendingSeries> penders)
     {
-        add(Widgets.newLabel(_msgs.pendingIntro(), "handwriting"));
+        add(Widgets.newHTML(_msgs.pendingIntro(), "handwriting"));
 
         Collections.sort(penders, new Comparator<PendingSeries>() {
             public int compare (PendingSeries s1, PendingSeries s2) {
