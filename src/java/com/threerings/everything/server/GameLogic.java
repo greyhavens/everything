@@ -348,6 +348,7 @@ public class GameLogic
                 }
             }
         }
+
         // then, copy the index to one that's been weighted according to the user's preferences
         index = index.copyWeighted(weights);
 
@@ -366,9 +367,9 @@ public class GameLogic
         log.info("Selected rare thing", "for", player.who(), "rarity", pup.getBonusRarity(),
                  "needed", needed.size(), "gotNeeded", gotNeeded, "ids", thingIds);
 
-        // now ensure that half the grid is cards they need, (one may have been chosen above)
-        int neededGimmes = Grid.GRID_SIZE/2 - (gotNeeded ? 1 : 0);
-        neededGimmes = Math.min(2*haveCats.size(), neededGimmes); // adjust for small collections
+        // compute the number of cards in the grid that should be selected from the set of cards
+        // that are needed by the player (in series they are collecting but don't already have)
+        int neededGimmes = computeNeededGimmes(player.coins, gotNeeded, haveCats.size());
         if (neededGimmes > 0) {
             index.selectThingsFrom(haveCats, neededGimmes, haveIds, thingIds);
             log.info("Selected needed cards", "for", player.who(), "count", neededGimmes,
@@ -614,6 +615,18 @@ public class GameLogic
             card.giver = PlayerName.create(Card.BIRTHDAY_GIVER_ID);
         }
         return card;
+    }
+
+    protected static int computeNeededGimmes (int coins, boolean gotNeeded, int haveCats)
+    {
+        // if the player doesn't have much money, we'll give them up to 1/2 a grid full of cards
+        // that they need (because they're not likely to get the money to flip all the cards); if
+        // they have a 1000 coins or more, we'll stick with only 1/4
+        float frac = 1 / (2 + (Math.min(Math.max(500, coins), 1000)-500)/250f);
+        int neededGimmes = Math.round(Grid.GRID_SIZE * frac);
+        neededGimmes -= (gotNeeded ? 1 : 0); // we may have already given them one needed card
+        neededGimmes = Math.min(2*haveCats, neededGimmes); // adjust for small collections
+        return neededGimmes;
     }
 
     public static class TrophyRecord
