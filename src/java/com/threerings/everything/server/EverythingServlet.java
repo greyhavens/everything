@@ -182,7 +182,7 @@ public class EverythingServlet extends EveryServiceServlet
             }
 
             // look up their friends' facebook ids and make friend mappings for them
-            updateFacebookFriends(player, fbinfo.right);
+            updateFacebookInfo(player, fbinfo.right);
 
             // note that a new user added our app
             try {
@@ -198,10 +198,11 @@ public class EverythingServlet extends EveryServiceServlet
             log.info("Welcome back", "who", player.who(), "gone", elapsed,
                      "tracking", kontagentToken);
 
-            // check to see if they made FB friends with any existing Everything players
+            // check to see if they made FB friends with any existing Everything players (this also
+            // updates other Facebook ephemera like first and last name)
             Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
             if (fbinfo != null) {
-                updateFacebookFriends(player, fbinfo.right);
+                updateFacebookInfo(player, fbinfo.right);
             }
         }
 
@@ -354,7 +355,7 @@ public class EverythingServlet extends EveryServiceServlet
         }
     }
 
-    protected void updateFacebookFriends (final PlayerRecord prec, String fbSessionKey)
+    protected void updateFacebookInfo (final PlayerRecord prec, String fbSessionKey)
     {
         final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbSessionKey);
         _app.getExecutor().execute(new Runnable() {
@@ -389,37 +390,29 @@ public class EverythingServlet extends EveryServiceServlet
                              "error", e.getMessage());
                 }
 
-                // TEMP: update birthdays for people who started when there was a bug
-                if (prec.birthdate == 0) {
-                    Set<Long> ids = Collections.singleton(prec.facebookId);
-                    EnumSet<ProfileField> fields = EnumSet.of(ProfileField.BIRTHDAY);
-                    UsersGetInfoResponse uinfo;
-                    try {
-                        uinfo = fbclient.users_getInfo(ids, fields);
-                    } catch (FacebookException fbe) {
-                        log.warning("Failed to load Facebook profile info", "who", prec.who(), fbe);
-                        return;
-                    }
-                    if (uinfo.getUser().size() == 0) {
-                        log.warning("User has no Facebook profile info?", "who", prec.who());
-                        return;
-                    }
-
-                    User fbuser = uinfo.getUser().get(0);
-                    String bdstr = fbuser.getBirthday();
-                    try {
-                        if (bdstr != null) {
-                            Date born = (bdstr.indexOf(",") == -1) ?
-                                _bdfmt.parse(bdstr) : _bfmt.parse(bdstr);
-                            log.info("Parsed birthday", "bday", bdstr, "date", born);
-                            _playerRepo.updateBirthday(prec.userId, born.getTime());
-                        }
-                    } catch (Exception e) {
-                        log.info("Cannot parse birthday", "who", prec.who(), "bday", bdstr,
-                                 "err", e.getMessage());
-                    }
+                // check to see if this player's first or last name has changed
+                Set<Long> ids = Collections.singleton(prec.facebookId);
+                EnumSet<ProfileField> fields = EnumSet.of(
+                    ProfileField.FIRST_NAME, ProfileField.LAST_NAME);
+                UsersGetInfoResponse uinfo;
+                try {
+                    uinfo = fbclient.users_getInfo(ids, fields);
+                } catch (FacebookException fbe) {
+                    log.warning("Failed to load Facebook profile info", "who", prec.who(), fbe);
+                    return;
                 }
-                // END TEMP
+                if (uinfo.getUser().size() == 0) {
+                    log.warning("User has no Facebook profile info?", "who", prec.who());
+                    return;
+                }
+
+                User fbuser = uinfo.getUser().get(0);
+                String name = StringUtil.getOr(fbuser.getFirstName(), prec.name);
+                String surname = StringUtil.getOr(fbuser.getLastName(), prec.surname);
+                if (!prec.name.equals(name) || !prec.surname.equals(surname)) {
+                    log.info("Updating name", "who", prec.who(), "name", name, "surname", surname);
+                    _playerRepo.updateName(prec.userId, name, surname);
+                }
             }
         });
     }

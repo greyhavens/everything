@@ -204,11 +204,12 @@ public class PlayerRepository extends DepotRepository
     }
 
     /**
-     * TEMP: updates player's birthday.
+     * Updates the specified player's name.
      */
-    public void updateBirthday (int userId, long birthday)
+    public void updateName (int userId, String name, String surname)
     {
-        updatePartial(PlayerRecord.getKey(userId), PlayerRecord.BIRTHDATE, toDateVal(birthday));
+        updatePartial(PlayerRecord.getKey(userId),
+                      PlayerRecord.NAME, name, PlayerRecord.SURNAME, surname);
     }
 
     /**
