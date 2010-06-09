@@ -101,7 +101,7 @@
     <!-- these libraries are *only* needed at build and testing time -->
     <artifact:dependencies filesetId="builddeps.fileset">
       <remoteRepository refid="ooo.maven.depends.repo"/>
-      <dependency groupId="com.threerings" artifactId="ooolib" version="0.0-SNAPSHOT" type="swc"/>
+      <dependency groupId="com.threerings" artifactId="aspirin" version="0.0-SNAPSHOT" type="swc"/>
       <dependency groupId="extern" artifactId="corelib" version="1.0" type="swc"/>
       <dependency groupId="extern" artifactId="flexlib" version="1.0" type="swc"/>
       <dependency groupId="extern" artifactId="tweener" version="1.0" type="swc"/>
