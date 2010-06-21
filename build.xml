@@ -89,7 +89,7 @@
       <dependency groupId="extern" artifactId="mail" version="1.4"/>
       <dependency groupId="extern" artifactId="postgresql-jdbc4" version="8.3"/>
 
-      <dependency groupId="extern" artifactId="s3lib" version="1.0"/>
+      <dependency groupId="extern" artifactId="s3lib" version="r335"/>
       <dependency groupId="extern" artifactId="servlet-api" version="2.5"/>
       <dependency groupId="extern" artifactId="velocity-dev" version="1.5"/>
     </artifact:dependencies>
