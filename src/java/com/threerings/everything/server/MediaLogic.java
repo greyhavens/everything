@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 
 import com.samskivert.util.StringUtil;
 
+import com.threerings.s3.client.MediaType;
 import com.threerings.s3.client.S3ByteArrayObject;
 import com.threerings.s3.client.S3Connection;
 import com.threerings.s3.client.S3Exception;
@@ -125,7 +126,7 @@ public class MediaLogic
             // ship it up to S3
             S3Connection conn = new S3Connection(_app.getMediaStoreId(), _app.getMediaStoreKey());
             conn.putObject(_app.getMediaStoreBucket(),
-                           new S3ByteArrayObject(name, bout.toByteArray(), mimeType),
+                           new S3ByteArrayObject(name, bout.toByteArray(), new MediaType(mimeType)),
                            AccessControlList.StandardPolicy.PUBLIC_READ, EXPIRES_2038);
 
             log.info("Processed thing image", "name", name,
