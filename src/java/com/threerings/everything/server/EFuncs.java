@@ -16,22 +16,6 @@ import com.threerings.everything.server.persist.CardRecord;
  */
 public class EFuncs
 {
-//    /** Turn a Map.Entry into the result of getKey() */
-//    protected static final Function<Map.Entry<K, V>, K> ENTRY_TO_KEY =
-//        new Function<Map.Entry<K, V>, K>() {
-//            public K apply (Map.Entry<K, V> e) {
-//                return e.getKey();
-//            }
-//        };
-//
-//    /** Turn a Map.Entry into the result of getValue() */
-//    public static final <K, V> Function<Map.Entry<K, V>, V> ENTRY_TO_VALUE =
-//        new Function<Map.Entry<K, V>, V>() {
-//            public V apply (Map.Entry<K, V> e) {
-//                return e.getValue();
-//            }
-//        };
-
     /** Extracts the thing id from a thing. */
     public static final Function<Thing, Integer> THING_ID = new Function<Thing, Integer>() {
         public Integer apply (Thing thing) {
