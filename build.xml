@@ -78,6 +78,7 @@
       <dependency groupId="extern" artifactId="commons-io" version="1.4"/>
       <dependency groupId="extern" artifactId="commons-lang" version="1.0"/>
       <dependency groupId="extern" artifactId="commons-logging" version="1.0"/>
+      <dependency groupId="extern" artifactId="commons-httpclient" version="3.1"/>
 
       <dependency groupId="extern" artifactId="facebook-java-api" version="3.0"/>
 
