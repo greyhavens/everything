@@ -35,6 +35,7 @@ import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.client.GameService;
 import com.threerings.everything.client.GameServiceAsync;
+import com.threerings.everything.data.Build;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.Powerup;
@@ -247,7 +248,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup popup = CardPopup.display(
                     _ctx, result, _slots[position].status, _slots[position], null);
-                if (result.bonanza) {
+                if (Build.BONANZAS_ENABLED && result.bonanza) {
                     popup.addCloseHandler(new CloseHandler<PopupPanel>() {
                         public void onClose (CloseEvent<PopupPanel> event) {
                             if (event.isAutoClosed()) {

@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,6 +28,7 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 
 import com.threerings.everything.client.GameService;
+import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
 import com.threerings.everything.data.Category;
@@ -240,7 +242,7 @@ public class GameServlet extends EveryServiceServlet
         _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name);
 
         // on a free flip, there's a chance they'll get a bonanza card
-        if (expectedCost == 0) {
+        if (Build.BONANZAS_ENABLED && expectedCost == 0) {
             result.bonanza = maybePickBonanza(player, result.card);
         }
 
@@ -692,8 +694,7 @@ public class GameServlet extends EveryServiceServlet
 
     /** Old attractors that are no longer in the database but
      * which we still allow to be received. */
-    protected static final Set<Integer> OLD_ATTRACTORS = Sets.newHashSet(
-        648, // Crack    (Really old, can be deleted sooner)
+    protected static final Set<Integer> OLD_ATTRACTORS = ImmutableSet.of(
         2119, // Voldemort
         767, // Beer
         232, // Little Penguin
