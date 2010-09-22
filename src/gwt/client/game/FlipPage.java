@@ -244,34 +244,6 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 // display the flipped card in the grid
                 _slots[position].setCard(_ctx, result.card.toThingCard(), false, null);
 
-//                if (result.bonanza) {
-                    // TODO: work out how to display the bonanza card on the grid...
-                    // 1) A little behind and shifted on the card you clicked.
-                    // 2) Squeeze it in. Shift the whole row around so that it's crowded.
-//                    _bonanza = new SlotView();
-//                    _bonanza.setStatus(SlotStatus.FLIPPED);
-//                    _bonanza.setCard(_ctx, result.bonanza.card.toThingCard(), false,
-//                        new ClickHandler() {
-//                            public void onClick (ClickEvent event) {
-//                                // TODO: change it so that they can react the bonanza at any time,
-//                                // thus granting the free flip.
-//                                new BonanzaPopup(_ctx, result.bonanza,
-//                                    new AsyncCallback<GameStatus>() {
-//                                    public void onSuccess (GameStatus status) {
-//                                        updateGameStatus(_data.status = status);
-//                                    }
-//                                    public void onFailure (Throwable caught) {
-//                                        // nada
-//                                    }
-//                                });
-//                            }
-//                        });
-//                    _cards.add(_bonanza, _cards.getWidgetLeft(_slots[position]) + 10,
-//                        _cards.getWidgetTop(_slots[position]));
-                    // TODO: mutherfuck! We need to put the bonanza card "behind"
-                    //_cards.adjustIndex(_bonanza, 0);
-//                }
-
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup popup = CardPopup.display(
                     _ctx, result, _slots[position].status, _slots[position], null);
@@ -422,9 +394,6 @@ public class FlipPage extends DataPanel<GameService.GridResult>
 
     protected AbsolutePanel _cards;
     protected SlotView[] _slots;
-
-//    /** Our bonanza card, if any. */
-//    protected SlotView _bonanza;
 
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 }
