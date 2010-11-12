@@ -73,18 +73,11 @@
       <dependency groupId="extern" artifactId="guice-multibindings" version="2.0"/>
 
       <dependency groupId="extern" artifactId="activation" version="1.0"/>
-      <dependency groupId="extern" artifactId="commons-collections" version="1.0"/>
-      <dependency groupId="extern" artifactId="commons-fileupload" version="1.2.1"/>
-      <dependency groupId="extern" artifactId="commons-io" version="1.4"/>
-      <dependency groupId="extern" artifactId="commons-lang" version="1.0"/>
-      <dependency groupId="extern" artifactId="commons-logging" version="1.0"/>
-      <dependency groupId="extern" artifactId="commons-httpclient" version="3.1"/>
 
       <dependency groupId="extern" artifactId="facebook-java-api" version="3.0"/>
 
       <dependency groupId="extern" artifactId="guava" version="1.0"/>
       <dependency groupId="extern" artifactId="gwt-user" version="2.0"/>
-      <dependency groupId="extern" artifactId="jvnet-runtime" version="1.0"/>
       <dependency groupId="extern" artifactId="json" version="1.0"/>
       <dependency groupId="extern" artifactId="log4j" version="1.2"/>
       <dependency groupId="extern" artifactId="mail" version="1.4"/>
@@ -94,8 +87,18 @@
       <dependency groupId="extern" artifactId="servlet-api" version="2.5"/>
       <dependency groupId="extern" artifactId="velocity-dev" version="1.5"/>
     </artifact:dependencies>
+    <artifact:dependencies filesetId="ext.rundeps.fileset">
+<!--
+      <dependency groupId="commons-collections" artifactId="commons-collections" version="1.0"/>
+      <dependency groupId="commons-lang" artifactId="commons-lang" version="1.0"/>
+-->
+      <dependency groupId="commons-io" artifactId="commons-io" version="1.4"/>
+      <dependency groupId="commons-fileupload" artifactId="commons-fileupload" version="1.2.1"/>
+      <dependency groupId="commons-httpclient" artifactId="commons-httpclient" version="3.1"/>
+    </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
       <fileset refid="rundeps.fileset"/>
+      <fileset refid="ext.rundeps.fileset"/>
       <mapper type="flatten"/>
     </copy>
 
