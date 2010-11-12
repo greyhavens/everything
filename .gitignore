@@ -1,0 +1,9 @@
+/build
+/dist
+/etc/build.properties
+/etc/everything.properties
+/lib/gwt
+/lib/flex_sdk
+/package
+/src/gwt/client/*/*Messages.java
+/src/java/com/threerings/everything/data/Build.java
