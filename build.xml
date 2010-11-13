@@ -93,7 +93,7 @@
       <dependency groupId="commons-httpclient" artifactId="commons-httpclient" version="3.1"/>
       <!-- lang and collections are needed by velocity which lacks transient depends -->
       <dependency groupId="commons-lang" artifactId="commons-lang" version="1.0"/>
-      <dependency groupId="commons-collections" artifactId="commons-collections" version="1.0"/>
+      <dependency groupId="commons-collections" artifactId="commons-collections" version="3.2.1"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/lib">
       <fileset refid="rundeps.fileset"/>
