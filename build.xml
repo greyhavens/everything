@@ -69,25 +69,33 @@
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="0.0-SNAPSHOT"/>
 
-      <dependency groupId="extern" artifactId="guice" version="2.0"/>
-      <dependency groupId="extern" artifactId="guice-multibindings" version="2.0"/>
-
-      <dependency groupId="extern" artifactId="activation" version="1.0"/>
-
       <dependency groupId="extern" artifactId="facebook-java-api" version="3.0"/>
-
-      <dependency groupId="extern" artifactId="guava" version="1.0"/>
-      <dependency groupId="extern" artifactId="gwt-user" version="2.0"/>
       <dependency groupId="extern" artifactId="json" version="1.0"/>
-      <dependency groupId="extern" artifactId="log4j" version="1.2"/>
-      <dependency groupId="extern" artifactId="mail" version="1.4"/>
+
       <dependency groupId="extern" artifactId="postgresql-jdbc4" version="8.3"/>
 
       <dependency groupId="extern" artifactId="s3lib" version="r335"/>
-      <dependency groupId="extern" artifactId="servlet-api" version="2.5"/>
       <dependency groupId="extern" artifactId="velocity-dev" version="1.5"/>
     </artifact:dependencies>
     <artifact:dependencies filesetId="ext.rundeps.fileset">
+      <dependency groupId="com.google.inject" artifactId="guice" version="2.0"/>
+      <dependency groupId="com.google.inject.extensions"
+                  artifactId="guice-multibindings" version="2.0"/>
+<!--
+      <dependency groupId="extern" artifactId="activation" version="1.0"/>
+-->
+      <dependency groupId="com.google.guava" artifactId="guava" version="r05"/>
+      <dependency groupId="com.google.gwt" artifactId="gwt-user" version="2.1.0"/>
+      <dependency groupId="log4j" artifactId="log4j" version="1.2.15">
+        <exclusion groupId="javax.mail" artifactId="mail"/>
+        <exclusion groupId="javax.jms" artifactId="jms"/>
+        <exclusion groupId="com.sun.jdmk" artifactId="jmxtools"/>
+        <exclusion groupId="com.sun.jmx" artifactId="jmxri"/>
+        <exclusion groupId="oro" artifactId="oro"/>
+        <exclusion groupId="junit" artifactId="junit"/>
+      </dependency>
+      <dependency groupId="javax.mail" artifactId="mail" version="1.4.1"/>
+      <dependency groupId="javax.servlet" artifactId="servlet-api" version="2.5"/>
       <dependency groupId="commons-io" artifactId="commons-io" version="1.4"/>
       <dependency groupId="commons-fileupload" artifactId="commons-fileupload" version="1.2.1"/>
       <dependency groupId="commons-httpclient" artifactId="commons-httpclient" version="3.1"/>
@@ -112,10 +120,13 @@
       <dependency groupId="extern" artifactId="easymock" version="1.0"/>
       <dependency groupId="extern" artifactId="junit4" version="4.0"/>
       <dependency groupId="extern" artifactId="gwt-asyncgen" version="1.0"/>
-      <dependency groupId="extern" artifactId="gwt-dev" version="2.0"/>
+    </artifact:dependencies>
+    <artifact:dependencies filesetId="ext.builddeps.fileset">
+      <dependency groupId="com.google.gwt" artifactId="gwt-dev" version="2.1.0"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/build">
       <fileset refid="builddeps.fileset"/>
+      <fileset refid="ext.builddeps.fileset"/>
       <mapper type="flatten"/>
     </copy>
 
@@ -181,10 +192,10 @@
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
         <fileset dir="${deploy.dir}/build">
-          <include name="gwt-dev-2.0.jar"/> <!-- the GWT compiler -->
+          <include name="gwt-dev-*.jar"/> <!-- the GWT compiler -->
         </fileset>
         <fileset dir="${deploy.dir}/lib">
-          <include name="gwt-user-2.0.jar"/>
+          <include name="gwt-user-*.jar"/>
           <include name="gwt-utils*.jar"/>
           <include name="samskivert-gwt*.jar"/>
           <include name="samsara-app*.jar"/>
@@ -223,11 +234,11 @@
     </else></if>
     <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
-        <pathelement path="${deploy.dir}/build/gwt-dev-2.0.jar"/>
-        <pathelement path="${deploy.dir}/lib/gwt-user-2.0.jar"/>
-        <pathelement path="${deploy.dir}/lib/gwt-utils-0.0-SNAPSHOT.jar"/>
-        <pathelement path="${deploy.dir}/lib/samskivert-gwt-0.0-SNAPSHOT.jar"/>
-        <pathelement path="${deploy.dir}/lib/samsara-app-0.0-SNAPSHOT.jar"/>
+        <pathelement path="${deploy.dir}/build/gwt-dev-*.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-user-*.jar"/>
+        <pathelement path="${deploy.dir}/lib/gwt-utils-*.jar"/>
+        <pathelement path="${deploy.dir}/lib/samskivert-gwt-*.jar"/>
+        <pathelement path="${deploy.dir}/lib/samsara-app-*.jar"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="${gsrc.dir}"/>
       </classpath>

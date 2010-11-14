@@ -13,7 +13,7 @@ import com.google.common.base.Function;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import com.threerings.gwt.util.ChainedCallback;
+import com.threerings.gwt.util.Callbacks;
 
 import com.threerings.everything.client.EditorService;
 import com.threerings.everything.client.EditorServiceAsync;
@@ -44,7 +44,7 @@ public class CategoriesModel
                     return null;
                 }
             };
-            _editorsvc.loadCategories(parentId, ChainedCallback.before(callback, storeOp));
+            _editorsvc.loadCategories(parentId, Callbacks.before(callback, storeOp));
         }
     }
 
@@ -74,7 +74,7 @@ public class CategoriesModel
             }
         };
         _editorsvc.createCategory(
-            cat, ChainedCallback.map(ChainedCallback.before(callback, addCatOp), toCat));
+            cat, Callbacks.map(Callbacks.before(callback, addCatOp), toCat));
     }
 
     /**
@@ -99,7 +99,7 @@ public class CategoriesModel
             }
         };
         cat.parentId = newParentId;
-        _editorsvc.updateCategory(cat, ChainedCallback.before(callback, movedOp));
+        _editorsvc.updateCategory(cat, Callbacks.before(callback, movedOp));
     }
 
     /**
@@ -113,7 +113,7 @@ public class CategoriesModel
                 return null;
             }
         };
-        _editorsvc.deleteCategory(categoryId, ChainedCallback.before(callback, deletedOp));
+        _editorsvc.deleteCategory(categoryId, Callbacks.before(callback, deletedOp));
     }
 
     /**
