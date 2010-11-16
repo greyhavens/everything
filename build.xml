@@ -61,11 +61,8 @@
     <!-- these libraries are needed at runtime -->
     <artifact:dependencies filesetId="rundeps.fileset">
       <remoteRepository refid="ooo.maven.depends.repo"/>
-      <dependency groupId="com.samskivert" artifactId="depot" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.samskivert" artifactId="samskivert-gwt" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-shared" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.threerings" artifactId="gwt-utils" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="threerings" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="0.0-SNAPSHOT"/>
 
@@ -78,6 +75,9 @@
       <dependency groupId="extern" artifactId="velocity-dev" version="1.5"/>
     </artifact:dependencies>
     <artifact:dependencies filesetId="ext.rundeps.fileset">
+      <dependency groupId="com.samskivert" artifactId="depot" version="1.0"/>
+      <dependency groupId="com.google.gwt" artifactId="gwt-servlet" version="2.1.0"/>
+
       <dependency groupId="com.google.inject" artifactId="guice" version="2.0"/>
       <dependency groupId="com.google.inject.extensions"
                   artifactId="guice-multibindings" version="2.0"/>
@@ -85,7 +85,6 @@
       <dependency groupId="extern" artifactId="activation" version="1.0"/>
 -->
       <dependency groupId="com.google.guava" artifactId="guava" version="r05"/>
-      <dependency groupId="com.google.gwt" artifactId="gwt-user" version="2.1.0"/>
       <dependency groupId="log4j" artifactId="log4j" version="1.2.15">
         <exclusion groupId="javax.mail" artifactId="mail"/>
         <exclusion groupId="javax.jms" artifactId="jms"/>
@@ -122,6 +121,7 @@
       <dependency groupId="extern" artifactId="gwt-asyncgen" version="1.0"/>
     </artifact:dependencies>
     <artifact:dependencies filesetId="ext.builddeps.fileset">
+      <dependency groupId="com.threerings" artifactId="gwt-utils" version="1.2"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-dev" version="2.1.0"/>
     </artifact:dependencies>
     <copy todir="${deploy.dir}/build">
@@ -192,12 +192,12 @@
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
         <fileset dir="${deploy.dir}/build">
+          <include name="samskivert-*.jar"/>
+          <include name="gwt-user-*.jar"/>
+          <include name="gwt-utils*.jar"/>
           <include name="gwt-dev-*.jar"/> <!-- the GWT compiler -->
         </fileset>
         <fileset dir="${deploy.dir}/lib">
-          <include name="gwt-user-*.jar"/>
-          <include name="gwt-utils*.jar"/>
-          <include name="samskivert-gwt*.jar"/>
           <include name="samsara-app*.jar"/>
         </fileset>
         <pathelement location="${src.dir}"/>
