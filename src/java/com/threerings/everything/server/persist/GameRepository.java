@@ -60,9 +60,15 @@ public class GameRepository extends DepotRepository
      */
     public List<News> loadLatestNews ()
     {
-        List<NewsRecord> records = findAll(NewsRecord.class,
-            OrderBy.descending(NewsRecord.REPORTED), new Limit(0, 1));
-        return map(records, NewsRecord.TO_NEWS).toList();
+        return loadNews(1);
+    }
+
+    /**
+     * Loads up the most recent 5 news stories. May return fewer if five stories do not exist.
+     */
+    public List<News> loadRecentNews ()
+    {
+        return loadNews(5);
     }
 
     /**
@@ -633,6 +639,16 @@ public class GameRepository extends DepotRepository
             store(record);
         }
         return load(CollectionRecord.getKey(userId));
+    }
+
+    /**
+     * Helper function for {@link #loadLatestNews} and {@link #loadRecentNews}.
+     */
+    protected List<News> loadNews (int limit)
+    {
+        List<NewsRecord> records = findAll(
+            NewsRecord.class, OrderBy.descending(NewsRecord.REPORTED), new Limit(0, limit));
+        return map(records, NewsRecord.TO_NEWS).toList();
     }
 
     @Override // from DepotRepository
