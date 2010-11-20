@@ -101,14 +101,7 @@
       <dependency groupId="extern" artifactId="activation" version="1.0"/>
 -->
       <dependency groupId="com.google.guava" artifactId="guava" version="r05"/>
-      <dependency groupId="log4j" artifactId="log4j" version="1.2.15">
-        <exclusion groupId="javax.mail" artifactId="mail"/>
-        <exclusion groupId="javax.jms" artifactId="jms"/>
-        <exclusion groupId="com.sun.jdmk" artifactId="jmxtools"/>
-        <exclusion groupId="com.sun.jmx" artifactId="jmxri"/>
-        <exclusion groupId="oro" artifactId="oro"/>
-        <exclusion groupId="junit" artifactId="junit"/>
-      </dependency>
+      <dependency groupId="log4j" artifactId="log4j" version="1.2.16"/>
       <dependency groupId="javax.mail" artifactId="mail" version="1.4.1"/>
       <dependency groupId="javax.servlet" artifactId="servlet-api" version="2.5"/>
       <dependency groupId="commons-io" artifactId="commons-io" version="1.4"/>
