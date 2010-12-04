@@ -354,6 +354,11 @@
     </dpkg>
   </target>
 
+  <target name="bamboo" depends="distcleanall,checkclean,package,aptupdate"
+          description="Run by the build server to build, package and deploy Everything.">
+    <antcall target="distcleanall"/>
+  </target>
+
   <target name="genrecord" depends="prepare" description="Regenerates PersistentRecord classes.">
     <taskdef name="grecord" classname="com.samskivert.depot.tools.GenRecordTask"
              classpathref="build.classpath"/>
