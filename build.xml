@@ -13,7 +13,7 @@
   <property name="pkg.maintainer.email" value="ooo-dev@threerings.net"/>
 
   <!-- bring in our standard build support -->
-  <import file="build/etc/build-support.xml"/>
+  <import file="package/etc/build-support.xml"/>
 
   <target name="-prep-flex">
     <condition property="flexsdk.dir" value="../flex/current">
@@ -30,7 +30,7 @@
     </fail>
   </target>
 
-  <target name="prepare">
+  <target name="prepare" depends="-init-ooo">
     <mkdir dir="${deploy.dir}"/>
     <mkdir dir="${candidate.dir}"/>
     <mkdir dir="${classes.dir}"/>
@@ -65,7 +65,7 @@
       <dependency groupId="com.threerings" artifactId="gwt-utils" version="1.2"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-dev" version="2.1.0"/>
       <dependency groupId="junit" artifactId="junit" version="4.8.1"/>
-      <dependency groupId="easymock" artifactId="easymock" version="2.0"/>
+      <dependency groupId="org.easymock" artifactId="easymock" version="2.0"/>
     </artifact:dependencies>
     <path id="build.classpath">
       <path refid="buildlibs.classpath"/>
