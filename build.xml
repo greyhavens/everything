@@ -78,6 +78,7 @@
     <!-- these libraries are needed at runtime -->
     <artifact:dependencies filesetId="rundeps.fileset">
       <dependency groupId="com.samskivert" artifactId="depot" version="1.0"/>
+      <dependency groupId="com.samskivert" artifactId="samskivert" version="1.1"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-servlet" version="2.1.0"/>
       <dependency groupId="com.google.inject" artifactId="guice" version="2.0"/>
       <dependency groupId="com.google.inject.extensions"
