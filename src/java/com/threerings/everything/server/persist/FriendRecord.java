@@ -17,8 +17,8 @@ public class FriendRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<FriendRecord> _R = FriendRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp FRIEND_ID = colexp(_R, "friendId");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> FRIEND_ID = colexp(_R, "friendId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

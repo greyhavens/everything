@@ -27,12 +27,12 @@ public class FeedItemRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<FeedItemRecord> _R = FeedItemRecord.class;
-    public static final ColumnExp ACTOR_ID = colexp(_R, "actorId");
-    public static final ColumnExp WHEN = colexp(_R, "when");
-    public static final ColumnExp TYPE = colexp(_R, "type");
-    public static final ColumnExp TARGET_ID = colexp(_R, "targetId");
-    public static final ColumnExp OBJECT = colexp(_R, "object");
-    public static final ColumnExp MESSAGE = colexp(_R, "message");
+    public static final ColumnExp<Integer> ACTOR_ID = colexp(_R, "actorId");
+    public static final ColumnExp<Timestamp> WHEN = colexp(_R, "when");
+    public static final ColumnExp<FeedItem.Type> TYPE = colexp(_R, "type");
+    public static final ColumnExp<Integer> TARGET_ID = colexp(_R, "targetId");
+    public static final ColumnExp<String> OBJECT = colexp(_R, "object");
+    public static final ColumnExp<String> MESSAGE = colexp(_R, "message");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */

@@ -14,9 +14,9 @@ public class AttractorPostedRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<AttractorPostedRecord> _R = AttractorPostedRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp WHEN = colexp(_R, "when");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Timestamp> WHEN = colexp(_R, "when");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment on schema changes. */

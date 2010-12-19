@@ -17,10 +17,10 @@ public class EscrowedCardRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<EscrowedCardRecord> _R = EscrowedCardRecord.class;
-    public static final ColumnExp EXTERNAL_ID = colexp(_R, "externalId");
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp CREATED = colexp(_R, "created");
-    public static final ColumnExp ESCROWED = colexp(_R, "escrowed");
+    public static final ColumnExp<String> EXTERNAL_ID = colexp(_R, "externalId");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Timestamp> CREATED = colexp(_R, "created");
+    public static final ColumnExp<Timestamp> ESCROWED = colexp(_R, "escrowed");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

@@ -17,9 +17,9 @@ public class ThingInfoRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<ThingInfoRecord> _R = ThingInfoRecord.class;
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp RARITY = colexp(_R, "rarity");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Rarity> RARITY = colexp(_R, "rarity");
     // AUTO-GENERATED: FIELDS END
 
     /** A unique identifier for this thing. */

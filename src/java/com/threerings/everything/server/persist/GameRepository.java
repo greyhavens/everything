@@ -28,12 +28,9 @@ import com.samskivert.depot.Key;
 import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
-import com.samskivert.depot.clause.FieldOverride;
-import com.samskivert.depot.clause.GroupBy;
-import com.samskivert.depot.clause.Limit;
-import com.samskivert.depot.clause.OrderBy;
 import com.samskivert.depot.clause.Where;
 import com.samskivert.depot.util.Sequence;
+import com.samskivert.depot.util.Tuple2;
 
 import com.threerings.everything.data.GridStatus;
 import com.threerings.everything.data.News;
@@ -106,10 +103,8 @@ public class GameRepository extends DepotRepository
      */
     public List<CardRecord> loadCards (int ownerId, int categoryId)
     {
-        return findAll(CardRecord.class,
-                       CardRecord.THING_ID.join(ThingRecord.THING_ID),
-                       new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
-                                         ThingRecord.CATEGORY_ID.eq(categoryId))));
+        return from(CardRecord.class).join(CardRecord.THING_ID.join(ThingRecord.THING_ID)).
+            where(CardRecord.OWNER_ID.eq(ownerId), ThingRecord.CATEGORY_ID.eq(categoryId)).select();
     }
 
     /**
@@ -117,9 +112,8 @@ public class GameRepository extends DepotRepository
      */
     public List<CardRecord> loadCards (int ownerId, Collection<Integer> thingIds, boolean useCache)
     {
-        return findAll(CardRecord.class, useCache ? CacheStrategy.BEST : CacheStrategy.NONE,
-                       new Where(Ops.and(CardRecord.OWNER_ID.eq(ownerId),
-                                         CardRecord.THING_ID.in(thingIds))));
+        return from(CardRecord.class).cache(useCache ? CacheStrategy.BEST : CacheStrategy.NONE).
+            where(CardRecord.OWNER_ID.eq(ownerId), CardRecord.THING_ID.in(thingIds)).select();
     }
 
     /**
@@ -127,7 +121,7 @@ public class GameRepository extends DepotRepository
      */
     public List<CardRecord> loadCards (int ownerId)
     {
-        return findAll(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(ownerId)));
+        return from(CardRecord.class).where(CardRecord.OWNER_ID.eq(ownerId)).select();
     }
 
     /**
@@ -137,8 +131,9 @@ public class GameRepository extends DepotRepository
     public Multimap<Integer, Integer> loadCollection (int userId, ThingIndex index)
     {
         TreeMultimap<Integer, Integer> collection = TreeMultimap.create();
-        for (Integer thingId : map(findAllKeys(CardRecord.class, false,
-                new Where(CardRecord.OWNER_ID.eq(userId))), Key.<CardRecord,Integer>extract(1))) {
+        for (Integer thingId : map(
+                 from(CardRecord.class).where(CardRecord.OWNER_ID.eq(userId)).selectKeys(false),
+                 Key.<CardRecord,Integer>extract(1))) {
             collection.put(index.getCategory(thingId), thingId);
         }
         return collection;
@@ -214,7 +209,7 @@ public class GameRepository extends DepotRepository
      */
     public List<CardRecord> loadGifts (int userId)
     {
-        return findAll(CardRecord.class, new Where(CardRecord.OWNER_ID.eq(-userId)));
+        return from(CardRecord.class).where(CardRecord.OWNER_ID.eq(-userId)).select();
     }
 
     /**
@@ -279,8 +274,8 @@ public class GameRepository extends DepotRepository
      */
     public void unescrowCards (String externalId, PlayerRecord player)
     {
-        Where where = new Where(EscrowedCardRecord.EXTERNAL_ID.eq(externalId));
-        for (EscrowedCardRecord card : findAll(EscrowedCardRecord.class, where)) {
+        for (EscrowedCardRecord card : from(EscrowedCardRecord.class).
+                 where(EscrowedCardRecord.EXTERNAL_ID.eq(externalId)).select()) {
             // transfer the card to the player
             log.info("Transfering escrowed card to new player", "card", card.thingId,
                      "player", player.who());
@@ -310,13 +305,11 @@ public class GameRepository extends DepotRepository
             ownerIds = ids;
         }
         Multiset<Integer> data = HashMultiset.create();
-        for (OwnerRecord orec : findAll(OwnerRecord.class,
-                                        new FieldOverride(OwnerRecord.COUNT,
-                                                          Funcs.countDistinct(CardRecord.THING_ID)),
-                                        new Where(Ops.and(CardRecord.OWNER_ID.in(ownerIds),
-                                                          CardRecord.THING_ID.in(thingIds))),
-                                        new GroupBy(CardRecord.OWNER_ID))) {
-            data.add(Math.abs(orec.ownerId), orec.count);
+        for (Tuple2<Integer, Integer> orec : from(CardRecord.class).
+                 where(CardRecord.OWNER_ID.in(ownerIds), CardRecord.THING_ID.in(thingIds)).
+                 groupBy(CardRecord.OWNER_ID).
+                 select(CardRecord.OWNER_ID, Funcs.countDistinct(CardRecord.THING_ID))) {
+            data.add(Math.abs(orec.a), orec.b);
         }
         return data;
     }
@@ -430,9 +423,8 @@ public class GameRepository extends DepotRepository
     public boolean flipSlot (int userId, int position)
     {
         return updatePartial(SlotStatusRecord.class,
-                             new Where(Ops.and(SlotStatusRecord.USER_ID.eq(userId),
-                                               SlotStatusRecord.STATUSES[position].eq(
-                                                   SlotStatus.UNFLIPPED))),
+                             new Where(SlotStatusRecord.USER_ID, userId,
+                                       SlotStatusRecord.STATUSES[position], SlotStatus.UNFLIPPED),
                              SlotStatusRecord.getKey(userId),
                              SlotStatusRecord.STATUSES[position], SlotStatus.FLIPPED) == 1;
     }
@@ -463,8 +455,8 @@ public class GameRepository extends DepotRepository
     public void updateSlot (int userId, int position, SlotStatus from, SlotStatus to)
     {
         updatePartial(SlotStatusRecord.class,
-                      new Where(Ops.and(SlotStatusRecord.USER_ID.eq(userId),
-                                        SlotStatusRecord.STATUSES[position].eq(from))),
+                      new Where(SlotStatusRecord.USER_ID, userId,
+                                SlotStatusRecord.STATUSES[position], from),
                       SlotStatusRecord.getKey(userId),
                       SlotStatusRecord.STATUSES[position], to);
     }
@@ -475,8 +467,8 @@ public class GameRepository extends DepotRepository
     public Map<Powerup, Integer> loadPowerups (int ownerId)
     {
         Map<Powerup, Integer> inventory = Maps.newHashMap();
-        for (PowerupRecord record : findAll(PowerupRecord.class,
-                                            new Where(PowerupRecord.OWNER_ID.eq(ownerId)))) {
+        for (PowerupRecord record : from(PowerupRecord.class).
+                 where((PowerupRecord.OWNER_ID.eq(ownerId))).select()) {
             inventory.put(record.type, record.charges);
         }
         return inventory;
@@ -541,8 +533,8 @@ public class GameRepository extends DepotRepository
     public void markCollectionDirty (int userId)
     {
         updatePartial(CollectionRecord.class,
-                      new Where(Ops.and(CollectionRecord.USER_ID.eq(userId),
-                                        CollectionRecord.NEEDS_UPDATE.eq(false))),
+                      new Where(CollectionRecord.USER_ID, userId,
+                                CollectionRecord.NEEDS_UPDATE, false),
                       CollectionRecord.getKey(userId),
                       CollectionRecord.NEEDS_UPDATE, true);
     }
@@ -556,8 +548,8 @@ public class GameRepository extends DepotRepository
     {
         Map<Integer, CollectionRecord> stats = Maps.newHashMap();
         Set<Integer> updates = Sets.newHashSet();
-        for (CollectionRecord record : findAll(CollectionRecord.class,
-                                               new Where(CollectionRecord.USER_ID.in(owners)))) {
+        for (CollectionRecord record : from(CollectionRecord.class).
+                 where(CollectionRecord.USER_ID.in(owners)).select()) {
             if (record.needsUpdate) {
                 updates.add(record.userId);
             }
@@ -646,9 +638,8 @@ public class GameRepository extends DepotRepository
      */
     protected List<News> loadNews (int limit)
     {
-        List<NewsRecord> records = findAll(
-            NewsRecord.class, OrderBy.descending(NewsRecord.REPORTED), new Limit(0, limit));
-        return map(records, NewsRecord.TO_NEWS).toList();
+        return map(from(NewsRecord.class).descending(NewsRecord.REPORTED).limit(limit).select(),
+                   NewsRecord.TO_NEWS).toList();
     }
 
     @Override // from DepotRepository

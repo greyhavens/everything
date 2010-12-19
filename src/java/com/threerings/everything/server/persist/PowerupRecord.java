@@ -17,9 +17,9 @@ public class PowerupRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<PowerupRecord> _R = PowerupRecord.class;
-    public static final ColumnExp OWNER_ID = colexp(_R, "ownerId");
-    public static final ColumnExp TYPE = colexp(_R, "type");
-    public static final ColumnExp CHARGES = colexp(_R, "charges");
+    public static final ColumnExp<Integer> OWNER_ID = colexp(_R, "ownerId");
+    public static final ColumnExp<Powerup> TYPE = colexp(_R, "type");
+    public static final ColumnExp<Integer> CHARGES = colexp(_R, "charges");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

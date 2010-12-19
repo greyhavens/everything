@@ -22,11 +22,11 @@ public class ActionRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<ActionRecord> _R = ActionRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp WHEN = colexp(_R, "when");
-    public static final ColumnExp TARGET = colexp(_R, "target");
-    public static final ColumnExp TARGET_ID = colexp(_R, "targetId");
-    public static final ColumnExp ACTION = colexp(_R, "action");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Timestamp> WHEN = colexp(_R, "when");
+    public static final ColumnExp<Action.Target> TARGET = colexp(_R, "target");
+    public static final ColumnExp<Integer> TARGET_ID = colexp(_R, "targetId");
+    public static final ColumnExp<String> ACTION = colexp(_R, "action");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */

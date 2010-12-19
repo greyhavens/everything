@@ -23,10 +23,10 @@ public class CategoryCommentRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<CategoryCommentRecord> _R = CategoryCommentRecord.class;
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp WHEN = colexp(_R, "when");
-    public static final ColumnExp COMMENTOR_ID = colexp(_R, "commentorId");
-    public static final ColumnExp MESSAGE = colexp(_R, "message");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Timestamp> WHEN = colexp(_R, "when");
+    public static final ColumnExp<Integer> COMMENTOR_ID = colexp(_R, "commentorId");
+    public static final ColumnExp<String> MESSAGE = colexp(_R, "message");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */

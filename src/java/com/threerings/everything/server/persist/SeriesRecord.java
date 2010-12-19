@@ -17,9 +17,9 @@ public class SeriesRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<SeriesRecord> _R = SeriesRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp WHEN = colexp(_R, "when");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Timestamp> WHEN = colexp(_R, "when");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

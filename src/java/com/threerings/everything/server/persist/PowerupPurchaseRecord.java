@@ -15,10 +15,10 @@ public class PowerupPurchaseRecord extends PowerupRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<PowerupPurchaseRecord> _R = PowerupPurchaseRecord.class;
-    public static final ColumnExp AT = colexp(_R, "at");
-    public static final ColumnExp OWNER_ID = colexp(_R, "ownerId");
-    public static final ColumnExp TYPE = colexp(_R, "type");
-    public static final ColumnExp CHARGES = colexp(_R, "charges");
+    public static final ColumnExp<Timestamp> AT = colexp(_R, "at");
+    public static final ColumnExp<Integer> OWNER_ID = colexp(_R, "ownerId");
+    public static final ColumnExp<Powerup> TYPE = colexp(_R, "type");
+    public static final ColumnExp<Integer> CHARGES = colexp(_R, "charges");
     // AUTO-GENERATED: FIELDS END
 
     /** The time at which the powerup was purchased. */

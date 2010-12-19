@@ -19,39 +19,39 @@ public class SlotStatusRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<SlotStatusRecord> _R = SlotStatusRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp STATUS0 = colexp(_R, "status0");
-    public static final ColumnExp STATUS1 = colexp(_R, "status1");
-    public static final ColumnExp STATUS2 = colexp(_R, "status2");
-    public static final ColumnExp STATUS3 = colexp(_R, "status3");
-    public static final ColumnExp STATUS4 = colexp(_R, "status4");
-    public static final ColumnExp STATUS5 = colexp(_R, "status5");
-    public static final ColumnExp STATUS6 = colexp(_R, "status6");
-    public static final ColumnExp STATUS7 = colexp(_R, "status7");
-    public static final ColumnExp STATUS8 = colexp(_R, "status8");
-    public static final ColumnExp STATUS9 = colexp(_R, "status9");
-    public static final ColumnExp STATUS10 = colexp(_R, "status10");
-    public static final ColumnExp STATUS11 = colexp(_R, "status11");
-    public static final ColumnExp STATUS12 = colexp(_R, "status12");
-    public static final ColumnExp STATUS13 = colexp(_R, "status13");
-    public static final ColumnExp STATUS14 = colexp(_R, "status14");
-    public static final ColumnExp STATUS15 = colexp(_R, "status15");
-    public static final ColumnExp FLIPPED0 = colexp(_R, "flipped0");
-    public static final ColumnExp FLIPPED1 = colexp(_R, "flipped1");
-    public static final ColumnExp FLIPPED2 = colexp(_R, "flipped2");
-    public static final ColumnExp FLIPPED3 = colexp(_R, "flipped3");
-    public static final ColumnExp FLIPPED4 = colexp(_R, "flipped4");
-    public static final ColumnExp FLIPPED5 = colexp(_R, "flipped5");
-    public static final ColumnExp FLIPPED6 = colexp(_R, "flipped6");
-    public static final ColumnExp FLIPPED7 = colexp(_R, "flipped7");
-    public static final ColumnExp FLIPPED8 = colexp(_R, "flipped8");
-    public static final ColumnExp FLIPPED9 = colexp(_R, "flipped9");
-    public static final ColumnExp FLIPPED10 = colexp(_R, "flipped10");
-    public static final ColumnExp FLIPPED11 = colexp(_R, "flipped11");
-    public static final ColumnExp FLIPPED12 = colexp(_R, "flipped12");
-    public static final ColumnExp FLIPPED13 = colexp(_R, "flipped13");
-    public static final ColumnExp FLIPPED14 = colexp(_R, "flipped14");
-    public static final ColumnExp FLIPPED15 = colexp(_R, "flipped15");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<SlotStatus> STATUS0 = colexp(_R, "status0");
+    public static final ColumnExp<SlotStatus> STATUS1 = colexp(_R, "status1");
+    public static final ColumnExp<SlotStatus> STATUS2 = colexp(_R, "status2");
+    public static final ColumnExp<SlotStatus> STATUS3 = colexp(_R, "status3");
+    public static final ColumnExp<SlotStatus> STATUS4 = colexp(_R, "status4");
+    public static final ColumnExp<SlotStatus> STATUS5 = colexp(_R, "status5");
+    public static final ColumnExp<SlotStatus> STATUS6 = colexp(_R, "status6");
+    public static final ColumnExp<SlotStatus> STATUS7 = colexp(_R, "status7");
+    public static final ColumnExp<SlotStatus> STATUS8 = colexp(_R, "status8");
+    public static final ColumnExp<SlotStatus> STATUS9 = colexp(_R, "status9");
+    public static final ColumnExp<SlotStatus> STATUS10 = colexp(_R, "status10");
+    public static final ColumnExp<SlotStatus> STATUS11 = colexp(_R, "status11");
+    public static final ColumnExp<SlotStatus> STATUS12 = colexp(_R, "status12");
+    public static final ColumnExp<SlotStatus> STATUS13 = colexp(_R, "status13");
+    public static final ColumnExp<SlotStatus> STATUS14 = colexp(_R, "status14");
+    public static final ColumnExp<SlotStatus> STATUS15 = colexp(_R, "status15");
+    public static final ColumnExp<Long> FLIPPED0 = colexp(_R, "flipped0");
+    public static final ColumnExp<Long> FLIPPED1 = colexp(_R, "flipped1");
+    public static final ColumnExp<Long> FLIPPED2 = colexp(_R, "flipped2");
+    public static final ColumnExp<Long> FLIPPED3 = colexp(_R, "flipped3");
+    public static final ColumnExp<Long> FLIPPED4 = colexp(_R, "flipped4");
+    public static final ColumnExp<Long> FLIPPED5 = colexp(_R, "flipped5");
+    public static final ColumnExp<Long> FLIPPED6 = colexp(_R, "flipped6");
+    public static final ColumnExp<Long> FLIPPED7 = colexp(_R, "flipped7");
+    public static final ColumnExp<Long> FLIPPED8 = colexp(_R, "flipped8");
+    public static final ColumnExp<Long> FLIPPED9 = colexp(_R, "flipped9");
+    public static final ColumnExp<Long> FLIPPED10 = colexp(_R, "flipped10");
+    public static final ColumnExp<Long> FLIPPED11 = colexp(_R, "flipped11");
+    public static final ColumnExp<Long> FLIPPED12 = colexp(_R, "flipped12");
+    public static final ColumnExp<Long> FLIPPED13 = colexp(_R, "flipped13");
+    public static final ColumnExp<Long> FLIPPED14 = colexp(_R, "flipped14");
+    public static final ColumnExp<Long> FLIPPED15 = colexp(_R, "flipped15");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that
@@ -59,13 +59,13 @@ public class SlotStatusRecord extends PersistentRecord
     public static final int SCHEMA_VERSION = 1;
 
     /** Our status columns, in grid position order. */
-    public static ColumnExp[] STATUSES = {
+    public static ColumnExp<?>[] STATUSES = {
         STATUS0, STATUS1, STATUS2, STATUS3, STATUS4, STATUS5, STATUS6, STATUS7,
         STATUS8, STATUS9, STATUS10, STATUS11, STATUS12, STATUS13, STATUS14, STATUS15
     };
 
     /** Our timestamp columns, in grid position order. */
-    public static ColumnExp[] STAMPS = {
+    public static ColumnExp<?>[] STAMPS = {
         FLIPPED0, FLIPPED1, FLIPPED2, FLIPPED3, FLIPPED4, FLIPPED5, FLIPPED6, FLIPPED7,
         FLIPPED8, FLIPPED9, FLIPPED10, FLIPPED11, FLIPPED12, FLIPPED13, FLIPPED14, FLIPPED15
     };

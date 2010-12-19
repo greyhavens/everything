@@ -303,7 +303,7 @@ public class PlayerRepository extends DepotRepository
      */
     public void recordSession (PlayerRecord player, long sessionStamp, String timezone)
     {
-        Map<ColumnExp, Object> updates = Maps.newHashMap();
+        Map<ColumnExp<?>, Object> updates = Maps.newHashMap();
         updates.put(PlayerRecord.LAST_SESSION, new Timestamp(sessionStamp));
         if (!player.timezone.equals(timezone)) {
             updates.put(PlayerRecord.TIMEZONE, timezone);

@@ -15,10 +15,10 @@ public class GiftMessageRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<GiftMessageRecord> _R = GiftMessageRecord.class;
-    public static final ColumnExp OWNER_ID = colexp(_R, "ownerId");
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp RECEIVED = colexp(_R, "received");
-    public static final ColumnExp MESSAGE = colexp(_R, "message");
+    public static final ColumnExp<Integer> OWNER_ID = colexp(_R, "ownerId");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Long> RECEIVED = colexp(_R, "received");
+    public static final ColumnExp<String> MESSAGE = colexp(_R, "message");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

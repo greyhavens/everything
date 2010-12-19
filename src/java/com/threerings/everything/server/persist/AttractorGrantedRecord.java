@@ -15,8 +15,8 @@ public class AttractorGrantedRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<AttractorGrantedRecord> _R = AttractorGrantedRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

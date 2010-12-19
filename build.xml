@@ -77,8 +77,8 @@
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
     <!-- these libraries are needed at runtime -->
     <artifact:dependencies filesetId="rundeps.fileset">
-      <dependency groupId="com.samskivert" artifactId="depot" version="1.0"/>
-      <dependency groupId="com.samskivert" artifactId="samskivert" version="1.1"/>
+      <dependency groupId="com.samskivert" artifactId="depot" version="1.2-SNAPSHOT"/>
+      <dependency groupId="com.samskivert" artifactId="samskivert" version="1.2-SNAPSHOT"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-servlet" version="2.1.0"/>
       <dependency groupId="com.google.inject" artifactId="guice" version="2.0"/>
       <dependency groupId="com.google.inject.extensions"
@@ -364,7 +364,8 @@
     <taskdef name="grecord" classname="com.samskivert.depot.tools.GenRecordTask"
              classpathref="build.classpath"/>
     <!-- make sure the record class files are all compiled -->
-    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"
+           debug="on" deprecation="on" includeAntRuntime="no">
       <classpath refid="build.classpath"/>
       <include name="**/*Record.java"/>
     </javac>

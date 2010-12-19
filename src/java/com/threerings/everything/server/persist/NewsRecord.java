@@ -24,9 +24,9 @@ public class NewsRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<NewsRecord> _R = NewsRecord.class;
-    public static final ColumnExp REPORTED = colexp(_R, "reported");
-    public static final ColumnExp REPORTER_ID = colexp(_R, "reporterId");
-    public static final ColumnExp TEXT = colexp(_R, "text");
+    public static final ColumnExp<Timestamp> REPORTED = colexp(_R, "reported");
+    public static final ColumnExp<Integer> REPORTER_ID = colexp(_R, "reporterId");
+    public static final ColumnExp<String> TEXT = colexp(_R, "text");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */

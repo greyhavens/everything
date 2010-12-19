@@ -19,9 +19,9 @@ public class LikeRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<LikeRecord> _R = LikeRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp LIKE = colexp(_R, "like");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Boolean> LIKE = colexp(_R, "like");
     // AUTO-GENERATED: FIELDS END
 
     public static final int SCHEMA_VERSION = 1;

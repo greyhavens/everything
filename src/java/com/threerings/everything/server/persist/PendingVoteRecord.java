@@ -15,8 +15,8 @@ public class PendingVoteRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<PendingVoteRecord> _R = PendingVoteRecord.class;
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp VOTER_ID = colexp(_R, "voterId");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Integer> VOTER_ID = colexp(_R, "voterId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

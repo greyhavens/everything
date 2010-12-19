@@ -23,12 +23,12 @@ public class CollectionRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<CollectionRecord> _R = CollectionRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp THINGS = colexp(_R, "things");
-    public static final ColumnExp SERIES = colexp(_R, "series");
-    public static final ColumnExp COMPLETE_SERIES = colexp(_R, "completeSeries");
-    public static final ColumnExp GIFTS = colexp(_R, "gifts");
-    public static final ColumnExp NEEDS_UPDATE = colexp(_R, "needsUpdate");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> THINGS = colexp(_R, "things");
+    public static final ColumnExp<Integer> SERIES = colexp(_R, "series");
+    public static final ColumnExp<Integer> COMPLETE_SERIES = colexp(_R, "completeSeries");
+    public static final ColumnExp<Integer> GIFTS = colexp(_R, "gifts");
+    public static final ColumnExp<Boolean> NEEDS_UPDATE = colexp(_R, "needsUpdate");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting this record to a {@link PlayerStats}. */

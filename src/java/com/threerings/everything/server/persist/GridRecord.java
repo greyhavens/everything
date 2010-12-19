@@ -26,11 +26,11 @@ public class GridRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<GridRecord> _R = GridRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp GRID_ID = colexp(_R, "gridId");
-    public static final ColumnExp STATUS = colexp(_R, "status");
-    public static final ColumnExp THING_IDS = colexp(_R, "thingIds");
-    public static final ColumnExp EXPIRES = colexp(_R, "expires");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Integer> GRID_ID = colexp(_R, "gridId");
+    public static final ColumnExp<GridStatus> STATUS = colexp(_R, "status");
+    public static final ColumnExp<int[]> THING_IDS = colexp(_R, "thingIds");
+    public static final ColumnExp<Timestamp> EXPIRES = colexp(_R, "expires");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting persistent records to runtime records. */

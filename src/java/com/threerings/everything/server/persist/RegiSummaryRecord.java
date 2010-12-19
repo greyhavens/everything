@@ -17,8 +17,8 @@ public class RegiSummaryRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<RegiSummaryRecord> _R = RegiSummaryRecord.class;
-    public static final ColumnExp WHEN = colexp(_R, "when");
-    public static final ColumnExp COUNT = colexp(_R, "count");
+    public static final ColumnExp<Date> WHEN = colexp(_R, "when");
+    public static final ColumnExp<Integer> COUNT = colexp(_R, "count");
     // AUTO-GENERATED: FIELDS END
 
     /** The date for which we're summarizing. */

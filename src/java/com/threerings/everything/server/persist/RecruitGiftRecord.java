@@ -20,9 +20,9 @@ public class RecruitGiftRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<RecruitGiftRecord> _R = RecruitGiftRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp EXPIRES = colexp(_R, "expires");
-    public static final ColumnExp GIFT_IDS = colexp(_R, "giftIds");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Timestamp> EXPIRES = colexp(_R, "expires");
+    public static final ColumnExp<int[]> GIFT_IDS = colexp(_R, "giftIds");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

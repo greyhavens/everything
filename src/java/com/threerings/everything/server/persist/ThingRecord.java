@@ -27,15 +27,15 @@ public class ThingRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<ThingRecord> _R = ThingRecord.class;
-    public static final ColumnExp THING_ID = colexp(_R, "thingId");
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp NAME = colexp(_R, "name");
-    public static final ColumnExp RARITY = colexp(_R, "rarity");
-    public static final ColumnExp IMAGE = colexp(_R, "image");
-    public static final ColumnExp DESCRIP = colexp(_R, "descrip");
-    public static final ColumnExp FACTS = colexp(_R, "facts");
-    public static final ColumnExp SOURCE = colexp(_R, "source");
-    public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
+    public static final ColumnExp<Integer> THING_ID = colexp(_R, "thingId");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<String> NAME = colexp(_R, "name");
+    public static final ColumnExp<Rarity> RARITY = colexp(_R, "rarity");
+    public static final ColumnExp<String> IMAGE = colexp(_R, "image");
+    public static final ColumnExp<String> DESCRIP = colexp(_R, "descrip");
+    public static final ColumnExp<String> FACTS = colexp(_R, "facts");
+    public static final ColumnExp<String> SOURCE = colexp(_R, "source");
+    public static final ColumnExp<Integer> CREATOR_ID = colexp(_R, "creatorId");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

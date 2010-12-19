@@ -101,10 +101,10 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadPendingCategories ()
     {
-        List<CategoryRecord> records = findAll(
-            CategoryRecord.class,
-            new Where(CategoryRecord.STATE.eq(Category.State.PENDING_REVIEW)));
-        return map(records, CategoryRecord.TO_CATEGORY);
+        return map(from(CategoryRecord.class).
+                   where(CategoryRecord.STATE.eq(Category.State.PENDING_REVIEW)).
+                   // order from newest to oldest
+                   descending(CategoryRecord.CATEGORY_ID).select(), CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -223,13 +223,12 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<CategoryComment> loadCommentsSince (int creatorId, long sinceStamp)
     {
-        Timestamp since = new Timestamp(sinceStamp);
-        List<CategoryCommentRecord> records = findAll(CategoryCommentRecord.class,
-            CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
-            new Where(Ops.and(CategoryRecord.CREATOR_ID.eq(creatorId),
-                              CategoryCommentRecord.WHEN.greaterEq(since))),
-            OrderBy.descending(CategoryCommentRecord.WHEN));
-        return map(records, CategoryCommentRecord.TO_COMMENT);
+        return map(from(CategoryCommentRecord.class).
+                   join(CategoryCommentRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID)).
+                   where(CategoryRecord.CREATOR_ID.eq(creatorId),
+                         CategoryCommentRecord.WHEN.greaterEq(new Timestamp(sinceStamp))).
+                   descending(CategoryCommentRecord.WHEN).select(),
+                   CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
@@ -355,7 +354,7 @@ public class ThingRepository extends DepotRepository
      */
     public Set<Integer> loadPlayerThings (int ownerId, Rarity minRarity, Rarity maxRarity)
     {
-        List<SQLExpression> whereConds = Lists.newArrayList();
+        List<SQLExpression<?>> whereConds = Lists.newArrayList();
         whereConds.add(CardRecord.OWNER_ID.eq(ownerId));
         if (minRarity != null) {
             whereConds.add(ThingRecord.RARITY.greaterEq(minRarity));
@@ -363,10 +362,8 @@ public class ThingRepository extends DepotRepository
         if (maxRarity != null) {
             whereConds.add(ThingRecord.RARITY.lessEq(maxRarity));
         }
-        return map(findAllKeys(ThingRecord.class, false,
-                               ThingRecord.THING_ID.join(CardRecord.THING_ID),
-                               new Where(Ops.and(whereConds))),
-                   Key.<ThingRecord>toInt()).toSet();
+        return map(from(ThingRecord.class).join(ThingRecord.THING_ID.join(CardRecord.THING_ID)).
+                   where(whereConds).selectKeys(false), Key.<ThingRecord>toInt()).toSet();
     }
 
     /**

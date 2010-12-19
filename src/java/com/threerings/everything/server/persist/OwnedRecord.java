@@ -15,8 +15,8 @@ public class OwnedRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<OwnedRecord> _R = OwnedRecord.class;
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp OWNED = colexp(_R, "owned");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<Integer> OWNED = colexp(_R, "owned");
     // AUTO-GENERATED: FIELDS END
 
     /** The category id of the series in question. */

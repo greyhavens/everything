@@ -26,14 +26,14 @@ public class CategoryRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<CategoryRecord> _R = CategoryRecord.class;
-    public static final ColumnExp CATEGORY_ID = colexp(_R, "categoryId");
-    public static final ColumnExp NAME = colexp(_R, "name");
-    public static final ColumnExp PARENT_ID = colexp(_R, "parentId");
-    public static final ColumnExp CREATOR_ID = colexp(_R, "creatorId");
-    public static final ColumnExp ACTIVE = colexp(_R, "active");
-    public static final ColumnExp STATE = colexp(_R, "state");
-    public static final ColumnExp THINGS = colexp(_R, "things");
-    public static final ColumnExp PAID = colexp(_R, "paid");
+    public static final ColumnExp<Integer> CATEGORY_ID = colexp(_R, "categoryId");
+    public static final ColumnExp<String> NAME = colexp(_R, "name");
+    public static final ColumnExp<Integer> PARENT_ID = colexp(_R, "parentId");
+    public static final ColumnExp<Integer> CREATOR_ID = colexp(_R, "creatorId");
+    public static final ColumnExp<Boolean> ACTIVE = colexp(_R, "active");
+    public static final ColumnExp<Category.State> STATE = colexp(_R, "state");
+    public static final ColumnExp<Integer> THINGS = colexp(_R, "things");
+    public static final ColumnExp<Integer> PAID = colexp(_R, "paid");
     // AUTO-GENERATED: FIELDS END
 
     /** Increment this value if you modify the definition of this persistent object in a way that

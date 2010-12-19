@@ -33,20 +33,20 @@ public class PlayerRecord extends PersistentRecord
 {
     // AUTO-GENERATED: FIELDS START
     public static final Class<PlayerRecord> _R = PlayerRecord.class;
-    public static final ColumnExp USER_ID = colexp(_R, "userId");
-    public static final ColumnExp FACEBOOK_ID = colexp(_R, "facebookId");
-    public static final ColumnExp NAME = colexp(_R, "name");
-    public static final ColumnExp SURNAME = colexp(_R, "surname");
-    public static final ColumnExp BIRTHDATE = colexp(_R, "birthdate");
-    public static final ColumnExp LAST_GIFT_YEAR = colexp(_R, "lastGiftYear");
-    public static final ColumnExp TIMEZONE = colexp(_R, "timezone");
-    public static final ColumnExp IS_EDITOR = colexp(_R, "isEditor");
-    public static final ColumnExp JOINED = colexp(_R, "joined");
-    public static final ColumnExp LAST_SESSION = colexp(_R, "lastSession");
-    public static final ColumnExp COINS = colexp(_R, "coins");
-    public static final ColumnExp FREE_FLIPS = colexp(_R, "freeFlips");
-    public static final ColumnExp FLAGS = colexp(_R, "flags");
-    public static final ColumnExp NEXT_ATTRACTOR = colexp(_R, "nextAttractor");
+    public static final ColumnExp<Integer> USER_ID = colexp(_R, "userId");
+    public static final ColumnExp<Long> FACEBOOK_ID = colexp(_R, "facebookId");
+    public static final ColumnExp<String> NAME = colexp(_R, "name");
+    public static final ColumnExp<String> SURNAME = colexp(_R, "surname");
+    public static final ColumnExp<Integer> BIRTHDATE = colexp(_R, "birthdate");
+    public static final ColumnExp<Integer> LAST_GIFT_YEAR = colexp(_R, "lastGiftYear");
+    public static final ColumnExp<String> TIMEZONE = colexp(_R, "timezone");
+    public static final ColumnExp<Boolean> IS_EDITOR = colexp(_R, "isEditor");
+    public static final ColumnExp<Timestamp> JOINED = colexp(_R, "joined");
+    public static final ColumnExp<Timestamp> LAST_SESSION = colexp(_R, "lastSession");
+    public static final ColumnExp<Integer> COINS = colexp(_R, "coins");
+    public static final ColumnExp<Integer> FREE_FLIPS = colexp(_R, "freeFlips");
+    public static final ColumnExp<Integer> FLAGS = colexp(_R, "flags");
+    public static final ColumnExp<Timestamp> NEXT_ATTRACTOR = colexp(_R, "nextAttractor");
     // AUTO-GENERATED: FIELDS END
 
     /** A function for converting this record to a {@link PlayerName}. */
