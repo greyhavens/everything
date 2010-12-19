@@ -82,9 +82,8 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadCategories (int parentId)
     {
-        return map(findAll(CategoryRecord.class,
-            new Where(CategoryRecord.PARENT_ID.eq(parentId))),
-            CategoryRecord.TO_CATEGORY);
+        return map(from(CategoryRecord.class).where(CategoryRecord.PARENT_ID.eq(parentId)).select(),
+                   CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -92,8 +91,8 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadCategories (Set<Integer> ids)
     {
-        return map(findAll(CategoryRecord.class, new Where(CategoryRecord.CATEGORY_ID.in(ids))),
-            CategoryRecord.TO_CATEGORY);
+        return map(from(CategoryRecord.class).where(CategoryRecord.CATEGORY_ID.in(ids)).select(),
+                   CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -112,11 +111,10 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadNonActiveCategories ()
     {
-        List<CategoryRecord> records = findAll(CategoryRecord.class,
-            CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID),
-            new Where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)),
-            new GroupBy(CategoryRecord.CATEGORY_ID));
-        return map(records, CategoryRecord.TO_CATEGORY);
+        return map(from(CategoryRecord.class).
+                   join(CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID)).
+                   where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)).
+                   groupBy(CategoryRecord.CATEGORY_ID).select(), CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -127,8 +125,8 @@ public class ThingRepository extends DepotRepository
         // load all categories created by this player (will include non-leaves)
         Map<Integer, Category> cats = Maps.newHashMap();
         Set<Integer> parentIds = Sets.newHashSet();
-        for (CategoryRecord crec : findAll(CategoryRecord.class,
-                                           new Where(CategoryRecord.CREATOR_ID.eq(creatorId)))) {
+        for (CategoryRecord crec : from(CategoryRecord.class).
+                 where(CategoryRecord.CREATOR_ID.eq(creatorId)).select()) {
             cats.put(crec.categoryId, CategoryRecord.TO_CATEGORY.apply(crec));
             parentIds.add(crec.parentId);
         }
@@ -136,8 +134,8 @@ public class ThingRepository extends DepotRepository
         // now load up all parents of those categories, only those parents who also have parents
         // are sub-categories, meaning their children are leaves
         final Set<Integer> validParents = Sets.newHashSet();
-        for (CategoryRecord crec : findAll(CategoryRecord.class,
-                                           new Where(CategoryRecord.CATEGORY_ID.in(parentIds)))) {
+        for (CategoryRecord crec : from(CategoryRecord.class).
+                 where(CategoryRecord.CATEGORY_ID.in(parentIds)).select()) {
             if (crec.parentId != 0) {
                 validParents.add(crec.categoryId);
             }
@@ -156,7 +154,7 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadAllCategories ()
     {
-        return map(findAll(CategoryRecord.class), CategoryRecord.TO_CATEGORY);
+        return map(from(CategoryRecord.class).select(), CategoryRecord.TO_CATEGORY);
     }
 
     /**
@@ -166,8 +164,8 @@ public class ThingRepository extends DepotRepository
     public Multiset<Integer> loadEditorInfo ()
     {
         Multiset<Integer> info = HashMultiset.create();
-        Where where = new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE));
-        for (CategoryRecord catrec : findAll(CategoryRecord.class, where)) {
+        for (CategoryRecord catrec : from(CategoryRecord.class).
+                 where(CategoryRecord.STATE.eq(Category.State.ACTIVE)).select()) {
             info.add(catrec.creatorId, catrec.things);
         }
         return info;
@@ -211,10 +209,10 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<CategoryComment> loadComments (int categoryId)
     {
-        List<CategoryCommentRecord> records = findAll(CategoryCommentRecord.class,
-            new Where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)),
-            OrderBy.descending(CategoryCommentRecord.WHEN));
-        return map(records, CategoryCommentRecord.TO_COMMENT);
+        return map(from(CategoryCommentRecord.class).
+                   where(CategoryCommentRecord.CATEGORY_ID.eq(categoryId)).
+                   descending(CategoryCommentRecord.WHEN).select(),
+                   CategoryCommentRecord.TO_COMMENT);
     }
 
     /**
@@ -258,8 +256,8 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Thing> loadThings (Collection<Integer> thingIds)
     {
-        return map(findAll(ThingRecord.class, new Where(ThingRecord.THING_ID.in(thingIds))),
-            ThingRecord.TO_THING);
+        return map(from(ThingRecord.class).where(ThingRecord.THING_ID.in(thingIds)).select(),
+                   ThingRecord.TO_THING);
     }
 
     /**
@@ -267,8 +265,8 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Thing> loadThings (int categoryId)
     {
-        return map(findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))),
-            ThingRecord.TO_THING);
+        return map(from(ThingRecord.class).where(ThingRecord.CATEGORY_ID.eq(categoryId)).select(),
+                   ThingRecord.TO_THING);
     }
 
     /**
@@ -276,8 +274,8 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<ThingCard> loadThingCards (int categoryId)
     {
-        return map(findAll(ThingRecord.class, new Where(ThingRecord.CATEGORY_ID.eq(categoryId))),
-            ThingRecord.TO_CARD);
+        return map(from(ThingRecord.class).where(ThingRecord.CATEGORY_ID.eq(categoryId)).select(),
+                   ThingRecord.TO_CARD);
     }
 
     /**
@@ -285,9 +283,7 @@ public class ThingRepository extends DepotRepository
      */
     public int getThingCount (int categoryId)
     {
-        return load(CountRecord.class,
-                    new FromOverride(ThingRecord.class),
-                    new Where(ThingRecord.CATEGORY_ID.eq(categoryId))).count;
+        return from(ThingRecord.class).where(ThingRecord.CATEGORY_ID.eq(categoryId)).selectCount();
     }
 
     /**
@@ -327,10 +323,9 @@ public class ThingRepository extends DepotRepository
      */
     public Collection<ThingInfoRecord> loadActiveThings ()
     {
-        return findAll(ThingInfoRecord.class,
-                       CacheStrategy.NONE,
-                       ThingRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID),
-                       new Where(CategoryRecord.STATE.eq(Category.State.ACTIVE)));
+        return from(ThingInfoRecord.class).noCache().
+            join(ThingRecord.CATEGORY_ID.join(CategoryRecord.CATEGORY_ID)).
+            where(CategoryRecord.STATE.eq(Category.State.ACTIVE)).select();
     }
 
     /**
