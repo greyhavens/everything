@@ -422,11 +422,12 @@ public class GameRepository extends DepotRepository
      */
     public boolean flipSlot (int userId, int position)
     {
-        return updatePartial(SlotStatusRecord.class,
-                             new Where(SlotStatusRecord.USER_ID, userId,
-                                       SlotStatusRecord.STATUSES[position], SlotStatus.UNFLIPPED),
-                             SlotStatusRecord.getKey(userId),
-                             SlotStatusRecord.STATUSES[position], SlotStatus.FLIPPED) == 1;
+        return updatePartial(
+            SlotStatusRecord.class,
+            new Where(SlotStatusRecord.USER_ID, userId,
+                      SlotStatusRecord.STATUSES.get(position), SlotStatus.UNFLIPPED),
+            SlotStatusRecord.getKey(userId),
+            SlotStatusRecord.STATUSES.get(position), SlotStatus.FLIPPED) == 1;
     }
 
     /**
@@ -435,8 +436,8 @@ public class GameRepository extends DepotRepository
     public void resetSlot (int userId, int position)
     {
         updatePartial(SlotStatusRecord.getKey(userId),
-                      SlotStatusRecord.STATUSES[position], SlotStatus.UNFLIPPED,
-                      SlotStatusRecord.STAMPS[position], 0L);
+                      SlotStatusRecord.STATUSES.get(position), SlotStatus.UNFLIPPED,
+                      SlotStatusRecord.STAMPS.get(position), 0L);
     }
 
     /**
@@ -445,7 +446,7 @@ public class GameRepository extends DepotRepository
     public void updateSlot (int userId, int position, long stamp)
     {
         updatePartial(SlotStatusRecord.getKey(userId),
-                      SlotStatusRecord.STAMPS[position], stamp);
+                      SlotStatusRecord.STAMPS.get(position), stamp);
     }
 
     /**
@@ -456,9 +457,9 @@ public class GameRepository extends DepotRepository
     {
         updatePartial(SlotStatusRecord.class,
                       new Where(SlotStatusRecord.USER_ID, userId,
-                                SlotStatusRecord.STATUSES[position], from),
+                                SlotStatusRecord.STATUSES.get(position), from),
                       SlotStatusRecord.getKey(userId),
-                      SlotStatusRecord.STATUSES[position], to);
+                      SlotStatusRecord.STATUSES.get(position), to);
     }
 
     /**

@@ -3,6 +3,9 @@
 
 package com.threerings.everything.server.persist;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.samskivert.depot.Key;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.annotation.Id;
@@ -59,16 +62,16 @@ public class SlotStatusRecord extends PersistentRecord
     public static final int SCHEMA_VERSION = 1;
 
     /** Our status columns, in grid position order. */
-    public static ColumnExp<?>[] STATUSES = {
+    @SuppressWarnings("unchecked")
+    public static List<ColumnExp<SlotStatus>> STATUSES = Arrays.asList(
         STATUS0, STATUS1, STATUS2, STATUS3, STATUS4, STATUS5, STATUS6, STATUS7,
-        STATUS8, STATUS9, STATUS10, STATUS11, STATUS12, STATUS13, STATUS14, STATUS15
-    };
+        STATUS8, STATUS9, STATUS10, STATUS11, STATUS12, STATUS13, STATUS14, STATUS15);
 
     /** Our timestamp columns, in grid position order. */
-    public static ColumnExp<?>[] STAMPS = {
+    @SuppressWarnings("unchecked")
+    public static List<ColumnExp<Long>> STAMPS = Arrays.asList(
         FLIPPED0, FLIPPED1, FLIPPED2, FLIPPED3, FLIPPED4, FLIPPED5, FLIPPED6, FLIPPED7,
-        FLIPPED8, FLIPPED9, FLIPPED10, FLIPPED11, FLIPPED12, FLIPPED13, FLIPPED14, FLIPPED15
-    };
+        FLIPPED8, FLIPPED9, FLIPPED10, FLIPPED11, FLIPPED12, FLIPPED13, FLIPPED14, FLIPPED15);
 
     /** The user for whom we're tracking grid status. */
     @Id public int userId;
