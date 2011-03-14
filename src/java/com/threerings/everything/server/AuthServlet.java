@@ -37,7 +37,7 @@ public class AuthServlet extends AppServlet
     public static final String SEED_COOKIE = "s";
 
     @Override // from HttpServlet
-    protected void doGet (HttpServletRequest req, HttpServletResponse rsp)
+    protected void doPost (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
     {
         // if we have auth info on our URL, use that (for gshell)
@@ -130,6 +130,15 @@ public class AuthServlet extends AppServlet
                 break;
             }
         }
+    }
+
+    @Override // from HttpServlet
+    protected void doGet (HttpServletRequest req, HttpServletResponse rsp)
+        throws IOException
+    {
+        // Facebook now sends a POST request when loading our app iframe, but we'll still support
+        // GET just in case the winds blow back in that direction
+        doPost(req, rsp);
     }
 
     protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
