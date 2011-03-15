@@ -305,11 +305,11 @@ public class GameRepository extends DepotRepository
             ownerIds = ids;
         }
         Multiset<Integer> data = HashMultiset.create();
-        for (Tuple2<Integer, Integer> orec : from(CardRecord.class).
+        for (Tuple2<Integer, Number> orec : from(CardRecord.class).
                  where(CardRecord.OWNER_ID.in(ownerIds), CardRecord.THING_ID.in(thingIds)).
                  groupBy(CardRecord.OWNER_ID).
                  select(CardRecord.OWNER_ID, Funcs.countDistinct(CardRecord.THING_ID))) {
-            data.add(Math.abs(orec.a), orec.b);
+            data.add(Math.abs(orec.a), orec.b.intValue());
         }
         return data;
     }
