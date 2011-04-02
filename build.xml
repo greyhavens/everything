@@ -77,7 +77,7 @@
   <target name="mavendeps" depends="prepare" description="Fetches our dependencies via Maven.">
     <!-- these libraries are needed at runtime -->
     <artifact:dependencies filesetId="rundeps.fileset">
-      <dependency groupId="com.samskivert" artifactId="depot" version="1.3-SNAPSHOT"/>
+      <dependency groupId="com.samskivert" artifactId="depot" version="1.3"/>
       <dependency groupId="com.samskivert" artifactId="samskivert" version="1.2"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-servlet" version="2.1.0"/>
       <dependency groupId="com.google.inject" artifactId="guice" version="2.0"/>
@@ -99,8 +99,8 @@
       <remoteRepository refid="ooo.maven.depends.repo"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-shared" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.threerings" artifactId="threerings" version="1.1-SNAPSHOT"/>
-      <dependency groupId="com.threerings" artifactId="database-utils" version="1.0-SNAPSHOT"/>
+      <dependency groupId="com.threerings" artifactId="threerings" version="1.1"/>
+      <dependency groupId="com.threerings" artifactId="database-utils" version="1.0"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="1.0"/>
 
       <dependency groupId="extern" artifactId="s3lib" version="r335"/>
