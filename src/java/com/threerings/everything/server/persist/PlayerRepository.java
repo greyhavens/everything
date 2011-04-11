@@ -564,7 +564,7 @@ public class PlayerRepository extends DepotRepository
     }
 
     /** Helper for {@link #loadIdlePlayers}. */
-    protected SQLExpression fromTo (int daysAgo, int hour)
+    protected SQLExpression<?> fromTo (int daysAgo, int hour)
     {
         Calendars.Builder builder = Calendars.now().zeroTime().addDays(-daysAgo).addHours(hour);
         Timestamp from = builder.toTimestamp();
