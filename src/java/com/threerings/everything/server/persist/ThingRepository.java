@@ -111,10 +111,12 @@ public class ThingRepository extends DepotRepository
      */
     public Sequence<Category> loadNonActiveCategories ()
     {
-        return map(from(CategoryRecord.class).
-                   join(CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID)).
-                   where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)).
-                   groupBy(CategoryRecord.CATEGORY_ID).select(), CategoryRecord.TO_CATEGORY);
+        Set<Integer> catIds = Sets.newHashSet();
+        catIds.addAll(from(CategoryRecord.class).
+                      join(CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID)).
+                      where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)).
+                      groupBy(CategoryRecord.CATEGORY_ID).select(CategoryRecord.CATEGORY_ID));
+        return loadCategories(catIds);
     }
 
     /**
