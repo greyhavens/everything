@@ -94,7 +94,7 @@
       <dependency groupId="com.google.code.facebookapi"
                   artifactId="facebook-java-api" version="3.0.4"/>
       <dependency groupId="org.json" artifactId="json" version="20090211"/>
-      <dependency groupId="postgresql" artifactId="postgresql" version="8.3-606.jdbc4"/>
+      <dependency groupId="postgresql" artifactId="postgresql" version="9.0-801.jdbc4"/>
 
       <remoteRepository refid="ooo.maven.depends.repo"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
