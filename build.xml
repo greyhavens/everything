@@ -99,7 +99,7 @@
       <remoteRepository refid="ooo.maven.depends.repo"/>
       <dependency groupId="com.threerings" artifactId="samsara-app" version="0.0-SNAPSHOT"/>
       <dependency groupId="com.threerings" artifactId="samsara-shared" version="0.0-SNAPSHOT"/>
-      <dependency groupId="com.threerings" artifactId="threerings" version="1.1"/>
+      <dependency groupId="com.threerings" artifactId="threerings" version="1.2"/>
       <dependency groupId="com.threerings" artifactId="database-utils" version="1.0"/>
       <dependency groupId="com.threerings" artifactId="pulse" version="1.0"/>
 
@@ -146,7 +146,7 @@
   </target>
 
   <target name="compile" depends="prepare" description="Compiles the source code.">
-    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on"
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" source="1.6" target="1.6"
            optimize="off" deprecation="on" includeAntRuntime="no">
       <classpath refid="build.classpath"/>
       <compilerarg value="-Xlint"/>
@@ -238,17 +238,8 @@
   </target>
 
   <target name="flashui" depends="prepare,-prep-flex" description="Compiles our Flash UI swf.">
-    <dirname property="abs.flexsdk.dir" file="${flexsdk.dir}/somefile.txt"/>
-    <copy file="etc/flex-config.xml.in" tofile="${deploy.dir}/flex-config.xml">
-      <filterset>
-        <filter token="flex_sdk_dir" value="${abs.flexsdk.dir}"/>
-        <filter token="flex_url" value="${flex_url}"/>
-      </filterset>
-    </copy>
-
     <java jar="${flexsdk.dir}/lib/mxmlc.jar" fork="true" failonerror="true">
-      <arg value="-load-config"/>
-      <arg value="${deploy.dir}/flex-config.xml"/>
+      <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
       <arg value="-compiler.source-path=${asrc.dir}/"/>
       <arg value="-default-size"/>
       <arg value="600"/>
@@ -271,7 +262,7 @@
     </jar>
   </target>
 
-  <target name="distall" depends="mavendeps,version,dist,flashui,gclient"
+  <target name="distall" depends="mavendeps,version,dist,gclient"
           description="Fetches dependencies and builds everything.">
   </target>
 
@@ -364,7 +355,7 @@
     <taskdef name="grecord" classname="com.samskivert.depot.tools.GenRecordTask"
              classpathref="build.classpath"/>
     <!-- make sure the record class files are all compiled -->
-    <javac srcdir="${src.dir}" destdir="${classes.dir}"
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" source="1.6" target="1.6"
            debug="on" deprecation="on" includeAntRuntime="no">
       <classpath refid="build.classpath"/>
       <include name="**/*Record.java"/>
