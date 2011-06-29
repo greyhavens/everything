@@ -84,6 +84,7 @@
       <dependency groupId="com.google.inject.extensions"
                   artifactId="guice-multibindings" version="2.0"/>
       <dependency groupId="com.google.guava" artifactId="guava" version="r05"/>
+      <dependency groupId="com.google.code.gson" artifactId="gson" version="1.7.1"/>
       <dependency groupId="log4j" artifactId="log4j" version="1.2.16"/>
       <dependency groupId="javax.mail" artifactId="mail" version="1.4.1"/>
       <dependency groupId="javax.servlet" artifactId="servlet-api" version="2.5"/>
@@ -209,7 +210,9 @@
     <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
         <path refid="buildlibs.classpath"/>
-        <pathelement path="${deploy.dir}/lib/samsara-app-*.jar"/>
+        <fileset dir="${deploy.dir}/lib">
+          <include name="samsara-app*.jar"/>
+        </fileset>
         <pathelement path="${src.dir}"/>
         <pathelement path="${gsrc.dir}"/>
       </classpath>
