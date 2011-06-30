@@ -338,7 +338,7 @@ public class EverythingClient
         }
 
         setContent(null);
-        initFacebook(Build.facebookKey(data.candidate));
+        initFacebook(Build.facebookAppID(data.candidate));
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
         History.fireCurrentHistoryState();
     }
@@ -352,19 +352,22 @@ public class EverythingClient
         return new Date().getTimezoneOffset();
     }-*/;
 
-    protected static native void initFacebook (String apiKey) /*-{
-        // $wnd.FB_RequireFeatures(["XFBML"], function () {
-        //     $wnd.FB.init(apiKey, "xd_receiver.html", { doNotUseCachedConnectState: true });
-        // });
-
+    protected static native void initFacebook (String appId) /*-{
         $wnd.fbAsyncInit = function () {
-            $wnd.FB.init({ appId: apiKey, status: true, cookie: true });
+            $wnd.FB.init({ appId: appId, status: true, cookie: true });
             // start up our iframe resizer if we're running in an iframe
             if ($wnd != $wnd.top) {
                 $wnd.FB.Canvas.setAutoResize();
             }
-            console.log("Facebook initialized...");
+            $wnd.FB.XFBML.parse(); // grind through once on init
         };
+
+        (function() {
+            var e = document.createElement('script');
+            e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+            e.async = true;
+            $wnd.document.getElementById('fb-root').appendChild(e);
+        }());
     }-*/;
 
     protected SessionData _data;
