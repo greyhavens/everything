@@ -38,9 +38,9 @@ public class CoinPrices
     /** The deals on offer. */
     public static final Offer[] OFFERS = new Offer[] {
         // don't reuse unique ids
-        new Offer(1, State.ACTIVE, 5000, 500),
-        new Offer(2, State.ACTIVE, 11000, 1000),
-        new Offer(3, State.ACTIVE, 24000, 20000),
+        new Offer(1, State.ACTIVE, 5000, 50),
+        new Offer(2, State.ACTIVE, 11000, 100),
+        new Offer(3, State.ACTIVE, 24000, 200),
     };
 
     /**
