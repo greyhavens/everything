@@ -61,7 +61,7 @@ public class CreditsServlet extends HttpServlet
     public void doPost (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
     {
-        log.info("CreditsServlet.doPost", "params", getPrettyParams(req));
+        log.debug("CreditsServlet.doPost", "params", getPrettyParams(req));
 
         // Check the fb_sig parameter to make sure this request came from Facebook's servers.
         if (!validateFacebookSig(req)) {
