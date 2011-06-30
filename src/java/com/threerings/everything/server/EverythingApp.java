@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -15,14 +16,18 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import com.samskivert.util.StringUtil;
-import com.threerings.user.OOOUser;
+
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.facebook.server.AbstractFacebookApp;
 import com.threerings.samsara.app.server.AbstractSamsaraAppModule;
 import com.threerings.samsara.shared.App;
+import com.threerings.user.OOOUser;
+
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Build;
+import com.threerings.everything.server.credits.CreditsServlet;
 import com.threerings.everything.server.persist.PlayerRepository;
+
 import static com.threerings.everything.Log.log;
 
 /**
@@ -49,6 +54,7 @@ public class EverythingApp extends AbstractFacebookApp
             serve(ShowInviteServlet.class).at("/showinvite");
             serve(MediaUploadServlet.class).at("/upload");
             serve(CardImageServlet.class).at("/cardimg");
+            serve(CreditsServlet.class).at("/fbcredits");
 //            serve(TrophyImageServlet.class).at("/trophyimg");
             serve(EverythingServlet.class).at("/" +EverythingServlet.ENTRY_POINT);
             serve(GameServlet.class).at("/" + GameServlet.ENTRY_POINT);
