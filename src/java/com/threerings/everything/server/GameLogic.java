@@ -765,7 +765,6 @@ public class GameLogic
 
     @Inject protected EverythingApp _app;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingLogic _thingLogic;

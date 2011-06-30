@@ -149,9 +149,11 @@ public class PlayerLogic
                     fbclient.dashboard_multiAddNews(
                         Collections.singleton(toFBId), Collections.singleton(item));
 
+                    // disabled Kontagent for now since we don't really care
+                    //
                     // tell Kontagent that we sent a notification
-                    _kontLogic.reportAction(
-                        Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
+                    // _kontLogic.reportAction(
+                    //     Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
                 } catch (Exception e) {
                     log.info("Failed to send Facebook notification", "to", toFBId,
                              "item", item, "error", e.getMessage());

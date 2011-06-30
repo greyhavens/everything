@@ -160,7 +160,8 @@ public class AuthServlet extends AppServlet
         String recipId = StringUtil.getOr(FBParam.USER.getStringValue(req),
                                           FBParam.CANVAS_USER.getStringValue(req));
         String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
-        _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
+        // disabled Kontagent for now since we don't really care
+        // _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
     }
 
     protected Random _rando = new Random();

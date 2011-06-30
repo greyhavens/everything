@@ -85,8 +85,9 @@ public class InviteServlet extends AppServlet
                 log.warning("Missing Kontagent tracking id for invitation.", "who", player.who(),
                             "target", targetFBIds);
             } else {
-                _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId,
-                                        "r", Joiner.on(",").join(targetFBIds), "u", tracking);
+                // disabled Kontagent for now since we don't really care
+                // _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId,
+                //                         "r", Joiner.on(",").join(targetFBIds), "u", tracking);
             }
 
         } catch (Exception e) {
@@ -169,7 +170,7 @@ public class InviteServlet extends AppServlet
     @Inject protected EverythingApp _app;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected KontagentLogic _kontLogic;
+    // @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;

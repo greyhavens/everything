@@ -332,8 +332,9 @@ public class EverythingServlet extends EveryServiceServlet
     // from interface EverythingService
     public void storyPosted (String tracking) throws ServiceException
     {
-        _kontLogic.reportAction(
-            Kontagent.POST, "s", requirePlayer().facebookId, "tu", "stream", "u", tracking);
+        // disabled Kontagent for now since we don't really care
+        // _kontLogic.reportAction(
+        //     Kontagent.POST, "s", requirePlayer().facebookId, "tu", "stream", "u", tracking);
     }
 
     protected void aggregateFeed (int callerId, List<FeedItem> items)
