@@ -11,7 +11,6 @@ import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
 import client.game.CoinLabel;
-import client.ui.XFBML;
 import client.util.Args;
 import client.util.Context;
 import client.util.Page;
@@ -55,12 +54,15 @@ public class HeaderPanel extends FlowPanel
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("News", Page.ADMIN_NEWS));
         }
-        // add our kontagent "page request" pixel to the extras
-        Image tracker = Widgets.newImage(kontagentHello);
-        tracker.setWidth("1px");
-        tracker.setHeight("1px");
-        extras.add(tracker);
-        bits.at(0, col++).setWidget(extras).alignCenter();
+
+        // disabled Kontagent, since we don't really care about Everything stats
+        //
+        // // add our kontagent "page request" pixel to the extras
+        // Image tracker = Widgets.newImage(kontagentHello);
+        // tracker.setWidth("1px");
+        // tracker.setHeight("1px");
+        // extras.add(tracker);
+        // bits.at(0, col++).setWidget(extras).alignCenter();
 
         bits.at(0, col++).setWidget(new CoinLabel("You have: ", ctx.getCoins())).alignRight();
         add(bits);
@@ -74,13 +76,6 @@ public class HeaderPanel extends FlowPanel
             right().setWidget(Args.createLink("Friends", Page.FRIENDS), "machine").
             right().setWidget(Args.createLink("Credits", Page.CREDITS), "machine");
         add(links);
-    }
-
-    @Override // from Widget
-    protected void onLoad ()
-    {
-        super.onLoad();
-        XFBML.parse(this);
     }
 
     protected static String getHello (String name)
