@@ -172,29 +172,32 @@ public class ThingDialog
                                              String everyURL, String everyURLText,
                                              String prompt,
                                              Command onComplete, Command onIncomplete) /*-{
-        var attachment = {
-            'name': title,
-            'href': everyURL,
-            'description': descrip,
-            'media': [{ 'type': 'image',
-                        'src': imageURL,
-                        'href': cardURL }],
-            'properties': {'Category': categories,
-                           'Rarity': rarity,
-                           'Join the fun': {'text': everyURLText,
-                                            'href': everyURL }},
+        var publish = {
+            method: "stream.publish",
+            attachment: {
+                name: title,
+                href: everyURL,
+                description: descrip,
+                media: [{ type: 'image',
+                          src: imageURL,
+                          href: cardURL }],
+                properties: {'Category': categories,
+                             'Rarity': rarity,
+                             'Join the fun': { text: everyURLText,
+                                               href: everyURL }},
+            },
+            actions: [{ name: "Collect Everything",
+                        link: everyURL }],
+            target_id: targetId,
+            user_message_prompt: prompt, // TODO: this seems not to work
         };
-        var actions = [{ "text": "Collect Everything",
-                         "href": everyURL }];
-        $wnd.FB.Connect.streamPublish("", attachment, actions, targetId, prompt,
-            function (postId, exception) {
-                if ((postId != null) && (postId != "null")) { // holy shit, what a fiasco
-                    onComplete.@com.google.gwt.user.client.Command::execute()();
-                } else {
-                    onIncomplete.@com.google.gwt.user.client.Command::execute()();
-                }
+        $wnd.FB.ui(publish, function (rsp) {
+            if (rsp && rsp.post_id) {
+                onComplete.@com.google.gwt.user.client.Command::execute()();
+            } else {
+                onIncomplete.@com.google.gwt.user.client.Command::execute()();
             }
-        );
+        });
     }-*/;
 
     protected static final EverythingServiceAsync _everysvc = GWT.create(EverythingService.class);
