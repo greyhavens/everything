@@ -86,7 +86,7 @@ public class CreditsServlet extends HttpServlet
         if (ItemDescription.METHOD_NAME.equals(method)) {
             try {
                 CoinsItem item = _coiner.get();
-                item.init(Integer.parseInt(req.getParameter(ORDER_INFO)));
+                item.init(_gson.fromJson(req.getParameter(ORDER_INFO), Integer.class));
                 return new ItemDescription(item);
             } catch (Exception e) {
                 log.warning("Failed to process item description request",
