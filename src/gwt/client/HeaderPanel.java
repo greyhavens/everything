@@ -62,7 +62,7 @@ public class HeaderPanel extends FlowPanel
         // tracker.setWidth("1px");
         // tracker.setHeight("1px");
         // extras.add(tracker);
-        // bits.at(0, col++).setWidget(extras).alignCenter();
+        bits.at(0, col++).setWidget(extras).alignCenter();
 
         bits.at(0, col++).setWidget(new CoinLabel("You have: ", ctx.getCoins())).alignRight();
         add(bits);
