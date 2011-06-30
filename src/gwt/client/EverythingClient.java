@@ -42,7 +42,7 @@ import client.game.BrowsePage;
 import client.game.CreditsPage;
 import client.game.FlipPage;
 import client.game.FriendsPage;
-import client.game.GetCoinsPage;
+import client.game.BuyCoinsPage;
 import client.game.LandingPage;
 import client.game.ShopPage;
 import client.game.TermsPage;
@@ -269,7 +269,7 @@ public class EverythingClient
             setContent(new ShopPage(this));
             return;
         case GET_COINS:
-            setContent(new GetCoinsPage(this, args.get(0, "")));
+            setContent(new BuyCoinsPage(this, args.get(0, "")));
             return;
         case FRIENDS:
             if (!(_content instanceof FriendsPage)) {
@@ -353,16 +353,18 @@ public class EverythingClient
     }-*/;
 
     protected static native void initFacebook (String apiKey) /*-{
-        $wnd.FB_RequireFeatures(["XFBML"], function () {
-            $wnd.FB.init(apiKey, "xd_receiver.html");
-        });
+        // $wnd.FB_RequireFeatures(["XFBML"], function () {
+        //     $wnd.FB.init(apiKey, "xd_receiver.html", { doNotUseCachedConnectState: true });
+        // });
 
-        // start up our iframe resizer once FB_Init is called by GWT
-        if ($wnd != $wnd.top) {
-            $wnd.FB.Bootstrap.ensureInit(function () {
-                $wnd.FB.CanvasClient.startTimerToSizeToContent();
-            });
-        }
+        $wnd.fbAsyncInit = function () {
+            $wnd.FB.init({ appId: apiKey, status: true, cookie: true });
+            // start up our iframe resizer if we're running in an iframe
+            if ($wnd != $wnd.top) {
+                $wnd.FB.Canvas.setAutoResize();
+            }
+            console.log("Facebook initialized...");
+        };
     }-*/;
 
     protected SessionData _data;

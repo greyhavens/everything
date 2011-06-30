@@ -21,7 +21,8 @@ import client.util.Context;
 import client.util.Page;
 
 /**
- * Displays the billing website wrapped in an iframe;
+ * Displays an landing page for buying coins which links to the OOO billing system. (Obsolete but
+ * kept around for posterity.)
  */
 public class GetCoinsPage extends FlowPanel
 {

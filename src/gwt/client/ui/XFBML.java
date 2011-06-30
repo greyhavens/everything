@@ -152,9 +152,7 @@ public class XFBML
 
     protected static native void nativeParse (Element elem) /*-{
         try {
-            $wnd.FB.Bootstrap.ensureInit(function () {
-                $wnd.FB.XFBML.Host.parseDomElement(elem);
-            });
+            $wnd.FB.XFBML.parse(elem);
         } catch (e) {
             if ($wnd.console) {
                 $wnd.console.log("Failed to reparse XFBML [error=" + e + "]");

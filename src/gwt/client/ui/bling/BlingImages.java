@@ -64,4 +64,13 @@ public interface BlingImages extends ImageBundle
 
     @Resource("sms_over.png")
     AbstractImagePrototype sms_over ();
+
+    @Resource("fbcredit.png")
+    AbstractImagePrototype fbcredit ();
+
+    @Resource("buywithfb_up.png")
+    AbstractImagePrototype buywithfb_up ();
+
+    @Resource("buywithfb_down.png")
+    AbstractImagePrototype buywithfb_down ();
 }
