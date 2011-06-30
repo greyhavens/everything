@@ -68,29 +68,15 @@ public class BuyCoinsPage extends FlowPanel
     }
 
     protected native void startPurchase (String offerId) /*-{
-        var order_info = 'abc123';
-        var obj = {
+        var pay = {
           method: 'pay',
           order_info: offerId,
           purchase_type: 'item'
         };
-        var callback = function(data) {
+        $wnd.FB.ui(pay, function(data) {
             this.@client.game.BuyCoinsPage::onPurchaseComplete(Ljava/lang/String;)(
                 data['order_id']);
-            // if (data['order_id']) {
-            //     return true;
-            // } else {
-            //     //handle errors here
-            //     return false;
-            // }
-        };
-        if ($wnd.FB) {
-            $wnd.FB.ui(obj, callback);
-            console.log("Called FB ui...");
-        } else {
-            this.@client.game.BuyCoinsPage::onPurchaseComplete(Ljava/lang/String;)(
-                "FB.ui is null!");
-        }
+        });
     }-*/;
 
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
