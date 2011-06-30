@@ -23,6 +23,12 @@ public class Build
         return "@build_time@";
     }
 
+    /** Returns our Facebook app ID. */
+    public static String facebookAppID (boolean candidate)
+    {
+        return candidate ? "@candidate_facebook_appid@" : "@facebook_appid@";
+    }
+
     /** Returns our Facebook API key. */
     public static String facebookKey (boolean candidate)
     {
