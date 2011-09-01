@@ -98,15 +98,6 @@ public class AuthServlet extends AppServlet
             rsp.addCookie(c);
         }
 
-        // TEMP
-        log.info("Handling auth request", "scheme", req.getScheme(), "uri", req.getRequestURI());
-        java.util.Enumeration<?> hnames = req.getHeaderNames();
-        while (hnames.hasMoreElements()) {
-            String hname = String.valueOf(hnames.nextElement());
-            log.info(" " + hname + "=" + req.getHeader(hname));
-        }
-        // END TEMP
-
         // otherwise pass the buck to the app servlet, it may have to get jiggy
         if (doFacebookAuth(req, rsp, _app.getFacebookAppURL(req.getScheme()), null, indexPath)) {
             // if our authentication process actually directed the user to the app, we can emit our
