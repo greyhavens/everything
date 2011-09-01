@@ -115,7 +115,7 @@ public class EverythingApp extends AbstractFacebookApp
      */
     public String getHelloURL (Kontagent type, String tracking, Object... args)
     {
-        String url = getFacebookAppURL() + "?kc=" + type.code + "&t=" + tracking;
+        String url = getFacebookAppURL("http") + "?kc=" + type.code + "&t=" + tracking;
         if (args.length > 0) {
             url += "&token=" + Joiner.on("~").join(args);
         }
@@ -129,7 +129,7 @@ public class EverythingApp extends AbstractFacebookApp
      */
     public String getHelloURL (String vector, Object... args)
     {
-        String url = getFacebookAppURL() + "?vec=" + vector;
+        String url = getFacebookAppURL("http") + "?vec=" + vector;
         if (args.length > 0) {
             url += "&token=" + Joiner.on("~").join(args);
         }

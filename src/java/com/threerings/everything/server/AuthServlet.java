@@ -99,7 +99,7 @@ public class AuthServlet extends AppServlet
         }
 
         // otherwise pass the buck to the app servlet, it may have to get jiggy
-        if (doFacebookAuth(req, rsp, _app.getFacebookAppURL(), null, indexPath)) {
+        if (doFacebookAuth(req, rsp, _app.getFacebookAppURL(req.getScheme()), null, indexPath)) {
             // if our authentication process actually directed the user to the app, we can emit our
             // event to Kontagent, otherwise we're in the middle of swizzling them and need to hold
             // off until the swizzling process is complete

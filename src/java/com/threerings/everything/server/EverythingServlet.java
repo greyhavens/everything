@@ -81,7 +81,7 @@ public class EverythingServlet extends EveryServiceServlet
             data.news = news;
         }
         data.powerups = Maps.newHashMap();
-        data.everythingURL = _app.getFacebookAppURL();
+        data.everythingURL = _app.getFacebookAppURL("http");
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
         data.likes = Lists.newArrayList();
         data.dislikes = Lists.newArrayList();
