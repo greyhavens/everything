@@ -37,6 +37,7 @@ import com.samskivert.util.Comparators;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
+import com.threerings.user.ExternalAuther;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
@@ -99,7 +100,8 @@ public class EverythingServlet extends EveryServiceServlet
 
         PlayerRecord player = _playerRepo.loadPlayer(user.userId);
         if (player == null) {
-            Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
+            Tuple<String, String> fbinfo = _userLogic.getExtAuthInfo(
+                ExternalAuther.FACEBOOK, user.userId);
             if (fbinfo == null || fbinfo.right == null) {
                 log.info("Have no session key for user, can't create player", "who", user.userId,
                          "fbinfo", fbinfo);
@@ -200,7 +202,8 @@ public class EverythingServlet extends EveryServiceServlet
 
             // check to see if they made FB friends with any existing Everything players (this also
             // updates other Facebook ephemera like first and last name)
-            Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
+            Tuple<String, String> fbinfo = _userLogic.getExtAuthInfo(
+                ExternalAuther.FACEBOOK, user.userId);
             if (fbinfo != null) {
                 updateFacebookInfo(player, fbinfo.right);
             }
@@ -366,8 +369,8 @@ public class EverythingServlet extends EveryServiceServlet
                     List<String> fbFriendIds = Lists.transform(
                         fbclient.friends_get().getUid(), Functions.toStringFunction());
                     // map those friends to Samsara user ids
-                    Set<Integer> allFriendIds =
-                        Sets.newHashSet(_userLogic.mapFacebookIds(fbFriendIds).values());
+                    Set<Integer> allFriendIds = Sets.newHashSet(
+                        _userLogic.mapExtAuthIds(ExternalAuther.FACEBOOK, fbFriendIds).values());
                     // retain only those that have Everything accounts
                     allFriendIds.retainAll(_playerRepo.loadPlayerNames(allFriendIds).keySet());
                     // load our current friends

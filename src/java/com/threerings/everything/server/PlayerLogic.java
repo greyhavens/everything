@@ -24,13 +24,15 @@ import com.google.code.facebookapi.FacebookJaxbRestClient;
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Tuple;
 
+import com.threerings.samsara.common.UserLogic;
+import com.threerings.user.ExternalAuther;
+
 import com.threerings.everything.client.GameCodes;
 import com.threerings.everything.client.Kontagent;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
-import com.threerings.samsara.common.UserLogic;
 
 import static com.threerings.everything.Log.log;
 
@@ -96,7 +98,8 @@ public class PlayerLogic
      */
     public void postFacebookStory (PlayerRecord user, String todo)
     {
-        Tuple<String, String> fbinfo = _userLogic.getFacebookAuthInfo(user.userId);
+        Tuple<String, String> fbinfo = _userLogic.getExtAuthInfo(
+            ExternalAuther.FACEBOOK, user.userId);
         if (fbinfo == null || fbinfo.right == null) {
             log.warning("Can't post Facebook story, have no Facebook authinfo?", "who", user.who(),
                         "fbinfo", fbinfo);
@@ -133,7 +136,8 @@ public class PlayerLogic
             return; // noop, some day we'll support players who aren't on Facebook
         }
 
-        final Tuple<String, String> finfo = _userLogic.getFacebookAuthInfo(from.userId);
+        final Tuple<String, String> finfo = _userLogic.getExtAuthInfo(
+            ExternalAuther.FACEBOOK, from.userId);
         if (finfo == null || finfo.right == null) {
             log.warning("Missing Facebook data for notification", "from", from.who(),
                         "finfo", finfo);

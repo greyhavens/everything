@@ -20,7 +20,7 @@ import com.threerings.facebook.FBParam;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.server.AppServlet;
+import com.threerings.samsara.app.facebook.server.FacebookAppServlet;
 
 import com.threerings.everything.client.Kontagent;
 
@@ -31,7 +31,7 @@ import static com.threerings.everything.Log.log;
  * redirects them to the "You need to add the Everything app if you want to play" page if they
  * haven't added the app.
  */
-public class AuthServlet extends AppServlet
+public class AuthServlet extends FacebookAppServlet
 {
     /** The name of the cookie in which we store the seed category. */
     public static final String SEED_COOKIE = "s";

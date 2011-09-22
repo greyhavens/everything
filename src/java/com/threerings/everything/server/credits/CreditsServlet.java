@@ -31,6 +31,7 @@ import com.samskivert.util.Tuple;
 
 import com.threerings.samsara.common.UserLogic;
 import com.threerings.servlet.util.Parameters;
+import com.threerings.user.ExternalAuther;
 
 import com.threerings.everything.data.CoinPrices;
 import com.threerings.everything.server.EverythingApp;
@@ -110,8 +111,8 @@ public class CreditsServlet extends HttpServlet
         OrderDetails details = _gson.fromJson(req.getParameter(ORDER_DETAILS), OrderDetails.class);
         if (PLACED.equals(details.status)) {
             // let's make sure we recognize this player, and cancel the order if we don't
-            Map<String, Integer> userIds = _userLogic.mapFacebookIds(
-                Collections.singletonList(details.receiver));
+            Map<String, Integer> userIds = _userLogic.mapExtAuthIds(
+                ExternalAuther.FACEBOOK, Collections.singletonList(details.receiver));
             if (!userIds.containsKey(details.receiver)) {
                 log.warning("CreditsServlet receiver not recognized!", "fbId", details.receiver);
                 return new StatusUpdate(CANCELED);
@@ -120,8 +121,8 @@ public class CreditsServlet extends HttpServlet
             }
 
         } else if (SETTLED.equals(details.status)) {
-            Map<String, Integer> userIds = _userLogic.mapFacebookIds(
-                Collections.singletonList(details.receiver));
+            Map<String, Integer> userIds = _userLogic.mapExtAuthIds(
+                ExternalAuther.FACEBOOK, Collections.singletonList(details.receiver));
             Integer userId = userIds.get(details.receiver);
             if (userId == null) {
                 log.warning("Settled payment has bad reciever id!", "fbId", details.receiver,

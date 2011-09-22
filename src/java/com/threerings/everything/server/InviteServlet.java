@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 
 import com.samskivert.servlet.util.ParameterUtil;
 import com.samskivert.util.StringUtil;
+import com.threerings.user.ExternalAuther;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.server.AppServlet;
@@ -124,7 +125,8 @@ public class InviteServlet extends AppServlet
         }
 
         // see if the recipient in question is already a player
-        Map<String, Integer> ids = _userLogic.mapFacebookIds(Collections.singletonList(targetFBId));
+        Map<String, Integer> ids = _userLogic.mapExtAuthIds(
+            ExternalAuther.FACEBOOK, Collections.singletonList(targetFBId));
         Integer targetId = ids.get(targetFBId);
         PlayerRecord target;
         if (targetId != null && (target = _playerRepo.loadPlayer(targetId)) != null) {
