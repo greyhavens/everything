@@ -48,6 +48,7 @@ public class EverythingApp extends AbstractFacebookApp
         @Override protected void configure () {
             super.configure();
             bind(App.class).to(EverythingApp.class);
+            bind(AbstractFacebookApp.class).to(EverythingApp.class);
             // bind our various servlets
             serve(AuthServlet.class).at("/auth");
             serve(InviteServlet.class).at("/invite");
