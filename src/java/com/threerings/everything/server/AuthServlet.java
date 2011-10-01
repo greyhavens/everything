@@ -21,6 +21,7 @@ import com.threerings.facebook.FBParam;
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.facebook.server.FacebookAppServlet;
+import com.threerings.samsara.common.ServletAuthUtil;
 
 import com.threerings.everything.client.Kontagent;
 
@@ -98,8 +99,13 @@ public class AuthServlet extends FacebookAppServlet
             rsp.addCookie(c);
         }
 
-        // otherwise pass the buck to the app servlet, it may have to get jiggy
-        if (doFacebookAuth(req, rsp, indexPath)) {
+        // we need to supply a full URL to doFacebookAuth so that it can redirect properly to https
+        // or http even when the current request is http representing proxied https
+        String indexURL = ServletAuthUtil.getScheme(req) + "://" +
+            req.getServerName() + ":" + req.getServerPort() + indexPath;
+
+        // pass the buck to the app servlet, it may have to get jiggy
+        if (doFacebookAuth(req, rsp, indexURL)) {
             // if our authentication process actually directed the user to the app, we can emit our
             // event to Kontagent, otherwise we're in the middle of swizzling them and need to hold
             // off until the swizzling process is complete
