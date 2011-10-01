@@ -87,7 +87,7 @@ public class AuthServlet extends FacebookAppServlet
         // back up when it validates its session for the first time and we detect a new user and
         // report that the app was added
         if (tracking != null) {
-            indexPath = "?t=" + tracking;
+            indexPath += "?t=" + tracking;
         }
 
         // if we have a seed category, stuff that into a session cookie so we can pick it up again
