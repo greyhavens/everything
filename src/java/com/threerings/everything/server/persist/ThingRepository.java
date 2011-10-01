@@ -202,7 +202,7 @@ public class ThingRepository extends DepotRepository
     {
         delete(CategoryRecord.getKey(category.categoryId));
         deleteAll(CategoryCommentRecord.class,
-                  new Where(CategoryCommentRecord.CATEGORY_ID.eq(category.categoryId)), null);
+                  new Where(CategoryCommentRecord.CATEGORY_ID.eq(category.categoryId)));
         clearPendingVotes(category.categoryId);
     }
 
@@ -430,7 +430,7 @@ public class ThingRepository extends DepotRepository
     public void clearPendingVotes (int categoryId)
     {
         deleteAll(PendingVoteRecord.class,
-                  new Where(PendingVoteRecord.CATEGORY_ID.eq(categoryId)), null);
+                  new Where(PendingVoteRecord.CATEGORY_ID.eq(categoryId)));
     }
 
     protected void updateCategoryThingCount (int categoryId)
