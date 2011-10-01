@@ -101,8 +101,7 @@ public class AuthServlet extends FacebookAppServlet
 
         // we need to supply a full URL to doFacebookAuth so that it can redirect properly to https
         // or http even when the current request is http representing proxied https
-        String indexURL = ServletAuthUtil.getScheme(req) + "://" +
-            req.getServerName() + ":" + req.getServerPort() + indexPath;
+        String indexURL = ServletAuthUtil.createURL(req, indexPath);
 
         // pass the buck to the app servlet, it may have to get jiggy
         if (doFacebookAuth(req, rsp, indexURL)) {
