@@ -262,8 +262,23 @@
     <copy todir="${instroot.dir}/lib">
       <fileset dir="${deploy.dir}" includes="${app.ident}.jar"/>
       <fileset dir="${deploy.dir}" includes="${app.ident}-candidate.jar"/>
-      <fileset dir="${deploy.dir}/lib" includes="*.jar" excludes="samsara-shared*"/>
+      <fileset dir="${deploy.dir}/lib" includes="*.jar"/>
     </copy>
+
+    <!-- we need to remove the libraries provided by samsara-shared -->
+    <artifact:dependencies filesetId="shared.fileset">
+      <dependency groupId="com.threerings.samsara" artifactId="samsara-shared"
+                  version="0.0-SNAPSHOT"/>
+    </artifact:dependencies>
+    <pathconvert property="shared.list" pathsep="," refid="shared.fileset">
+      <mapper type="flatten"/>
+    </pathconvert>
+    <for list="${shared.list}" param="file">
+      <sequential>
+        <delete file="${instroot.dir}/lib/@{file}"/>
+      </sequential>
+    </for>
+
     <mkdir dir="${instroot.dir}/web"/>
     <copy todir="${instroot.dir}/web" preservelastmodified="true">
       <fileset dir="${wsrc.dir}" includes="**"/>
