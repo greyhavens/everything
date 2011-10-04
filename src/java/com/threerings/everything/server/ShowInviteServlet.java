@@ -21,6 +21,7 @@ import com.samskivert.servlet.util.ParameterUtil;
 import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.data.AppCodes;
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
 import com.threerings.samsara.app.server.AppServlet;
 
 import com.threerings.everything.client.Kontagent;
@@ -68,7 +69,7 @@ public class ShowInviteServlet extends AppServlet
         String tracking = _kontLogic.generateUniqueId(player.userId);
         subs.put("URL", _app.getHelloURL(Kontagent.INVITE, tracking));
         subs.put("TRACKING", tracking);
-        subs.put("FACEBOOK_KEY", _app.getFacebookKey());
+        subs.put("FACEBOOK_KEY", _fbconf.getFacebookKey());
 
         // if they specified a card, load that up
         CardRecord card = null;
@@ -121,6 +122,7 @@ public class ShowInviteServlet extends AppServlet
     protected String _template;
 
     @Inject protected EverythingApp _app;
+    @Inject protected FacebookConfig _fbconf;
     @Inject protected GameRepository _gameRepo;
     @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;

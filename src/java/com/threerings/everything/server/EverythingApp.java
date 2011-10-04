@@ -18,7 +18,8 @@ import com.google.inject.name.Named;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.samsara.app.data.AppCodes;
-import com.threerings.samsara.app.facebook.server.AbstractFacebookApp;
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
+import com.threerings.samsara.app.server.AbstractSamsaraApp;
 import com.threerings.samsara.app.server.AbstractSamsaraAppModule;
 import com.threerings.samsara.shared.App;
 import com.threerings.user.OOOUser;
@@ -34,7 +35,7 @@ import static com.threerings.everything.Log.log;
  * The main entry point for the Everything app.
  */
 @Singleton
-public class EverythingApp extends AbstractFacebookApp
+public class EverythingApp extends AbstractSamsaraApp
 {
     /** Our app identifier. */
     public static final String IDENT = "everything";
@@ -69,36 +70,6 @@ public class EverythingApp extends AbstractFacebookApp
         }
     }
 
-    protected static class ProcessBirthdays implements Runnable {
-        @Override public void run () {
-            _gameLogic.processBirthdays();
-        }
-        @Inject GameLogic _gameLogic;
-    }
-
-    protected static class SendReminders implements Runnable {
-        @Override public void run () {
-            _playerLogic.sendReminderNotifications();
-        }
-        @Inject PlayerLogic _playerLogic;
-    }
-
-    protected static class PruneRecords implements Runnable {
-        @Override public void run () {
-            int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-            int recruit = _playerRepo.pruneGiftRecords();
-            if (feed > 0) {
-                log.info("Pruned " + feed + " old feed items.");
-            }
-            if (recruit > 0) {
-                log.info("Pruned " + recruit + " old recruitment gift records.");
-            }
-            // TODO: prune GridRecords, but only after the maximum number of free flips
-            // can be accumulated into the PlayerRecord
-        }
-        @Inject PlayerRepository _playerRepo;
-    }
-
     /**
      * Returns an executor that can be used for background processing tasks.
      */
@@ -116,7 +87,7 @@ public class EverythingApp extends AbstractFacebookApp
      */
     public String getHelloURL (Kontagent type, String tracking, Object... args)
     {
-        String url = getFacebookAppURL("http") + "?kc=" + type.code + "&t=" + tracking;
+        String url = _fbconf.getFacebookAppURL("http") + "?kc=" + type.code + "&t=" + tracking;
         if (args.length > 0) {
             url += "&token=" + Joiner.on("~").join(args);
         }
@@ -130,7 +101,7 @@ public class EverythingApp extends AbstractFacebookApp
      */
     public String getHelloURL (String vector, Object... args)
     {
-        String url = getFacebookAppURL("http") + "?vec=" + vector;
+        String url = _fbconf.getFacebookAppURL("http") + "?vec=" + vector;
         if (args.length > 0) {
             url += "&token=" + Joiner.on("~").join(args);
         }
@@ -232,11 +203,42 @@ public class EverythingApp extends AbstractFacebookApp
         shutdown();
     }
 
+    protected static class ProcessBirthdays implements Runnable {
+        @Override public void run () {
+            _gameLogic.processBirthdays();
+        }
+        @Inject GameLogic _gameLogic;
+    }
+
+    protected static class SendReminders implements Runnable {
+        @Override public void run () {
+            _playerLogic.sendReminderNotifications();
+        }
+        @Inject PlayerLogic _playerLogic;
+    }
+
+    protected static class PruneRecords implements Runnable {
+        @Override public void run () {
+            int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+            int recruit = _playerRepo.pruneGiftRecords();
+            if (feed > 0) {
+                log.info("Pruned " + feed + " old feed items.");
+            }
+            if (recruit > 0) {
+                log.info("Pruned " + recruit + " old recruitment gift records.");
+            }
+            // TODO: prune GridRecords, but only after the maximum number of free flips
+            // can be accumulated into the PlayerRecord
+        }
+        @Inject PlayerRepository _playerRepo;
+    }
+
     protected ExecutorService _executor = Executors.newFixedThreadPool(3);
 
     @Inject protected @Named(AppCodes.APPVERS) String _appvers;
     @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected PlayerRepository _playerRepo;
+    @Inject protected FacebookConfig _fbconf;
 
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
     protected static final int FEED_PRUNE_DAYS = 5;

@@ -29,6 +29,7 @@ import com.samskivert.servlet.HttpErrorException;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
 import com.threerings.samsara.common.UserLogic;
 import com.threerings.servlet.util.Parameters;
 import com.threerings.user.ExternalAuther;
@@ -174,7 +175,7 @@ public class CreditsServlet extends HttpServlet
         for (Entry<String, String> entry : sigParams.entrySet()) {
             keyString.append(entry.getKey()).append("=").append(entry.getValue());
         }
-        keyString.append(_app.getFacebookSecret());
+        keyString.append(_fbconf.getFacebookSecret());
         return StringUtil.md5hex(keyString.toString()).equals(params.get(FB_SIG));
     }
 
@@ -193,6 +194,7 @@ public class CreditsServlet extends HttpServlet
     protected Gson _gson;
 
     @Inject protected EverythingApp _app;
+    @Inject protected FacebookConfig _fbconf;
     @Inject protected UserLogic _userLogic;
     @Inject protected PlayerRepository _playerRepo;
 

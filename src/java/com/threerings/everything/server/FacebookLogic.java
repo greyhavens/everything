@@ -11,6 +11,8 @@ import com.google.inject.Singleton;
 import com.google.code.facebookapi.DefaultCommunicationStrategy;
 import com.google.code.facebookapi.FacebookJaxbRestClient;
 
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
+
 /**
  * Centralizes some Facebook API bits.
  */
@@ -31,14 +33,14 @@ public class FacebookLogic
     public FacebookJaxbRestClient getFacebookClient (String sessionKey)
     {
         FacebookJaxbRestClient cli = new FacebookJaxbRestClient(
-            _app.getFacebookKey(), _app.getFacebookSecret(), sessionKey);
+            _fbconf.getFacebookKey(), _fbconf.getFacebookSecret(), sessionKey);
         cli.setServerUrl(SERVER_URL);
         cli.setCommunicationStrategy(
             new DefaultCommunicationStrategy(CONNECT_TIMEOUT, READ_TIMEOUT));
         return cli;
     }
 
-    @Inject protected EverythingApp _app;
+    @Inject protected FacebookConfig _fbconf;
 
     protected static final int CONNECT_TIMEOUT = 15*1000; // in millis
     protected static final int READ_TIMEOUT = 15*1000; // in millis

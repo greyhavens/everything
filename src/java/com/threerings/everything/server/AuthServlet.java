@@ -22,6 +22,7 @@ import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
 import com.threerings.samsara.app.facebook.server.FacebookAppServlet;
 import com.threerings.samsara.common.ServletAuthUtil;
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
 
 import com.threerings.everything.client.Kontagent;
 
@@ -104,7 +105,7 @@ public class AuthServlet extends FacebookAppServlet
         String indexURL = ServletAuthUtil.createURL(req, indexPath);
 
         // pass the buck to the app servlet, it may have to get jiggy
-        if (doFacebookAuth(req, rsp, indexURL)) {
+        if (doFacebookAuth(req, rsp, indexURL, true, false).isSwizzled()) {
             // if our authentication process actually directed the user to the app, we can emit our
             // event to Kontagent, otherwise we're in the middle of swizzling them and need to hold
             // off until the swizzling process is complete

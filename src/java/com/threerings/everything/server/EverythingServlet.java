@@ -42,6 +42,7 @@ import com.threerings.user.OOOUser;
 
 import com.threerings.samsara.app.client.ServiceException;
 import com.threerings.samsara.app.data.AppCodes;
+import com.threerings.samsara.app.facebook.server.FacebookConfig;
 import com.threerings.samsara.common.UserLogic;
 
 import com.threerings.everything.client.EverythingService;
@@ -82,7 +83,7 @@ public class EverythingServlet extends EveryServiceServlet
             data.news = news;
         }
         data.powerups = Maps.newHashMap();
-        data.everythingURL = _app.getFacebookAppURL("http");
+        data.everythingURL = _fbconf.getFacebookAppURL("http");
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
         data.likes = Lists.newArrayList();
         data.dislikes = Lists.newArrayList();
@@ -474,6 +475,7 @@ public class EverythingServlet extends EveryServiceServlet
 
     @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected EverythingApp _app;
+    @Inject protected FacebookConfig _fbconf;
     @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
