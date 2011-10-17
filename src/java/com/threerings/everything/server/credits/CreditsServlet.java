@@ -179,8 +179,8 @@ public class CreditsServlet extends HttpServlet
 
     // Parameters we're specifically interested in
     protected static final String METHOD = "method";
-    protected static final String ORDER_INFO = "fb_sig_order_info";
-    protected static final String ORDER_DETAILS = "fb_sig_order_details";
+    protected static final String ORDER_INFO = "order_info";
+    protected static final String ORDER_DETAILS = "order_details";
 
     // Statuses
     protected static final String PLACED = "placed";
