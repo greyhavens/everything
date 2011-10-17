@@ -29,6 +29,7 @@ import com.samskivert.servlet.HttpErrorException;
 import com.samskivert.util.StringUtil;
 import com.samskivert.util.Tuple;
 
+import com.threerings.facebook.SignedRequest;
 import com.threerings.samsara.app.facebook.server.FacebookConfig;
 import com.threerings.samsara.common.UserLogic;
 import com.threerings.servlet.util.Parameters;
@@ -66,7 +67,8 @@ public class CreditsServlet extends HttpServlet
         log.debug("CreditsServlet.doPost", "params", getPrettyParams(req));
 
         // Check the fb_sig parameter to make sure this request came from Facebook's servers.
-        if (!validateFacebookSig(req)) {
+        SignedRequest sreq = new SignedRequest(new Parameters(req), _fbconf.getFacebookSecret());
+        if (!sreq.isAuthorized()) {
             log.warning("Request did not originate with Facebook", "params", getPrettyParams(req));
             rsp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
@@ -162,23 +164,6 @@ public class CreditsServlet extends HttpServlet
         }
     }
 
-    protected boolean validateFacebookSig (HttpServletRequest req)
-    {
-        Parameters params = new Parameters(req);
-        Map<String, String> sigParams = Maps.newTreeMap();
-        for (Tuple<String, String> param : params.entries()) {
-            if (param.left.startsWith(SIG_PARAMS_PREFIX)) {
-                sigParams.put(param.left.substring(SIG_PARAMS_PREFIX.length()), param.right);
-            }
-        }
-        StringBuilder keyString = new StringBuilder();
-        for (Entry<String, String> entry : sigParams.entrySet()) {
-            keyString.append(entry.getKey()).append("=").append(entry.getValue());
-        }
-        keyString.append(_fbconf.getFacebookSecret());
-        return StringUtil.md5hex(keyString.toString()).equals(params.get(FB_SIG));
-    }
-
     protected String getPrettyParams (HttpServletRequest req)
     {
         return StringUtil.toString(Collections2.transform(new Parameters(req).entries(),
@@ -201,8 +186,6 @@ public class CreditsServlet extends HttpServlet
     // Parameters we're specifically interested in
     protected static final String METHOD = "method";
     protected static final String ORDER_INFO = "fb_sig_order_info";
-    protected static final String SIG_PARAMS_PREFIX = "fb_sig_";
-    protected static final String FB_SIG = "fb_sig";
     protected static final String ORDER_DETAILS = "fb_sig_order_details";
 
     // Statuses
