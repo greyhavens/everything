@@ -140,6 +140,7 @@
   </target>
 
   <target name="gclient" depends="prepare,genasync,gmsgs" description="Builds our GWT client.">
+    <mkdir dir="${deploy.dir}/gwt"/>
     <!-- blow away our old app -->
     <delete dir="${deploy.dir}/gwt/${app.ident}"/>
 
