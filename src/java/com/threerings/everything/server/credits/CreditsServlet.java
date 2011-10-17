@@ -94,7 +94,7 @@ public class CreditsServlet extends HttpServlet
                 return new ItemDescription(item);
             } catch (Exception e) {
                 log.warning("Failed to process item description request",
-                            "params", getPrettyParams(req), "error", e);
+                            "params", getPrettyParams(req), e);
                 throw new HttpErrorException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
