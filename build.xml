@@ -9,11 +9,12 @@
   <property name="candidate.dir" value="${deploy.dir}/candidate"/>
   <property name="classes.dir" value="${deploy.dir}/classes"/>
   <property name="pkg.user" value="_samsara"/>
-  <property name="pkg.maintainer.name" value="Three Rings Design"/>
-  <property name="pkg.maintainer.email" value="ooo-dev@threerings.net"/>
+  <property name="ooo.distribution" value="local"/>
 
   <!-- bring in our standard build support -->
-  <import file="package/etc/build-support.xml"/>
+  <property name="ooo-build.vers" value="2.9"/>
+  <ant antfile="etc/bootstrap.xml"/>
+  <import file="${user.home}/.m2/ooo-build/${ooo-build.vers}/ooo-build.xml"/>
 
   <target name="-prep-flex">
     <condition property="flexsdk.dir" value="../flex/current">
@@ -37,14 +38,16 @@
     <mkdir dir="${deploy.dir}/lib"/>
 
     <!-- obtain our configuration files -->
-    <gatherconfiguration app="${app.ident}" distribution="${ooo.distribution}" dest="${deploy.dir}">
+    <maventaskdef groupId="com.threerings.internal.ant" artifactId="gatherconfiguration"
+                  version="1.3"/>
+    <internalgather app="${app.ident}" distribution="${ooo.distribution}" dest="${deploy.dir}">
       <sources refid="ooo.appsconfig.source"/>
       <sources><directory path="${basedir}/etc"/></sources>
       <files>
         <file name="build.properties"/>
         <file name="everything.properties"/>
       </files>
-    </gatherconfiguration>
+    </internalgather>
     <property file="${deploy.dir}/build.properties"/>
     <property file="${deploy.dir}/everything.properties"/>
     <!-- copy our distribution-specific but otherwise uncustomized configuration files -->
@@ -95,7 +98,6 @@
         <filter token="build_time" value="${build.time}"/>
         <filter token="build_version" value="${build.version}"/>
         <filter token="facebook_appid" value="${facebook_appid}"/>
-        <filter token="facebook_key" value="${facebook_key}"/>
         <filter token="candidate_facebook_appid" value="${candidate_facebook_appid}"/>
         <filter token="candidate_facebook_key" value="${candidate_facebook_key}"/>
         <filter token="facebook_got_tmpl" value="${facebook_got_tmpl}"/>
@@ -309,39 +311,27 @@
   <target name="package" depends="distall" description="Builds our deployment package.">
     <property name="pkgroot.dir" value="${deploy.dir}/packages/${app.ident}-app"/>
 
+    <!-- install the bits into the right place in pkgroot.dir -->
     <antcall target="install-app">
       <param name="instroot.dir"
-             value="${pkgroot.dir}/${ooo.prefix}/samsara/apps/${app.ident}/candidate"/>
+             value="${pkgroot.dir}/export/samsara/apps/${app.ident}/candidate"/>
     </antcall>
 
-    <!-- TEMP: define where our .dpkg files will be written -->
-    <propertycopy name="package.output" from="ooo.deprecated.package.deploy"/>
-
-    <!-- build the actual Debian package -->
-    <dpkg output="${package.output}" prefix="${ooo.prefix}/${app.ident}"
-          distribution="${ooo.distribution}">
-      <package destroot="${pkgroot.dir}">
-        <info>
-          <name>${app.ident}-app</name>
-          <version>${build.version}</version>
-          <arch>${ooo.architecture}</arch>
-          <description>Everything App</description>
-          <maintainer>
-            <name>${pkg.maintainer.name}</name>
-            <email>${pkg.maintainer.email}</email>
-          </maintainer>
-        </info>
-        <permissions>
-          <permission user="${pkg.user}" group="${pkg.user}" mode="755" recursive="false">
-            <path>.</path>
-          </permission>
-        </permissions>
-      </package>
-    </dpkg>
+    <!-- build the Debian package -->
+    <maventaskdef groupId="com.threerings.internal.ant" artifactId="dpkg" version="1.1"/>
+    <ooodpkg destroot="${pkgroot.dir}" prefix="export/${app.ident}" name="${app.ident}-app"
+             version="${build.version}" description="Everything App">
+      <permissions>
+        <permission user="${pkg.user}" group="${pkg.user}" mode="755" recursive="false">
+          <path>.</path>
+        </permission>
+      </permissions>
+    </ooodpkg>
   </target>
 
-  <target name="bamboo" depends="distcleanall,checkclean,package,aptupdate"
+  <target name="bamboo" depends="distcleanall,package"
           description="Run by the build server to build, package and deploy Everything.">
+    <aptupdate/>
     <antcall target="distcleanall"/>
   </target>
 
