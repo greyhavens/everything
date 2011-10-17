@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import com.samskivert.servlet.HttpErrorException;
@@ -49,13 +48,9 @@ import static com.threerings.everything.Log.log;
 @Singleton
 public class CreditsServlet extends HttpServlet
 {
-    @Inject public CreditsServlet (ProviderCreator<OrderDetails> odCreator,
-                                   ProviderCreator<CoinsItem> ciCreator)
+    @Inject public CreditsServlet ()
     {
-        _coiner = ciCreator.getProvider();
         _gson = new GsonBuilder().
-            registerTypeAdapter(OrderDetails.class, odCreator).
-            registerTypeAdapter(CoinsItem.class, ciCreator).
             excludeFieldsWithModifiers(Modifier.PROTECTED, Modifier.STATIC).
             create();
     }
@@ -89,8 +84,8 @@ public class CreditsServlet extends HttpServlet
     {
         if (ItemDescription.METHOD_NAME.equals(method)) {
             try {
-                CoinsItem item = _coiner.get();
-                item.init(_gson.fromJson(req.getParameter(ORDER_INFO), Integer.class));
+                CoinsItem item = new CoinsItem();
+                item.init(_app, _gson.fromJson(req.getParameter(ORDER_INFO), Integer.class));
                 return new ItemDescription(item);
             } catch (Exception e) {
                 log.warning("Failed to process item description request",
@@ -175,7 +170,6 @@ public class CreditsServlet extends HttpServlet
             }));
     }
 
-    protected Provider<CoinsItem> _coiner;
     protected Gson _gson;
 
     @Inject protected EverythingApp _app;
