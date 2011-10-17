@@ -124,7 +124,7 @@ public class EverythingClient
     {
         String appID = Build.facebookAppID(_data.candidate);
         return "http://www.facebook.com/dialog/oauth?client_id=" + appID +
-            "&redirect_url=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
+            "&redirect_uri=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
     }
 
     // from interface Context
