@@ -122,10 +122,9 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args)
     {
-        String key = Build.facebookKey(_data.candidate);
-        String url = "http://www.facebook.com/login.php?api_key=" + key + "&canvas=1&v=1.0";
-        url += "&next=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
-        return url;
+        String appID = Build.facebookAppID(_data.candidate);
+        return "http://www.facebook.com/dialog/oauth?client_id=" + appID +
+            "&redirect_url=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
     }
 
     // from interface Context

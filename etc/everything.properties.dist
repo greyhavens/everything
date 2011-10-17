@@ -6,12 +6,10 @@
 # Our Facebook app configuration
 facebook_appname = everythinggame
 facebook_appid = APP_ID
-facebook_key = API_KEY
 facebook_secret = APP_SECRET
 
 candidate_facebook_appname = everythingcandidate
 candidate_facebook_appid = APP_ID
-candidate_facebook_key = API_KEY
 candidate_facebook_secret = APP_SECRET
 
 # Our Postgres database configuration
