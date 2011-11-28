@@ -17,10 +17,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import com.google.code.facebookapi.BundleActionLink;
-import com.google.code.facebookapi.DashboardNewsItem;
-import com.google.code.facebookapi.FacebookJaxbRestClient;
-
 import com.samskivert.util.Calendars;
 import com.samskivert.util.Tuple;
 
@@ -94,77 +90,62 @@ public class PlayerLogic
     }
 
     /**
-     * Posts a story to the specified player's Facebook feed.
-     */
-    public void postFacebookStory (PlayerRecord user, String todo)
-    {
-        Tuple<String, String> fbinfo = _userLogic.getExtAuthInfo(
-            ExternalAuther.FACEBOOK, user.userId);
-        if (fbinfo == null || fbinfo.right == null) {
-            log.warning("Can't post Facebook story, have no Facebook authinfo?", "who", user.who(),
-                        "fbinfo", fbinfo);
-            return;
-        }
-        // TODO
-    }
-
-    /**
      * Sends a card gifting notification to the specified Facebook player.
      */
     public void sendGiftNotification (PlayerRecord sender, long toFBId, Category series)
     {
-        String tracking = _kontLogic.generateUniqueId(sender.userId);
-        String url = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
+        // String tracking = _kontLogic.generateUniqueId(sender.userId);
+        // String url = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
 
-        BundleActionLink link = new BundleActionLink();
-        link.setText("Open gift");
-        link.setHref(url);
-        DashboardNewsItem item = new DashboardNewsItem();
-        item.setMessage(sender.name + " gave you a card in the " + series.name + " series.");
-        item.setActionLink(link);
+        // BundleActionLink link = new BundleActionLink();
+        // link.setText("Open gift");
+        // link.setHref(url);
+        // DashboardNewsItem item = new DashboardNewsItem();
+        // item.setMessage(sender.name + " gave you a card in the " + series.name + " series.");
+        // item.setActionLink(link);
 
-        sendFacebookNotification(sender, toFBId, item, tracking);
+        // sendFacebookNotification(sender, toFBId, item, tracking);
     }
 
-    /**
-     * Delivers a notification to the specified Facebook user from the specified sender.
-     */
-    public void sendFacebookNotification (
-        PlayerRecord from, final long toFBId, final DashboardNewsItem item, final String tracking)
-    {
-        if (toFBId == 0) {
-            return; // noop, some day we'll support players who aren't on Facebook
-        }
+    // /**
+    //  * Delivers a notification to the specified Facebook user from the specified sender.
+    //  */
+    // public void sendFacebookNotification (
+    //     PlayerRecord from, final long toFBId, final DashboardNewsItem item, final String tracking)
+    // {
+    //     if (toFBId == 0) {
+    //         return; // noop, some day we'll support players who aren't on Facebook
+    //     }
 
-        final Tuple<String, String> finfo = _userLogic.getExtAuthInfo(
-            ExternalAuther.FACEBOOK, from.userId);
-        if (finfo == null || finfo.right == null) {
-            log.warning("Missing Facebook data for notification", "from", from.who(),
-                        "finfo", finfo);
-            return;
-        }
+    //     final Tuple<String, String> finfo = _userLogic.getExtAuthInfo(
+    //         ExternalAuther.FACEBOOK, from.userId);
+    //     if (finfo == null || finfo.right == null) {
+    //         log.warning("Missing Facebook data for notification", "from", from.who(),
+    //                     "finfo", finfo);
+    //         return;
+    //     }
 
-        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(finfo.right);
-        _app.getExecutor().execute(new Runnable() {
-            public void run () {
-                try {
-                    log.debug("Sending FB notification", "id", toFBId, "item", item);
-                    // send the notification to Facebook
-                    fbclient.dashboard_multiAddNews(
-                        Collections.singleton(toFBId), Collections.singleton(item));
+    //     final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(finfo.right);
+    //     _app.getExecutor().execute(new Runnable() {
+    //         public void run () {
+    //             try {
+    //                 log.debug("Sending FB notification", "id", toFBId, "item", item);
+    //                 // send the notification to Facebook
+    //                 fbclient.dashboard_multiAddNews(
+    //                     Collections.singleton(toFBId), Collections.singleton(item));
 
-                    // disabled Kontagent for now since we don't really care
-                    //
-                    // tell Kontagent that we sent a notification
-                    // _kontLogic.reportAction(
-                    //     Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
-                } catch (Exception e) {
-                    log.info("Failed to send Facebook notification", "to", toFBId,
-                             "item", item, "error", e.getMessage());
-                }
-            }
-        });
-    }
+    //                 // disabled Kontagent for now since we don't really care
+    //                 //
+    //                 // tell Kontagent that we sent a notification
+    //                 // _kontLogic.reportAction(
+    //                 //     Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
+    //             } catch (Exception e) {
+    //                 log.info("Failed to send Facebook notification", "to", toFBId,
+    //                          "item", item, "error", e.getMessage());
+    //             }
+    //         }
+    //     });
+    // }
 
     /**
      * Sends notifications to all players whose last session fell during the current hour exactly
@@ -172,25 +153,25 @@ public class PlayerLogic
      */
     public void sendReminderNotifications ()
     {
-        final Set<Long> two = Sets.newHashSet(), four = Sets.newHashSet(), six = Sets.newHashSet();
-        Calendars.Builder cal = Calendars.now().set(Calendar.MINUTE, 0).set(Calendar.SECOND, 0);
-        long threeDays = cal.addDays(-3).toTime(), fiveDays = cal.addDays(-2).toTime();
-        for (PlayerRecord prec : _playerRepo.loadIdlePlayers()) {
-            if (prec.lastSession.getTime() < fiveDays) {
-                six.add(prec.facebookId);
-            } else if (prec.lastSession.getTime() < threeDays) {
-                four.add(prec.facebookId);
-            } else {
-                two.add(prec.facebookId);
-            }
-        }
-        sendReminderNotifications(two, 2);
-        sendReminderNotifications(four, 4);
-        sendReminderNotifications(six, 6);
-        if (two.size() > 0 || four.size() > 0 || six.size() > 0) {
-            log.info("Send Facebook reminder notifications", "two", two.size(), "four", four.size(),
-                     "six", six.size());
-        }
+        // final Set<Long> two = Sets.newHashSet(), four = Sets.newHashSet(), six = Sets.newHashSet();
+        // Calendars.Builder cal = Calendars.now().set(Calendar.MINUTE, 0).set(Calendar.SECOND, 0);
+        // long threeDays = cal.addDays(-3).toTime(), fiveDays = cal.addDays(-2).toTime();
+        // for (PlayerRecord prec : _playerRepo.loadIdlePlayers()) {
+        //     if (prec.lastSession.getTime() < fiveDays) {
+        //         six.add(prec.facebookId);
+        //     } else if (prec.lastSession.getTime() < threeDays) {
+        //         four.add(prec.facebookId);
+        //     } else {
+        //         two.add(prec.facebookId);
+        //     }
+        // }
+        // sendReminderNotifications(two, 2);
+        // sendReminderNotifications(four, 4);
+        // sendReminderNotifications(six, 6);
+        // if (two.size() > 0 || four.size() > 0 || six.size() > 0) {
+        //     log.info("Send Facebook reminder notifications", "two", two.size(), "four", four.size(),
+        //              "six", six.size());
+        // }
     }
 
     /**
@@ -199,32 +180,32 @@ public class PlayerLogic
      */
     public void sendReminderNotifications (final Set<Long> fbids, int idleDays)
     {
-        if (fbids.isEmpty()) {
-            return; // noop!
-        }
+        // if (fbids.isEmpty()) {
+        //     return; // noop!
+        // }
 
-        int flips = GameCodes.DAILY_FREE_FLIPS + idleDays - 1; // reasonable estimate
+        // int flips = GameCodes.DAILY_FREE_FLIPS + idleDays - 1; // reasonable estimate
 
-        BundleActionLink link = new BundleActionLink();
-        link.setText("Flip cards");
-        link.setHref(_app.getHelloURL("reminder" + idleDays));
-        final DashboardNewsItem item = new DashboardNewsItem();
-        item.setMessage("You have " + flips + " free card flips waiting for you.");
-        item.setActionLink(link);
+        // BundleActionLink link = new BundleActionLink();
+        // link.setText("Flip cards");
+        // link.setHref(_app.getHelloURL("reminder" + idleDays));
+        // final DashboardNewsItem item = new DashboardNewsItem();
+        // item.setMessage("You have " + flips + " free card flips waiting for you.");
+        // item.setActionLink(link);
 
-        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
-        _app.getExecutor().execute(new Runnable() {
-            public void run () {
-                for (List<Long> ids : Iterables.partition(fbids, 50)) {
-                    try {
-                        fbclient.dashboard_multiAddNews(ids, Collections.singleton(item));
-                    } catch (Exception e) {
-                        log.info("Failed to send Facebook reminder notification", "item", item,
-                                 "error", e.getMessage());
-                    }
-                }
-            }
-        });
+        // final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient();
+        // _app.getExecutor().execute(new Runnable() {
+        //     public void run () {
+        //         for (List<Long> ids : Iterables.partition(fbids, 50)) {
+        //             try {
+        //                 fbclient.dashboard_multiAddNews(ids, Collections.singleton(item));
+        //             } catch (Exception e) {
+        //                 log.info("Failed to send Facebook reminder notification", "item", item,
+        //                          "error", e.getMessage());
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     protected List<Field> getNameFields (Class<?> clazz)
@@ -248,7 +229,6 @@ public class PlayerLogic
         new ConcurrentHashMap<Class<?>, List<Field>>();
 
     @Inject protected EverythingApp _app;
-    @Inject protected FacebookLogic _faceLogic;
     @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected UserLogic _userLogic;

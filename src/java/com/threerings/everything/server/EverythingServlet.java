@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -25,11 +26,12 @@ import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import com.google.code.facebookapi.FacebookException;
-import com.google.code.facebookapi.FacebookJaxbRestClient;
-import com.google.code.facebookapi.ProfileField;
-import com.google.code.facebookapi.schema.User;
-import com.google.code.facebookapi.schema.UsersGetInfoResponse;
+import com.restfb.Connection;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.exception.FacebookException;
+import com.restfb.types.User;
 
 import com.samskivert.servlet.util.CookieUtil;
 import com.samskivert.util.Calendars;
@@ -111,28 +113,19 @@ public class EverythingServlet extends EveryServiceServlet
             }
 
             // load up this player's Facebook profile info
-            FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbinfo.right);
+            FacebookClient fbclient = new DefaultFacebookClient(fbinfo.right);
             long facebookId = Long.parseLong(fbinfo.left);
             Set<Long> ids = Collections.singleton(facebookId);
-            EnumSet<ProfileField> fields = EnumSet.of(
-                ProfileField.FIRST_NAME, ProfileField.LAST_NAME, ProfileField.BIRTHDAY,
-                ProfileField.SEX, ProfileField.CURRENT_LOCATION);
-            UsersGetInfoResponse uinfo;
+            User fbuser;
             try {
-                uinfo = fbclient.users_getInfo(ids, fields);
+                fbuser = fbclient.fetchObject("me", User.class);
             } catch (FacebookException fbe) {
                 log.warning("Failed to load Facebook profile info", "who", user.userId,
                             "fbinfo", fbinfo, fbe);
                 throw new ServiceException(E_FACEBOOK_DOWN);
             }
-            if (uinfo.getUser().size() == 0) {
-                log.warning("User has no Facebook profile info?", "who", user.userId,
-                            "fbinfo", fbinfo);
-                throw new ServiceException(AppCodes.E_SESSION_EXPIRED);
-            }
 
             // create a new player with their Facebook data
-            User fbuser = uinfo.getUser().get(0);
             String bdstr = fbuser.getBirthday();
             long birthday = 0L;
             try {
@@ -362,13 +355,19 @@ public class EverythingServlet extends EveryServiceServlet
 
     protected void updateFacebookInfo (final PlayerRecord prec, String fbSessionKey)
     {
-        final FacebookJaxbRestClient fbclient = _faceLogic.getFacebookClient(fbSessionKey);
+        final FacebookClient fbclient = new DefaultFacebookClient(fbSessionKey);
         _app.getExecutor().execute(new Runnable() {
             public void run () {
                 try {
                     // ask Facebook for their list of friends
+                    Connection<User> fbFriends = fbclient.fetchConnection(
+                        "me/friends", User.class, Parameter.with("fields", "id"));
                     List<String> fbFriendIds = Lists.transform(
-                        fbclient.friends_get().getUid(), Functions.toStringFunction());
+                        fbFriends.getData(), new Function<User,String>() {
+                            public String apply (User user) {
+                                return user.getId();
+                            }
+                        });
                     // map those friends to Samsara user ids
                     Set<Integer> allFriendIds = Sets.newHashSet(
                         _userLogic.mapExtAuthIds(ExternalAuther.FACEBOOK, fbFriendIds).values());
@@ -396,27 +395,18 @@ public class EverythingServlet extends EveryServiceServlet
                 }
 
                 // check to see if this player's first or last name has changed
-                Set<Long> ids = Collections.singleton(prec.facebookId);
-                EnumSet<ProfileField> fields = EnumSet.of(
-                    ProfileField.FIRST_NAME, ProfileField.LAST_NAME);
-                UsersGetInfoResponse uinfo;
+                User fbuser;
                 try {
-                    uinfo = fbclient.users_getInfo(ids, fields);
+                    fbuser = fbclient.fetchObject("me", User.class);
+                    String name = StringUtil.getOr(fbuser.getFirstName(), prec.name);
+                    String surname = StringUtil.getOr(fbuser.getLastName(), prec.surname);
+                    if (!prec.name.equals(name) || !prec.surname.equals(surname)) {
+                        log.info("Updating name", "who", prec.who(),
+                                 "name", name, "surname", surname);
+                        _playerRepo.updateName(prec.userId, name, surname);
+                    }
                 } catch (FacebookException fbe) {
                     log.warning("Failed to load Facebook profile info", "who", prec.who(), fbe);
-                    return;
-                }
-                if (uinfo.getUser().size() == 0) {
-                    log.warning("User has no Facebook profile info?", "who", prec.who());
-                    return;
-                }
-
-                User fbuser = uinfo.getUser().get(0);
-                String name = StringUtil.getOr(fbuser.getFirstName(), prec.name);
-                String surname = StringUtil.getOr(fbuser.getLastName(), prec.surname);
-                if (!prec.name.equals(name) || !prec.surname.equals(surname)) {
-                    log.info("Updating name", "who", prec.who(), "name", name, "surname", surname);
-                    _playerRepo.updateName(prec.userId, name, surname);
                 }
             }
         });
@@ -476,7 +466,6 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected @Named(AppCodes.APPCANDIDATE) boolean _candidate;
     @Inject protected EverythingApp _app;
     @Inject protected FacebookConfig _fbconf;
-    @Inject protected FacebookLogic _faceLogic;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
     @Inject protected KontagentLogic _kontLogic;

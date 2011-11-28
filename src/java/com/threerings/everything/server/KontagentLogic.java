@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import com.google.code.facebookapi.schema.User;
+import com.restfb.types.User;
 
 import com.samskivert.util.StringUtil;
 
@@ -83,7 +83,7 @@ public class KontagentLogic
         List<Object> args = Lists.newArrayList();
         add(args, "s", user.facebookId);
 
-        String sex = fbuser.getSex();
+        String sex = fbuser.getGender();
         if (sex.equalsIgnoreCase("male")) {
             add(args, "g", "m");
         } else if (sex.equalsIgnoreCase("female")) {
@@ -100,12 +100,12 @@ public class KontagentLogic
             // oh well
         }
 
-        if (fbuser.getCurrentLocation() != null) {
-            add(args, "ly", fbuser.getCurrentLocation().getCity());
-            add(args, "ls", fbuser.getCurrentLocation().getState());
-            add(args, "lc", fbuser.getCurrentLocation().getCountry());
-            add(args, "lp", fbuser.getCurrentLocation().getZip());
-        }
+        // if (fbuser.getCurrentLocation() != null) {
+        //     add(args, "ly", fbuser.getCurrentLocation().getCity());
+        //     add(args, "ls", fbuser.getCurrentLocation().getState());
+        //     add(args, "lc", fbuser.getCurrentLocation().getCountry());
+        //     add(args, "lp", fbuser.getCurrentLocation().getZip());
+        // }
 
         // TODO: friend count?
 
