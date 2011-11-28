@@ -161,10 +161,11 @@ public class InviteServlet extends AppServlet
     protected static void writeClose (HttpServletResponse rsp, boolean completed)
         throws IOException
     {
-        // we're in an iframe so we have to send down some JavaScript that jimmies
+        // we're in an iframe so we have to send down some JavaScript that notifies the parent
+        // frame that it should close the invite popup
         PrintWriter out = rsp.getWriter();
         out.println("<html><head><script language=\"JavaScript\">");
-        out.println("window.parent.closePopup(" + completed + ");");
+        out.println("window.parent.postMessage('closePopup:" + completed + "', '*');");
         out.println("</script></head></html>");
         out.close();
     }

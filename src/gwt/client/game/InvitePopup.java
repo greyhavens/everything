@@ -53,13 +53,19 @@ public class InvitePopup extends PopupPanel
     }
 
     protected native static void registerCloseCallback (InvitePopup popup) /*-{
-        $wnd.closePopup = function (completed) {
-            popup.@client.game.InvitePopup::onClose(Z)(completed);
-        }
+        $wnd.popupCloser = function(event) {
+            if (event.data == "closePopup:true") {
+              popup.@client.game.InvitePopup::onClose(Z)(true);
+            } else if (event.data == "closePopup:false") {
+              popup.@client.game.InvitePopup::onClose(Z)(false);
+            }
+        };
+        $wnd.addEventListener("message", $wnd.popupCloser, false);
     }-*/;
 
     protected native static void clearCloseCallback () /*-{
-        $wnd.closePopup = null;
+        $wnd.removeEventListener("message", $wnd.popupCloser, false);
+        $wnd.popupCloser = null;
     }-*/;
 
     protected Runnable _onComplete;
