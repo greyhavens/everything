@@ -2,8 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 <head><title>Everything</title></head>
 <body bgcolor="#D2D9E6">
-  <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
-          type="text/javascript"></script>
+  <script src="http://connect.facebook.net/en_US/all.js"></script>
+  <script>
+    FB.init({
+      appId  : 'FACEBOOK_APPID',
+      status : true, // check login status
+      cookie : true, // enable cookies to allow the server to access the session
+      xfbml  : true  // parse XFBML
+    });
+  </script>
   <fb:serverfbml style="background: #D2D9E6"><script type="text/fbml"><fb:fbml>
   <fb:request-form action="ACTION_URL" method="POST" invite="true" type="Everything Game" 
                    content="TITLE&lt;fb:req-choice url='URL' label='BUTTON'/&gt;">
@@ -16,10 +23,5 @@
     </div>
   </fb:request-form>
   </fb:fbml></script></fb:serverfbml>
-  <script type="text/javascript">
-     FB_RequireFeatures(["XFBML"], function () {
-        FB.init("FACEBOOK_KEY", "xd_receiver.html");
-     });
-  </script>
 </body>
 </html>
