@@ -57,7 +57,6 @@ public class EverythingApp extends AbstractSamsaraApp
             serve(MediaUploadServlet.class).at("/upload");
             serve(CardImageServlet.class).at("/cardimg");
             serve(CreditsServlet.class).at("/fbcredits");
-//            serve(TrophyImageServlet.class).at("/trophyimg");
             serve(EverythingServlet.class).at("/" +EverythingServlet.ENTRY_POINT);
             serve(GameServlet.class).at("/" + GameServlet.ENTRY_POINT);
             serve(EditorServlet.class).at("/" + EditorServlet.ENTRY_POINT);
