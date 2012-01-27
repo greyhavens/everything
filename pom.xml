@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.threerings.apps</groupId>
   <artifactId>everything</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>The Everything Game</name>
 
@@ -14,15 +14,44 @@
       <id>ooo-maven-repo</id>
       <url>http://ooo-maven.googlecode.com/hg/repository</url>
     </repository>
+    <repository>
+      <id>ooo-public-repo</id>
+      <url>http://build.threerings.net/plugin/repository/everything</url>
+    </repository>
   </repositories>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gwt.version>2.4.0</gwt.version>
+  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>com.threerings.samsara</groupId>
-      <artifactId>samsara-app-facebook</artifactId>
-      <version>0.0-SNAPSHOT</version>
+      <groupId>com.threerings</groupId>
+      <artifactId>ooo-app</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.threerings</groupId>
+      <artifactId>ooo-facebook</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.threerings</groupId>
+      <artifactId>gwt-utils</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>com.threerings</groupId>
+      <artifactId>database-utils</artifactId>
+      <version>1.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwt.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.restfb</groupId>
       <artifactId>restfb</artifactId>
@@ -49,5 +78,78 @@
       <artifactId>commons-codec</artifactId>
       <version>1.5</version>
     </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>2.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>${gwt.version}</version>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <configuration>
+          <mainClass>com.threerings.everything.server.EverythingApp</mainClass>
+        </configuration>
+      </plugin>
+
+<!--
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <version>1.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>assemble</goal></goals>
+            <configuration>
+              <assembleDirectory>target</assembleDirectory>
+              <programs>
+                <program>
+                  <mainClass>com.threerings.everything.server.EverythingApp</mainClass>
+                  <name>everyapp</name>
+                </program>
+              </programs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+-->
+    </plugins>
+  </build>
 </project>

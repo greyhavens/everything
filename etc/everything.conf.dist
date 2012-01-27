@@ -1,0 +1,22 @@
+#
+# Everything app configuration for local development.
+#
+#  In production, these values are all configured as Heroku environment
+# variables. Use 'heroku config' to view them.
+
+# Our database configuration
+export DATABASE_URL=postgres://everything:test@localhost/everything
+
+# Our Facebook app configuration
+export FACEBOOK_APPNAME=everythinggame
+export FACEBOOK_APPID=APP_ID
+export FACEBOOK_SECRET=APP_SECRET
+
+# Our S3 media store configuration
+export MEDIASTORE_ID=S3ID
+export MEDIASTORE_KEY=S3KEY
+export MEDIASTORE_BUCKET=S3BUCKET
+
+# Kontagent configuration
+export KONTAGENT_KEY=API_KEY
+export KONTAGENT_SECRET=APP_SECRET

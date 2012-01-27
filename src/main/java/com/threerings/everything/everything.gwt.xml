@@ -1,0 +1,11 @@
+<module rename-to="everything">
+  <inherits name="com.google.gwt.user.User"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name="com.threerings.app.App"/>
+
+  <source path="client"/>
+  <source path="data"/>
+  <source path="rpc"/>
+
+  <entry-point class="com.threerings.everything.client.EverythingClient"/>
+</module>
