@@ -69,7 +69,7 @@ public class EverythingApp
                 @Override public String getFacebookAppName () {
                     return getenv("FACEBOOK_APPNAME", null);
                 }
-            }); // TODO
+            });
             File approot = new File(System.getProperty("approot"));
             bind(File.class).annotatedWith(Names.named(APPROOT)).toInstance(approot);
         }
@@ -267,6 +267,7 @@ public class EverythingApp
         // start the http server, let the app run run run, and then we're done done done
         try {
             _https.start();
+            // wait for all of our pending servlets to finish before we exit
             _https.join();
         } catch (Throwable t) {
             log.error("HTTP server failure", t);
@@ -280,7 +281,6 @@ public class EverythingApp
         _executor.shutdown();
         // shutdown our persistence context
         _perCtx.shutdown();
-        // TODO: we want to wait for all of our pending servlets to finish before shutdown
         log.info("Everything app shutdown.");
     }
 
