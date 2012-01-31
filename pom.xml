@@ -28,6 +28,11 @@
   <dependencies>
     <dependency>
       <groupId>com.threerings</groupId>
+      <artifactId>ooo-util</artifactId>
+      <version>1.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.threerings</groupId>
       <artifactId>ooo-app</artifactId>
       <version>1.0</version>
     </dependency>
@@ -40,11 +45,6 @@
       <groupId>com.threerings</groupId>
       <artifactId>gwt-utils</artifactId>
       <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>database-utils</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>
