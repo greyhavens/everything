@@ -123,8 +123,7 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args)
     {
-        String appID = Build.facebookAppID();
-        return "http://www.facebook.com/dialog/oauth?client_id=" + appID +
+        return "http://www.facebook.com/dialog/oauth?client_id=" + _data.facebookAppId +
             "&redirect_uri=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
     }
 
@@ -141,6 +140,14 @@ public class EverythingClient
         StringBuilder buf = new StringBuilder();
         buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();
+    }
+
+    // from interface Context
+    public String billingURL (String path)
+    {
+        String url = _data.billingRootURL + path;
+        String sep = url.contains("?") ? "&" : "?";
+        return url + sep + "SiteIdentifierOverride=12";
     }
 
     // from interface Context
@@ -338,7 +345,7 @@ public class EverythingClient
         }
 
         setContent(null);
-        initFacebook(Build.facebookAppID());
+        initFacebook(data.facebookAppId);
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
         History.fireCurrentHistoryState();
     }

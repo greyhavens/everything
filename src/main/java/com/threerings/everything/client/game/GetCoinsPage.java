@@ -12,7 +12,6 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.everything.data.Build;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 
@@ -31,7 +30,7 @@ public class GetCoinsPage extends FlowPanel
     {
         addStyleName("getCoins");
 
-        Widget frame = makeFrame(action);
+        Widget frame = makeFrame(ctx, action);
         if (frame != null) {
             add(frame);
             return;
@@ -62,23 +61,23 @@ public class GetCoinsPage extends FlowPanel
         add(choices);
     }
 
-    protected Widget makeFrame (String action)
+    protected Widget makeFrame (Context ctx, String action)
     {
         String path;
         if (action.equals("admin")) {
-            path = Build.billingURL("admin/");
+            path = ctx.billingURL("admin/");
         } else if (action.equals("credit_card")) {
-            path = Build.billingURL("creditcard/choosecoins.jspx");
+            path = ctx.billingURL("creditcard/choosecoins.jspx");
         } else if (action.equals("paypal")) {
-            path = Build.billingURL("paypal/choosecoins.jspx");
+            path = ctx.billingURL("paypal/choosecoins.jspx");
         } else if (action.equals("ooocard")) {
-            path = Build.billingURL("threeringscard/check.jspx?mode=coins");
+            path = ctx.billingURL("threeringscard/check.jspx?mode=coins");
         } else if (action.equals("boku")) {
-            path = Build.billingURL("boku/choosecoins.jspx");
+            path = ctx.billingURL("boku/choosecoins.jspx");
         } else if (action.equals("paysafecard")) {
-            path = Build.billingURL("paysafecard/choosecoins.jspx");
+            path = ctx.billingURL("paysafecard/choosecoins.jspx");
         } else if (action.equals("other")) {
-            path = Build.billingURL("otheroptions.wm?choice=coins");
+            path = ctx.billingURL("otheroptions.wm?choice=coins");
         } else {
             return null;
         }

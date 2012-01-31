@@ -113,11 +113,24 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
+                <!-- update our i18n classes -->
                 <taskdef name="i18nsync" classname="com.threerings.gwt.tools.I18nSyncTask"
                          classpathref="maven.plugin.classpath"/>
                 <i18nsync srcdir="${project.build.sourceDirectory}">
                   <fileset dir="${project.build.sourceDirectory}" includes="**/*Messages.properties"/>
                 </i18nsync>
+                <!-- generate a build version and create our Build.java file -->
+                <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
+                <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
+                <property name="build.java" value="com/threerings/everything/data/Build.java"/>
+                <copy file="${project.build.sourceDirectory}/${build.java}.tmpl"
+                      tofile="${project.build.sourceDirectory}/${build.java}" overwrite="true">
+                  <filterset>
+                    <filter token="build_time" value="${build.time}"/>
+                    <filter token="build_version" value="${build.version}"/>
+                  </filterset>
+                </copy>
+                <echo>Assigned build version ${build.version}.</echo>
               </target>
             </configuration>
             <goals>

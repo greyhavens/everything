@@ -22,24 +22,4 @@ public class Build
     {
         return "@build_time@";
     }
-
-    /** Returns our Facebook app ID. */
-    public static String facebookAppID ()
-    {
-        return "@facebook_appid@";
-    }
-
-    /** Returns our Kontagent API key. */
-    public static String kontagentKey ()
-    {
-        return "@kontagent_key@";
-    }
-
-    /** Returns our billing URL. */
-    public static String billingURL (String path)
-    {
-        String url = "@billing_url@" + path;
-        String sep = url.contains("?") ? "&" : "?";
-        return url + sep + "SiteIdentifierOverride=12";
-    }
 }

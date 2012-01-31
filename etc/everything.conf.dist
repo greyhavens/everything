@@ -20,3 +20,6 @@ export MEDIASTORE_BUCKET=S3BUCKET
 # Kontagent configuration
 export KONTAGENT_KEY=API_KEY
 export KONTAGENT_SECRET=APP_SECRET
+
+# OOO billing server bits
+export BILLING_URL=https://billing.apps.threerings.net/billing/

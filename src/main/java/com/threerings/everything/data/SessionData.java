@@ -51,6 +51,12 @@ public class SessionData
     /** The main URL to our app. */
     public String everythingURL;
 
+    /** The URL root for all billing pages. */
+    public String billingRootURL;
+
+    /** Our Facebook app ID. */
+    public String facebookAppId;
+
     /** A URL to request from Kontagent once we're loaded. */
     public String kontagentHello;
 }
