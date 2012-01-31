@@ -22,7 +22,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gwt.version>2.4.0</gwt.version>
   </properties>
 
   <dependencies>
@@ -47,11 +46,6 @@
       <version>1.5</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-    </dependency>
     <dependency>
       <groupId>com.restfb</groupId>
       <artifactId>restfb</artifactId>
@@ -110,6 +104,7 @@
         <version>1.7</version>
         <executions>
           <execution>
+            <id>gensrc</id>
             <phase>generate-sources</phase>
             <configuration>
               <target>
@@ -137,6 +132,36 @@
               <goal>run</goal>
             </goals>
           </execution>
+          <execution>
+            <id>cleancrap</id>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <!-- delete a bunch of cruft we don't want -->
+                <property name="target.dir" value="${project.build.directory}"/>
+                <delete dir="${target.dir}/gwt-unitCache"/>
+                <property name="war.dir" value="${target.dir}/${project.build.finalName}"/>
+                <delete dir="${war.dir}/WEB-INF/deploy/everything/symbolMaps"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>killwar</id>
+            <phase>package</phase>
+            <configuration>
+              <target>
+                <!-- delete a bunch of cruft we don't want -->
+                <property name="target.dir" value="${project.build.directory}"/>
+                <delete file="${target.dir}/${project.build.finalName}.war"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
         </executions>
         <dependencies>
           <dependency>
@@ -150,10 +175,10 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwt.version}</version>
+        <version>2.4.0</version>
         <executions>
           <execution>
-            <phase>prepare-package</phase>
+            <phase>process-classes</phase>
             <goals>
               <goal>compile</goal>
             </goals>
