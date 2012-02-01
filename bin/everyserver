@@ -6,7 +6,7 @@ ROOT=`cd $ROOT/.. ; pwd`
 # Add all necessary JAR files to the CLASSPATH
 APPROOT=`echo $ROOT/target/everything-1.0-SNAPSHOT`
 WEBDIR=$APPROOT/WEB-INF
-CLASSPATH=$WEBDIR/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
+CLASSPATH=$ROOT/target/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
 
 # if we have a local config, read it in
 if [ -f etc/everything.conf ]; then
