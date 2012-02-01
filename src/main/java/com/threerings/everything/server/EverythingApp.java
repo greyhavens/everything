@@ -117,7 +117,7 @@ public class EverythingApp
         // handle SIGNINT and SIGTERM by shutting down
         SignalUtil.Handler onQuit = new SignalUtil.Handler() {
             public void signalReceived (SignalUtil.Number sig) {
-                log.info("Shtudown requested.");
+                log.info("Shutdown requested.");
                 app.requestShutdown();
             }
         };
@@ -269,7 +269,9 @@ public class EverythingApp
         // schedule("prune_records", PruneRecords.class).at(1);
 
         String jvm = System.getProperty("java.vendor") + " " + System.getProperty("java.version");
-        log.info("Everything app initialized.", "build", Build.version(), "jvm", jvm);
+        String os = System.getProperty("os.name") + " " + System.getProperty("os.version") + " " +
+            System.getProperty("os.arch");
+        log.info("Everything app initialized.", "build", Build.version(), "jvm", jvm, "os", os);
     }
 
     public void run () {
