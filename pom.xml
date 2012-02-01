@@ -150,7 +150,7 @@
           </execution>
           <execution>
             <id>killwar</id>
-            <phase>package</phase>
+            <phase>install</phase>
             <configuration>
               <target>
                 <!-- delete a bunch of cruft we don't want -->
@@ -179,6 +179,14 @@
         <executions>
           <execution>
             <phase>process-classes</phase>
+            <configuration>
+              <!-- don't use the separate-process socket-using worker factory -->
+              <!-- as that causes a bunch of warnings during the Heroku build -->
+              <extraJvmArgs>
+                -mx1024m \
+                -Dgwt.jjs.permutationWorkerFactory=com.google.gwt.dev.ThreadedPermutationWorkerFactory
+              </extraJvmArgs>
+            </configuration>
             <goals>
               <goal>compile</goal>
             </goals>
