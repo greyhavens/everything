@@ -8,8 +8,8 @@ APPROOT=`echo $ROOT/target/everything-1.0-SNAPSHOT`
 WEBDIR=$APPROOT/WEB-INF
 CLASSPATH=$WEBDIR/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
 
-# if we're not running on Heroku, read in our local config
-if [ -z "$RACK_ENV" ]; then
+# if we have a local config, read it in
+if [ -f etc/everything.conf ]; then
     . etc/everything.conf
 fi
 
