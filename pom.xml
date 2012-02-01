@@ -134,7 +134,7 @@
           </execution>
           <execution>
             <id>cleancrap</id>
-            <phase>prepare-package</phase>
+            <phase>install</phase>
             <configuration>
               <target>
                 <!-- delete a bunch of cruft we don't want -->
@@ -142,19 +142,6 @@
                 <delete dir="${target.dir}/gwt-unitCache"/>
                 <property name="war.dir" value="${target.dir}/${project.build.finalName}"/>
                 <delete dir="${war.dir}/WEB-INF/deploy/everything/symbolMaps"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>killwar</id>
-            <phase>install</phase>
-            <configuration>
-              <target>
-                <!-- delete a bunch of cruft we don't want -->
-                <property name="target.dir" value="${project.build.directory}"/>
                 <delete file="${target.dir}/${project.build.finalName}.war"/>
               </target>
             </configuration>
@@ -178,7 +165,7 @@
         <version>2.4.0</version>
         <executions>
           <execution>
-            <phase>process-classes</phase>
+            <phase>prepare-package</phase>
             <configuration>
               <!-- don't use the separate-process socket-using worker factory -->
               <!-- as that causes a bunch of warnings during the Heroku build -->
