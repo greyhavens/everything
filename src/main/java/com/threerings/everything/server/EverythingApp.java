@@ -59,16 +59,16 @@ public class EverythingApp
             bind(Lifecycle.class).toInstance(new Lifecycle());
             bind(FacebookConfig.class).toInstance(new FacebookConfig() {
                 @Override public String getFacebookKey () {
-                    return getenv("FACEBOOK_KEY", null);
+                    return reqenv("FACEBOOK_KEY");
                 }
                 @Override public String getFacebookSecret () {
-                    return getenv("FACEBOOK_SECRET", null);
+                    return reqenv("FACEBOOK_SECRET");
                 }
                 @Override public String getFacebookAppId () {
-                    return getenv("FACEBOOK_APPID", null);
+                    return reqenv("FACEBOOK_APPID");
                 }
                 @Override public String getFacebookAppName () {
-                    return getenv("FACEBOOK_APPNAME", null);
+                    return reqenv("FACEBOOK_APPNAME");
                 }
             });
             File approot = new File(System.getProperty("approot"));
@@ -83,10 +83,7 @@ public class EverythingApp
         // create our database connection
         PersistenceContext perCtx = injector.getInstance(PersistenceContext.class);
         try {
-            String dbenv = getenv("DATABASE_URL", null);
-            if (dbenv == null) {
-                throw new RuntimeException("Must supply 'DATABASE_URL' environment variable.");
-            }
+            String dbenv = reqenv("DATABASE_URL");
             // swap postgres: for http: otherwise URL freaks out
             URL dburl = new URL(dbenv.replaceAll("postgres:", "http:"));
             // TODO: validate (regexp?) that it has the form: postgres://username:password@host/dbname
@@ -205,28 +202,28 @@ public class EverythingApp
      * Returns the id of our S3 media store.
      */
     public String getMediaStoreId () {
-        return getenv("MEDIASTORE_ID", null);
+        return reqenv("MEDIASTORE_ID");
     }
 
     /**
      * Returns the secret key to our S3 media store.
      */
     public String getMediaStoreKey () {
-        return getenv("MEDIASTORE_KEY", null);
+        return reqenv("MEDIASTORE_KEY");
     }
 
     /**
      * Returns the S3 bucket to which to upload when saving to our media store.
      */
     public String getMediaStoreBucket () {
-        return getenv("MEDIASTORE_BUCKET", null);
+        return reqenv("MEDIASTORE_BUCKET");
     }
 
     /**
      * Returns our embedded billing page URL.
      */
     public String getBillingURL () {
-        return getenv("BILLING_URL", null);
+        return reqenv("BILLING_URL");
     }
 
     /**
@@ -297,6 +294,12 @@ public class EverythingApp
     protected static String getenv (String name, String defval) {
         String value = System.getenv(name);
         return (value == null) ? defval : value;
+    }
+
+    protected static String reqenv (String name) {
+        String value = getenv(name, null);
+        if (value == null) throw new RuntimeException("Missing '" + name + "' env variable.");
+        return value;
     }
 
     protected static class ProcessBirthdays implements Runnable {
