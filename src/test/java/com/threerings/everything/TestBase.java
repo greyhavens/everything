@@ -28,9 +28,7 @@ public abstract class TestBase
     public static void run (Class<? extends TestBase> testClass, String[] args)
     {
         Injector injector = Guice.createInjector(new TestModule());
-        EverythingApp app = injector.getInstance(EverythingApp.class);
         injector.getInstance(testClass).run(args);
-        app.shutdown();
     }
 
     protected static void usage (String usage, String errmsg)

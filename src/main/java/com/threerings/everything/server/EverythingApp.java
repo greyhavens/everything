@@ -27,6 +27,7 @@ import com.samskivert.depot.PersistenceContext;
 import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
 import com.samskivert.util.Lifecycle;
+import com.samskivert.util.SignalUtil;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.app.server.AppHttpServer;
@@ -110,8 +111,17 @@ public class EverythingApp
         }
 
         // create and initialize the whole shebang
-        EverythingApp app = injector.getInstance(EverythingApp.class);
+        final EverythingApp app = injector.getInstance(EverythingApp.class);
         app.init();
+
+        // handle SIGNINT and SIGTERM by shutting down
+        SignalUtil.Handler onQuit = new SignalUtil.Handler() {
+            public void signalReceived (SignalUtil.Number sig) {
+                app.requestShutdown();
+            }
+        };
+        SignalUtil.register(SignalUtil.Number.TERM, onQuit);
+        SignalUtil.register(SignalUtil.Number.INT, onQuit);
 
         // initialize our database repositories and run migrations (now that all the servlets are
         // injected, they will have been created and registered)
@@ -121,9 +131,8 @@ public class EverythingApp
         Lifecycle cycle = injector.getInstance(Lifecycle.class);
         cycle.init();
 
-        // when run() returns, a shutdown will have been requested
+        // run the app, when run() returns, shutdown will have completed
         app.run();
-        app.shutdown();
     }
 
     /**
@@ -227,10 +236,10 @@ public class EverythingApp
     }
 
     /**
-     * Returns the url for this app as hosted by samsara.
+     * Returns the URL for this app.
      */
     public String getBaseUrl () {
-        return _config.getValue("samsara_base_url", getHostUrl());
+        return getenv("BASE_URL", getHostUrl());
     }
 
     public void coinsPurchased (int userId, int coins) {
@@ -270,21 +279,24 @@ public class EverythingApp
         } catch (Throwable t) {
             log.error("HTTP server failure", t);
         }
-    }
 
-    public void shutdown () {
-        // shut down the http server
-        _https.shutdown();
         // shut down our executors
         _executor.shutdown();
+
         // shutdown our persistence context
         _perCtx.shutdown();
         log.info("Everything app shutdown.");
     }
 
+    public void requestShutdown () {
+        // shut down the http server; this will cause run() to exit
+        _https.shutdown();
+    }
+
     protected String getHostUrl () {
+        String host = getenv("HOST", "localhost");
         int port = getHttpPort();
-        return "http://localhost" + (port == 80 ? "" : (":" + port));
+        return "http://" + host + (port == 80 ? "" : (":" + port));
     }
 
     protected int getHttpPort () {
@@ -332,8 +344,7 @@ public class EverythingApp
         @Inject PlayerRepository _playerRepo;
     }
 
-    protected ExecutorService _executor = Executors.newFixedThreadPool(3);
-
+    protected final ExecutorService _executor = Executors.newFixedThreadPool(3);
     protected final Config _config = new Config("everything"); // TODO
 
     @Inject protected @Named(APPROOT) File _approot;
