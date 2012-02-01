@@ -31,6 +31,7 @@ import com.samskivert.util.SignalUtil;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.app.server.AppHttpServer;
+import com.threerings.cron.server.CronLogic;
 import com.threerings.facebook.servlet.FacebookConfig;
 import com.threerings.user.OOOUser;
 import com.threerings.util.PostgresUtil;
@@ -56,6 +57,7 @@ public class EverythingApp
 
     public static class Module extends AbstractModule {
         @Override protected void configure () {
+            bind(ExecutorService.class).toInstance(Executors.newFixedThreadPool(3));
             bind(PersistenceContext.class).toInstance(new PersistenceContext());
             bind(Lifecycle.class).toInstance(new Lifecycle());
             bind(FacebookConfig.class).toInstance(new FacebookConfig() {
@@ -128,10 +130,6 @@ public class EverythingApp
         // injected, they will have been created and registered)
         perCtx.initializeRepositories(true);
 
-        // initialize everything that is registered with Lifecycle
-        Lifecycle cycle = injector.getInstance(Lifecycle.class);
-        cycle.init();
-
         // run the app, when run() returns, shutdown will have completed
         app.run();
     }
@@ -141,7 +139,7 @@ public class EverythingApp
      */
     public Executor getExecutor ()
     {
-        return _executor;
+        return _exec;
     }
 
     /**
@@ -264,9 +262,33 @@ public class EverythingApp
         _https.serve(AdminServlet.class, gwtRoot + AdminServlet.ENTRY_POINT);
 
         // set up our cron jobs
-        // schedule("process_birthdays", ProcessBirthdays.class).every(1);
-        // schedule("send_reminders", SendReminders.class).every(1);
-        // schedule("prune_records", PruneRecords.class).at(1);
+        _cronLogic.scheduleEvery(1, "process_birthdays", new Runnable() {
+            @Override public void run () {
+                _gameLogic.processBirthdays();
+            }
+        });
+        _cronLogic.scheduleEvery(1, "send_reminders", new Runnable() {
+            @Override public void run () {
+                _playerLogic.sendReminderNotifications();
+            }
+        });
+        _cronLogic.scheduleAt(1, "prune_records", new Runnable() {
+            @Override public void run () {
+                int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+                int recruit = _playerRepo.pruneGiftRecords();
+                if (feed > 0) {
+                    log.info("Pruned " + feed + " old feed items.");
+                }
+                if (recruit > 0) {
+                    log.info("Pruned " + recruit + " old recruitment gift records.");
+                }
+                // TODO: prune GridRecords, but only after the maximum number of free flips
+                // can be accumulated into the PlayerRecord
+            }
+        });
+
+        // initialize everything that is registered with Lifecycle
+        _cycle.init();
 
         String jvm = System.getProperty("java.vendor") + " " + System.getProperty("java.version");
         String os = System.getProperty("os.name") + " " + System.getProperty("os.version") + " " +
@@ -284,8 +306,11 @@ public class EverythingApp
             log.error("HTTP server failure", t);
         }
 
-        // shut down our executors
-        _executor.shutdown();
+        // shutdown our lifecycle components (mainly cronlogic)
+        _cycle.shutdown();
+
+        // shut down our executor
+        _exec.shutdown();
 
         // shutdown our persistence context
         _perCtx.shutdown();
@@ -318,44 +343,23 @@ public class EverythingApp
         return value;
     }
 
-    protected static class ProcessBirthdays implements Runnable {
-        @Override public void run () {
-            _gameLogic.processBirthdays();
+    @Singleton
+    protected static class EverythingCronLogic extends CronLogic {
+        @Inject public EverythingCronLogic (Lifecycle cycle, ExecutorService exec) {
+            super(cycle, exec);
         }
-        @Inject GameLogic _gameLogic;
     }
-
-    protected static class SendReminders implements Runnable {
-        @Override public void run () {
-            _playerLogic.sendReminderNotifications();
-        }
-        @Inject PlayerLogic _playerLogic;
-    }
-
-    protected static class PruneRecords implements Runnable {
-        @Override public void run () {
-            int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-            int recruit = _playerRepo.pruneGiftRecords();
-            if (feed > 0) {
-                log.info("Pruned " + feed + " old feed items.");
-            }
-            if (recruit > 0) {
-                log.info("Pruned " + recruit + " old recruitment gift records.");
-            }
-            // TODO: prune GridRecords, but only after the maximum number of free flips
-            // can be accumulated into the PlayerRecord
-        }
-        @Inject PlayerRepository _playerRepo;
-    }
-
-    protected final ExecutorService _executor = Executors.newFixedThreadPool(3);
-    protected final Config _config = new Config("everything"); // TODO
 
     @Inject protected @Named(APPROOT) File _approot;
+    @Inject protected FacebookConfig _fbconf;
+    @Inject protected ExecutorService _exec;
+    @Inject protected Lifecycle _cycle;
     @Inject protected PersistenceContext _perCtx;
     @Inject protected AppHttpServer _https;
+    @Inject protected EverythingCronLogic _cronLogic;
+    @Inject protected GameLogic _gameLogic;
+    @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
-    @Inject protected FacebookConfig _fbconf;
 
     protected static final int POSTGRES_PORT = 5432;
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
