@@ -15,6 +15,7 @@ fi
 
 if [ ! -z "NEW_RELIC_APP_NAME" ]; then
     NEW_RELIC_ARGS=-javaagent:lib/newrelic.jar
+    echo "Host: $HOST"
 fi
 
 exec java \
