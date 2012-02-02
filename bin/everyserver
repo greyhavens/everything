@@ -13,7 +13,12 @@ if [ -f etc/everything.conf ]; then
     . etc/everything.conf
 fi
 
+if [ ! -z "NEW_RELIC_APP_NAME" ]; then
+    NEW_RELIC_ARGS=-javaagent:lib/newrelic.jar
+fi
+
 exec java \
+    $NEW_RELIC_ARGS \
     -Djava.util.logging.config.file=$WEBDIR/classes/logging.properties \
     -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog \
     -Dapproot=$APPROOT \
