@@ -6,14 +6,14 @@ ROOT=`cd $ROOT/.. ; pwd`
 # Add all necessary JAR files to the CLASSPATH
 APPROOT=`echo $ROOT/target/everything-1.0-SNAPSHOT`
 WEBDIR=$APPROOT/WEB-INF
-CLASSPATH=$ROOT/target/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
+export CLASSPATH=$ROOT/target/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
 
 # if we have a local config, read it in
 if [ -f etc/everything.conf ]; then
     . etc/everything.conf
 fi
 
-java -cp $CLASSPATH \
+exec java \
     -Djava.util.logging.config.file=$WEBDIR/classes/logging.properties \
     -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog \
     -Dapproot=$APPROOT \
