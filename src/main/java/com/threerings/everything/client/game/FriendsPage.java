@@ -64,13 +64,13 @@ public class FriendsPage extends DataPanel<List<PlayerStats>>
         FluentTable table = new FluentTable(5, 0, "handwriting");
         // table.setWidth("100%");
 
-        Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
-        PushButton invite = ButtonUI.newSmallButton("Invite", new ClickHandler() {
-            public void onClick (ClickEvent event) {
-                _ctx.displayPopup(new InvitePopup(_ctx, null, null), (Widget)event.getSource());
-            }
-        });
-        table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS).alignCenter();
+        // Label label = Widgets.newLabel("Invite friends to play Everything with you:", "machine");
+        // PushButton invite = ButtonUI.newSmallButton("Invite", new ClickHandler() {
+        //     public void onClick (ClickEvent event) {
+        //         _ctx.displayPopup(new InvitePopup(_ctx, null, null), (Widget)event.getSource());
+        //     }
+        // });
+        // table.add().setWidget(Widgets.newRow(label, invite)).setColSpan(COLUMNS).alignCenter();
 
         if (friends.size() == 0) {
             return;

@@ -36,25 +36,25 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     @Override // from DataPanel
     protected void init (EverythingService.FeedResult result)
     {
-        if (result.recruitGifts.size() > 0) {
-            add(Widgets.newLabel("Send Free Gifts to your friends!", "Title", "machine"));
-            add(Widgets.newLabel("More players means more things!"));
-            FluentTable cards = new FluentTable(0, 0);
-            int col = 0;
-            for (Card card : result.recruitGifts) {
-                SlotView slot = new SlotView();
-                if (card == null) { // already gifted
-                    slot.status.update(SlotStatus.RECRUIT_GIFTED);
-                } else {
-                    slot.status.update(SlotStatus.FLIPPED);
-                    slot.setCard(_ctx, card.toThingCard(), false,
-                        CardPopup.recruitGiftClick(_ctx, card, slot.status));
-                }
-                cards.at(0, col).setWidget(slot);
-                col++;
-            }
-            add(cards);
-        }
+        // if (result.recruitGifts.size() > 0) {
+        //     add(Widgets.newLabel("Send Free Gifts to your friends!", "Title", "machine"));
+        //     add(Widgets.newLabel("More players means more things!"));
+        //     FluentTable cards = new FluentTable(0, 0);
+        //     int col = 0;
+        //     for (Card card : result.recruitGifts) {
+        //         SlotView slot = new SlotView();
+        //         if (card == null) { // already gifted
+        //             slot.status.update(SlotStatus.RECRUIT_GIFTED);
+        //         } else {
+        //             slot.status.update(SlotStatus.FLIPPED);
+        //             slot.setCard(_ctx, card.toThingCard(), false,
+        //                 CardPopup.recruitGiftClick(_ctx, card, slot.status));
+        //         }
+        //         cards.at(0, col).setWidget(slot);
+        //         col++;
+        //     }
+        //     add(cards);
+        // }
 
         if (!result.gifts.isEmpty()) {
             add(Widgets.newLabel("Unopened Gifts", "Title", "machine"));
