@@ -364,7 +364,7 @@ public class EverythingClient
             $wnd.FB.init({ appId: appId, status: true, cookie: true });
             // start up our iframe resizer if we're running in an iframe
             if ($wnd != $wnd.top) {
-                $wnd.FB.Canvas.setAutoResize();
+                $wnd.FB.Canvas.setAutoGrow();
             }
             $wnd.FB.XFBML.parse(); // grind through once on init
         };
