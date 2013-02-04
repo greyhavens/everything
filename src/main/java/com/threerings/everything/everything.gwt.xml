@@ -8,4 +8,9 @@
   <source path="rpc"/>
 
   <entry-point class="com.threerings.everything.client.EverythingClient"/>
+
+  <!-- speed up compiles by only generating one version; safari is the best -->
+  <!-- choice for targetting HTML5-compliant browsers -->
+  <set-property name='user.agent' value='safari'/>
+  <set-configuration-property name="user.agent.runtimeWarning" value="false"/>
 </module>
