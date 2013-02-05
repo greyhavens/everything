@@ -376,7 +376,7 @@ public class EverythingClient
            js = d.createElement('script'); js.id = id; js.async = true;
            js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
            ref.parentNode.insertBefore(js, ref);
-        }(document, false));
+        }($wnd.document, false));
         // (function() {
         //     var e = document.createElement('script');
         //     e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
