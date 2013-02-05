@@ -345,7 +345,7 @@ public class EverythingClient
         }
 
         setContent(null);
-        initFacebook(data.facebookAppId);
+        initFacebook(data.facebookAppId, data.everythingURL + "/channel.html");
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
         History.fireCurrentHistoryState();
     }
@@ -359,10 +359,10 @@ public class EverythingClient
         return new Date().getTimezoneOffset();
     }-*/;
 
-    protected static native void initFacebook (String appId) /*-{
+    protected static native void initFacebook (String appId, String channelUrl) /*-{
         $wnd.fbAsyncInit = function () {
             $wnd.FB.JSON.stringify = function (value) { return JSON.encode(value);};
-            $wnd.FB.init({ appId: appId, status: true, cookie: true });
+            $wnd.FB.init({ appId: appId, channelUrl: channelUrl, status: true, cookie: true });
             // start up our iframe resizer if we're running in an iframe
             if ($wnd != $wnd.top) {
                 $wnd.FB.Canvas.setAutoGrow();
@@ -370,12 +370,19 @@ public class EverythingClient
             $wnd.FB.XFBML.parse(); // grind through once on init
         };
 
-        (function() {
-            var e = document.createElement('script');
-            e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-            e.async = true;
-            $wnd.document.getElementById('fb-root').appendChild(e);
-        }());
+        (function(d, debug){
+           var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+           if (d.getElementById(id)) {return;}
+           js = d.createElement('script'); js.id = id; js.async = true;
+           js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+           ref.parentNode.insertBefore(js, ref);
+        }(document, false));
+        // (function() {
+        //     var e = document.createElement('script');
+        //     e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+        //     e.async = true;
+        //     $wnd.document.getElementById('fb-root').appendChild(e);
+        // }());
     }-*/;
 
     protected SessionData _data;
