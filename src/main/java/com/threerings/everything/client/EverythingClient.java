@@ -345,7 +345,7 @@ public class EverythingClient
         }
 
         setContent(null);
-        initFacebook(data.facebookAppId, data.everythingURL + "/channel.cache.html");
+        initFacebook(data.facebookAppId, GWT.getModuleBaseURL() + "/channel.cache.html");
         RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
         History.fireCurrentHistoryState();
     }
