@@ -41,8 +41,8 @@ public class TrophyDialog
         String title = ctx.getMe() + " got the '" + trophy.name + "' trophy in Everything.";
         String desc = "Through persistent collecting, " + ctx.getMe() + " has earned " +
             "a trophy while learning much about the world.";
-        String imageURL = GWT.getModuleBaseURL() + "images/trophies/trophy.png";
-        //String imageURL = GWT.getModuleBaseURL() + "trophyimg?trophy=" + trophy.trophyId;
+        String imageURL = GWT.getHostPageBaseURL() + "images/trophies/trophy.png";
+        //String imageURL = GWT.getHostPageBaseURL() + "trophyimg?trophy=" + trophy.trophyId;
         String collectionURL = ctx.getEverythingURL(
             Kontagent.POST, tracking, Page.BROWSE, ctx.getMe().userId);
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);

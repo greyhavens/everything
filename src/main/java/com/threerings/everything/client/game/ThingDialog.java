@@ -96,7 +96,7 @@ public class ThingDialog
 //        String joinURL = ctx.getEverythingURL(
         String joinURL = ctx.getFacebookAddURL(
             Kontagent.POST, tracking, Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
-        String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
+        String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog("", card.thing.name, card.thing.descrip + "\nFacts: " + card.thing.facts,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, joinURL, joinURL, "Start your collection with this card!",
@@ -140,7 +140,7 @@ public class ThingDialog
         String cardURL = ctx.getEverythingURL(
             Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
         String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
-        String imageURL = GWT.getModuleBaseURL() + "cardimg?thing=" + card.thing.thingId;
+        String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, cardURL, everyURL, "Start your own Everything collection!", prompt,
@@ -190,7 +190,7 @@ public class ThingDialog
             action_links: [{ text: "Collect Everything",
                              href: everyURL }],
             target_id: targetId,
-            user_message_prompt: prompt, // TODO: this seems not to work
+            user_message_prompt: prompt // TODO: this seems not to work
         };
         $wnd.FB.ui(publish, function (rsp) {
             if (rsp && rsp.post_id) {
