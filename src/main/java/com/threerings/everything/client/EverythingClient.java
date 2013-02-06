@@ -361,7 +361,6 @@ public class EverythingClient
 
     protected static native void initFacebook (String appId, String channelUrl) /*-{
         $wnd.fbAsyncInit = function () {
-            $wnd.FB.JSON.stringify = function (value) { return JSON.encode(value);};
             $wnd.FB.init({ appId: appId, channelUrl: channelUrl, status: true, cookie: true });
             // start up our iframe resizer if we're running in an iframe
             if ($wnd != $wnd.top) {
