@@ -4,10 +4,13 @@
 
 package com.threerings.everything.server;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +18,7 @@ import java.util.concurrent.Executors;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -334,6 +338,27 @@ public class EverythingApp
 
     protected static String getenv (String name, String defval) {
         String value = System.getenv(name);
+        if (value != null) return value;
+        // if we didn't find our variable, check whether we should pull in a fake env for testing
+        if (_fakeEnv == null) {
+            _fakeEnv = Maps.newHashMap();
+            String envFile = System.getProperty("env.file");
+            try {
+                if (envFile != null) {
+                    BufferedReader bin = new BufferedReader(new FileReader(envFile));
+                    String line;
+                    while ((line = bin.readLine()) != null) {
+                        if (!line.startsWith("export ")) continue; // skip non-envvar lines
+                        String[] bits = line.substring("export ".length()).split("=");
+                        if (bits.length != 2) log.warning("Weird env file line " + line);
+                        else _fakeEnv.put(bits[0].trim(), bits[1].trim());
+                    }
+                }
+            } catch (Exception e) {
+                log.warning("Failed to read env file: " + envFile, e);
+            }
+        }
+        value = _fakeEnv.get(name);
         return (value == null) ? defval : value;
     }
 
@@ -364,4 +389,7 @@ public class EverythingApp
     protected static final int POSTGRES_PORT = 5432;
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
     protected static final int FEED_PRUNE_DAYS = 5;
+
+    // used when testing and we don't have environment variables
+    protected static Map<String,String> _fakeEnv;
 }
