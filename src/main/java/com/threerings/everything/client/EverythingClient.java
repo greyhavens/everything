@@ -363,9 +363,7 @@ public class EverythingClient
         $wnd.fbAsyncInit = function () {
             $wnd.FB.init({ appId: appId, channelUrl: channelUrl, status: true, cookie: true });
             // start up our iframe resizer if we're running in an iframe
-            if ($wnd != $wnd.top) {
-                $wnd.FB.Canvas.setAutoGrow();
-            }
+            if ($wnd != $wnd.top) $wnd.FB.Canvas.setAutoGrow();
             $wnd.FB.XFBML.parse(); // grind through once on init
         };
 
@@ -376,12 +374,6 @@ public class EverythingClient
            js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
            ref.parentNode.insertBefore(js, ref);
         }($wnd.document, false));
-        // (function() {
-        //     var e = document.createElement('script');
-        //     e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        //     e.async = true;
-        //     $wnd.document.getElementById('fb-root').appendChild(e);
-        // }());
     }-*/;
 
     protected SessionData _data;
