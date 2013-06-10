@@ -14,9 +14,7 @@ import com.threerings.gwt.ui.Widgets;
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.rpc.GameService;
 import com.threerings.everything.rpc.GameServiceAsync;
-import com.threerings.everything.data.Card;
 import com.threerings.everything.data.ThingCard;
-import com.threerings.everything.data.SlotStatus;
 
 import com.threerings.everything.client.ui.XFBML;
 import com.threerings.everything.client.util.Context;

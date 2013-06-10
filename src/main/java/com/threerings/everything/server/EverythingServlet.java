@@ -9,14 +9,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -25,7 +23,6 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import com.restfb.Connection;
 import com.restfb.DefaultFacebookClient;
@@ -53,7 +50,6 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.PlayerStats;
-import com.threerings.everything.data.Rarity;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.rpc.EverythingService;
@@ -65,7 +61,6 @@ import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.RecruitGiftRecord;
 import com.threerings.everything.server.persist.ThingRepository;
-import com.threerings.everything.util.GameUtil;
 
 import static com.threerings.everything.Log.log;
 
@@ -116,7 +111,6 @@ public class EverythingServlet extends EveryServiceServlet
             // load up this player's Facebook profile info
             FacebookClient fbclient = new DefaultFacebookClient(fbinfo.right);
             long facebookId = Long.parseLong(fbinfo.left);
-            Set<Long> ids = Collections.singleton(facebookId);
             User fbuser;
             try {
                 fbuser = fbclient.fetchObject("me", User.class);

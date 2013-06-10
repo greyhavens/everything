@@ -249,7 +249,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                 // display the card big and fancy and allow them to gift it or cash it in
                 CardPopup popup = CardPopup.display(
                     _ctx, result, _slots[position].status, _slots[position], null);
-                if (Build.BONANZAS_ENABLED && result.bonanza) {
+                if (Build.bonanzasEnabled() && result.bonanza) {
                     popup.addCloseHandler(new CloseHandler<PopupPanel>() {
                         public void onClose (CloseEvent<PopupPanel> event) {
                             if (event.isAutoClosed()) {
@@ -259,7 +259,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                                 new AsyncCallback<GameStatus>() {
                                 public void onSuccess (GameStatus status) {
                                     updateGameStatus(_data.status = status);
-                                    Popups.infoNear("You've earned an extra free flip.",
+                                    Popups.infoBelow("You've earned an extra free flip.",
                                         _slots[position]);
                                 }
                                 public void onFailure (Throwable caught) {
@@ -291,7 +291,7 @@ public class FlipPage extends DataPanel<GameService.GridResult>
                     protected boolean callService () {
                         popup.hide();
                         if (pup.getTargetStatus() == _data.grid.status) {
-                            Popups.errorNear("This powerup will have no effect.", trigger);
+                            Popups.errorBelow("This powerup will have no effect.", trigger);
                             return false;
                         }
                         _gamesvc.usePowerup(_data.grid.gridId, pup, this);

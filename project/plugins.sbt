@@ -1,5 +1,5 @@
 // pom-util POM helpers
-libraryDependencies += "com.samskivert" % "sbt-pom-util" % "0.4-SNAPSHOT"
+libraryDependencies += "com.samskivert" % "sbt-pom-util" % "0.4"
 
 // this GWT plugin also pulls in xsbt-web-plugin
 addSbtPlugin("net.thunderklaus" % "sbt-gwt-plugin" % "1.1-SNAPSHOT")

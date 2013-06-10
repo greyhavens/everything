@@ -12,17 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import com.samskivert.servlet.util.ParameterUtil;
 import com.samskivert.util.StringUtil;
 
-import com.threerings.facebook.FBParam;
-
 import com.threerings.app.client.ServiceException;
 import com.threerings.app.server.ServletAuthUtil;
 import com.threerings.facebook.servlet.FacebookAppServlet;
-import com.threerings.facebook.servlet.FacebookConfig;
 
 import com.threerings.everything.rpc.Kontagent;
 
@@ -153,11 +149,11 @@ public class AuthServlet extends FacebookAppServlet
     protected void reportLanding (
         HttpServletRequest req, Kontagent type, String ltype, String tracking)
     {
-        String appAdded = (FBParam.SIG.isSet(req) && FBParam.SESSION_KEY.isSet(req)) ?  "1" : "0";
-        String rkey = (type == Kontagent.OTHER_RESPONSE) ? "s" : "r"; // retarded
-        String recipId = StringUtil.getOr(FBParam.USER.getStringValue(req),
-                                          FBParam.CANVAS_USER.getStringValue(req));
-        String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
+        // String appAdded = (FBParam.SIG.isSet(req) && FBParam.SESSION_KEY.isSet(req)) ?  "1" : "0";
+        // String rkey = (type == Kontagent.OTHER_RESPONSE) ? "s" : "r"; // retarded
+        // String recipId = StringUtil.getOr(FBParam.USER.getStringValue(req),
+        //                                   FBParam.CANVAS_USER.getStringValue(req));
+        // String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
         // disabled Kontagent for now since we don't really care
         // _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
     }

@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
@@ -18,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
@@ -37,7 +33,6 @@ import com.threerings.user.ExternalAuther;
 
 import com.threerings.everything.data.CoinPrices;
 import com.threerings.everything.server.EverythingApp;
-import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;

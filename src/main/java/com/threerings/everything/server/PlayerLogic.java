@@ -5,29 +5,20 @@
 package com.threerings.everything.server;
 
 import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import com.samskivert.util.Calendars;
-import com.samskivert.util.Tuple;
-
 import com.threerings.app.server.UserLogic;
-import com.threerings.user.ExternalAuther;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
-import com.threerings.everything.rpc.GameCodes;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 

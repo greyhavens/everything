@@ -63,7 +63,7 @@ public class MediaUploader extends FormPanel
                 String result = event.getResults();
                 result = (result == null) ? "" : result.trim();
                 if (result.length() > 0) {
-                    Popups.errorNear(result, _upload);
+                    Popups.errorBelow(result, _upload);
                 } else {
                     _submitted = _upload.getFilename();
                 }
@@ -93,7 +93,7 @@ public class MediaUploader extends FormPanel
 
     protected void uploadError (String code)
     {
-        Popups.errorNear("Upload error: " + Errors.xlate(code), _upload);
+        Popups.errorBelow("Upload error: " + Errors.xlate(code), _upload);
     }
 
     /**

@@ -32,7 +32,6 @@ import com.threerings.s3.client.S3ServerException;
 import com.threerings.s3.client.acl.AccessControlList;
 
 import com.threerings.app.client.ServiceException;
-import com.threerings.app.data.AppCodes;
 
 import com.threerings.everything.data.Thing;
 

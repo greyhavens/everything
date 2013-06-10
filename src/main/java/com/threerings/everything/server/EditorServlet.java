@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 import com.threerings.user.OOOUser;
 
 import com.threerings.app.client.ServiceException;
-import com.threerings.app.data.AppCodes;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.CategoryComment;

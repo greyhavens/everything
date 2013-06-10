@@ -9,21 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
-import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.DateUtil;
 
 import com.threerings.everything.rpc.EverythingServiceAsync;
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.data.PlayerStats;
 
-import com.threerings.everything.client.ui.ButtonUI;
 import com.threerings.everything.client.ui.DataPanel;
 import com.threerings.everything.client.ui.XFBML;
 import com.threerings.everything.client.util.Args;

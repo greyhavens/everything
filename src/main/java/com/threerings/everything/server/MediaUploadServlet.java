@@ -21,7 +21,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.samskivert.io.StreamUtil;
 
 import com.threerings.app.client.ServiceException;
-import com.threerings.app.data.AppCodes;
 import com.threerings.app.server.AppServlet;
 
 import com.threerings.everything.server.persist.PlayerRecord;

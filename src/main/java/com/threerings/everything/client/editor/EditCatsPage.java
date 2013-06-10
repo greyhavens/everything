@@ -264,7 +264,7 @@ public class EditCatsPage extends FluentTable
                 options.addItem("Move", new CategoryMenuBar(0, _level-1, onSelect));
             }
             popup.setWidget(options);
-            Popups.showNear(popup, trigger);
+            Popups.showBelow(popup, trigger);
         }
 
         protected boolean shouldDisplayCategory (Category cat)

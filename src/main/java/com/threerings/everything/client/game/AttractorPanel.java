@@ -5,19 +5,15 @@
 package com.threerings.everything.client.game;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.FlowPanel;
 
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.rpc.GameService;
 import com.threerings.everything.rpc.GameServiceAsync;
-import com.threerings.everything.data.News;
 import com.threerings.everything.data.SlotStatus;
 
 import com.threerings.everything.client.ui.DataPanel;
 import com.threerings.everything.client.util.Context;
-import com.threerings.everything.client.util.Page;
 
 /**
  * A panel, placed on the landing page, for acquiring an 'attractor' card for your new collection.

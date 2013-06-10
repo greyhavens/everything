@@ -7,10 +7,9 @@ package com.threerings.everything.client.game;
 import java.util.Collections;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
@@ -139,7 +138,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
             protected void onLoad () {
                 super.onLoad();
                 XFBML.parse(this);
-                DeferredCommand.addCommand(new Command() {
+                Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
                     public void execute () {
                         message.setFocus(true);
                     }

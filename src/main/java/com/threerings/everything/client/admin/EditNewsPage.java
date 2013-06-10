@@ -42,7 +42,7 @@ public class EditNewsPage extends FlowPanel
                 return true;
             }
             protected boolean gotResult (Void result) {
-                Popups.infoNear("News updated.", upnews);
+                Popups.infoBelow("News updated.", upnews);
                 _news.update(_news.get());
                 return true;
             }
@@ -67,7 +67,7 @@ public class EditNewsPage extends FlowPanel
                 _news.update(news);
                 setLatestNews(onews, upnews, news);
                 nnews.setText("");
-                Popups.infoNear("News posted.", post);
+                Popups.infoBelow("News posted.", post);
                 return true;
             }
         };

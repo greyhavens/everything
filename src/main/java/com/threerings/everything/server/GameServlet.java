@@ -26,7 +26,6 @@ import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
 import com.threerings.app.client.ServiceException;
-import com.threerings.app.data.AppCodes;
 
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Card;
@@ -243,7 +242,7 @@ public class GameServlet extends EveryServiceServlet
         _playerRepo.recordFeedItem(player.userId, FeedItem.Type.FLIPPED, 0, thing.name);
 
         // on a free flip, there's a chance they'll get a bonanza card
-        if (Build.BONANZAS_ENABLED && expectedCost == 0) {
+        if (Build.bonanzasEnabled() && expectedCost == 0) {
             result.bonanza = maybePickBonanza(player, result.card);
         }
 
@@ -424,7 +423,7 @@ public class GameServlet extends EveryServiceServlet
 
         // else, go ahead and grant them the card. Even if they're an old player.
         CardResult result = new CardResult();
-        CardRecord card = prepareCard(player, thing, result,
+        /*CardRecord card =*/ prepareCard(player, thing, result,
             cardCreator(player.userId, thingId, friendId));
         // TODO?
         return result;

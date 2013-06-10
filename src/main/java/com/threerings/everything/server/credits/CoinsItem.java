@@ -4,8 +4,6 @@
 
 package com.threerings.everything.server.credits;
 
-import com.google.gson.Gson;
-
 import com.threerings.everything.data.CoinPrices;
 import com.threerings.everything.server.EverythingApp;
 

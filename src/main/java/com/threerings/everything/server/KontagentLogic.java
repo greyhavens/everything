@@ -16,7 +16,6 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 import com.restfb.types.User;
 

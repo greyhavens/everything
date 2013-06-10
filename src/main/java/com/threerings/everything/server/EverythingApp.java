@@ -37,12 +37,12 @@ import com.samskivert.util.StringUtil;
 import com.threerings.app.server.AppHttpServer;
 import com.threerings.cron.server.CronLogic;
 import com.threerings.facebook.servlet.FacebookConfig;
-import com.threerings.user.OOOUser;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.everything.data.Build;
 import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.credits.CreditsServlet;
+import com.threerings.everything.server.credits.PayUpServlet;
 import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;
@@ -93,12 +93,12 @@ public class EverythingApp
             String dbenv = reqenv("DATABASE_URL");
             // swap postgres: for http: otherwise URL freaks out
             URL dburl = new URL(dbenv.replaceAll("postgres:", "http:"));
-            // TODO: validate (regexp?) that it has the form: postgres://username:password@host/dbname
+            // TODO: validate (regexp?) that it has form: postgres://username:password@host/dbname
 
             Properties dbprops = new Properties();
             dbprops.setProperty("db.default.server", dburl.getHost());
             int port = dburl.getPort();
-            dbprops.setProperty("db.default.port", String.valueOf(port == -1 ? POSTGRES_PORT : port));
+            dbprops.setProperty("db.default.port", String.valueOf(port == -1 ? PGSQL_PORT : port));
             dbprops.setProperty("db.default.database", dburl.getPath().substring(1));
             String[] uinfo = dburl.getUserInfo().split(":");
             dbprops.setProperty("db.default.username", uinfo[0]);
@@ -107,7 +107,7 @@ public class EverythingApp
 
             String dbid = IDENT + start;
             ConnectionProvider conprov = PostgresUtil.createPoolingProvider(
-                new Config("db", dbprops), dbid);
+                new Config(dbprops), dbid);
             // Initialize our app persistence context
             perCtx.init(IDENT, conprov, null);
 
@@ -259,6 +259,7 @@ public class EverythingApp
         _https.serve(MediaUploadServlet.class, "/upload");
         _https.serve(CardImageServlet.class, "/cardimg");
         _https.serve(CreditsServlet.class, "/fbcredits");
+        _https.serve(PayUpServlet.class, "/fbpayup");
         String gwtRoot = "/everything/";
         _https.serve(EverythingServlet.class, gwtRoot + EverythingServlet.ENTRY_POINT);
         _https.serve(GameServlet.class, gwtRoot + GameServlet.ENTRY_POINT);
@@ -353,6 +354,7 @@ public class EverythingApp
                         if (bits.length != 2) log.warning("Weird env file line " + line);
                         else _fakeEnv.put(bits[0].trim(), bits[1].trim());
                     }
+                    bin.close();
                 }
             } catch (Exception e) {
                 log.warning("Failed to read env file: " + envFile, e);
@@ -386,7 +388,7 @@ public class EverythingApp
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
 
-    protected static final int POSTGRES_PORT = 5432;
+    protected static final int PGSQL_PORT = 5432;
     protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
     protected static final int FEED_PRUNE_DAYS = 5;
 

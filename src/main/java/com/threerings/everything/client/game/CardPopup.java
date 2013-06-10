@@ -4,7 +4,6 @@
 
 package com.threerings.everything.client.game;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -22,7 +21,6 @@ import com.threerings.gwt.ui.FX;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.WidgetUtil;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.Handlers;
 import com.threerings.gwt.util.StringUtil;
 import com.threerings.gwt.util.Value;
@@ -31,7 +29,6 @@ import com.threerings.everything.rpc.GameService;
 import com.threerings.everything.rpc.GameServiceAsync;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
-import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.TrophyData;

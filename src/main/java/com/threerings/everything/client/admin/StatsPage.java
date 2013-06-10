@@ -62,7 +62,7 @@ public class StatsPage extends DataPanel<AdminService.StatsResult>
                 return true;
             }
             protected boolean gotResult (Void result) {
-                Popups.infoNear("Free flips granted to everyone!", grant);
+                Popups.infoBelow("Free flips granted to everyone!", grant);
                 return true;
             }
         }.setConfirmText("Are you sure you want to grant free flips to every player in the " +

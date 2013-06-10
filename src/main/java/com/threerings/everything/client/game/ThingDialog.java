@@ -13,7 +13,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.rpc.EverythingServiceAsync;
 import com.threerings.everything.rpc.Kontagent;
-import com.threerings.everything.data.Build;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;

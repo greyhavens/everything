@@ -6,7 +6,6 @@ package com.threerings.everything.client;
 
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;

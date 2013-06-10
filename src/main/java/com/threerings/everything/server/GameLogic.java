@@ -122,6 +122,7 @@ public class GameLogic
         case CAT_REVEALED: reveal = resolveReveal(things.values(), 2); break;
         case SUBCAT_REVEALED: reveal = resolveReveal(things.values(), 1); break;
         case SERIES_REVEALED: reveal = resolveReveal(things.values(), 0); break;
+        default: break;
         }
 
         // place the flipped cards into the runtime grid and summarize the rarities of the rest

@@ -4,7 +4,6 @@
 
 package com.threerings.everything.client.ui;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 

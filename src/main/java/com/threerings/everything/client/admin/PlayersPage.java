@@ -146,7 +146,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
                     return true;
                 }
                 protected boolean gotResult (Void result) {
-                    Popups.infoNear("Editor status updated.", isEditor);
+                    Popups.infoBelow("Editor status updated.", isEditor);
                     return true;
                 }
             };
@@ -184,7 +184,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
                     return true;
                 }
                 protected boolean gotResult (Void result) {
-                    Popups.infoNear(onGranted, grant);
+                    Popups.infoBelow(onGranted, grant);
                     return true;
                 }
             };
@@ -196,6 +196,7 @@ public class PlayersPage extends DataPanel<AdminService.RegiStatsResult>
     }
 
     protected static final AdminServiceAsync _adminsvc = GWT.create(AdminService.class);
-    protected static final DateTimeFormat _bfmt = DateTimeFormat.getMediumDateFormat();
+    protected static final DateTimeFormat _bfmt = DateTimeFormat.getFormat(
+        DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
     protected static final DateTimeFormat _dfmt = DateTimeFormat.getFormat("MMM dd");
 }

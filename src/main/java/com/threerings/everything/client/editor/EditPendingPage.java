@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PushButton;
 
@@ -80,10 +79,10 @@ public class EditPendingPage extends DataPanel<List<PendingSeries>>
                 protected boolean gotResult (Void result) {
                     if (pender.voters.contains(_ctx.getMe().userId)) {
                         pender.voters.remove(_ctx.getMe().userId);
-                        Popups.infoNear("Vote rescinded.", vote);
+                        Popups.infoBelow("Vote rescinded.", vote);
                     } else {
                         pender.voters.add(_ctx.getMe().userId);
-                        Popups.infoNear("Vote submitted.", vote);
+                        Popups.infoBelow("Vote submitted.", vote);
                     }
                     votes.setText(repeat(CHECK_CHAR, pender.voters.size()));
                     vote.getUpFace().setText(getVoteLabel(pender));

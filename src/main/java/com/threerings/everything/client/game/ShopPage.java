@@ -69,7 +69,7 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
             new ClickCallback<Void>(buy) {
                 protected boolean callService () {
                     if (_ctx.getCoins().get() < type.cost) {
-                        Popups.errorNear("You don't have enough coins to buy that.", buy);
+                        Popups.errorBelow("You don't have enough coins to buy that.", buy);
                         return false;
                     }
                     _gamesvc.buyPowerup(type, this);
@@ -78,7 +78,7 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
                 protected boolean gotResult (Void result) {
                     _ctx.getCoins().update(_ctx.getCoins().get() - type.cost);
                     _ctx.getPupsModel().notePurchase(type);
-                    Popups.infoNear("Powerup purchased!", buy);
+                    Popups.infoBelow("Powerup purchased!", buy);
                     if (type.isPermanent()) {
                         buy.setVisible(false);
                     }

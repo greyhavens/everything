@@ -29,7 +29,6 @@ import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.LimitedTextArea;
 import com.threerings.gwt.ui.Popups;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.DateUtil;
 import com.threerings.gwt.util.Value;
 
@@ -95,7 +94,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 }
                 protected boolean gotResult (Void result) {
                     series.update(series.get());
-                    Popups.infoNear("Name updated.", name);
+                    Popups.infoBelow("Name updated.", name);
                     return true;
                 }
             };
@@ -123,9 +122,9 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                     public void onSuccess (Void result) {
                         series.update(series.get());
                         switch (series.get().state) {
-                        case IN_DEVELOPMENT: Popups.infoNear("Series is editable.", state); break;
-                        case PENDING_REVIEW: Popups.infoNear("Submitted for review.", state); break;
-                        case ACTIVE: Popups.infoNear("Series activated.", state); break;
+                        case IN_DEVELOPMENT: Popups.infoBelow("Series is editable.", state); break;
+                        case PENDING_REVIEW: Popups.infoBelow("Submitted for review.", state); break;
+                        case ACTIVE: Popups.infoBelow("Series activated.", state); break;
                         }
                     }
                 });
@@ -148,6 +147,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 switch (series.state) {
                 case IN_DEVELOPMENT: chstate.setText("Submit for review"); break;
                 case PENDING_REVIEW: chstate.setText("Cancel review"); break;
+                default: break;
                 }
                 chstate.setVisible(_ctx.getMe().equals(series.creator) && !series.isActive());
             }
@@ -384,7 +384,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
             new ClickCallback<Void>(save) {
                 protected boolean callService () {
                     if (!updateCard.apply(null)) {
-                        Popups.infoNear(_msgs.textTooLong(), facts);
+                        Popups.infoBelow(_msgs.textTooLong(), facts);
                         return false;
                     }
                     _editorsvc.updateThing(card.thing, this);
@@ -392,7 +392,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
                 }
                 protected boolean gotResult (Void result) {
                     setEditing(false);
-                    Popups.infoNear("Thing saved.", _edit);
+                    Popups.infoBelow("Thing saved.", _edit);
                     return true;
                 }
             };

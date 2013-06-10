@@ -7,23 +7,17 @@ package com.threerings.everything.client.game;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.everything.data.Build;
 import com.threerings.everything.data.CoinPrices;
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.Console;
 
 import com.threerings.everything.client.ui.bling.BlingImages;
-import com.threerings.everything.client.util.Args;
 import com.threerings.everything.client.util.Context;
-import com.threerings.everything.client.util.Page;
 
 /**
  * Displays an interface for buying coins via Facebook Credits.
@@ -79,6 +73,16 @@ public class BuyCoinsPage extends FlowPanel
                 data['order_id']);
         });
     }-*/;
+
+// FB.ui({
+//       method: 'pay',
+//       action: 'purchaseitem',
+//       product: 'http://www.friendsmash.com/og/smashingpack.html',
+//       quantity: 1,                  // optional, defaults to 1
+//       request_id: 'YOUR_REQUEST_ID' // optional, must be unique for each payment
+//     },
+//     callback
+// );
 
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
     protected static final BlingImages _images = GWT.create(BlingImages.class);

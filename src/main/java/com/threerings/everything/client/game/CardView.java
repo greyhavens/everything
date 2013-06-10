@@ -4,9 +4,6 @@
 
 package com.threerings.everything.client.game;
 
-import java.util.List;
-
-import com.google.common.base.Function;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -14,17 +11,13 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
 import com.threerings.gwt.ui.Widgets;
-import com.threerings.gwt.util.Console;
 import com.threerings.gwt.util.StringUtil;
-import com.threerings.gwt.util.Value;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
-import com.threerings.everything.data.TrophyData;
 
 import com.threerings.everything.client.ui.LikeWidget;
 import com.threerings.everything.client.ui.ShadowPanel;
-import com.threerings.everything.client.ui.TrophyUI;
 import com.threerings.everything.client.util.Context;
 import com.threerings.everything.client.util.ImageUtil;
 
@@ -187,5 +180,6 @@ public class CardView extends ShadowPanel
     }-*/;
 
     protected Right _right;
-    protected static final DateTimeFormat _dfmt = DateTimeFormat.getLongDateFormat();
+    protected static final DateTimeFormat _dfmt = DateTimeFormat.getFormat(
+        DateTimeFormat.PredefinedFormat.DATE_LONG);
 }

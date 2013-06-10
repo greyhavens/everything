@@ -13,14 +13,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import com.samskivert.depot.DateFuncs;
 import com.samskivert.depot.DepotRepository;
 import com.samskivert.depot.Key;
 import com.samskivert.depot.KeySet;

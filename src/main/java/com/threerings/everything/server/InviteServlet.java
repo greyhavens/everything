@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 
 import com.samskivert.servlet.util.ParameterUtil;
@@ -26,7 +25,6 @@ import com.threerings.app.server.UserLogic;
 
 import com.threerings.everything.data.SlotStatus;
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;

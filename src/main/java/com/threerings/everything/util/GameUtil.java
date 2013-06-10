@@ -8,8 +8,6 @@ import com.threerings.everything.data.Player;
 import com.threerings.everything.rpc.GameCodes;
 import com.threerings.everything.server.persist.PlayerRecord;
 
-import static com.threerings.everything.Log.log;
-
 /**
  * Game related utility methods.
  */

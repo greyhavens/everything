@@ -4,8 +4,6 @@
 
 package com.threerings.everything.client.ui;
 
-import com.google.common.base.Function;
-
 import com.google.gwt.core.client.GWT;
 
 import com.google.gwt.event.dom.client.ClickEvent;

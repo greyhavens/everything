@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
@@ -30,7 +28,6 @@ import com.samskivert.depot.Ops;
 import com.samskivert.depot.PersistenceContext;
 import com.samskivert.depot.PersistentRecord;
 import com.samskivert.depot.clause.Where;
-import com.samskivert.depot.util.Sequence;
 import com.samskivert.depot.util.Tuple2;
 
 import com.threerings.everything.data.GridStatus;

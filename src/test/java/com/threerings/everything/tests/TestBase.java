@@ -8,15 +8,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
 
 import org.easymock.EasyMock;
 
 import com.samskivert.depot.PersistenceContext;
 import com.threerings.app.server.ServletLogic;
 import com.threerings.app.server.UserLogic;
-
-import com.threerings.everything.server.EverythingApp;
 
 /**
  * A base class for tests that need to be run on the command line and access a database.

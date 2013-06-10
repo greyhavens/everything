@@ -4,8 +4,6 @@
 
 package com.threerings.everything.server;
 
-import java.util.Map;
-
 import com.google.common.base.Function;
 
 import com.threerings.everything.data.Category;

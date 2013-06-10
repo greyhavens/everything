@@ -102,6 +102,23 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+          <compilerArgs>
+            <arg>-Xlint</arg>
+            <arg>-Xlint:-serial</arg>
+            <arg>-Xlint:-path</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <version>2.5</version>
         <configuration>
@@ -123,7 +140,8 @@
                 <taskdef name="i18nsync" classname="com.threerings.gwt.tools.I18nSyncTask"
                          classpathref="maven.plugin.classpath"/>
                 <i18nsync srcdir="${project.build.sourceDirectory}">
-                  <fileset dir="${project.build.sourceDirectory}" includes="**/*Messages.properties"/>
+                  <fileset dir="${project.build.sourceDirectory}"
+                           includes="**/*Messages.properties"/>
                 </i18nsync>
                 <!-- generate a build version and create our Build.java file -->
                 <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
@@ -201,5 +219,36 @@
         </configuration>
       </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Tell m2eclipse to ignore the enforcer plugin from our parent. Otherwise it warns
+               about not being able to run it. -->
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

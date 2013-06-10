@@ -124,7 +124,7 @@ public class EverythingClient
     public String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args)
     {
         return "http://www.facebook.com/dialog/oauth?client_id=" + _data.facebookAppId +
-            "&redirect_uri=" + URL.encodeComponent(getEverythingURL(type, tracking, page, args));
+            "&redirect_uri=" + URL.encodeQueryString(getEverythingURL(type, tracking, page, args));
     }
 
     // from interface Context
@@ -259,6 +259,8 @@ public class EverythingClient
                 return;
             }
             break;
+        default:
+            break; // keep going
         }
 
         // otherwise guests see the "add this app to play" button
@@ -287,6 +289,8 @@ public class EverythingClient
         case EDIT_INTRO:
             setContent(new EditIntroPage(this));
             return;
+        default:
+            break; // keep going
         }
 
         // these are OK for editors
@@ -307,6 +311,8 @@ public class EverythingClient
             case EDIT_SERIES:
                 setContent(new EditSeriesPage(this, args.get(0, 0)));
                 return;
+            default:
+                break; // keep going
             }
         }
 
@@ -322,6 +328,8 @@ public class EverythingClient
             case ADMIN_NEWS:
                 setContent(new EditNewsPage(this, _news));
                 return;
+            default:
+                break; // keep going
             }
         }
 

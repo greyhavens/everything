@@ -10,17 +10,17 @@ package com.threerings.everything.data;
 public class Build
 {
     /** Are bonanzas enabled? */
-    public static final boolean BONANZAS_ENABLED = false;
+    public static final boolean bonanzasEnabled () {
+        return false;
+    }
 
     /** The version number assigned to this build. */
-    public static String version ()
-    {
+    public static String version () {
         return "@build_version@";
     }
 
     /** The time at which this build was made. */
-    public static String time ()
-    {
+    public static String time () {
         return "@build_time@";
     }
 }
