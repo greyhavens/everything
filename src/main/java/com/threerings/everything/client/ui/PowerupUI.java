@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.Widgets;
@@ -27,14 +28,14 @@ public class PowerupUI
      */
     public static Widget newIcon (Powerup pup)
     {
-        AbstractImagePrototype pimg = _picons.get(pup);
-        return (pimg == null) ? Widgets.newShim(26, 26) : pimg.createImage();
+        ImageResource pimg = _picons.get(pup);
+        return (pimg == null) ? Widgets.newShim(26, 26) : new Image(pimg);
     }
 
     protected static final PowerupImages _pupimgs = GWT.create(PowerupImages.class);
 
-    protected static Map<Powerup, AbstractImagePrototype> _picons =
-        new HashMap<Powerup, AbstractImagePrototype>();
+    protected static Map<Powerup, ImageResource> _picons =
+        new HashMap<Powerup, ImageResource>();
     static {
         _picons.put(Powerup.SHOW_CATEGORY, _pupimgs.show_category());
         _picons.put(Powerup.SHOW_SUBCATEGORY, _pupimgs.show_subcategory());

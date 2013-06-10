@@ -11,8 +11,8 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -334,12 +334,12 @@ public class BrowsePage extends DataPanel<PlayerCollection>
         if (down) key += "D";
         if (left) key += "L";
         if (right) key += "R";
-        AbstractImagePrototype img = _linemap.get(key);
+        ImageResource img = _linemap.get(key);
         if (img == null) {
             Console.log("Missing image " + key);
             img = _linemap.get("UDLR");
         }
-        return img.createImage();
+        return new Image(img);
     }
 
     protected int _seriesId;
@@ -353,8 +353,8 @@ public class BrowsePage extends DataPanel<PlayerCollection>
     protected static final GameServiceAsync _gamesvc = GWT.create(GameService.class);
 
     protected static final LineImages _lines = GWT.create(LineImages.class);
-    protected static Map<String, AbstractImagePrototype> _linemap =
-        new HashMap<String, AbstractImagePrototype>();
+    protected static Map<String, ImageResource> _linemap =
+        new HashMap<String, ImageResource>();
     static {
         _linemap.put("DL", _lines.downleft());
         _linemap.put("DR", _lines.downright());

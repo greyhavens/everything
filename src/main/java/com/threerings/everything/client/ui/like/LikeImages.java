@@ -4,23 +4,23 @@
 
 package com.threerings.everything.client.ui.like;
 
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
  * Images used on like widget.
  */
-public interface LikeImages extends ImageBundle
+public interface LikeImages extends ClientBundle
 {
-    @Resource("pos.png")
-    AbstractImagePrototype pos ();
+    @Source("pos.png")
+    ImageResource pos ();
 
-    @Resource("neg.png")
-    AbstractImagePrototype neg ();
+    @Source("neg.png")
+    ImageResource neg ();
 
-    @Resource("pos_sel.png")
-    AbstractImagePrototype pos_selected ();
+    @Source("pos_sel.png")
+    ImageResource pos_selected ();
 
-    @Resource("neg_sel.png")
-    AbstractImagePrototype neg_selected ();
+    @Source("neg_sel.png")
+    ImageResource neg_selected ();
 }

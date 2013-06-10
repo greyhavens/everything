@@ -4,44 +4,44 @@
 
 package com.threerings.everything.client.ui.lines;
 
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
  * Taxonomy line images.
  */
-public interface LineImages extends ImageBundle
+public interface LineImages extends ClientBundle
 {
-    @Resource("downleft.png")
-    AbstractImagePrototype downleft ();
+    @Source("downleft.png")
+    ImageResource downleft ();
 
-    @Resource("downright.png")
-    AbstractImagePrototype downright ();
+    @Source("downright.png")
+    ImageResource downright ();
 
-    @Resource("downleftright.png")
-    AbstractImagePrototype downleftright ();
+    @Source("downleftright.png")
+    ImageResource downleftright ();
 
-    @Resource("upleftright.png")
-    AbstractImagePrototype upleftright ();
+    @Source("upleftright.png")
+    ImageResource upleftright ();
 
-    @Resource("updownleft.png")
-    AbstractImagePrototype updownleft ();
+    @Source("updownleft.png")
+    ImageResource updownleft ();
 
-    @Resource("updownright.png")
-    AbstractImagePrototype updownright ();
+    @Source("updownright.png")
+    ImageResource updownright ();
 
-    @Resource("upleft.png")
-    AbstractImagePrototype upleft ();
+    @Source("upleft.png")
+    ImageResource upleft ();
 
-    @Resource("upright.png")
-    AbstractImagePrototype upright ();
+    @Source("upright.png")
+    ImageResource upright ();
 
-    @Resource("leftright.png")
-    AbstractImagePrototype leftright ();
+    @Source("leftright.png")
+    ImageResource leftright ();
 
-    @Resource("updown.png")
-    AbstractImagePrototype updown ();
+    @Source("updown.png")
+    ImageResource updown ();
 
-    @Resource("full.png")
-    AbstractImagePrototype full ();
+    @Source("full.png")
+    ImageResource full ();
 }

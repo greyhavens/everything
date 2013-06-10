@@ -5,10 +5,11 @@
 package com.threerings.everything.client.game;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -53,7 +54,7 @@ public class GetCoinsPage extends FlowPanel
         choices.add().setText( _msgs.selectSelect(), "machine").setColSpan(2);
         for (final Method method : METHODS) {
             PushButton button = Widgets.newPushButton(
-                method.normal.createImage(), method.hover.createImage(), method.down.createImage(),
+                new Image(method.normal), new Image(method.hover), new Image(method.down),
                 Args.createLinkHandler(Page.GET_COINS, method.target));
             button.setStyleName("BuyButton");
             choices.add().setWidget(button).right().setHTML(method.tip, "handwriting");
@@ -86,14 +87,14 @@ public class GetCoinsPage extends FlowPanel
 
     protected static class Method
     {
-        public AbstractImagePrototype normal;
-        public AbstractImagePrototype hover;
-        public AbstractImagePrototype down;
+        public ImageResource normal;
+        public ImageResource hover;
+        public ImageResource down;
         public String tip;
         public String target;
 
-        public Method (AbstractImagePrototype normal, AbstractImagePrototype hover,
-                       AbstractImagePrototype down, String tip, String target) {
+        public Method (ImageResource normal, ImageResource hover,
+                       ImageResource down, String tip, String target) {
             this.normal = normal;
             this.hover = hover;
             this.down = down;

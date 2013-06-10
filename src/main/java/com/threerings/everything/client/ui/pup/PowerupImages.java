@@ -4,41 +4,41 @@
 
 package com.threerings.everything.client.ui.pup;
 
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
  * Powerup images.
  */
-public interface PowerupImages extends ImageBundle
+public interface PowerupImages extends ClientBundle
 {
-    @Resource("show_category.png")
-    AbstractImagePrototype show_category ();
+    @Source("show_category.png")
+    ImageResource show_category ();
 
-    @Resource("show_subcategory.png")
-    AbstractImagePrototype show_subcategory ();
+    @Source("show_subcategory.png")
+    ImageResource show_subcategory ();
 
-    @Resource("show_series.png")
-    AbstractImagePrototype show_series ();
+    @Source("show_series.png")
+    ImageResource show_series ();
 
-    @Resource("extra_flip.png")
-    AbstractImagePrototype extra_flip ();
+    @Source("extra_flip.png")
+    ImageResource extra_flip ();
 
-    @Resource("all_new_cards.png")
-    AbstractImagePrototype all_new_cards ();
+    @Source("all_new_cards.png")
+    ImageResource all_new_cards ();
 
-    @Resource("all_collected_series.png")
-    AbstractImagePrototype all_collected_series ();
+    @Source("all_collected_series.png")
+    ImageResource all_collected_series ();
 
-    @Resource("ensure_one_vii.png")
-    AbstractImagePrototype ensure_one_vii ();
+    @Source("ensure_one_vii.png")
+    ImageResource ensure_one_vii ();
 
-    @Resource("ensure_one_viii.png")
-    AbstractImagePrototype ensure_one_viii ();
+    @Source("ensure_one_viii.png")
+    ImageResource ensure_one_viii ();
 
-    @Resource("ensure_one_ix.png")
-    AbstractImagePrototype ensure_one_ix ();
+    @Source("ensure_one_ix.png")
+    ImageResource ensure_one_ix ();
 
-    @Resource("ensure_one_x.png")
-    AbstractImagePrototype ensure_one_x ();
+    @Source("ensure_one_x.png")
+    ImageResource ensure_one_x ();
 }

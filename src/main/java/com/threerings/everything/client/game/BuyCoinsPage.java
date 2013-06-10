@@ -8,6 +8,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -38,9 +39,9 @@ public class BuyCoinsPage extends FlowPanel
                 continue; // don't display inactive offers
             }
             PushButton button = Widgets.newPushButton(
-                _images.buywithfb_up().createImage(),
-                _images.buywithfb_up().createImage(),
-                _images.buywithfb_down().createImage(), new ClickHandler() {
+                new Image(_images.buywithfb_up()),
+                new Image(_images.buywithfb_up()),
+                new Image(_images.buywithfb_down()), new ClickHandler() {
                     public void onClick (ClickEvent event) {
                         startPurchase(""+offer.id);
                     }

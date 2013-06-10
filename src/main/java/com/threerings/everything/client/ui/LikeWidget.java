@@ -5,6 +5,7 @@
 package com.threerings.everything.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ImageResource;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,7 +15,6 @@ import com.google.gwt.event.shared.HandlerManager;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
@@ -41,7 +41,7 @@ public class LikeWidget extends HorizontalPanel
         if (like == null) {
             return null;
         }
-        Image img = (like ? _images.pos() : _images.neg()).createImage();
+        Image img = new Image(like ? _images.pos() : _images.neg());
         img.setTitle(like ? "Liked" : "Disliked");
         return img;
     }
@@ -87,8 +87,8 @@ public class LikeWidget extends HorizontalPanel
     // from ValueListener
     public void valueChanged (Boolean liked)
     {
-        proto(true, liked).applyTo(_pos);
-        proto(false, liked).applyTo(_neg);
+        _pos.setResource(proto(true, liked));
+        _neg.setResource(proto(false, liked));
     }
 
     protected void onLoad ()
@@ -105,7 +105,7 @@ public class LikeWidget extends HorizontalPanel
 
     protected Image createImage (final Boolean buttonValue)
     {
-        Image img = proto(buttonValue, _liked.get()).createImage();
+        Image img = new Image(proto(buttonValue, _liked.get()));
         img.setTitle(buttonValue ? "I like this series" : "I dislike this series");
         Widgets.makeActionable(img, new ClickHandler() {
             public void onClick (ClickEvent event) {
@@ -116,7 +116,7 @@ public class LikeWidget extends HorizontalPanel
         return img;
     }
 
-    protected AbstractImagePrototype proto (Boolean buttonValue, Boolean liked)
+    protected ImageResource proto (Boolean buttonValue, Boolean liked)
     {
         return buttonValue
             ? ((liked == buttonValue) ? _images.pos_selected() : _images.pos())
