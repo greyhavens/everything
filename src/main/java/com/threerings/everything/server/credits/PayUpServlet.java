@@ -74,6 +74,9 @@ public class PayUpServlet extends HttpServlet {
                         handlePurchase(info, userId, item.product);
                     }
                 }
+                // TODO: we also get notified of chargeback, and refund, so we could handle those
+                // here and retrack their currency if this wasn't all just an exercise in yak
+                // shavery in the first place
 
             } catch (Exception e) {
                 log.warning("Failure processing entry", "entry", entry, e);
@@ -106,7 +109,7 @@ public class PayUpServlet extends HttpServlet {
 
     protected boolean isCompleted (PaymentInfo info) {
         for (PaymentInfo.Action action : info.actions) {
-            if ("completed".equals(action.status)) return true;
+            if ("charge".equals(action.type) && "completed".equals(action.status)) return true;
         }
         return false;
     }
