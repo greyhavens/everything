@@ -49,7 +49,7 @@ public class CoinPrices
     public static final Offer[] OFFERS = new Offer[] {
         // don't reuse unique ids
         new Offer(1, State.ACTIVE,  5000,  50,  499),
-        new Offer(2, State.ACTIVE, 11000, 100, 9999),
+        new Offer(2, State.ACTIVE, 11000, 100,  999),
         new Offer(3, State.ACTIVE, 24000, 200, 1999),
     };
 
