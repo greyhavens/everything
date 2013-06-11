@@ -151,6 +151,12 @@ public class EverythingClient
     }
 
     // from interface Context
+    public String backendURL ()
+    {
+        return _data.backendURL;
+    }
+
+    // from interface Context
     public boolean isNewbie ()
     {
         return _data.gridsConsumed < NEWBIE_GRIDS;

@@ -44,6 +44,9 @@ public interface Context
     /** Returns the URL to the specified billing page. */
     String billingURL (String path);
 
+    /** Returns the base URL for our backend server. */
+    String backendURL ();
+
     /** Returns true if this player is still pretty new. */
     boolean isNewbie ();
 

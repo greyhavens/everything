@@ -25,7 +25,7 @@ import com.threerings.everything.client.util.Context;
  */
 public class BuyCoinsPage extends FlowPanel
 {
-    public BuyCoinsPage (Context ctx, String action)
+    public BuyCoinsPage (final Context ctx, String action)
     {
         addStyleName("buyCoins");
         addStyleName("page");
@@ -43,7 +43,7 @@ public class BuyCoinsPage extends FlowPanel
                 new Image(_images.buywithfb_up()),
                 new Image(_images.buywithfb_down()), new ClickHandler() {
                     public void onClick (ClickEvent event) {
-                        startPurchase(""+offer.id);
+                        startPurchase(offer.graphURL(ctx.backendURL()));
                     }
                 });
             button.setStyleName("BuyButton");
