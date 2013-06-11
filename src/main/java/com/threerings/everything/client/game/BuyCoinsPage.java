@@ -10,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.everything.data.CoinPrices;
 import com.threerings.gwt.ui.FluentTable;
@@ -47,12 +46,10 @@ public class BuyCoinsPage extends FlowPanel
                     }
                 });
             button.setStyleName("BuyButton");
-            Widget credits = Widgets.newFlowPanel(
-                Widgets.newImage(_images.fbcredit(), "Credits"),
-                Widgets.newInlineLabel(""+offer.credits, "machine"));
+            String cost = "$" + (offer.pennies / 100) + "." + (offer.pennies % 100);
             offers.add().setWidget(new CoinLabel(offer.coins)).
                 right().setText(_msgs.buyFor()).
-                right().setWidget(credits).
+                right().setWidget(Widgets.newInlineLabel(cost, "machine")).
                 right().setWidget(button);
         }
         add(offers);
