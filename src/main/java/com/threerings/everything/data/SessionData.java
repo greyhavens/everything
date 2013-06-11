@@ -51,6 +51,9 @@ public class SessionData
     /** The main URL to our app. */
     public String everythingURL;
 
+    /** The URL of our backend app server. */
+    public String backendURL;
+
     /** The URL root for all billing pages. */
     public String billingRootURL;
 

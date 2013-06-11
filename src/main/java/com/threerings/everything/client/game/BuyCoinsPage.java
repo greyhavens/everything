@@ -58,32 +58,22 @@ public class BuyCoinsPage extends FlowPanel
         add(offers);
     }
 
-    protected void onPurchaseComplete (String offerId)
+    protected void onPurchaseComplete (String status)
     {
-        Console.log("Purchase complete '" + offerId + "'");
+        Console.log("Purchase complete '" + status + "'");
     }
 
-    protected native void startPurchase (String offerId) /*-{
-        var pay = {
+    protected native void startPurchase (String offerURL) /*-{
+        $wnd.FB.ui({
           method: 'pay',
-          order_info: offerId,
-          purchase_type: 'item'
-        };
-        $wnd.FB.ui(pay, function(data) {
+          action: 'purchaseitem',
+          product: offerURL,
+          quantity: 1
+        }, function(data) {
             this.@com.threerings.everything.client.game.BuyCoinsPage::onPurchaseComplete(Ljava/lang/String;)(
-                data['order_id']);
+                data['status']);
         });
     }-*/;
-
-// FB.ui({
-//       method: 'pay',
-//       action: 'purchaseitem',
-//       product: 'http://www.friendsmash.com/og/smashingpack.html',
-//       quantity: 1,                  // optional, defaults to 1
-//       request_id: 'YOUR_REQUEST_ID' // optional, must be unique for each payment
-//     },
-//     callback
-// );
 
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
     protected static final BlingImages _images = GWT.create(BlingImages.class);

@@ -1,8 +1,10 @@
 import java.io.File
 
 import sbt._
-import Keys._
+import sbt.Keys._
+
 import net.thunderklaus.GwtPlugin._
+import net.virtualvoid.sbt.graph.Plugin.graphSettings
 import samskivert.POMUtil
 
 object EverythingBuild extends Build {
@@ -34,12 +36,13 @@ object EverythingBuild extends Build {
 
   val pom = pomutil.POM.fromFile(new File("pom.xml")).get
   val pomSettings = POMUtil.pomToSettings(pom, false)
-  val baseSettings = Defaults.defaultSettings ++ pomSettings ++ gwtSettings
+  val baseSettings = Defaults.defaultSettings ++ pomSettings ++ gwtSettings ++ graphSettings
 
   val everything = Project("everything", file("."), settings = baseSettings ++ seq(
     crossPaths    := false,
     scalaVersion  := "2.10.0",
-    javacOptions  ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
+    javacOptions  ++= Seq("-Xlint", "-Xlint:-serial", "-Xlint:-path",
+                          "-source", "1.6", "-target", "1.6"),
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     // no scala-library dependency
     autoScalaLibrary := false,

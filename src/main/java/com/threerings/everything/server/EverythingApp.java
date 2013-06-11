@@ -239,10 +239,27 @@ public class EverythingApp
     }
 
     /**
+     * Returns the URL to our backend app server. E.g.: everything.herokuapp.com.
+     */
+    public String getBackendURL () {
+        return reqenv("BACKEND_URL");
+    }
+
+    /**
      * Returns the URL for this app.
      */
     public String getBaseUrl () {
         return getenv("BASE_URL", getHostUrl());
+    }
+
+    /**
+     * Returns the Facebook Open Graph API app access token. This is generated via: {@code
+     * https://graph.facebook.com/oauth/access_token?
+     * client_id=APPID&client_secret=APPSECRET&grant_type=client_credentials} and does not expire
+     * unless explicitly reset.
+     */
+    public String getFacebookAppToken () {
+        return reqenv("FACEBOOK_APPTOKEN");
     }
 
     public void coinsPurchased (int userId, int coins) {
