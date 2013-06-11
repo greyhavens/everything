@@ -47,6 +47,14 @@ public class PayUpServlet extends HttpServlet {
     }
 
     @Override
+    public void doGet (HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+        // String mode = req.getParameter("hub.mode");
+        String challenge = req.getParameter("hub.challenge");
+        // String token = req.getParameter("hub.verify_token");
+        rsp.getWriter().print(challenge); // yes yes whatever
+    }
+
+    @Override
     public void doPost (HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         Notification note = _gson.fromJson(req.getReader(), Notification.class);
 
