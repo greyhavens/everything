@@ -6,20 +6,28 @@ ROOT=`cd $ROOT/.. ; pwd`
 # Add all necessary JAR files to the CLASSPATH
 APPROOT=`echo $ROOT/server/target/everything-server-1.0-SNAPSHOT`
 WEBDIR=$APPROOT/WEB-INF
-export CLASSPATH=$ROOT/server/target/classes:`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
+WEBJARS=`echo $WEBDIR/lib/*.jar | sed 's/ /:/g'`
+export CLASSPATH=$ROOT/shared/target/classes:$ROOT/server/target/classes:$WEBJARS
 
 # if we have a local config, read it in
 if [ -f etc/everything.conf ]; then
     . etc/everything.conf
 fi
 
-if [ ! -z "NEW_RELIC_APP_NAME" ]; then
+# if we're running locally and have JRebel, wire it up
+REBEL_HOME=$HOME/ops/jrebel
+if [ -f $REBEL_HOME/jrebel.jar ]; then
+    REBEL_ARGS="-noverify -javaagent:$REBEL_HOME/jrebel.jar"
+
+# if we're running on Heroku, wire up New Relic
+elif [ ! -z "NEW_RELIC_APP_NAME" ]; then
     NEW_RELIC_ARGS=-javaagent:lib/newrelic.jar
     echo "Host: $HOST"
 fi
 
 exec java \
     $NEW_RELIC_ARGS \
+    $REBEL_ARGS \
     -Djava.util.logging.config.file=$WEBDIR/classes/logging.properties \
     -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog \
     -Dapproot=$APPROOT \
