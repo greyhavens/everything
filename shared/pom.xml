@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.threerings.everything</groupId>
+    <artifactId>everything-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>everything-shared</artifactId>
+  <packaging>jar</packaging>
+  <name>Everything Shared</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.samskivert</groupId>
+      <artifactId>samskivert</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>gensrc</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <!-- generate a build version and create our Build.java file -->
+                <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
+                <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
+                <property name="build.java" value="com/threerings/everything/data/Build.java"/>
+                <copy file="${project.build.sourceDirectory}/${build.java}.tmpl"
+                      tofile="${project.build.sourceDirectory}/${build.java}" overwrite="true">
+                  <filterset>
+                    <filter token="build_time" value="${build.time}"/>
+                    <filter token="build_version" value="${build.version}"/>
+                  </filterset>
+                </copy>
+                <echo>Assigned build version ${build.version}.</echo>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

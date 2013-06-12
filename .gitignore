@@ -1,4 +1,4 @@
 /etc/build.properties
 /etc/everything.conf
-/src/main/java/com/threerings/everything/client/*/*Messages.java
-/src/main/java/com/threerings/everything/data/Build.java
+/server/src/main/java/com/threerings/everything/client/*/*Messages.java
+/shared/src/main/java/com/threerings/everything/data/Build.java

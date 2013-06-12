@@ -11,6 +11,7 @@ export DATABASE_URL=postgres://everything:test@localhost/everything
 export FACEBOOK_APPNAME=everythinggame
 export FACEBOOK_APPID=APP_ID
 export FACEBOOK_SECRET=APP_SECRET
+export FACEBOOK_TOKEN=APP_TOKEN
 
 # Our S3 media store configuration
 export MEDIASTORE_ID=S3ID
@@ -23,3 +24,6 @@ export KONTAGENT_SECRET=APP_SECRET
 
 # OOO billing server bits
 export BILLING_URL=https://billing.apps.threerings.net/billing/
+
+# Other niggling bits
+export BACKEND_URL=http://localhost:8080/

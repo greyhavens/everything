@@ -3,10 +3,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.threerings.apps</groupId>
-  <artifactId>everything</artifactId>
-  <packaging>war</packaging>
+
+  <groupId>com.threerings.everything</groupId>
+  <artifactId>everything-project</artifactId>
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+
   <name>The Everything Game</name>
 
   <repositories>
@@ -25,98 +27,10 @@
     <gwt.version>2.5.0</gwt.version>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>ooo-util</artifactId>
-      <version>1.3.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>ooo-app</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>ooo-user</artifactId>
-      <version>1.4.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>ooo-cron</artifactId>
-      <version>1.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>ooo-facebook</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings</groupId>
-      <artifactId>gwt-utils</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
-      <version>${gwt.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.restfb</groupId>
-      <artifactId>restfb</artifactId>
-      <version>1.6.9</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>9.0-801.jdbc4</version>
-    </dependency>
-    <dependency>
-      <groupId>com.threerings.s3lib</groupId>
-      <artifactId>s3lib</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <!-- force a newer commons-codec, otherwise s3lib fucks us -->
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.5</version>
-    </dependency>
-
-    <!-- GWT blah blah -->
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>2.0</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>shared</module>
+    <module>server</module>
+  </modules>
 
   <build>
     <plugins>
@@ -146,105 +60,12 @@
           <outputDirectory>${project.build.outputDirectory}</outputDirectory>
         </configuration>
       </plugin>
-
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>gensrc</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <target>
-                <!-- update our i18n classes -->
-                <taskdef name="i18nsync" classname="com.threerings.gwt.tools.I18nSyncTask"
-                         classpathref="maven.plugin.classpath"/>
-                <i18nsync srcdir="${project.build.sourceDirectory}">
-                  <fileset dir="${project.build.sourceDirectory}"
-                           includes="**/*Messages.properties"/>
-                </i18nsync>
-                <!-- generate a build version and create our Build.java file -->
-                <tstamp><format property="build.version" pattern="yyyyMMddHHmmss"/></tstamp>
-                <tstamp><format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/></tstamp>
-                <property name="build.java" value="com/threerings/everything/data/Build.java"/>
-                <copy file="${project.build.sourceDirectory}/${build.java}.tmpl"
-                      tofile="${project.build.sourceDirectory}/${build.java}" overwrite="true">
-                  <filterset>
-                    <filter token="build_time" value="${build.time}"/>
-                    <filter token="build_version" value="${build.version}"/>
-                  </filterset>
-                </copy>
-                <echo>Assigned build version ${build.version}.</echo>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>cleancrap</id>
-            <phase>install</phase>
-            <configuration>
-              <target>
-                <!-- delete a bunch of cruft we don't want -->
-                <property name="target.dir" value="${project.build.directory}"/>
-                <delete dir="${target.dir}/gwt-unitCache"/>
-                <property name="war.dir" value="${target.dir}/${project.build.finalName}"/>
-                <delete dir="${war.dir}/WEB-INF/deploy/everything/symbolMaps"/>
-                <delete file="${target.dir}/${project.build.finalName}.war"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.threerings</groupId>
-            <artifactId>gwt-utils</artifactId>
-            <version>1.5</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwt.version}</version>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <configuration>
-              <!-- don't use the separate-process socket-using worker factory -->
-              <!-- as that causes a bunch of warnings during the Heroku build -->
-              <extraJvmArgs>
-                -mx1024m \
-                -Dgwt.jjs.permutationWorkerFactory=com.google.gwt.dev.ThreadedPermutationWorkerFactory
-              </extraJvmArgs>
-            </configuration>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <configuration>
-          <mainClass>com.threerings.everything.server.EverythingApp</mainClass>
-        </configuration>
-      </plugin>
     </plugins>
 
     <pluginManagement>
       <plugins>
         <plugin>
-          <!-- Tell m2eclipse to ignore the enforcer plugin from our parent. Otherwise it warns
-               about not being able to run it. -->
+          <!-- Tell m2eclipse to ignore some Maven plugins. -->
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
           <version>1.0.0</version>
