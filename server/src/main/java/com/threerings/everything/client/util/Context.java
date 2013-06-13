@@ -41,9 +41,6 @@ public interface Context
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text, Page page, Object... args);
 
-    /** Returns the URL to the specified billing page. */
-    String billingURL (String path);
-
     /** Returns the base URL for our backend server. */
     String backendURL ();
 

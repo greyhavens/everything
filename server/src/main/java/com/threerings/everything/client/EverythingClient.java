@@ -143,14 +143,6 @@ public class EverythingClient
     }
 
     // from interface Context
-    public String billingURL (String path)
-    {
-        String url = _data.billingRootURL + path;
-        String sep = url.contains("?") ? "&" : "?";
-        return url + sep + "SiteIdentifierOverride=12";
-    }
-
-    // from interface Context
     public String backendURL ()
     {
         return _data.backendURL;

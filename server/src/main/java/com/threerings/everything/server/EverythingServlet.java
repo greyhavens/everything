@@ -81,7 +81,6 @@ public class EverythingServlet extends EveryServiceServlet
         data.powerups = Maps.newHashMap();
         data.everythingURL = _fbconf.getFacebookAppURL("http");
         data.backendURL = _app.getBackendURL();
-        data.billingRootURL = _app.getBillingURL();
         data.facebookAppId = _fbconf.getFacebookAppId();
         data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
         data.likes = Lists.newArrayList();

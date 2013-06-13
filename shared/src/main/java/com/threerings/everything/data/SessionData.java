@@ -53,9 +53,6 @@ public class SessionData
     /** The URL of our backend app server. */
     public String backendURL;
 
-    /** The URL root for all billing pages. */
-    public String billingRootURL;
-
     /** Our Facebook app ID. */
     public String facebookAppId;
 

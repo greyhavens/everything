@@ -232,13 +232,6 @@ public class EverythingApp
     }
 
     /**
-     * Returns our embedded billing page URL.
-     */
-    public String getBillingURL () {
-        return reqenv("BILLING_URL");
-    }
-
-    /**
      * Returns the URL to our backend app server. E.g.: everything.herokuapp.com.
      */
     public String getBackendURL () {
