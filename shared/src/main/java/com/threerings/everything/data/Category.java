@@ -63,8 +63,7 @@ public class Category
     /**
      * Returns an HTML snippet that will display cat -> cat -> cat for the supplied categories.
      */
-    public static String getHierarchy (Category[] cats)
-    {
+    public static String getHierarchy (Category[] cats) {
         StringBuilder buf = new StringBuilder();
         for (Category cat : cats) {
             if (buf.length() > 0) {
@@ -78,34 +77,28 @@ public class Category
     /**
      * Returns true if this category is in development, false if not.
      */
-    public boolean isInDevelopment ()
-    {
+    public boolean isInDevelopment () {
         return state == State.IN_DEVELOPMENT;
     }
 
     /**
      * Returns true if this category is active, false if not.
      */
-    public boolean isActive ()
-    {
+    public boolean isActive () {
         return state == State.ACTIVE;
     }
 
     // from interface Created
-    public int getCreatorId ()
-    {
+    public int getCreatorId () {
         return creator.userId;
     }
 
     // from interface Comparable<Category>
-    public int compareTo (Category other)
-    {
+    public int compareTo (Category other) {
         return name.compareTo(other.name);
     }
 
-    @Override
-    public String toString ()
-    {
+    @Override public String toString () {
         return name;
     }
 }

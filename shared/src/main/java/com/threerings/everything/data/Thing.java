@@ -55,8 +55,7 @@ public class Thing
     public PlayerName creator;
 
     /** Converts this Thing to a ThingCard. */
-    public ThingCard toCard (long received)
-    {
+    public ThingCard toCard (long received) {
         ThingCard card = new ThingCard();
         card.thingId = thingId;
         card.name = name;
@@ -67,14 +66,12 @@ public class Thing
     }
 
     // from interface Created
-    public int getCreatorId ()
-    {
+    public int getCreatorId () {
         return creator.userId;
     }
 
     // from interface Comparable<Thing>
-    public int compareTo (Thing other)
-    {
+    public int compareTo (Thing other) {
         return (rarity != other.rarity) ? rarity.compareTo(other.rarity) :
             name.compareTo(other.name);
     }
