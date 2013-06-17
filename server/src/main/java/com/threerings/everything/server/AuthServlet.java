@@ -11,16 +11,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.inject.Inject;
-
 import com.samskivert.servlet.util.ParameterUtil;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.app.client.ServiceException;
 import com.threerings.app.server.ServletAuthUtil;
 import com.threerings.facebook.servlet.FacebookAppServlet;
-
-import com.threerings.everything.rpc.Kontagent;
 
 import static com.threerings.everything.Log.log;
 
@@ -56,29 +52,6 @@ public class AuthServlet extends FacebookAppServlet
             }
         }
 
-        // we should get some sort of kontagent tracking data with this request
-        Kontagent type = Kontagent.fromCode(req.getParameter("kc"));
-        String vector = ParameterUtil.getParameter(req, "vec", "organic");
-        String tracking = req.getParameter("t");
-
-        // if this is an undirected landing, we need to generate a short tracking code
-        if (type == Kontagent.OTHER_RESPONSE) {
-            if (tracking != null) {
-                log.warning("Got a tracking code but no Kontagent message type?",
-                            "req", req.getRequestURI());
-                // whatever, overwrite it with our short code
-            }
-            tracking = StringUtil.prepad(Integer.toHexString(_rando.nextInt()), 8, '0');
-        }
-
-        // if we have a tracking token, we need to pass that down to the app so that it can pass it
-        // back up when it validates its session for the first time and we detect a new user and
-        // report that the app was added
-        String indexPath = "/";
-        if (tracking != null) {
-            indexPath += "?t=" + tracking;
-        }
-
         // if we have a seed category, stuff that into a session cookie so we can pick it up again
         // after the client adds the app and validates their session for the first time
         String seed = ParameterUtil.getParameter(req, "seed", false);
@@ -90,40 +63,10 @@ public class AuthServlet extends FacebookAppServlet
 
         // we need to supply a full URL to doFacebookAuth so that it can redirect properly to https
         // or http even when the current request is http representing proxied https
-        String indexURL = ServletAuthUtil.createURL(req, indexPath);
+        String indexURL = ServletAuthUtil.createURL(req, "/");
 
         // pass the buck to the app servlet, it may have to get jiggy
-        if (doFacebookAuth(req, rsp, indexURL, true, false).isSwizzled()) {
-            // if our authentication process actually directed the user to the app, we can emit our
-            // event to Kontagent, otherwise we're in the middle of swizzling them and need to hold
-            // off until the swizzling process is complete
-            switch (type) {
-            case NOOP: break; // nothing!
-            case INVITE:
-                reportResponse(req, Kontagent.INVITE_RESPONSE, tracking);
-                break;
-            case NOTIFICATION:
-                reportResponse(req, Kontagent.NOTIFICATION_RESPONSE, tracking);
-                break;
-            case NOTIFICATION_EMAIL:
-                reportResponse(req, Kontagent.NOTIFICATION_EMAIL_RESPONSE, tracking);
-                break;
-            case POST:
-                reportLanding(req, Kontagent.POST_RESPONSE, "stream", tracking);
-                break;
-            case OTHER_RESPONSE:
-                reportLanding(req, Kontagent.OTHER_RESPONSE, vector, tracking);
-                break;
-            case APP_ADDED:
-                // this is not a landing, the player has added the app after browsing something as
-                // a guest; we pass their token back through to the client and it will supply it
-                // when it refreshes its session
-                break;
-            default:
-                log.warning("Got weird Kontagent message type", "uri", req.getRequestURI());
-                break;
-            }
-        }
+        doFacebookAuth(req, rsp, indexURL, true, false);
     }
 
     @Override // from HttpServlet
@@ -135,32 +78,7 @@ public class AuthServlet extends FacebookAppServlet
         doPost(req, rsp);
     }
 
-    protected void reportResponse (HttpServletRequest req, Kontagent type, String tracking)
-    {
-        String ltype = type.code;
-        if (type != Kontagent.OTHER_RESPONSE && StringUtil.isBlank(tracking)) {
-            log.warning("Missing tracking code for landing?", "uri", req.getRequestURI());
-            ltype = "no_tracking:" + type.code;
-            type = Kontagent.OTHER_RESPONSE;
-        }
-        reportLanding(req, type, ltype, tracking);
-    }
-
-    protected void reportLanding (
-        HttpServletRequest req, Kontagent type, String ltype, String tracking)
-    {
-        // String appAdded = (FBParam.SIG.isSet(req) && FBParam.SESSION_KEY.isSet(req)) ?  "1" : "0";
-        // String rkey = (type == Kontagent.OTHER_RESPONSE) ? "s" : "r"; // retarded
-        // String recipId = StringUtil.getOr(FBParam.USER.getStringValue(req),
-        //                                   FBParam.CANVAS_USER.getStringValue(req));
-        // String tkey = (tracking != null && tracking.length() == 8) ? "su" : "u";
-        // disabled Kontagent for now since we don't really care
-        // _kontLogic.reportAction(type, "tu", ltype, rkey, recipId, tkey, tracking, "i", appAdded);
-    }
-
     protected Random _rando = new Random();
-
-    @Inject protected KontagentLogic _kontLogic;
 
     protected static final String GWT_DEVPARAM = "gwt.codesvr";
 }

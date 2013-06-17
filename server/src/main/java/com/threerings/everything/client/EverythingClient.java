@@ -21,11 +21,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.threerings.gwt.ui.Widgets;
 import com.threerings.gwt.util.PopupStack;
 import com.threerings.gwt.util.Value;
-import com.threerings.gwt.util.WindowUtil;
 
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.rpc.EverythingServiceAsync;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.data.Build;
 import com.threerings.everything.data.News;
 import com.threerings.everything.data.PlayerName;
@@ -66,11 +64,8 @@ public class EverythingClient
         setInfoContent("Initializing...");
         History.addValueChangeHandler(this);
 
-        // check to see if we have a ?t=XXX tracking token
-        _kontagentToken = WindowUtil.getQueryParams().get("t");
-
         // validate our session which will trigger the rest of our initialization
-        _everysvc.validateSession(Build.version(), getTimezoneOffset(), _kontagentToken,
+        _everysvc.validateSession(Build.version(), getTimezoneOffset(),
                                   new AsyncCallback<SessionData>() {
             public void onSuccess (SessionData data) {
                 gotSessionData(data);
@@ -114,17 +109,10 @@ public class EverythingClient
     }
 
     // from interface Context
-    public String getEverythingURL (Kontagent type, String tracking, Page page, Object... args)
-    {
-        return _data.everythingURL + "?token=" + Args.createLinkToken(page, args) +
-            "&kc=" + type.code + "&t=" + tracking;
-    }
-
-    // from interface Context
-    public String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args)
+    public String getFacebookAddURL (String vector, Page page, Object... args)
     {
         return "http://www.facebook.com/dialog/oauth?client_id=" + _data.facebookAppId +
-            "&redirect_uri=" + URL.encodeQueryString(getEverythingURL(type, tracking, page, args));
+            "&redirect_uri=" + URL.encodeQueryString(getEverythingURL(vector, page, args));
     }
 
     // from interface Context
@@ -136,7 +124,7 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddLink (String text, Page page, Object... args)
     {
-        String url = getFacebookAddURL(Kontagent.APP_ADDED, _kontagentToken, page, args);
+        String url = getFacebookAddURL("app_added", page, args);
         StringBuilder buf = new StringBuilder();
         buf.append("<a target=\"_top\" href=\"").append(url).append("\">");
         return buf.append(text).append("</a>").toString();
@@ -352,7 +340,7 @@ public class EverythingClient
 
         setContent(null);
         initFacebook(data.facebookAppId, GWT.getHostPageBaseURL() + "channel.cache.html");
-        RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this, _data.kontagentHello));
+        RootPanel.get(CLIENT_DIV).add(_header = new HeaderPanel(this));
         History.fireCurrentHistoryState();
     }
 
@@ -383,7 +371,6 @@ public class EverythingClient
     }-*/;
 
     protected SessionData _data;
-    protected String _kontagentToken;
     protected Value<Integer> _coins;
     protected Value<Long> _gridExpires;
     protected Value<News> _news;

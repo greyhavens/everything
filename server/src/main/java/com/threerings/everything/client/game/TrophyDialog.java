@@ -8,16 +8,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.rpc.EverythingServiceAsync;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.data.TrophyData;
-import com.threerings.gwt.util.Console;
 
 import com.threerings.everything.client.util.Context;
-import com.threerings.everything.client.util.KontagentUtil;
 import com.threerings.everything.client.util.Page;
 
 /**
@@ -36,37 +32,20 @@ public class TrophyDialog
 
     protected static void showDialog (Context ctx, TrophyData trophy)
     {
-        final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
-
         String title = ctx.getMe() + " got the '" + trophy.name + "' trophy in Everything.";
         String desc = "Through persistent collecting, " + ctx.getMe() + " has earned " +
             "a trophy while learning much about the world.";
         String imageURL = GWT.getHostPageBaseURL() + "images/trophies/trophy.png";
         //String imageURL = GWT.getHostPageBaseURL() + "trophyimg?trophy=" + trophy.trophyId;
-        String collectionURL = ctx.getEverythingURL(
-            Kontagent.POST, tracking, Page.BROWSE, ctx.getMe().userId);
-        String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
+        String collectionURL = ctx.getEverythingURL("post", Page.BROWSE, ctx.getMe().userId);
+        String everyURL = ctx.getEverythingURL("post", Page.LANDING);
         String everyURLText = "Start your own Everything collection!";
         String prompt = "Celebrate your trophy:";
 
         showDialog(title, desc, trophy.name, trophy.description,
-            imageURL, collectionURL, everyURL, everyURLText, prompt,
-            new Command() { // complete callback
-                public void execute () {
-                    _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
-                        public void onSuccess (Void result) { /* nada */ }
-                        public void onFailure (Throwable cause) {
-                            Console.log("Failed to report story post",
-                                "tracking", tracking, cause);
-                        }
-                    });
-                }
-            },
-            new Command() { // incomplete callback
-                public void execute () {
-                    // nada
-                }
-            });
+                   imageURL, collectionURL, everyURL, everyURLText, prompt,
+                   new Command() { public void execute () {}},  // complete callback (noop!)
+                   new Command() { public void execute () {}}); // incomplete callback (noop!)
     }
 
     protected static native void showDialog (

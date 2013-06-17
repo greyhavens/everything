@@ -20,7 +20,7 @@ import com.threerings.everything.client.util.Page;
  */
 public class HeaderPanel extends FlowPanel
 {
-    public HeaderPanel (Context ctx, String kontagentHello)
+    public HeaderPanel (Context ctx)
     {
         setStyleName("header");
 
@@ -55,15 +55,7 @@ public class HeaderPanel extends FlowPanel
             extras.add(Args.createInlink("News", Page.ADMIN_NEWS));
         }
 
-        // disabled Kontagent, since we don't really care about Everything stats
-        //
-        // // add our kontagent "page request" pixel to the extras
-        // Image tracker = Widgets.newImage(kontagentHello);
-        // tracker.setWidth("1px");
-        // tracker.setHeight("1px");
-        // extras.add(tracker);
         bits.at(0, col++).setWidget(extras).alignCenter();
-
         bits.at(0, col++).setWidget(new CoinLabel("You have: ", ctx.getCoins())).alignRight();
         add(bits);
 

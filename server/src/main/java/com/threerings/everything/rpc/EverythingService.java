@@ -64,8 +64,7 @@ public interface EverythingService extends RemoteService
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */
-    SessionData validateSession (String version, int tzOffset, String kontagentToken)
-        throws ServiceException;
+    SessionData validateSession (String version, int tzOffset) throws ServiceException;
 
     /**
      * Returns the calling user's pending gifts and data on their friends' activities.
@@ -86,9 +85,4 @@ public interface EverythingService extends RemoteService
      * Returns the data needed for the credits page.
      */
     CreditsResult getCredits () throws ServiceException;
-
-    /**
-     * Reports that the user posted a story to their Facebook feed.
-     */
-    void storyPosted (String tracking) throws ServiceException;
 }

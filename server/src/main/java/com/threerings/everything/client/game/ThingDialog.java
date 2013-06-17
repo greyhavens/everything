@@ -12,14 +12,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.threerings.everything.rpc.EverythingService;
 import com.threerings.everything.rpc.EverythingServiceAsync;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
-import com.threerings.gwt.util.Console;
 
 import com.threerings.everything.client.util.Context;
-import com.threerings.everything.client.util.KontagentUtil;
 import com.threerings.everything.client.util.Page;
 
 /**
@@ -91,10 +88,9 @@ public class ThingDialog
     public static void showAttractor (
         Context ctx, Card card, final AsyncCallback<Boolean> callback)
     {
-        final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
 //        String joinURL = ctx.getEverythingURL(
         String joinURL = ctx.getFacebookAddURL(
-            Kontagent.POST, tracking, Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
+            "post", Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
         String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog("", card.thing.name, card.thing.descrip + "\nFacts: " + card.thing.facts,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
@@ -102,13 +98,6 @@ public class ThingDialog
                    "Tell your friends why Everthing is fun:",
                    new Command() { // complete callback
                        public void execute () {
-                           _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
-                               public void onSuccess (Void result) { /* nada */ }
-                               public void onFailure (Throwable cause) {
-                                   Console.log("Failed to report story post",
-                                       "tracking", tracking, cause);
-                               }
-                           });
                            callback.onSuccess(true);
                        }
                    },
@@ -135,33 +124,22 @@ public class ThingDialog
         Context ctx, String vec, String targetId, String title, Card card, PlayerName owner,
         String prompt, final AsyncCallback<Boolean> callback)
     {
-        final String tracking = KontagentUtil.generateUniqueId(ctx.getMe().userId);
-        String cardURL = ctx.getEverythingURL(
-            Kontagent.POST, tracking, Page.BROWSE, owner.userId, card.thing.categoryId);
-        String everyURL = ctx.getEverythingURL(Kontagent.POST, tracking, Page.LANDING);
+        String vector = "post";
+        String cardURL = ctx.getEverythingURL(vector, Page.BROWSE, owner.userId,
+                                              card.thing.categoryId);
+        String everyURL = ctx.getEverythingURL(vector, Page.LANDING);
         String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
                    Category.getHierarchy(card.categories), card.thing.rarity.toString(),
                    imageURL, cardURL, everyURL, "Start your own Everything collection!", prompt,
                    new Command() { // complete callback
                        public void execute () {
-                           _everysvc.storyPosted(tracking, new AsyncCallback<Void>() {
-                               public void onSuccess (Void result) { /* nada */ }
-                               public void onFailure (Throwable cause) {
-                                   Console.log("Failed to report story post",
-                                       "tracking", tracking, cause);
-                               }
-                           });
-                           if (callback != null) {
-                               callback.onSuccess(true);
-                           }
+                           if (callback != null) callback.onSuccess(true);
                        }
                    },
                    new Command() { // incomplete callback
                        public void execute () {
-                           if (callback != null) {
-                               callback.onSuccess(false);
-                           }
+                           if (callback != null) callback.onSuccess(false);
                        }
                    });
     }

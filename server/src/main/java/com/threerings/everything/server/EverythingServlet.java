@@ -53,7 +53,6 @@ import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.rpc.EverythingService;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.GridRecord;
@@ -71,7 +70,7 @@ public class EverythingServlet extends EveryServiceServlet
     implements EverythingService
 {
     // from interface EverythingService
-    public SessionData validateSession (String version, int tzOffset, String kontagentToken)
+    public SessionData validateSession (String version, int tzOffset)
         throws ServiceException
     {
         SessionData data = new SessionData();
@@ -82,14 +81,12 @@ public class EverythingServlet extends EveryServiceServlet
         data.everythingURL = _fbconf.getFacebookAppURL("http");
         data.backendURL = _app.getBackendURL();
         data.facebookAppId = _fbconf.getFacebookAppId();
-        data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST);
         data.likes = Lists.newArrayList();
         data.dislikes = Lists.newArrayList();
 
         OOOUser user = getUser();
         if (user == null) {
-            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset,
-                     "tracking", kontagentToken);
+            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset);
             data.name = PlayerName.createGuest();
             return data; // allow the player to do some things anonymously
         }
@@ -143,7 +140,7 @@ public class EverythingServlet extends EveryServiceServlet
             _gameRepo.startCollection(user.userId);
             _playerRepo.recordFeedItem(player.userId, FeedItem.Type.JOINED, 0, "");
             log.info("Hello newbie!", "who", player.who(), "surname", player.surname,
-                     "tz", tz, "fbid", player.facebookId, "tracking", kontagentToken);
+                     "tz", tz, "fbid", player.facebookId);
 
             try { // tell Samsara about the user's real name
                 _userLogic.updateUser(
@@ -175,19 +172,11 @@ public class EverythingServlet extends EveryServiceServlet
             // look up their friends' facebook ids and make friend mappings for them
             updateFacebookInfo(player, fbinfo.right);
 
-            // note that a new user added our app
-            try {
-                _kontLogic.reportNewUser(player, fbuser, kontagentToken);
-            } catch (Exception e) {
-                log.warning("Failed to report new user to Kontagent", "who", player.who(), e);
-            }
-
         } else {
             // if this is not their first session, update their last session timestamp
             long now = System.currentTimeMillis(), elapsed = now - player.lastSession.getTime();
             _playerRepo.recordSession(player, now, tz);
-            log.info("Welcome back", "who", player.who(), "gone", elapsed,
-                     "tracking", kontagentToken);
+            log.info("Welcome back", "who", player.who(), "gone", elapsed);
 
             // check to see if they made FB friends with any existing Everything players (this also
             // updates other Facebook ephemera like first and last name)
@@ -207,7 +196,6 @@ public class EverythingServlet extends EveryServiceServlet
         for (LikeRecord rec : _playerRepo.loadLikes(player.userId)) {
             (rec.like ? data.likes : data.dislikes).add(rec.categoryId);
         }
-        data.kontagentHello = _app.getKontagentURL(Kontagent.PAGE_REQUEST, "s", player.facebookId);
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid != null) {
             data.gridsConsumed = grid.gridId;
@@ -324,9 +312,7 @@ public class EverythingServlet extends EveryServiceServlet
     // from interface EverythingService
     public void storyPosted (String tracking) throws ServiceException
     {
-        // disabled Kontagent for now since we don't really care
-        // _kontLogic.reportAction(
-        //     Kontagent.POST, "s", requirePlayer().facebookId, "tu", "stream", "u", tracking);
+        // we used to report this for tracking, now we don't
     }
 
     protected void aggregateFeed (int callerId, List<FeedItem> items)
@@ -462,7 +448,6 @@ public class EverythingServlet extends EveryServiceServlet
     @Inject protected FacebookConfig _fbconf;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected ThingLogic _thingLogic;
     @Inject protected ThingRepository _thingRepo;

@@ -7,7 +7,6 @@ package com.threerings.everything.client.util;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.data.PlayerName;
 
 import com.threerings.gwt.util.Value;
@@ -29,11 +28,8 @@ public interface Context
     /** Returns the URL that will navigate directly to Everything. */
     String getEverythingURL (String vector, Page page, Object... args);
 
-    /** Returns the URL that will navigate directly to Everything. */
-    String getEverythingURL (Kontagent type, String tracking, Page page, Object... args);
-
     /** Returns the URL to the page that will add our app. */
-    String getFacebookAddURL (Kontagent type, String tracking, Page page, Object... args);
+    String getFacebookAddURL (String vector, Page page, Object... args);
 
     /** Returns HTML for an anchor tag that will add our app. */
     String getFacebookAddLink (String text);

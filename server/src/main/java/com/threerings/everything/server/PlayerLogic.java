@@ -86,9 +86,6 @@ public class PlayerLogic
      */
     public void sendGiftNotification (PlayerRecord sender, long toFBId, Category series)
     {
-        // String tracking = _kontLogic.generateUniqueId(sender.userId);
-        // String url = _app.getHelloURL(Kontagent.NOTIFICATION, tracking);
-
         // BundleActionLink link = new BundleActionLink();
         // link.setText("Open gift");
         // link.setHref(url);
@@ -96,14 +93,14 @@ public class PlayerLogic
         // item.setMessage(sender.name + " gave you a card in the " + series.name + " series.");
         // item.setActionLink(link);
 
-        // sendFacebookNotification(sender, toFBId, item, tracking);
+        // sendFacebookNotification(sender, toFBId, item);
     }
 
     // /**
     //  * Delivers a notification to the specified Facebook user from the specified sender.
     //  */
     // public void sendFacebookNotification (
-    //     PlayerRecord from, final long toFBId, final DashboardNewsItem item, final String tracking)
+    //     PlayerRecord from, final long toFBId, final DashboardNewsItem item)
     // {
     //     if (toFBId == 0) {
     //         return; // noop, some day we'll support players who aren't on Facebook
@@ -126,11 +123,6 @@ public class PlayerLogic
     //                 fbclient.dashboard_multiAddNews(
     //                     Collections.singleton(toFBId), Collections.singleton(item));
 
-    //                 // disabled Kontagent for now since we don't really care
-    //                 //
-    //                 // tell Kontagent that we sent a notification
-    //                 // _kontLogic.reportAction(
-    //                 //     Kontagent.NOTIFICATION, "s", finfo.left, "r", toFBId, "u", tracking);
     //             } catch (Exception e) {
     //                 log.info("Failed to send Facebook notification", "to", toFBId,
     //                          "item", item, "error", e.getMessage());
@@ -221,7 +213,6 @@ public class PlayerLogic
         new ConcurrentHashMap<Class<?>, List<Field>>();
 
     @Inject protected EverythingApp _app;
-    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected UserLogic _userLogic;
 }

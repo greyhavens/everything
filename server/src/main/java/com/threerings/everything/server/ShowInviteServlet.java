@@ -25,7 +25,6 @@ import com.threerings.app.server.AppServlet;
 import com.threerings.facebook.servlet.FacebookConfig;
 
 import com.threerings.everything.data.Thing;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
 import com.threerings.everything.server.persist.PlayerRecord;
@@ -66,9 +65,7 @@ public class ShowInviteServlet extends AppServlet
         Map<String, String> subs = Maps.newHashMap();
         subs.put("ACTION_URL", req.getRequestURL().toString().replaceAll("showinvite", "invite"));
 
-        String tracking = _kontLogic.generateUniqueId(player.userId);
-        subs.put("URL", _app.getHelloURL(Kontagent.INVITE, tracking));
-        subs.put("TRACKING", tracking);
+        subs.put("URL", _app.getHelloURL("invite"));
         subs.put("FACEBOOK_APPID", _fbconf.getFacebookAppId());
 
         // if they specified a card, load that up
@@ -124,7 +121,6 @@ public class ShowInviteServlet extends AppServlet
     @Inject protected EverythingApp _app;
     @Inject protected FacebookConfig _fbconf;
     @Inject protected GameRepository _gameRepo;
-    @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;
 }

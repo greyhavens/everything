@@ -8,8 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -17,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -32,7 +29,6 @@ import com.samskivert.jdbc.ConnectionProvider;
 import com.samskivert.util.Config;
 import com.samskivert.util.Lifecycle;
 import com.samskivert.util.SignalUtil;
-import com.samskivert.util.StringUtil;
 
 import com.threerings.app.server.AppHttpServer;
 import com.threerings.cron.server.CronLogic;
@@ -40,7 +36,6 @@ import com.threerings.facebook.servlet.FacebookConfig;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.everything.data.Build;
-import com.threerings.everything.rpc.Kontagent;
 import com.threerings.everything.server.credits.CreditsServlet;
 import com.threerings.everything.server.credits.PayUpServlet;
 import com.threerings.everything.server.persist.PlayerRepository;
@@ -149,22 +144,6 @@ public class EverythingApp
     /**
      * Returns a URL to our Facebook app that we can put out in the wide world.
      *
-     * @param type the vector in which this URL is being embedded, e.g. {@link Kontagent#INVITE}).
-     * @param the tracking code reported to Kontagent when the invite or notification in which this
-     * URL is being embedded was reported.
-     */
-    public String getHelloURL (Kontagent type, String tracking, Object... args)
-    {
-        String url = _fbconf.getFacebookAppURL("http") + "?kc=" + type.code + "&t=" + tracking;
-        if (args.length > 0) {
-            url += "&token=" + Joiner.on("~").join(args);
-        }
-        return url;
-    }
-
-    /**
-     * Returns a URL to our Facebook app that we can put out in the wide world.
-     *
      * @param vector an identifier used to track this URL, e.g. "reminder_2".
      */
     public String getHelloURL (String vector, Object... args)
@@ -174,40 +153,6 @@ public class EverythingApp
             url += "&token=" + Joiner.on("~").join(args);
         }
         return url;
-    }
-
-    /**
-     * Constructs the Kontagent reporting URL for the supplied parameters.
-     */
-    public String getKontagentURL (Kontagent type, Object... keyVals)
-    {
-        long now = System.currentTimeMillis();
-
-        // first construct the data we need to compute the signature
-        List<String> args = Lists.newArrayList();
-        for (int ii = 0; ii < keyVals.length; ii += 2) {
-            if (keyVals[ii+1] != null) {
-                keyVals[ii+1] = StringUtil.encode(String.valueOf(keyVals[ii+1]));
-                args.add(keyVals[ii] + "=" + keyVals[ii+1]);
-            }
-        }
-        args.add("ts=" + now);
-        Collections.sort(args);
-        args.add(getenv("KONTAGENT_SECRET", "secret"));
-
-        // now construct the URL
-        StringBuilder buf = new StringBuilder();
-        buf.append("http://").append(getenv("KONTAGENT_SERVER", "localhost"));
-        buf.append("/api/v1/").append(getenv("KONTAGENT_KEY", "key")).append("/");
-        buf.append(type.code).append("/?ts=").append(now);
-        buf.append("&an_sig=").append(StringUtil.md5hex(Joiner.on("").join(args)));
-        for (int ii = 0; ii < keyVals.length; ii += 2) {
-            if (keyVals[ii+1] != null) {
-                buf.append("&").append(keyVals[ii]).append("=").append(keyVals[ii+1]);
-            }
-        }
-
-        return buf.toString();
     }
 
     /**
@@ -399,7 +344,6 @@ public class EverythingApp
     @Inject protected PlayerRepository _playerRepo;
 
     protected static final int PGSQL_PORT = 5432;
-    protected static final String KONTAGENT_API_URL = "http://api.geo.kontagent.net/api/v1/";
     protected static final int FEED_PRUNE_DAYS = 5;
 
     // used when testing and we don't have environment variables

@@ -79,17 +79,6 @@ public class InviteServlet extends AppServlet
                 }
             }
 
-            // report to kontagent that we sent one or more invites
-            String tracking = req.getParameter("tracking");
-            if (StringUtil.isBlank(tracking)) {
-                log.warning("Missing Kontagent tracking id for invitation.", "who", player.who(),
-                            "target", targetFBIds);
-            } else {
-                // disabled Kontagent for now since we don't really care
-                // _kontLogic.reportAction(Kontagent.INVITE, "s", player.facebookId,
-                //                         "r", Joiner.on(",").join(targetFBIds), "u", tracking);
-            }
-
         } catch (Exception e) {
             log.warning("Failed to process invite gift: " + e.getMessage(),
                         "who", (player == null) ? "null" : player.who(),
@@ -172,7 +161,6 @@ public class InviteServlet extends AppServlet
     @Inject protected EverythingApp _app;
     @Inject protected GameLogic _gameLogic;
     @Inject protected GameRepository _gameRepo;
-    // @Inject protected KontagentLogic _kontLogic;
     @Inject protected PlayerLogic _playerLogic;
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ThingRepository _thingRepo;
