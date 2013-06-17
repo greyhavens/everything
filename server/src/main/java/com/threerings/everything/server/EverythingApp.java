@@ -220,6 +220,8 @@ public class EverythingApp
         _https.serve(GameServlet.class, gwtRoot + GameServlet.ENTRY_POINT);
         _https.serve(EditorServlet.class, gwtRoot + EditorServlet.ENTRY_POINT);
         _https.serve(AdminServlet.class, gwtRoot + AdminServlet.ENTRY_POINT);
+        String jsonRoot = "/json/";
+        _https.serve(JsonEverythingServlet.class, jsonRoot + EverythingServlet.ENTRY_POINT + "/*");
 
         // set up our cron jobs
         _cronLogic.scheduleEvery(1, "process_birthdays", new Runnable() {

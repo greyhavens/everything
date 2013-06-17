@@ -69,9 +69,7 @@ import static com.threerings.everything.Log.log;
 public class EverythingServlet extends EveryServiceServlet
     implements EverythingService
 {
-    // from interface EverythingService
-    public SessionData validateSession (String version, int tzOffset)
-        throws ServiceException
+    public SessionData validateSession (OOOUser user, int tzOffset) throws ServiceException
     {
         SessionData data = new SessionData();
         for (News news : _playerLogic.resolveNames(_gameRepo.loadLatestNews())) {
@@ -84,9 +82,8 @@ public class EverythingServlet extends EveryServiceServlet
         data.likes = Lists.newArrayList();
         data.dislikes = Lists.newArrayList();
 
-        OOOUser user = getUser();
         if (user == null) {
-            log.info("Have no user, allowing guest", "version", version, "tzOffset", tzOffset);
+            log.info("Have no user, allowing guest", "tzOffset", tzOffset);
             data.name = PlayerName.createGuest();
             return data; // allow the player to do some things anonymously
         }
@@ -202,6 +199,12 @@ public class EverythingServlet extends EveryServiceServlet
             data.gridExpires = grid.expires.getTime();
         }
         return data;
+    }
+
+    // from interface EverythingService
+    public SessionData validateSession (String version, int tzOffset) throws ServiceException
+    {
+        return validateSession(getUser(), tzOffset);
     }
 
     // from interface EverythingService
