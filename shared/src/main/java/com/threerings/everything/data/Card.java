@@ -5,7 +5,6 @@
 package com.threerings.everything.data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Provides data for a card to the client.
@@ -32,7 +31,7 @@ public class Card
     public int things;
 
     /** The time at which this card was received. */
-    public Date received;
+    public long received;
 
     /** The player that gave this card to the owner or null. */
     public PlayerName giver;
@@ -52,6 +51,6 @@ public class Card
     /** Converts this Card to a ThingCard. */
     public ThingCard toThingCard ()
     {
-        return thing.toCard((received != null) ? received.getTime() : 0L);
+        return thing.toCard(received);
     }
 }

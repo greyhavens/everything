@@ -4,7 +4,6 @@
 
 package com.threerings.everything.client.editor;
 
-import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -237,7 +236,7 @@ public class EditSeriesPage extends DataPanel<EditorService.SeriesResult>
         card.position = position;
         card.things = result.things.size();
         card.giver = _ctx.getMe();
-        card.received = new Date();
+        card.received = System.currentTimeMillis();
         return card;
     }
 

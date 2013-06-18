@@ -4,6 +4,8 @@
 
 package com.threerings.everything.client.game;
 
+import java.util.Date;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -126,17 +128,17 @@ public class CardView extends ShadowPanel
                 Widgets.newHTML(formatFacts(card.thing.facts)),
                 Widgets.newHTML("Source: " + sourceLink(card.thing.source), "Source"));
             _info.addStyleName(card.categories[0].name);
+            Date when = new Date(card.received);
             if (card.giver == null) {
-                if (card.received != null) {
-                    _info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(card.received),
-                                               "When"));
+                if (card.received > 0L) {
+                    _info.add(Widgets.newLabel("Flipped on: " + _dfmt.format(when), "When"));
                 }
             } else if (card.giver.userId == Card.BIRTHDAY_GIVER_ID) {
                 _info.add(Widgets.newLabel("A birthday present from Everything", "Giver"));
-                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(when), "When"));
             } else {
                 _info.add(Widgets.newLabel("A gift from " + card.giver, "Giver"));
-                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(card.received), "When"));
+                _info.add(Widgets.newLabel("Received on: " + _dfmt.format(when), "When"));
             }
             add(_info);
         }

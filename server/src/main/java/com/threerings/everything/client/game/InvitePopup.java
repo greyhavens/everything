@@ -24,8 +24,8 @@ public class InvitePopup extends PopupPanel
         String uri = "showinvite";
         if (card != null) {
             uri += "?thing=" + card.thing.thingId;
-            if (card.received != null) {
-                uri += "&received=" + card.received.getTime();
+            if (card.received > 0L) {
+                uri += "&received=" + card.received;
             }
         }
         setWidget(new Frame(uri));

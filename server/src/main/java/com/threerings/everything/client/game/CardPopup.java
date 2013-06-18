@@ -95,7 +95,7 @@ public class CardPopup extends PopupPanel
         sell.setTitle("Sell this card back for half its value.");
         new ClickCallback<GameService.SellResult>(sell) {
             protected boolean callService () {
-                gameSvc.sellCard(card.thing.thingId, card.received.getTime(), this);
+                gameSvc.sellCard(card.thing.thingId, card.received, this);
                 return true;
             }
             protected boolean gotResult (GameService.SellResult result) {

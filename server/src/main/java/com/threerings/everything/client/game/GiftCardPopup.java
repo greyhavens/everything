@@ -67,9 +67,7 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
                 onSent.run();
             }
         };
-        _gamesvc.getGiftCardInfo(card.thing.thingId,
-            (card.received != null) ? card.received.getTime() : 0,
-            createCallback());
+        _gamesvc.getGiftCardInfo(card.thing.thingId, card.received, createCallback());
     }
 
     @Override // from DataPopup<GameService.GiftInfoResult>
@@ -159,8 +157,8 @@ public class GiftCardPopup extends DataPopup<GameService.GiftInfoResult>
         new ClickCallback<Void>(give, message) {
             protected boolean callService () {
                 String msg = message.getText().trim();
-                _gamesvc.giftCard(
-                    _card.thing.thingId, _card.received.getTime(), info.friend.userId, msg, this);
+                _gamesvc.giftCard(_card.thing.thingId, _card.received, info.friend.userId,
+                                  msg, this);
                 return true;
             }
             protected boolean gotResult (Void result) {

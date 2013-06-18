@@ -6,7 +6,6 @@ package com.threerings.everything.server;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -718,7 +717,7 @@ public class GameLogic
     protected Card fillCard (Card card, CardRecord record)
     {
         card.owner = _playerRepo.loadPlayerName(record.ownerId);
-        card.received = new Date(record.received.getTime());
+        card.received = record.received.getTime();
         if (record.giverId > 0) {
             card.giver = _playerRepo.loadPlayerName(record.giverId);
         } else if (record.giverId == Card.BIRTHDAY_GIVER_ID) {

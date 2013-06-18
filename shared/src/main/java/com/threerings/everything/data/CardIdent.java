@@ -5,7 +5,6 @@
 package com.threerings.everything.data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Used to identify a card.
@@ -23,23 +22,13 @@ public class CardIdent
     public long received;
 
     /** Used when unserializing. */
-    public CardIdent ()
-    {
+    public CardIdent () {
     }
 
     /**
      * Creates an id for the specified card.
      */
-    public CardIdent (int ownerId, int thingId, Date received)
-    {
-        this(ownerId, thingId, received.getTime());
-    }
-
-    /**
-     * Creates an id for the specified card.
-     */
-    public CardIdent (int ownerId, int thingId, long received)
-    {
+    public CardIdent (int ownerId, int thingId, long received) {
         this.ownerId = ownerId;
         this.thingId = thingId;
         this.received = received;
