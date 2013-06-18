@@ -35,6 +35,7 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.GridStatus;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Rarity;
@@ -44,6 +45,7 @@ import com.threerings.everything.data.Thing;
 import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.data.TrophyData;
 import com.threerings.everything.rpc.GameService;
+import com.threerings.everything.util.GameUtil;
 
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
@@ -75,31 +77,139 @@ public class GameLogic
     }
 
     /**
-     * Generates a new grid for the supplied player.
+     * Gets the specified player's current grid, generating if needed.
      */
-    public GridRecord generateGrid (PlayerRecord player, Powerup pup, GridRecord previous)
+    public GameService.GridResult getGrid (PlayerRecord player, Powerup pup, boolean expectHave)
         throws ServiceException
     {
-        Map<Integer, Float> weights = generateSeriesWeights(player.userId);
+        long now = System.currentTimeMillis();
+        GridRecord grid = _gameRepo.loadGrid(player.userId);
+        if (grid == null || grid.expires.getTime() < now) {
+            if (expectHave) {
+                return null; // they thought they had a grid, but they don't, let them know
+            }
 
-        GridRecord grid = new GridRecord();
-        grid.userId = player.userId;
-        grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
-        grid.status = GridStatus.NORMAL;
-        grid.thingIds = selectGridThings(player, pup, weights);
-        grid.expires = player.calculateNextExpires();
+            // note the time that their old grid expired
+            long oexpires = (grid == null) ? (now - GameUtil.ONE_DAY) : grid.expires.getTime();
 
-        // now that we successfully selected things for our grid, consume the powerup
-        if (pup != Powerup.NOOP && !_gameRepo.consumePowerupCharge(player.userId, pup)) {
-            throw new ServiceException(GameService.E_LACK_CHARGE);
+            // generate a new grid
+            GridRecord previous = grid;
+            Map<Integer, Float> weights = generateSeriesWeights(player.userId);
+            grid = new GridRecord();
+            grid.userId = player.userId;
+            grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
+            grid.status = GridStatus.NORMAL;
+            grid.thingIds = selectGridThings(player, pup, weights);
+            grid.expires = player.calculateNextExpires();
+            // now that we successfully selected things for our grid, consume the powerup
+            if (pup != Powerup.NOOP && !_gameRepo.consumePowerupCharge(player.userId, pup)) {
+                throw new ServiceException(GameService.E_LACK_CHARGE);
+            }
+
+            // store the new grid in ze database and reset the player's flipped status
+            _gameRepo.storeGrid(grid);
+            _gameRepo.resetSlotStatus(player.userId);
+
+            // based on the time that has elapsed between grid expirations, grant them free flips
+            long elapsed = grid.expires.getTime() - oexpires;
+            int grantFlips = GameUtil.computeFreeFlips(player, elapsed);
+            _playerRepo.grantFreeFlips(player, grantFlips);
+
+            log.info("Generated grid", "for", player.who(), "pup", pup, "things", grid.thingIds,
+                     "expires", grid.expires, "elapsed", elapsed, "flips", grantFlips);
         }
 
-        return grid;
+        GameService.GridResult result = new GameService.GridResult();
+        result.grid = resolveGrid(grid);
+        result.status = getGameStatus(player, result.grid.unflipped);
+        log.info("Returning grid", "for", player.who(), "things", grid.thingIds,
+                 "unflipped", result.grid.unflipped);
+        return result;
+    }
+
+    public GameService.ShopResult getShopInfo (PlayerRecord player) throws ServiceException
+    {
+        GameService.ShopResult result = new GameService.ShopResult();
+        result.coins = player.coins;
+        result.powerups = _gameRepo.loadPowerups(player.userId);
+        return result;
+    }
+
+    public void buyPowerup (PlayerRecord player, Powerup type) throws ServiceException
+    {
+        // sanity check
+        if (type == null || type.cost <= 0) {
+            throw ServiceException.internalError();
+        }
+
+        // if this is a permanent powerup, make sure they don't already own it
+        if (type.isPermanent()) {
+            if (_gameRepo.loadPowerupCount(player.userId, type) > 0) {
+                throw new ServiceException(GameService.E_ALREADY_OWN_POWERUP);
+            }
+        }
+
+        // if this is a flag granting powerup, make sure they don't already have the flag set (this
+        // should be caught by the previous check but we'll be extra sure)
+        Player.Flag flag = type.getTargetFlag();
+        if (flag != null && player.isSet(flag)) {
+            throw new ServiceException(GameService.E_ALREADY_OWN_POWERUP);
+        }
+
+        // deduct the coins from the player's account
+        if (!_playerRepo.consumeCoins(player.userId, type.cost)) {
+            throw new ServiceException(GameService.E_NSF_FOR_PURCHASE);
+        }
+
+        // grant them the powerup charges
+        _gameRepo.grantPowerupCharges(player.userId, type, type.charges);
+
+        // if this was a flag granting powerup, activate the flag
+        if (flag != null) {
+            _playerRepo.updateFlag(player, flag, true);
+        }
     }
 
     /**
-     * Converts a grid record to a grid object, resolving all flipped cards into populated {@link
-     * ThingCard} instances.
+     * Uses the specified powerup on the specified grid.
+     */
+    public Grid usePowerup (PlayerRecord player, int gridId, Powerup type) throws ServiceException
+    {
+        // make sure we're all talking about the same grid
+        GridRecord grid = _gameRepo.loadGrid(player.userId);
+        if (grid == null || grid.expires.getTime() < System.currentTimeMillis() ||
+            grid.gridId != gridId) {
+            throw new ServiceException(GameService.E_GRID_EXPIRED);
+        }
+
+        // determine the grid's new status
+        GridStatus status = type.getTargetStatus();
+        if (status == null) {
+            log.warning("Requested to apply invalid powerup to grid", "who", player.who(),
+                        "powerup", type);
+            throw ServiceException.internalError();
+        }
+
+        // save the player from wasting a charge (the client prevents this as well)
+        if (grid.status == status) {
+            log.warning("Preventing NOOP powerup usage", "who", player.who(), "powerup", type);
+            throw ServiceException.internalError();
+        }
+
+        // consume the powerup
+        if (!_gameRepo.consumePowerupCharge(player.userId, type)) {
+            throw new ServiceException(GameService.E_LACK_CHARGE);
+        }
+
+        // update the grid's status in the database (and in memory)
+        _gameRepo.updateGridStatus(grid, status);
+
+        // re-resolve and return the grid
+        return resolveGrid(grid);
+    }
+
+    /**
+     * Converts a grid record to a grid object. Resolves all flipped cards into {@link ThingCard}s.
      */
     public Grid resolveGrid (GridRecord record)
     {

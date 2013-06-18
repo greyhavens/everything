@@ -16,9 +16,8 @@ import com.google.inject.Singleton;
 
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Rarity;
-import com.threerings.everything.server.persist.ThingRepository;
 import com.threerings.everything.server.persist.PlayerRepository;
-
+import com.threerings.everything.server.persist.ThingRepository;
 import com.threerings.everything.util.LazyExpiringMemoizingSupplier;
 
 /**
