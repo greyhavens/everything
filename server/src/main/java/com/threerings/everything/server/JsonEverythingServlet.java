@@ -17,8 +17,9 @@ import com.threerings.user.ExternalAuther;
 import com.threerings.user.OOOUser;
 
 import static com.threerings.everything.Log.log;
+import static com.threerings.everything.rpc.JSON.*;
 
-public class JsonEverythingServlet extends JsonServlet {
+public class JsonEverythingServlet extends JsonServiceServlet {
 
     protected Object handle (String method, HttpServletRequest req, HttpServletResponse rsp)
         throws IOException, ServiceException {
@@ -34,31 +35,22 @@ public class JsonEverythingServlet extends JsonServlet {
             }
             OOOUser user = _servletLogic.getUser(authTok);
             log.info("Validating session", "authTok", authTok, "user", user);
-            return _everySvc.validateSession(user, args.tzOffset);
+            return _everyLogic.validateSession(req, user, args.tzOffset);
 
         } else if ("/getRecentFeed".equals(method)) {
-            return _everySvc.getRecentFeed();
+            return _everyLogic.getRecentFeed(requirePlayer(req));
 
         } else if ("/getFriends".equals(method)) {
-            return _everySvc.getFriends();
+            return _everyLogic.getFriends(requirePlayer(req));
 
         } else if ("/getCredits".equals(method)) {
-            return _everySvc.getCredits();
+            return _everyLogic.getCredits();
 
         } else {
             return null;
         }
     }
 
-    protected static class ValidateSession {
-        public String fbId;
-        public String fbToken;
-        public int tzOffset;
-    }
-    protected static class GetUserFeed {
-        public int userId;
-    }
-
-    @Inject protected EverythingServlet _everySvc;
+    @Inject protected EverythingLogic _everyLogic;
     @Inject protected ServletLogic _servletLogic;
 }
