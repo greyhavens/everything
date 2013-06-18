@@ -126,11 +126,11 @@ public class JSON {
             this.trophies = trophies;
         }
     }
-    public static class FlipCardResult {
-        public CardResult card;
+    public static class FlipCardResult extends CardResult {
         public GameStatus status;
-        public FlipCardResult (CardResult card, GameStatus status) {
-            this.card = card;
+        public FlipCardResult (Card card, int haveCount, int thingsRemaining, TrophyData[] trophies,
+                               GameStatus status) {
+            super(card, haveCount, thingsRemaining, trophies);
             this.status = status;
         }
     }
@@ -150,11 +150,11 @@ public class JSON {
             this.friends = friends;
         }
     }
-    public static class GiftInfo {
-        public CardResult card;
+    public static class GiftInfo extends CardResult {
         public String message;
-        public GiftInfo (CardResult card, String message) {
-            this.card = card;
+        public GiftInfo (Card card, int haveCount, int thingsRemaining, TrophyData[] trophies,
+                         String message) {
+            super(card, haveCount, thingsRemaining, trophies);
             this.message = message;
         }
     }
