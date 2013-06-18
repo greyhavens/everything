@@ -12,8 +12,8 @@ import com.google.common.collect.ImmutableSet;
 
 import com.threerings.everything.data.TrophyData;
 
-public class Trophies {
-
+public class Trophies
+{
     public static class TrophyRecord
     {
         public final ImmutableSet<Integer> sets;
@@ -75,7 +75,7 @@ public class Trophies {
     }
 
     /**
-     * Trophy data. TODO: from database...
+     * Trophy data.
      */
     public static final List<TrophyRecord> trophies = ImmutableList.of(
         // a series of trophies awarded purely for completing numbers of sets?
