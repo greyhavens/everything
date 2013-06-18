@@ -15,6 +15,9 @@ public class ThingCard
     /** The id of the thing represented by this card. */
     public int thingId;
 
+    /** The (leaf) category to which this thing belongs. */
+    public int categoryId;
+
     /** The name of the thing on this card. */
     public String name;
 
@@ -35,6 +38,7 @@ public class ThingCard
     {
         ThingCard card = new ThingCard();
         card.thingId = other.thingId;
+        card.categoryId = other.categoryId;
         card.name = other.name;
         card.image = other.image;
         card.rarity = other.rarity;

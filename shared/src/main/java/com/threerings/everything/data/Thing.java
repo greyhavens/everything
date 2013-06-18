@@ -58,6 +58,7 @@ public class Thing
     public ThingCard toCard (long received) {
         ThingCard card = new ThingCard();
         card.thingId = thingId;
+        card.categoryId = categoryId;
         card.name = name;
         card.image = image;
         card.rarity = rarity;
