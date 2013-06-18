@@ -5,8 +5,6 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Inject;
 
@@ -21,27 +19,28 @@ import static com.threerings.everything.rpc.JSON.*;
 
 public class JsonEverythingServlet extends JsonServiceServlet {
 
-    protected Object handle (String method, HttpServletRequest req, HttpServletResponse rsp)
+    protected Object handle (String method)
         throws IOException, ServiceException {
         if ("/validateSession".equals(method)) {
-            ValidateSession args = readArgs(req, ValidateSession.class);
-            String authTok = _servletLogic.getAuthCookie(req);
+            ValidateSession args = readArgs(ValidateSession.class);
+            String authTok = _servletLogic.getAuthCookie(threadLocalRequest());
             if (authTok == null) {
                 // TODO: validate Facebook credentials
                 authTok = _servletLogic.externalLogon(
                     ExternalAuther.FACEBOOK, args.fbId, args.fbToken);
                 log.info("Logging in", "fbId", args.fbId, "token", args.fbToken, "authTok", authTok);
-                ServletAuthUtil.addAuthCookie(req, rsp, authTok, 180);
+                ServletAuthUtil.addAuthCookie(
+                    threadLocalRequest(), threadLocalResponse(), authTok, 180);
             }
             OOOUser user = _servletLogic.getUser(authTok);
             log.info("Validating session", "authTok", authTok, "user", user);
-            return _everyLogic.validateSession(req, user, args.tzOffset);
+            return _everyLogic.validateSession(threadLocalRequest(), user, args.tzOffset);
 
         } else if ("/getRecentFeed".equals(method)) {
-            return _everyLogic.getRecentFeed(requirePlayer(req));
+            return _everyLogic.getRecentFeed(requirePlayer());
 
         } else if ("/getFriends".equals(method)) {
-            return _everyLogic.getFriends(requirePlayer(req));
+            return _everyLogic.getFriends(requirePlayer());
 
         } else if ("/getCredits".equals(method)) {
             return _everyLogic.getCredits();

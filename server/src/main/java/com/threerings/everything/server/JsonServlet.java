@@ -19,13 +19,14 @@ import static com.threerings.everything.Log.log;
 
 public abstract class JsonServlet extends HttpServlet {
 
-    protected abstract Object handle (String method, HttpServletRequest req, HttpServletResponse rsp)
-        throws IOException, ServiceException;
+    protected abstract Object handle (String method) throws IOException, ServiceException;
 
     protected void doPost (HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         try {
+            _threadReq.set(req);
+            _threadRsp.set(rsp);
             String method = req.getPathInfo();
-            Object result = handle(method, req, rsp);
+            Object result = handle(method);
             if (result == null) {
                 log.warning("Unknown method " + req.getContextPath() + method);
                 rsp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown method " + method);
@@ -37,13 +38,28 @@ public abstract class JsonServlet extends HttpServlet {
 
         } catch (ServiceException se) {
             rsp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, se.getMessage());
+
+        } finally {
+            _threadReq.remove();
+            _threadRsp.remove();
         }
     }
 
     /** Decodes the request payload as an arguments JSON object. */
-    protected <T> T readArgs (HttpServletRequest req, Class<T> argClass) throws IOException {
-        return _gson.fromJson(req.getReader(), argClass);
+    protected <T> T readArgs (Class<T> argClass) throws IOException {
+        return _gson.fromJson(threadLocalRequest().getReader(), argClass);
+    }
+
+    protected HttpServletRequest threadLocalRequest () {
+        return _threadReq.get();
+    }
+    protected HttpServletResponse threadLocalResponse () {
+        return _threadRsp.get();
     }
 
     protected final Gson _gson = new GsonBuilder().create();
+    protected final ThreadLocal<HttpServletRequest> _threadReq =
+        new ThreadLocal<HttpServletRequest>();
+    protected final ThreadLocal<HttpServletResponse> _threadRsp =
+        new ThreadLocal<HttpServletResponse>();
 }

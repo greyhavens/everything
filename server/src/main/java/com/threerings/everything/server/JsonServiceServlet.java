@@ -4,7 +4,9 @@
 
 package com.threerings.everything.server;
 
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Inject;
 
@@ -19,34 +21,52 @@ import static com.threerings.everything.Log.log;
 
 public abstract class JsonServiceServlet extends JsonServlet {
 
-    protected OOOUser getUser (HttpServletRequest req) {
-        return _servletLogic.getUser(req);
+    protected void doPost (HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+        try {
+            super.doPost(req, rsp);
+        } finally {
+            _perThreadUser.remove();
+            _perThreadPlayer.remove();
+        }
     }
 
-    protected OOOUser requireUser (HttpServletRequest req) throws ServiceException {
-        OOOUser user = getUser(req);
+    protected OOOUser getUser () {
+        return _perThreadUser.get();
+    }
+
+    protected OOOUser requireUser () throws ServiceException {
+        OOOUser user = getUser();
         ServiceException.require(user != null, AppCodes.E_SESSION_EXPIRED);
         return user;
     }
 
-    protected PlayerRecord getPlayer (HttpServletRequest req) {
-        return getPlayer(getUser(req));
+    protected PlayerRecord getPlayer () {
+        return _perThreadPlayer.get();
     }
 
-    protected PlayerRecord getPlayer (OOOUser user) {
-        return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
-    }
-
-    protected PlayerRecord requirePlayer (HttpServletRequest req) throws ServiceException {
-        OOOUser user = getUser(req);
-        PlayerRecord player = getPlayer(user);
+    protected PlayerRecord requirePlayer () throws ServiceException {
+        PlayerRecord player = getPlayer();
         if (player == null) {
+            OOOUser user = getUser();
             log.warning("Missing player record for user in requirePlayer?",
                         "who", (user != null) ? user.userId : null);
             throw ServiceException.sessionExpired();
         }
         return player;
     }
+
+    protected final ThreadLocal<OOOUser> _perThreadUser = new ThreadLocal<OOOUser>() {
+        @Override protected OOOUser initialValue () {
+            return _servletLogic.getUser(threadLocalRequest());
+        }
+    };
+
+    protected final ThreadLocal<PlayerRecord> _perThreadPlayer = new ThreadLocal<PlayerRecord>() {
+        @Override protected PlayerRecord initialValue () {
+            OOOUser user = getUser();
+            return (user == null) ? null : _playerRepo.loadPlayer(user.userId);
+        }
+    };
 
     @Inject protected PlayerRepository _playerRepo;
     @Inject protected ServletLogic _servletLogic;
