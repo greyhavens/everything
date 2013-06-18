@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 
 import com.threerings.app.client.ServiceException;
 
@@ -57,7 +58,9 @@ public abstract class JsonServlet extends HttpServlet {
         return _threadRsp.get();
     }
 
-    protected final Gson _gson = new GsonBuilder().create();
+    protected final Gson _gson = new GsonBuilder().
+        setLongSerializationPolicy(LongSerializationPolicy.STRING).
+        create();
     protected final ThreadLocal<HttpServletRequest> _threadReq =
         new ThreadLocal<HttpServletRequest>();
     protected final ThreadLocal<HttpServletResponse> _threadRsp =
