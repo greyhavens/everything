@@ -317,9 +317,8 @@ public class GameLogic
      * Transfers the specified card to the specified target player. Takes care of feed message
      * generation and set completion checking and all the whatnots.
      */
-    public void giftCard (
-        PlayerRecord owner, CardRecord card, PlayerRecord target, String message,
-        boolean recruitGift)
+    public void giftCard (PlayerRecord owner, CardRecord card, PlayerRecord target, String message,
+                          boolean recruitGift)
     {
         // transfer the card to the target player (in gift form)
         _gameRepo.giftCard(card, target.userId, message);
