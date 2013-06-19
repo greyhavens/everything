@@ -13,14 +13,6 @@
   <packaging>jar</packaging>
   <name>Everything Shared</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.samskivert</groupId>
-      <artifactId>samskivert</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
