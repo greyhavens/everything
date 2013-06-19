@@ -4,15 +4,13 @@
 
 package com.threerings.everything.rpc;
 
-import java.util.Map;
-
 import com.threerings.everything.data.*;
 
 /** Contains JSON model objects for the JSON RPC API. */
-public class JSON {
+public interface JSON {
 
     // EveryService request classes
-    public static class ValidateSession {
+    class ValidateSession {
         public String fbId;
         public String fbToken;
         public int tzOffset;
@@ -22,7 +20,7 @@ public class JSON {
             this.tzOffset = tzOffset;
         }
     }
-    public static class GetUserFeed {
+    class GetUserFeed {
         public int userId;
         public GetUserFeed (int userId) {
             this.userId = userId;
@@ -30,13 +28,13 @@ public class JSON {
     }
 
     // GameService request classes
-    public static class GetCollection {
+    class GetCollection {
         public int ownerId;
         public GetCollection (int ownerId) {
             this.ownerId = ownerId;
         }
     }
-    public static class GetSeries {
+    class GetSeries {
         public int ownerId;
         public int categoryId;
         public GetSeries (int ownerId, int categoryId) {
@@ -44,7 +42,7 @@ public class JSON {
             this.categoryId = categoryId;
         }
     }
-    public static class GetGrid {
+    class GetGrid {
         public Powerup pup;
         public boolean expectHave;
         public GetGrid (Powerup pup, boolean expectHave) {
@@ -52,7 +50,7 @@ public class JSON {
             this.expectHave = expectHave;
         }
     }
-    public static class FlipCard {
+    class FlipCard {
         public int gridId;
         public int pos;
         public int expectCost;
@@ -62,7 +60,7 @@ public class JSON {
             this.expectCost = expectCost;
         }
     }
-    public static class CardInfo {
+    class CardInfo {
         public int thingId;
         public long created;
         public CardInfo (int thingId, long created) {
@@ -70,7 +68,7 @@ public class JSON {
             this.created = created;
         }
     }
-    public static class GiftCard {
+    class GiftCard {
         public int thingId;
         public long created;
         public int friendId;
@@ -82,7 +80,7 @@ public class JSON {
             this.message = message;
         }
     }
-    public static class SetLike {
+    class SetLike {
         public int catId;
         public Boolean like;
         public SetLike (int catId, Boolean like) {
@@ -90,80 +88,18 @@ public class JSON {
             this.like = like;
         }
     }
-    public static class BuyPowerup {
+    class BuyPowerup {
         public Powerup pup;
         public BuyPowerup (Powerup pup) {
             this.pup = pup;
         }
     }
-    public static class UsePowerup {
+    class UsePowerup {
         public int gridId;
         public Powerup pup;
         public UsePowerup (int gridId, Powerup pup) {
             this.gridId = gridId;
             this.pup = pup;
-        }
-    }
-
-    // GameService response classes
-    public static class GridResult {
-        public Grid grid;
-        public GameStatus status;
-        public GridResult (Grid grid, GameStatus status) {
-            this.grid = grid;
-            this.status = status;
-        }
-    }
-    public static class CardResult {
-        public Card card;
-        public int haveCount;
-        public int thingsRemaining;
-        public TrophyData[] trophies;
-        public CardResult (Card card, int haveCount, int thingsRemaining, TrophyData[] trophies) {
-            this.card = card;
-            this.haveCount = haveCount;
-            this.thingsRemaining = thingsRemaining;
-            this.trophies = trophies;
-        }
-    }
-    public static class FlipCardResult extends CardResult {
-        public GameStatus status;
-        public FlipCardResult (Card card, int haveCount, int thingsRemaining, TrophyData[] trophies,
-                               GameStatus status) {
-            super(card, haveCount, thingsRemaining, trophies);
-            this.status = status;
-        }
-    }
-    public static class SellCardResult {
-        public int coins;
-        public Boolean newLike;
-        public SellCardResult (int coins, Boolean newLike) {
-            this.coins = coins;
-            this.newLike = newLike;
-        }
-    }
-    public static class GiftCardInfo {
-        public int things;
-        public FriendCardInfo[] friends;
-        public GiftCardInfo (int things, FriendCardInfo[] friends) {
-            this.things = things;
-            this.friends = friends;
-        }
-    }
-    public static class GiftInfo extends CardResult {
-        public String message;
-        public GiftInfo (Card card, int haveCount, int thingsRemaining, TrophyData[] trophies,
-                         String message) {
-            super(card, haveCount, thingsRemaining, trophies);
-            this.message = message;
-        }
-    }
-    public static class ShopInfo {
-        public int coins;
-        public Map<Powerup,Integer> pups;
-        public ShopInfo (int coins, Map<Powerup,Integer> pups) {
-            this.coins = coins;
-            this.pups = pups;
         }
     }
 }

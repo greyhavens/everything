@@ -4,10 +4,6 @@
 
 package com.threerings.everything.rpc;
 
-import java.util.List;
-import java.util.Map;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -15,19 +11,17 @@ import com.threerings.app.client.ServiceException;
 
 import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CardIdent;
-import com.threerings.everything.data.FriendCardInfo;
 import com.threerings.everything.data.GameStatus;
 import com.threerings.everything.data.Grid;
 import com.threerings.everything.data.PlayerCollection;
 import com.threerings.everything.data.Powerup;
 import com.threerings.everything.data.Series;
-import com.threerings.everything.data.TrophyData;
 
 /**
  * Provides game services to the client.
  */
 @RemoteServiceRelativePath(GameService.ENTRY_POINT)
-public interface GameService extends RemoteService
+public interface GameService extends RemoteService, GameAPI
 {
     /** The path at which this servlet is mapped. */
     public static final String ENTRY_POINT = "game";
@@ -68,79 +62,6 @@ public interface GameService extends RemoteService
 
     /** Thrown by {@link #usePower} if the user doesn't have a charge of the specified powerup. */
     public static final String E_LACK_CHARGE = "e.lack_charge";
-
-    /** Provides results for {@link #getGrid}. */
-    public static class GridResult implements IsSerializable
-    {
-        /** The player's current grid. */
-        public Grid grid;
-
-        /** The player's current game status. */
-        public GameStatus status;
-    }
-
-    /** A base class shared by {@link FlipResult} and {@link GiftResult}. */
-    public static class CardResult implements IsSerializable
-    {
-        /** The card in question. */
-        public Card card;
-
-        /** Number of this thing already held by this player (not including this one). */
-        public int haveCount;
-
-        /** Number of things remaining in this set not held by this player. */
-        public int thingsRemaining;
-
-        /** Trophies newly earned, or null. */
-        public List<TrophyData> trophies;
-    }
-
-    /** Provides results for {@link #flipCard}. */
-    public static class FlipResult extends CardResult
-    {
-        /** The player's new game status after the flip. */
-        public GameStatus status;
-
-        /** Do we want to duplicate this card as a bonanza? */
-        public boolean bonanza;
-    }
-
-    /** Provides results for {@link #getGiftCardInfo}. */
-    public static class GiftInfoResult implements IsSerializable
-    {
-        /** The number of things in the series of the card being considered for gifting. */
-        public int things;
-
-        /** The status of each of this player's friends that do not already have the card. */
-        public List<FriendCardInfo> friends;
-    }
-
-    /** Provides results for {@link #openGift}. */
-    public static class GiftResult extends CardResult
-    {
-        /** The message from the gifter, if any. */
-        public String message;
-    }
-
-    /** Provides results for {@link #getShopInfo}. */
-    public static class ShopResult implements IsSerializable
-    {
-        /** This player's current coin balance. */
-        public int coins;
-
-        /** This player's current powerups count. */
-        public Map<Powerup, Integer> powerups;
-    }
-
-    /** Provides results for {@link #sellCard}. */
-    public static class SellResult implements IsSerializable
-    {
-        /** The player's new coin balance. */
-        public int coins;
-
-        /** The new 'like' value for this category. */
-        public Boolean newLike;
-    }
 
     /**
      * Returns the collection of the specified player.
