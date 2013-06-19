@@ -143,10 +143,10 @@ public class JSON {
         }
     }
     public static class GiftCardInfo {
-        public int thingCount;
+        public int things;
         public FriendCardInfo[] friends;
-        public GiftCardInfo (int thingCount, FriendCardInfo[] friends) {
-            this.thingCount = thingCount;
+        public GiftCardInfo (int things, FriendCardInfo[] friends) {
+            this.things = things;
             this.friends = friends;
         }
     }
