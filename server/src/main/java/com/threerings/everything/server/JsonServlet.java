@@ -33,8 +33,9 @@ public abstract class JsonServlet extends HttpServlet {
                 rsp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown method " + method);
             } else {
                 String json = _gson.toJson(result);
-                rsp.setContentType("application/json");
+                rsp.setContentType("application/json; charset=UTF-8");
                 rsp.getWriter().write(json);
+                // rsp.getOutputStream.write(result.getBytes("UTF8"))
             }
 
         } catch (ServiceException se) {
