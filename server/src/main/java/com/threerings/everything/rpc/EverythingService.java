@@ -38,7 +38,7 @@ public interface EverythingService extends RemoteService, EveryAPI
     /**
      * Returns the calling user's pending gifts and data on their friends' activities.
      */
-    FeedResult getRecentFeed () throws ServiceException;
+    FeedResult getFeed () throws ServiceException;
 
     /**
      * Returns a list of recent activity for the specified user.

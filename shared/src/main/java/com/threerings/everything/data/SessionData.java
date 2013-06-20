@@ -26,6 +26,15 @@ public class SessionData
     /** Whether or not this player is a maintainer. */
     public boolean isMaintainer;
 
+    /** The main URL to our app. */
+    public String everythingURL;
+
+    /** The URL of our backend app server. */
+    public String backendURL;
+
+    /** Our Facebook app ID. */
+    public String facebookAppId;
+
     /** Our coin balance at the time we validated our session. */
     public int coins;
 
@@ -38,6 +47,9 @@ public class SessionData
     /** The categoryIds that this player dislikes. */
     public List<Integer> dislikes;
 
+    /** Gifts awaiting this player, if any. */
+    public List<ThingCard> gifts;
+
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;
 
@@ -46,13 +58,4 @@ public class SessionData
 
     /** The current game news, or null. */
     public News news;
-
-    /** The main URL to our app. */
-    public String everythingURL;
-
-    /** The URL of our backend app server. */
-    public String backendURL;
-
-    /** Our Facebook app ID. */
-    public String facebookAppId;
 }

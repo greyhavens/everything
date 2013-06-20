@@ -194,6 +194,7 @@ public class EverythingLogic
         for (LikeRecord rec : _playerRepo.loadLikes(player.userId)) {
             (rec.like ? data.likes : data.dislikes).add(rec.categoryId);
         }
+        data.gifts = loadGifts(player);
         GridRecord grid = _gameRepo.loadGrid(player.userId);
         if (grid != null) {
             data.gridsConsumed = grid.gridId;
@@ -202,16 +203,11 @@ public class EverythingLogic
         return data;
     }
 
-    public EverythingService.FeedResult getRecentFeed (PlayerRecord player) throws ServiceException
+    public EverythingService.FeedResult getFeed (PlayerRecord player) throws ServiceException
     {
         EverythingService.FeedResult result = new EverythingService.FeedResult();
-
         // load up their friends' recent activiteis
-        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS)
-            .toList();
-        aggregateFeed(player.userId, items);
-        result.items = _playerLogic.resolveNames(items, player.getName());
-
+        result.items = getRecentFeed(player);
         // if this player is an editor, load up recent comments on their series
         if (player.isEditor) {
             result.comments = Lists.newArrayList();
@@ -231,20 +227,17 @@ public class EverythingLogic
 //                 cats.put(cat.categoryId, cat);
 //             }
         }
-
         // load up their pending gifts
-        result.gifts = Lists.newArrayList();
-        for (CardRecord gift : _gameRepo.loadGifts(player.userId)) {
-            ThingCard card = new ThingCard();
-            card.thingId = gift.thingId;
-            card.received = gift.received.getTime();
-            result.gifts.add(card);
-        }
-
+        result.gifts = loadGifts(player);
         // resolve the user's recruitment gift
         result.recruitGifts = resolveRecruitGifts(player);
-
         return result;
+    }
+
+    public List<FeedItem> getRecentFeed (PlayerRecord player) throws ServiceException {
+        List<FeedItem> items = _playerRepo.loadRecentFeed(player.userId, RECENT_FEED_ITEMS).toList();
+        aggregateFeed(player.userId, items);
+        return _playerLogic.resolveNames(items, player.getName());
     }
 
     public List<FeedItem> getUserFeed (PlayerRecord caller, int userId) throws ServiceException
@@ -318,6 +311,17 @@ public class EverythingLogic
                 imap.put(key, item);
             }
         }
+    }
+
+    protected List<ThingCard> loadGifts (PlayerRecord player) {
+        List<ThingCard> gifts = Lists.newArrayList();
+        for (CardRecord gift : _gameRepo.loadGifts(player.userId)) {
+            ThingCard card = new ThingCard();
+            card.thingId = gift.thingId;
+            card.received = gift.received.getTime();
+            gifts.add(card);
+        }
+        return gifts;
     }
 
     protected void updateFacebookInfo (final PlayerRecord prec, String fbSessionKey)

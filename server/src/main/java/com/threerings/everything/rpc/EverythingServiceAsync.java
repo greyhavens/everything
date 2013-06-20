@@ -22,9 +22,9 @@ public interface EverythingServiceAsync
     void validateSession (String version, int tzOffset, AsyncCallback<SessionData> callback);
 
     /**
-     * The async version of {@link EverythingService#getRecentFeed}.
+     * The async version of {@link EverythingService#getFeed}.
      */
-    void getRecentFeed (AsyncCallback<EverythingService.FeedResult> callback);
+    void getFeed (AsyncCallback<EverythingService.FeedResult> callback);
 
     /**
      * The async version of {@link EverythingService#getUserFeed}.

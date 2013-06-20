@@ -28,7 +28,7 @@ public class MyFeedPanel extends FeedPanel<EverythingService.FeedResult>
     public MyFeedPanel (Context ctx)
     {
         super(ctx);
-        _everysvc.getRecentFeed(createCallback());
+        _everysvc.getFeed(createCallback());
     }
 
     @Override // from DataPanel

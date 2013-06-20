@@ -27,8 +27,8 @@ public class EverythingServlet extends EveryServiceServlet
     }
 
     // from interface EverythingService
-    public FeedResult getRecentFeed () throws ServiceException {
-        return _logic.getRecentFeed(requirePlayer());
+    public FeedResult getFeed () throws ServiceException {
+        return _logic.getFeed(requirePlayer());
     }
 
     // from interface EverythingService

@@ -12,7 +12,7 @@ import com.threerings.everything.data.*;
 /** Defines classes used by the {@code everything} service. */
 public interface EveryAPI {
 
-    /** Provides results for {@code getRecentFeed}. */
+    /** Provides results for {@code getFeed}. */
     class FeedResult implements Serializable {
         /** The "recruitment gifts" for you to use to slurp in new players, or null to mark
          * a slot as already gifted. */
