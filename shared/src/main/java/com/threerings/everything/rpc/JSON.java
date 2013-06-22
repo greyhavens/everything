@@ -11,11 +11,9 @@ public interface JSON {
 
     // EveryService request classes
     class ValidateSession {
-        public String fbId;
         public String fbToken;
         public int tzOffset;
-        public ValidateSession (String fbId, String fbToken, int tzOffset) {
-            this.fbId = fbId;
+        public ValidateSession (String fbToken, int tzOffset) {
             this.fbToken = fbToken;
             this.tzOffset = tzOffset;
         }

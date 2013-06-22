@@ -184,6 +184,13 @@ public class EverythingApp
     }
 
     /**
+     * Returns true if we're running on the candidate app.
+     */
+    public boolean isCandidate () {
+        return getBackendURL().contains("-candidate");
+    }
+
+    /**
      * Returns the URL for this app.
      */
     public String getBaseUrl () {
