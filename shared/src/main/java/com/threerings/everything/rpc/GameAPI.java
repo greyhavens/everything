@@ -13,6 +13,46 @@ import com.threerings.everything.data.*;
 /** Defines classes used by the {@code game} service. */
 public interface GameAPI {
 
+    /** The path at which this API's servlets are mapped. */
+    String ENTRY_POINT = "game";
+
+    /** Thrown by {@code getCollection} if the user in question does not exist. */
+    String E_UNKNOWN_USER = "e.unknown_user";
+
+    /** Thrown by {@code getSeries} if the series in question does not exist. */
+    String E_UNKNOWN_SERIES = "e.unknown_series";
+
+    /** Thrown by {@code getGrid} if the player has too few series for the ALL_COLLECTED_SERIES
+     * powerup. */
+    String E_TOO_FEW_SERIES = "e.too_few_series";
+
+    /** Thrown by {@code flipCard} or {@code usePowerup} if the grid in question has expired. */
+    String E_GRID_EXPIRED = "e.grid_expired";
+
+    /** Thrown by {@code flipCard} if the position requested has already been flipped. */
+    String E_ALREADY_FLIPPED = "e.already_flipped";
+
+    /** Thrown by {@code flipCard} if the user thinks they get a free flip but don't have one. */
+    String E_LACK_FREE_FLIP = "e.lack_free_flip";
+
+    /** Thrown by {@code flipCard} if the user's expected flip cost doesn't match the server's. */
+    String E_FLIP_COST_CHANGED = "e.flip_cost_changed";
+
+    /** Thrown by {@code flipCard} if the user can't afford the flip they requested. */
+    String E_NSF_FOR_FLIP = "e.nsf_for_flip";
+
+    /** Thrown by various card-related methods if the card in question does not exist. */
+    String E_UNKNOWN_CARD = "e.unknown_card";
+
+    /** Thrown by {@code buyPowerup} if the powerup is permanent and the player already owns it. */
+    String E_ALREADY_OWN_POWERUP = "e.already_own_powerup";
+
+    /** Thrown by {@code buyPowerup} if the user can't afford the powerup they requested. */
+    String E_NSF_FOR_PURCHASE = "e.nsf_for_purchase";
+
+    /** Thrown by {@code usePower} if the user doesn't have a charge of the specified powerup. */
+    String E_LACK_CHARGE = "e.lack_charge";
+
     /** Provides results for {@code getGrid}. */
     class GridResult implements Serializable {
         /** The player's current grid. */

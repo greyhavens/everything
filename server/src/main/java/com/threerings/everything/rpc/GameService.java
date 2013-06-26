@@ -23,46 +23,6 @@ import com.threerings.everything.data.Series;
 @RemoteServiceRelativePath(GameService.ENTRY_POINT)
 public interface GameService extends RemoteService, GameAPI
 {
-    /** The path at which this servlet is mapped. */
-    public static final String ENTRY_POINT = "game";
-
-    /** Thrown by {@link #getCollection} if the user in question does not exist. */
-    public static final String E_UNKNOWN_USER = "e.unknown_user";
-
-    /** Thrown by {@link #getSeries} if the series in question does not exist. */
-    public static final String E_UNKNOWN_SERIES = "e.unknown_series";
-
-    /** Thrown by {@link #getGrid} if the player has too few series for the ALL_COLLECTED_SERIES
-     * powerup. */
-    public static final String E_TOO_FEW_SERIES = "e.too_few_series";
-
-    /** Thrown by {@link #flipCard} or {@link #usePowerup} if the grid in question has expired. */
-    public static final String E_GRID_EXPIRED = "e.grid_expired";
-
-    /** Thrown by {@link #flipCard} if the position requested has already been flipped. */
-    public static final String E_ALREADY_FLIPPED = "e.already_flipped";
-
-    /** Thrown by {@link #flipCard} if the user thinks they get a free flip but don't have one. */
-    public static final String E_LACK_FREE_FLIP = "e.lack_free_flip";
-
-    /** Thrown by {@link #flipCard} if the user's expected flip cost doesn't match the server's. */
-    public static final String E_FLIP_COST_CHANGED = "e.flip_cost_changed";
-
-    /** Thrown by {@link #flipCard} if the user can't afford the flip they requested. */
-    public static final String E_NSF_FOR_FLIP = "e.nsf_for_flip";
-
-    /** Thrown by various card-related methods if the card in question does not exist. */
-    public static final String E_UNKNOWN_CARD = "e.unknown_card";
-
-    /** Thrown by {@link #buyPowerup} if the powerup is permanent and the player already owns it. */
-    public static final String E_ALREADY_OWN_POWERUP = "e.already_own_powerup";
-
-    /** Thrown by {@link #buyPowerup} if the user can't afford the powerup they requested. */
-    public static final String E_NSF_FOR_PURCHASE = "e.nsf_for_purchase";
-
-    /** Thrown by {@link #usePower} if the user doesn't have a charge of the specified powerup. */
-    public static final String E_LACK_CHARGE = "e.lack_charge";
-
     /**
      * Returns the collection of the specified player.
      */

@@ -36,6 +36,8 @@ import com.threerings.facebook.servlet.FacebookConfig;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.everything.data.Build;
+import com.threerings.everything.rpc.EveryAPI;
+import com.threerings.everything.rpc.GameAPI;
 import com.threerings.everything.server.credits.CreditsServlet;
 import com.threerings.everything.server.credits.PayUpServlet;
 import com.threerings.everything.server.persist.PlayerRepository;
@@ -223,13 +225,13 @@ public class EverythingApp
         _https.serve(CreditsServlet.class, "/fbcredits");
         _https.serve(PayUpServlet.class, "/fbpayup");
         String gwtRoot = "/everything/";
-        _https.serve(EverythingServlet.class, gwtRoot + EverythingServlet.ENTRY_POINT);
-        _https.serve(GameServlet.class, gwtRoot + GameServlet.ENTRY_POINT);
+        _https.serve(EverythingServlet.class, gwtRoot + EveryAPI.ENTRY_POINT);
+        _https.serve(GameServlet.class, gwtRoot + GameAPI.ENTRY_POINT);
         _https.serve(EditorServlet.class, gwtRoot + EditorServlet.ENTRY_POINT);
         _https.serve(AdminServlet.class, gwtRoot + AdminServlet.ENTRY_POINT);
         String jsonRoot = "/json/";
-        _https.serve(JsonEverythingServlet.class, jsonRoot + EverythingServlet.ENTRY_POINT + "/*");
-        _https.serve(JsonGameServlet.class, jsonRoot + GameServlet.ENTRY_POINT + "/*");
+        _https.serve(JsonEverythingServlet.class, jsonRoot + EveryAPI.ENTRY_POINT + "/*");
+        _https.serve(JsonGameServlet.class, jsonRoot + GameAPI.ENTRY_POINT + "/*");
 
         // set up our cron jobs
         _cronLogic.scheduleEvery(1, "process_birthdays", new Runnable() {

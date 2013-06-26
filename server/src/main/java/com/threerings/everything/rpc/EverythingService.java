@@ -21,15 +21,6 @@ import com.threerings.everything.data.SessionData;
 @RemoteServiceRelativePath(EverythingService.ENTRY_POINT)
 public interface EverythingService extends RemoteService, EveryAPI
 {
-    /** The path at which this servlet is mapped. */
-    public static final String ENTRY_POINT = "everything";
-
-    /** Thrown by {@link #validateSession} if we can't communicate with Facebook. */
-    public static final String E_FACEBOOK_DOWN = "e.facebook_down";
-
-    /** Thrown by {@link #getUserFeed} if the user in question does not exist. */
-    public static final String E_UNKNOWN_USER = "e.unknown_user";
-
     /**
      * Validates that this client has proper session credentials. Returns null if they do not.
      */

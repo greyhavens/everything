@@ -12,6 +12,15 @@ import com.threerings.everything.data.*;
 /** Defines classes used by the {@code everything} service. */
 public interface EveryAPI {
 
+    /** The path at which this API's servlets are mapped. */
+    String ENTRY_POINT = "everything";
+
+    /** Thrown by {@code validateSession} if we can't communicate with Facebook. */
+    String E_FACEBOOK_DOWN = "e.facebook_down";
+
+    /** Thrown by {@code getUserFeed} if the user in question does not exist. */
+    String E_UNKNOWN_USER = "e.unknown_user";
+
     /** Provides results for {@code getFeed}. */
     class FeedResult implements Serializable {
         /** The "recruitment gifts" for you to use to slurp in new players, or null to mark
