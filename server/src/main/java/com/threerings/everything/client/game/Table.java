@@ -20,7 +20,7 @@ public abstract class Table
     public static final int COLUMNS = 4;
 
     /** The number of card rows. */
-    public static final int ROWS = Grid.GRID_SIZE/COLUMNS;
+    public static final int ROWS = Grid.SIZE/COLUMNS;
 
     /** The width of a card column in pixels. */
     public static final int COL_WIDTH = 142;

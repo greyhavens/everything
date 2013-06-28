@@ -14,7 +14,7 @@ public class Grid
     implements Serializable
 {
     /** The number of things that are placed in a grid when it is generated. */
-    public static final int GRID_SIZE = 16;
+    public static final int SIZE = 16;
 
     /** The id assigned to this grid. */
     public int gridId;

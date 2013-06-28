@@ -488,16 +488,16 @@ public class GameLogic
         int fromCollected;
         switch (pup) {
         case ALL_COLLECTED_SERIES:
-            if (haveCats.size() < Grid.GRID_SIZE/2) {
+            if (haveCats.size() < Grid.SIZE/2) {
                 throw new ServiceException(GameService.E_TOO_FEW_SERIES);
             }
-            fromCollected = Grid.GRID_SIZE - thingIds.size();
+            fromCollected = Grid.SIZE - thingIds.size();
             break;
         case ALL_NEW_CARDS:
             fromCollected = 0;
             break;
         default:
-            fromCollected = Math.min(haveCats.size(), 3*Grid.GRID_SIZE/4) - neededGimmes;
+            fromCollected = Math.min(haveCats.size(), 3*Grid.SIZE/4) - neededGimmes;
             break;
         }
         if (fromCollected > 0) {
@@ -511,7 +511,7 @@ public class GameLogic
             (pup == Powerup.ALL_NEW_CARDS) ? haveIds : Collections.<Integer>emptySet();
 
         // now select the remainder randomly from all possible things
-        int randoCount = Grid.GRID_SIZE - thingIds.size();
+        int randoCount = Grid.SIZE - thingIds.size();
         if (randoCount > 0) {
             index.selectThings(randoCount, excludeIds, thingIds);
             log.info("Selected random cards", "for", player.who(), "count", randoCount,
@@ -519,11 +519,11 @@ public class GameLogic
         }
 
         // sanity check that we don't have too many things
-        if (thingIds.size() > Grid.GRID_SIZE) {
+        if (thingIds.size() > Grid.SIZE) {
             log.warning("Zoiks! Generated too many things for grid", "who", player.who(),
                         "pup", pup, "fromCollected", fromCollected, "randoCount", randoCount,
                         "excludes", excludeIds.size());
-            while (thingIds.size() > Grid.GRID_SIZE) {
+            while (thingIds.size() > Grid.SIZE) {
                 thingIds.remove(thingIds.iterator().next());
             }
         }
@@ -731,7 +731,7 @@ public class GameLogic
         // that they need (because they're not likely to get the money to flip all the cards); if
         // they have a 1000 coins or more, we'll stick with only 1/4
         float frac = 1 / (2 + (Math.min(Math.max(500, coins), 1000)-500)/250f);
-        int neededGimmes = Math.round(Grid.GRID_SIZE * frac);
+        int neededGimmes = Math.round(Grid.SIZE * frac);
         neededGimmes -= (gotNeeded ? 1 : 0); // we may have already given them one needed card
         neededGimmes = Math.min(2*haveCats, neededGimmes); // adjust for small collections
         return neededGimmes;
