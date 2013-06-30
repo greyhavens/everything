@@ -86,18 +86,10 @@ public class FlipPage extends DataPanel<GameService.GridResult>
 
     protected void figurePreGrid ()
     {
-        if (_ctx.getPupsModel().havePreGrid()) {
-            // if we have pre-grid powerups, then just show the use powerup display
-            showPreGrid();
-
-        } else if (_ctx.isNewbie()) {
-            // otherwise, if we're a newbie just fetch the grid directly
-            _gamesvc.getGrid(Powerup.NOOP, false, createCallback());
-
-        } else {
-            // we're a non-newbie, show the "Buy powerups or Get your grid" display
-            showPreGrid();
-        }
+        // we no longer sell pre-grid powerups, but if the player still has some that they already
+        // purchased, continue to show the pre-grid powerup selection UI until they use 'em up
+        if (_ctx.getPupsModel().havePreGrid()) showPreGrid();
+        else _gamesvc.getGrid(Powerup.NOOP, false, createCallback());
     }
 
     protected void showPreGrid ()

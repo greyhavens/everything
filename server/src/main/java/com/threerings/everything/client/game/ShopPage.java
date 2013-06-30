@@ -4,6 +4,10 @@
 
 package com.threerings.everything.client.game;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.PushButton;
 
@@ -53,10 +57,11 @@ public class ShopPage extends DataPanel<GameService.ShopResult>
             right().setText("Have", "Header").
             right().setText("Cost", "Header", "center").setColSpan(2);
 
+        Set<Powerup> preGrid = new HashSet<Powerup>(Arrays.asList(Powerup.PRE_GRID));
         for (final Powerup type : Powerup.values()) {
-            if (type.cost <= 0) {
-                continue; // skip non-salable pups
-            }
+            if (type.cost <= 0) continue; // skip non-salable pups
+            if (preGrid.contains(type)) continue; // we're phasing out pre-grid powerups
+
             final PushButton buy = ButtonUI.newButton("Buy");
             table.add().setWidget(PowerupUI.newIcon(type), "Icon").
                 right().setWidgets(Widgets.newLabel(Messages.xlate(type.toString()), "Name"),
