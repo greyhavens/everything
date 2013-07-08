@@ -7,6 +7,7 @@ package com.threerings.everything.data;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains summary information for a player's entire collection.
@@ -22,6 +23,9 @@ public class PlayerCollection
 
     /** The trophies this player has earned, ordered from most-recently earned, or null. */
     public List<TrophyData> trophies;
+
+    /** The ids of the categories liked by this player. */
+    public Set<Integer> likes;
 
     /**
      * Returns the number of (unique) cards in this collection.

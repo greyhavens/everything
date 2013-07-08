@@ -26,6 +26,7 @@ import com.threerings.everything.data.ThingCard;
 import com.threerings.everything.rpc.GameService;
 import com.threerings.everything.server.persist.CardRecord;
 import com.threerings.everything.server.persist.GameRepository;
+import com.threerings.everything.server.persist.LikeRecord;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.PlayerRepository;
 import com.threerings.everything.server.persist.ThingRepository;
@@ -75,6 +76,12 @@ public class CollectionLogic {
 
         // populate their trophies
         coll.trophies = _gameLogic.getTrophies(seriesCards);
+
+        // populate their liked categories
+        coll.likes = Sets.newHashSet();
+        for (LikeRecord rec : _playerRepo.loadLikes(ownerId)) {
+            if (rec.like) coll.likes.add(rec.categoryId);
+        }
 
         return coll;
     }
