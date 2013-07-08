@@ -34,12 +34,14 @@ public abstract class JsonServlet extends HttpServlet {
             } else {
                 String json = _gson.toJson(result);
                 rsp.setContentType("application/json; charset=UTF-8");
+                rsp.getWriter().write("OK ");
                 rsp.getWriter().write(json);
                 // rsp.getOutputStream.write(result.getBytes("UTF8"))
             }
 
         } catch (ServiceException se) {
-            rsp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, se.getMessage());
+            rsp.setContentType("text/plain; charset=UTF-8");
+            rsp.getWriter().write("ERR " + se.getMessage());
 
         } finally {
             _threadReq.remove();
