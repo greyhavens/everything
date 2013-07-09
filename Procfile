@@ -1,1 +1,1 @@
-web: sh bin/everyserve
+web: sh bin/everyserver
