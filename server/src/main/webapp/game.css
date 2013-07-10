@@ -7,6 +7,9 @@
   width: 250px;
   height: 300px;
   margin: 5px 15px;
+}
+
+.imageBox .gwt-Image {
   max-width: 250px;
   max-height: 300px;
 }
