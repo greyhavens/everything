@@ -22,7 +22,7 @@ public class Thing
     public static final int MAX_FACTS_LENGTH = 512;
 
     /** The largest allowed width for a thing image. */
-    public static final int MAX_IMAGE_WIDTH = 500;
+    public static final int MAX_IMAGE_WIDTH = 550;
 
     /** The largest allowed height for a thing image. */
     public static final int MAX_IMAGE_HEIGHT = 600;
