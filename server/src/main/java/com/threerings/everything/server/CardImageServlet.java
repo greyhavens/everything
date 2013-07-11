@@ -40,11 +40,11 @@ public class CardImageServlet extends AppServlet
     public void init ()
     {
         // load up our card front image
-        File cback = FileUtil.newFile(_approot, "images", "card_front.png");
+        File cbase = FileUtil.newFile(_approot, "images", "big_front.png");
         try {
-            _cback = ImageIO.read(cback);
+            _cbase = ImageIO.read(cbase);
         } catch (IOException ioe) {
-            log.warning("Failed to load card front image", "path", cback, ioe);
+            log.warning("Failed to load card front image", "path", cbase, ioe);
         }
 
         // load up our custom fonts
@@ -64,11 +64,11 @@ public class CardImageServlet extends AppServlet
             log.warning("Failed to obtain thing for card image", "id", thingId, e);
         }
 
-        BufferedImage image = new BufferedImage(_cback.getWidth(), _cback.getHeight(),
+        BufferedImage image = new BufferedImage(_cbase.getWidth(), _cbase.getHeight(),
                                                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D gfx = image.createGraphics();
         try {
-            gfx.drawImage(_cback, 0, 0, null);
+            gfx.drawImage(_cbase, 0, 0, null);
 
             if (thing != null) {
                 BufferedImage timage = ImageIO.read(new URL(S3_BUCKET + thing.image));
@@ -80,7 +80,7 @@ public class CardImageServlet extends AppServlet
 
                 SwingUtil.activateAntiAliasing(gfx);
 
-                Label name = new Label(thing.name, TEXT_COLOR, _sfont.deriveFont(Font.PLAIN, 14));
+                Label name = new Label(thing.name, TEXT_COLOR, _sfont.deriveFont(Font.PLAIN, 18));
                 name.setAlignment(Label.CENTER);
                 name.setTargetWidth(CARD.width);
                 name.layout(gfx);
@@ -88,7 +88,7 @@ public class CardImageServlet extends AppServlet
                 name.render(gfx, x, 5);
 
                 Label brand = new Label("Everything!", TEXT_COLOR,
-                                        _mfont.deriveFont(Font.PLAIN, 14));
+                                        _mfont.deriveFont(Font.PLAIN, 18));
                 brand.layout(gfx);
                 x = CARD.x + (CARD.width - brand.getSize().width)/2;
                 brand.render(gfx, x, CARD.y + CARD.height - brand.getSize().height - 5);
@@ -116,7 +116,7 @@ public class CardImageServlet extends AppServlet
         }
     }
 
-    protected BufferedImage _cback;
+    protected BufferedImage _cbase;
     protected Font _sfont, _mfont;
 
     @Inject protected @Named(EverythingApp.APPROOT) File _approot;
