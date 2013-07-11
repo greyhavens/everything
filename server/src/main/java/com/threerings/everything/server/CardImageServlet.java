@@ -123,7 +123,7 @@ public class CardImageServlet extends AppServlet
     @Inject protected ThingRepository _thingRepo;
 
     protected static final Color TEXT_COLOR = new Color(0x442D17);
-    protected static final Rectangle CARD = new Rectangle(2, 2, 125, 150);
+    protected static final Rectangle CARD = new Rectangle(3, 3, 194, 232);
 
     /** The URL via which we load images from our Amazon S3 bucket. */
     protected static final String S3_BUCKET = "http://s3.amazonaws.com/everything.threerings.net/";
