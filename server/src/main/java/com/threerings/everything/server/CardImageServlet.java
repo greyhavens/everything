@@ -5,6 +5,7 @@
 package com.threerings.everything.server;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -71,29 +72,33 @@ public class CardImageServlet extends AppServlet
             gfx.drawImage(_cbase, 0, 0, null);
 
             if (thing != null) {
-                BufferedImage timage = ImageIO.read(new URL(S3_BUCKET + thing.image));
-                float scale = Math.min((CARD.width-IMAGE_BORDER*2)/(float)timage.getWidth(),
-                                       (CARD.height-TEXT_HEIGHT)/(float)timage.getHeight());
-                float swidth = timage.getWidth()*scale, sheight = timage.getHeight()*scale;
-                AffineTransform xform = AffineTransform.getTranslateInstance(
-                    CARD.x + (CARD.width - swidth)/2, CARD.y + (CARD.height - sheight)/2);
-                xform.scale(scale, scale);
-                gfx.drawRenderedImage(timage, xform);
-
                 SwingUtil.activateAntiAliasing(gfx);
 
                 Label name = new Label(thing.name, TEXT_COLOR, _sfont.deriveFont(Font.PLAIN, 18));
                 name.setAlignment(Label.CENTER);
-                name.setTargetWidth(CARD.width);
+                name.setTargetWidth(CARD.width-IMAGE_BORDER*2);
                 name.layout(gfx);
-                int x = CARD.x + (CARD.width - name.getSize().width)/2;
-                name.render(gfx, x, 5);
+                Dimension nameSize = name.getSize();
+                name.render(gfx, CARD.x + (CARD.width - nameSize.width)/2, 5);
+                float nameBot = 5 + nameSize.height;
 
                 Label brand = new Label("Everything!", TEXT_COLOR,
                                         _mfont.deriveFont(Font.PLAIN, 18));
                 brand.layout(gfx);
-                x = CARD.x + (CARD.width - brand.getSize().width)/2;
-                brand.render(gfx, x, CARD.y + CARD.height - brand.getSize().height - 5);
+                Dimension brandSize = brand.getSize();
+                float brandTop = CARD.y + CARD.height - brandSize.height - 4;
+                brand.render(gfx, CARD.x + (CARD.width - brand.getSize().width)/2, brandTop);
+
+                float blankHeight = brandTop - nameBot;
+
+                BufferedImage timage = ImageIO.read(new URL(S3_BUCKET + thing.image));
+                float scale = Math.min((CARD.width-IMAGE_BORDER*2)/(float)timage.getWidth(),
+                                       blankHeight/(float)timage.getHeight());
+                float swidth = timage.getWidth()*scale, sheight = timage.getHeight()*scale;
+                AffineTransform xform = AffineTransform.getTranslateInstance(
+                    CARD.x + (CARD.width - swidth)/2, nameBot + (blankHeight - sheight)/2);
+                xform.scale(scale, scale);
+                gfx.drawRenderedImage(timage, xform);
             }
 
         } catch (Exception e) {
@@ -126,7 +131,7 @@ public class CardImageServlet extends AppServlet
 
     protected static final Color TEXT_COLOR = new Color(0x442D17);
     protected static final Rectangle CARD = new Rectangle(3, 4, 194, 232);
-    protected static final int TEXT_HEIGHT = 55, IMAGE_BORDER = 6;
+    protected static final int IMAGE_BORDER = 6;
 
     /** The URL via which we load images from our Amazon S3 bucket. */
     protected static final String S3_BUCKET = "http://s3.amazonaws.com/everything.threerings.net/";
