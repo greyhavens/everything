@@ -234,30 +234,32 @@ public class EverythingApp
         _https.serve(JsonGameServlet.class, jsonRoot + GameAPI.ENTRY_POINT + "/*");
 
         // set up our cron jobs
-        _cronLogic.scheduleEvery(1, "process_birthdays", new Runnable() {
-            @Override public void run () {
-                _gameLogic.processBirthdays();
-            }
-        });
-        _cronLogic.scheduleEvery(1, "send_reminders", new Runnable() {
-            @Override public void run () {
-                _playerLogic.sendReminderNotifications();
-            }
-        });
-        _cronLogic.scheduleAt(1, "prune_records", new Runnable() {
-            @Override public void run () {
-                int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
-                int recruit = _playerRepo.pruneGiftRecords();
-                if (feed > 0) {
-                    log.info("Pruned " + feed + " old feed items.");
+        if (!isCandidate()) {
+            _cronLogic.scheduleEvery(1, "process_birthdays", new Runnable() {
+                @Override public void run () {
+                    _gameLogic.processBirthdays();
                 }
-                if (recruit > 0) {
-                    log.info("Pruned " + recruit + " old recruitment gift records.");
+            });
+            _cronLogic.scheduleEvery(1, "send_reminders", new Runnable() {
+                @Override public void run () {
+                    _playerLogic.sendReminderNotifications();
                 }
-                // TODO: prune GridRecords, but only after the maximum number of free flips
-                // can be accumulated into the PlayerRecord
-            }
-        });
+            });
+            _cronLogic.scheduleAt(1, "prune_records", new Runnable() {
+                @Override public void run () {
+                    int feed = _playerRepo.pruneFeed(FEED_PRUNE_DAYS);
+                    int recruit = _playerRepo.pruneGiftRecords();
+                    if (feed > 0) {
+                        log.info("Pruned " + feed + " old feed items.");
+                    }
+                    if (recruit > 0) {
+                        log.info("Pruned " + recruit + " old recruitment gift records.");
+                    }
+                    // TODO: prune GridRecords, but only after the maximum number of free flips
+                    // can be accumulated into the PlayerRecord
+                }
+            });
+        }
 
         // initialize everything that is registered with Lifecycle
         _cycle.init();
