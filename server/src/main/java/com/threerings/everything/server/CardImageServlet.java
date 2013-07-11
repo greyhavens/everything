@@ -131,7 +131,7 @@ public class CardImageServlet extends AppServlet
 
     protected static final Color TEXT_COLOR = new Color(0x442D17);
     protected static final Rectangle CARD = new Rectangle(3, 4, 194, 232);
-    protected static final int IMAGE_BORDER = 6;
+    protected static final int IMAGE_BORDER = 8;
 
     /** The URL via which we load images from our Amazon S3 bucket. */
     protected static final String S3_BUCKET = "http://s3.amazonaws.com/everything.threerings.net/";
