@@ -72,10 +72,12 @@ public class CardImageServlet extends AppServlet
 
             if (thing != null) {
                 BufferedImage timage = ImageIO.read(new URL(S3_BUCKET + thing.image));
-                int swidth = timage.getWidth()/3, sheight = timage.getHeight()/3;
+                float scale = Math.min(CARD.width/(float)timage.getWidth(),
+                                       (CARD.height-TEXT_HEIGHT)/(float)timage.getHeight());
+                float swidth = timage.getWidth()*scale, sheight = timage.getHeight()*scale;
                 AffineTransform xform = AffineTransform.getTranslateInstance(
                     CARD.x + (CARD.width - swidth)/2, CARD.y + (CARD.height - sheight)/2);
-                xform.scale(1/3f, 1/3f);
+                xform.scale(scale, scale);
                 gfx.drawRenderedImage(timage, xform);
 
                 SwingUtil.activateAntiAliasing(gfx);
@@ -123,7 +125,8 @@ public class CardImageServlet extends AppServlet
     @Inject protected ThingRepository _thingRepo;
 
     protected static final Color TEXT_COLOR = new Color(0x442D17);
-    protected static final Rectangle CARD = new Rectangle(3, 3, 194, 232);
+    protected static final Rectangle CARD = new Rectangle(3, 4, 194, 232);
+    protected static final int TEXT_HEIGHT = 55;
 
     /** The URL via which we load images from our Amazon S3 bucket. */
     protected static final String S3_BUCKET = "http://s3.amazonaws.com/everything.threerings.net/";
