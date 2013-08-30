@@ -86,6 +86,14 @@ public interface JSON {
             this.like = like;
         }
     }
+    class SetWant {
+        public int catId;
+        public boolean want;
+        public SetWant (int catId, boolean want) {
+            this.catId = catId;
+            this.want = want;
+        }
+    }
     class BuyPowerup {
         public Powerup pup;
         public BuyPowerup (Powerup pup) {
