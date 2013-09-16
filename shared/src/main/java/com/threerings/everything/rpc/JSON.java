@@ -11,47 +11,56 @@ public interface JSON {
 
     // EveryService request classes
     class ValidateSession {
-        public String fbToken;
-        public int tzOffset;
+        public final String fbToken;
+        public final int tzOffset;
         public ValidateSession (String fbToken, int tzOffset) {
             this.fbToken = fbToken;
             this.tzOffset = tzOffset;
         }
     }
     class GetUserFeed {
-        public int userId;
+        public final int userId;
         public GetUserFeed (int userId) {
             this.userId = userId;
+        }
+    }
+    class RedeemPurchase {
+        public final String sku, platform, token, signature;
+        public RedeemPurchase (String sku, String platform, String token, String signature) {
+            this.sku = sku;
+            this.platform = platform;
+            this.token = token;
+            this.signature = signature;
         }
     }
 
     // GameService request classes
     class GetCollection {
-        public int ownerId;
+        public final int ownerId;
         public GetCollection (int ownerId) {
             this.ownerId = ownerId;
         }
     }
     class GetSeries {
-        public int ownerId;
-        public int categoryId;
+        public final int ownerId;
+        public final int categoryId;
         public GetSeries (int ownerId, int categoryId) {
             this.ownerId = ownerId;
             this.categoryId = categoryId;
         }
     }
     class GetGrid {
-        public Powerup pup;
-        public boolean expectHave;
+        public final Powerup pup;
+        public final boolean expectHave;
         public GetGrid (Powerup pup, boolean expectHave) {
             this.pup = pup;
             this.expectHave = expectHave;
         }
     }
     class FlipCard {
-        public int gridId;
-        public int pos;
-        public int expectCost;
+        public final int gridId;
+        public final int pos;
+        public final int expectCost;
         public FlipCard (int gridId, int pos, int expectCost) {
             this.gridId = gridId;
             this.pos = pos;
@@ -59,18 +68,18 @@ public interface JSON {
         }
     }
     class CardInfo {
-        public int thingId;
-        public long created;
+        public final int thingId;
+        public final long created;
         public CardInfo (int thingId, long created) {
             this.thingId = thingId;
             this.created = created;
         }
     }
     class GiftCard {
-        public int thingId;
-        public long created;
-        public int friendId;
-        public String message;
+        public final int thingId;
+        public final long created;
+        public final int friendId;
+        public final String message;
         public GiftCard (int thingId, long created, int friendId, String message) {
             this.thingId = thingId;
             this.created = created;
@@ -79,30 +88,30 @@ public interface JSON {
         }
     }
     class SetLike {
-        public int catId;
-        public Boolean like;
+        public final int catId;
+        public final Boolean like;
         public SetLike (int catId, Boolean like) {
             this.catId = catId;
             this.like = like;
         }
     }
     class SetWant {
-        public int catId;
-        public boolean want;
+        public final int catId;
+        public final boolean want;
         public SetWant (int catId, boolean want) {
             this.catId = catId;
             this.want = want;
         }
     }
     class BuyPowerup {
-        public Powerup pup;
+        public final Powerup pup;
         public BuyPowerup (Powerup pup) {
             this.pup = pup;
         }
     }
     class UsePowerup {
-        public int gridId;
-        public Powerup pup;
+        public final int gridId;
+        public final Powerup pup;
         public UsePowerup (int gridId, Powerup pup) {
             this.gridId = gridId;
             this.pup = pup;
