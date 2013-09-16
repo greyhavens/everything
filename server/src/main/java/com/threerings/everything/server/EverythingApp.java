@@ -209,6 +209,13 @@ public class EverythingApp
         return reqenv("FACEBOOK_APPTOKEN");
     }
 
+    /**
+     * Returns the public key to use when validating receipts for Google Play store.
+     */
+    public String getPlayStoreKey () {
+        return reqenv("PLAYSTORE_PUBKEY");
+    }
+
     public void coinsPurchased (int userId, int coins) {
         log.info("Player purchased coins, yay!", "user", userId, "coins", coins);
         _playerRepo.grantCoins(userId, coins);

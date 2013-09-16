@@ -25,12 +25,12 @@ public interface JSON {
         }
     }
     class RedeemPurchase {
-        public final String sku, platform, token, signature;
-        public RedeemPurchase (String sku, String platform, String token, String signature) {
+        public final String sku, platform, token, receipt;
+        public RedeemPurchase (String sku, String platform, String token, String receipt) {
             this.sku = sku;
             this.platform = platform;
             this.token = token;
-            this.signature = signature;
+            this.receipt = receipt;
         }
     }
 

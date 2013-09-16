@@ -64,6 +64,11 @@ public class JsonEverythingServlet extends JsonServiceServlet {
         } else if ("/getCredits".equals(method)) {
             return _everyLogic.getCredits();
 
+        } else if ("/redeemPurchase".equals(method)) {
+            RedeemPurchase args = readArgs(RedeemPurchase.class);
+            return _purchLogic.redeemPurchase(requirePlayer(), args.sku, args.platform,
+                                              args.token, args.receipt);
+
         } else {
             return null;
         }
@@ -85,6 +90,7 @@ public class JsonEverythingServlet extends JsonServiceServlet {
 
     @Inject protected EverythingApp _app;
     @Inject protected EverythingLogic _everyLogic;
+    @Inject protected PurchaseLogic _purchLogic;
     @Inject protected ServletLogic _servletLogic;
     @Inject protected ExternalAuthRepository _extAuthRepo;
 }
