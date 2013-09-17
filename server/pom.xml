@@ -133,6 +133,21 @@
       </plugin>
 
       <plugin>
+        <groupId>com.samskivert</groupId>
+        <artifactId>depot-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>genrecord</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>genrecord</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.7</version>
         <executions>
