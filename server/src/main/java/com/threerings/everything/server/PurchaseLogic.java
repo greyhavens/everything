@@ -16,6 +16,7 @@ import com.google.inject.Singleton;
 import com.threerings.app.client.ServiceException;
 
 import com.threerings.everything.server.persist.PlayerRecord;
+import com.threerings.everything.server.persist.RedemptionRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -33,14 +34,21 @@ public class PurchaseLogic
         ServiceException.require(uidx != -1, "e.invalid_sku");
         int coins = Integer.parseInt(sku.substring(uidx+1));
 
-        // TODO: check whether the token in question has already been redeemed
-
+        // make sure the receipt in question is valid before we do anything else
         if ("GOOGLE".equals(platform)) validateGoogleReceipt(sku, receipt);
         else if ("APPLE".equals(platform)) validateAppleReceipt(sku, receipt);
         else if ("TEST".equals(platform)) validateTestReceipt(sku, receipt);
         else throw new ServiceException("e.unknown_platform");
 
-        // TODO: grant the appropriate number of coins to the player
+        // if this token has already been redeemed, then ignore this request
+        if (!_redeemRepo.noteRedemption(token, player.userId, platform)) {
+            log.info("Ignoring repeated redemption.", "who", player.who(), "token", token,
+                     "platform", platform);
+            return player.coins;
+        }
+
+        // grant the appropriate number of coins to the player
+        _app.coinsPurchased(player.userId, coins);
         return player.coins + coins;
     }
 
@@ -87,4 +95,6 @@ public class PurchaseLogic
     protected final BaseEncoding _base64 = BaseEncoding.base64();
     protected final EverythingApp _app;
     protected final PublicKey _playStoreKey;
+
+    @Inject protected RedemptionRepository _redeemRepo;
 }
