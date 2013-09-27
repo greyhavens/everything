@@ -15,6 +15,7 @@ import com.google.inject.Singleton;
 
 import com.threerings.app.client.ServiceException;
 
+import com.threerings.everything.rpc.EveryAPI;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.RedemptionRepository;
 
@@ -35,9 +36,9 @@ public class PurchaseLogic
         int coins = Integer.parseInt(sku.substring(uidx+1));
 
         // make sure the receipt in question is valid before we do anything else
-        if ("GOOGLE".equals(platform)) validateGoogleReceipt(sku, receipt);
-        else if ("APPLE".equals(platform)) validateAppleReceipt(sku, receipt);
-        else if ("TEST".equals(platform)) validateTestReceipt(sku, receipt);
+        if (EveryAPI.PF_PLAYSTORE.equals(platform)) validateGoogleReceipt(sku, receipt);
+        else if (EveryAPI.PF_APPSTORE.equals(platform)) validateAppleReceipt(sku, receipt);
+        else if (EveryAPI.PF_TEST.equals(platform)) validateTestReceipt(sku, receipt);
         else throw new ServiceException("e.unknown_platform");
 
         // if this token has already been redeemed, then ignore this request
