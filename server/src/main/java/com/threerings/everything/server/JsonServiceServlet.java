@@ -48,10 +48,10 @@ public abstract class JsonServiceServlet extends JsonServlet {
         PlayerRecord player = getPlayer();
         if (player == null) {
             OOOUser user = getUser();
-            if (user != null) log.warning(
-                "No player for user in requirePlayer?", "who", user.userId);
-            else log.info(
-                "No authed user in requirePlayer", "authcook", _servletLogic.getAuthCookie());
+            if (user != null) log.warning("No player for user in requirePlayer?",
+                                          "who", user.userId);
+            else log.info("No authed user in requirePlayer",
+                          "authcook", _servletLogic.getAuthCookie(threadLocalRequest()));
             throw ServiceException.sessionExpired();
         }
         return player;
