@@ -236,4 +236,27 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- runs super-dev-mode via: mvn integration-test -Pdevmode -->
+  <profile>
+    <id>devmode</id>
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>gwt-maven-plugin</artifactId>
+          <version>${gwt.version}</version>
+          <executions>
+            <execution>
+              <id>test-html</id>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>run-codeserver</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
 </project>
