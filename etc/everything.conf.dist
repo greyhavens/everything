@@ -22,8 +22,8 @@ export MEDIASTORE_BUCKET=S3BUCKET
 export KONTAGENT_KEY=API_KEY
 export KONTAGENT_SECRET=APP_SECRET
 
-# OOO billing server bits
-export BILLING_URL=https://billing.apps.threerings.net/billing/
+# Google Play Store bits
+export PLAYSTORE_PUBKEY=PUBKEY
 
 # Other niggling bits
 export BACKEND_URL=http://localhost:8080/
