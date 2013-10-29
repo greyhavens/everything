@@ -5,7 +5,9 @@
 package com.threerings.everything.client.game;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 import com.threerings.gwt.ui.FluentTable;
@@ -59,11 +61,6 @@ public class LandingPage extends FlowPanel
             return;
         }
 
-        // TODO: use FQL to determine if they've bookmarked or not and provide additional prompting
-        Widget book = XFBML.newTag("bookmark");
-        book.addStyleName("Bookmark");
-        add(book);
-
         if (ctx.isNewbie()) {
             // show extra help for a new players
             addInstructions();
@@ -83,6 +80,13 @@ public class LandingPage extends FlowPanel
         add(link);
         add(Widgets.newShim(10, 10));
 
+        // add links to the mobile version
+        FluentTable mobile = new FluentTable(5, 0, "Mobile");
+        mobile.add().setText("Play Everything on your Android phone or tablet!", "Text").
+            right().setText("Everything coming soon for iOS!", "Text").
+            add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL)).
+            right().setWidget(new Image("images/appstore.svg"), "iOS");
+        add(mobile);
         add(Widgets.newShim(5, 5));
 
         add(new MyFeedPanel(ctx));
@@ -148,6 +152,8 @@ public class LandingPage extends FlowPanel
     }
 
     protected static final GameMessages _msgs = GWT.create(GameMessages.class);
+    protected static final String PLAYSTORE_URL =
+        "https://play.google.com/store/apps/details?id=com.threerings.everything";
 
     // news is considered stale after it's been up for a week
     protected static final long STALE_NEWS_MILLIS = 7*24*60*60*1000L;
