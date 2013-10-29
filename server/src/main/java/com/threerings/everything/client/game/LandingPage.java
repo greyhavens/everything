@@ -85,7 +85,8 @@ public class LandingPage extends FlowPanel
         mobile.add().setText("Play Everything on your Android phone or tablet!", "Text").
             right().setText("Everything coming soon for iOS!", "Text").
             right().setText("Meet other Everything players in our Google+ Community!", "Text").
-            add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL)).
+            add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL,
+                                       "_top")).
             right().setWidget(new Image("images/appstore.svg"), "iOS").
             right().setHTML(GOOGPLUS_LINK);
         add(mobile);
