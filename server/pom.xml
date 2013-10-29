@@ -215,14 +215,6 @@
               <goal>compile</goal>
             </goals>
           </execution>
-          <!-- runs super-dev-mode via: mvn integration-test -->
-          <execution>
-            <id>test-html</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>run-codeserver</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
 
