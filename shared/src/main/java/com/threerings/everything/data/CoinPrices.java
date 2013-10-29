@@ -54,6 +54,7 @@ public class CoinPrices
         new Offer(4, State.ACTIVE,  5000, 10,  99),
         new Offer(5, State.ACTIVE, 11000, 20, 199),
         new Offer(6, State.ACTIVE, 24000, 40, 399),
+        // be sure to add productN.html files for any new offers
     };
 
     /**
