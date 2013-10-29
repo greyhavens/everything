@@ -193,6 +193,13 @@ public class EverythingApp
     }
 
     /**
+     * Returns true if we're running on a local developer's workstation.
+     */
+    public boolean isLocalTest () {
+        return getBackendURL().contains("/localhost");
+    }
+
+    /**
      * Returns the URL for this app.
      */
     public String getBaseUrl () {

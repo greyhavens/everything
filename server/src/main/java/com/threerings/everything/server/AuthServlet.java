@@ -5,18 +5,22 @@
 package com.threerings.everything.server;
 
 import java.io.IOException;
-import java.util.Random;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.inject.Inject;
+
 import com.samskivert.servlet.util.ParameterUtil;
 import com.samskivert.util.StringUtil;
 
 import com.threerings.app.client.ServiceException;
+import com.threerings.app.data.AppCodes;
 import com.threerings.app.server.ServletAuthUtil;
 import com.threerings.facebook.servlet.FacebookAppServlet;
+import com.threerings.user.OOOUser;
+import com.threerings.user.depot.DepotUserRepository;
 
 import static com.threerings.everything.Log.log;
 
@@ -34,21 +38,18 @@ public class AuthServlet extends FacebookAppServlet
     protected void doPost (HttpServletRequest req, HttpServletResponse rsp)
         throws IOException
     {
-        // if we have auth info on our URL, use that (for gshell)
+        // if we have auth info on our URL, use that (for local testing)
         String username = ParameterUtil.getParameter(req, "user", true);
-        String passwd = ParameterUtil.getParameter(req, "pass", true);
-        if (username != null && passwd != null) {
+        if (username != null && _app.isLocalTest()) {
             try {
-                _servletLogic.logon(req, rsp, username, StringUtil.md5hex(passwd), 2);
-                // preserve a special argument that GWT needs to make devmode work
-                String gwtbits = ParameterUtil.getParameter(req, GWT_DEVPARAM, false);
-                if (gwtbits.length() > 0) {
-                    gwtbits = "?" + GWT_DEVPARAM + "=" + gwtbits;
-                }
-                rsp.sendRedirect("index.html" + gwtbits);
+                OOOUser user = _userRepo.loadUser(username, false);
+                ServiceException.require(user != null, AppCodes.E_NO_SUCH_USER);
+                String authtok = _userRepo.registerSession(user, 3);
+                ServletAuthUtil.addAuthCookie(req, rsp, authtok, 3);
+                rsp.sendRedirect("index.html");
                 return;
             } catch (ServiceException se) {
-                log.warning("Failed to logon", "user", username, "pass", passwd, "se", se);
+                log.warning("Failed to logon", "user", username, "se", se);
             }
         }
 
@@ -78,7 +79,8 @@ public class AuthServlet extends FacebookAppServlet
         doPost(req, rsp);
     }
 
-    protected Random _rando = new Random();
+    @Inject protected EverythingApp _app;
+    @Inject protected DepotUserRepository _userRepo;
 
     protected static final String GWT_DEVPARAM = "gwt.codesvr";
 }
