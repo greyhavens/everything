@@ -36,10 +36,12 @@ import com.threerings.facebook.servlet.FacebookConfig;
 import com.threerings.util.PostgresUtil;
 
 import com.threerings.everything.data.Build;
+import com.threerings.everything.data.CoinPrices;
 import com.threerings.everything.rpc.EveryAPI;
 import com.threerings.everything.rpc.GameAPI;
 import com.threerings.everything.server.credits.CreditsServlet;
 import com.threerings.everything.server.credits.PayUpServlet;
+import com.threerings.everything.server.credits.ProductServlet;
 import com.threerings.everything.server.persist.PlayerRepository;
 
 import static com.threerings.everything.Log.log;
@@ -238,6 +240,7 @@ public class EverythingApp
         _https.serve(CardImageServlet.class, "/cardimg");
         _https.serve(CreditsServlet.class, "/fbcredits");
         _https.serve(PayUpServlet.class, "/fbpayup");
+        _https.serve(ProductServlet.class, "/" + CoinPrices.OG_PATH + "/*");
         String gwtRoot = "/everything/";
         _https.serve(EverythingServlet.class, gwtRoot + EveryAPI.ENTRY_POINT);
         _https.serve(GameServlet.class, gwtRoot + GameAPI.ENTRY_POINT);

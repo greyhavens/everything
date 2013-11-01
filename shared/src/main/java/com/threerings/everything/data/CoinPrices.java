@@ -9,6 +9,9 @@ package com.threerings.everything.data;
  */
 public class CoinPrices
 {
+    /** The path to the servlet which serves up product open graph data. */
+    public static final String OG_PATH = "fbprod";
+
     /** Tracks the enabledness of an offer. Switch to pending removal when disabling an offer; this
      * will allow it to be redeemed, but will not show it in the UI. Then an hour or two later,
      * update again with the offer as retired. */
@@ -41,7 +44,7 @@ public class CoinPrices
 
         /** Returns the Facebook Graph Object URL for this offer. */
         public String graphURL (String backendURL) {
-            return backendURL + "product" + id + ".html";
+            return backendURL + OG_PATH + "/" + id;
         }
     }
 
@@ -54,7 +57,6 @@ public class CoinPrices
         new Offer(4, State.ACTIVE,   5000,  10,   99),
         new Offer(5, State.ACTIVE,  11000,  20,  199),
         new Offer(6, State.ACTIVE,  24000,  40,  399),
-        // be sure to add productN.html files for any new offers
     };
 
     /**

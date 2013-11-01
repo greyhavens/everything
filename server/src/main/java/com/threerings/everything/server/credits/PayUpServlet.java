@@ -125,7 +125,5 @@ public class PayUpServlet extends HttpServlet {
     protected Gson _gson;
 
     @Inject protected EverythingApp _app;
-    // @Inject protected FacebookConfig _fbconf;
     @Inject protected UserLogic _userLogic;
-    // @Inject protected PlayerRepository _playerRepo;
 }
