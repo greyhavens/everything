@@ -48,12 +48,12 @@ public class CoinPrices
     /** The deals on offer. */
     public static final Offer[] OFFERS = new Offer[] {
         // don't reuse unique ids
-        new Offer(1, State.PENDING_REMOVAL,  5000,  50,  499),
-        new Offer(2, State.PENDING_REMOVAL, 11000, 100,  999),
-        new Offer(3, State.PENDING_REMOVAL, 24000, 200, 1999),
-        new Offer(4, State.ACTIVE,  5000, 10,  99),
-        new Offer(5, State.ACTIVE, 11000, 20, 199),
-        new Offer(6, State.ACTIVE, 24000, 40, 399),
+        new Offer(1, State.RETIRED,  5000,  50,  499),
+        new Offer(2, State.RETIRED, 11000, 100,  999),
+        new Offer(3, State.RETIRED, 24000, 200, 1999),
+        new Offer(4, State.ACTIVE,   5000,  10,   99),
+        new Offer(5, State.ACTIVE,  11000,  20,  199),
+        new Offer(6, State.ACTIVE,  24000,  40,  399),
         // be sure to add productN.html files for any new offers
     };
 
