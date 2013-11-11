@@ -4,12 +4,20 @@
 
 package com.threerings.everything.server;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteStreams;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -74,7 +82,54 @@ public class PurchaseLogic
     }
 
     protected void validateAppleReceipt (String sku, String receipt) throws ServiceException {
-        throw new ServiceException("e.not_yet_implemented");
+        // send the receipt to the app store verification server
+        try {
+            String rcpt64 = DatatypeConverter.printBase64Binary(receipt.getBytes("UTF-8"));
+            String payload = _gson.toJson(ImmutableMap.of("receipt-data", rcpt64));
+            String url = _app.isCandidate() ? "https://sandbox.itunes.apple.com/verifyReceipt" :
+                "https://buy.itunes.apple.com/verifyReceipt";
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            try { // christ Java, really?
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
+                conn.setAllowUserInteraction(false);
+                conn.setRequestProperty("Content-type", "text/json");
+                conn.connect();
+                conn.getOutputStream().write(payload.getBytes("UTF-8"));
+                conn.getOutputStream().close();
+
+                // read and decode the response
+                int code = conn.getResponseCode();
+                byte[] brsp = ByteStreams.toByteArray(
+                    code >= 400 ? conn.getErrorStream() : conn.getInputStream());
+                String encoding = conn.getContentEncoding();
+                if (encoding == null) encoding = "UTF-8";
+                String rsp = new String(brsp, encoding);
+
+                if (code != 200) {
+                    log.warning("Failed to validate AppStore receipt", "sku", sku, "rcpt", receipt,
+                                "error", rsp);
+                    throw new ServiceException("e.server_error");
+                }
+
+                // we got some reasonable response from the app store server, decode it
+                class AppleResponse { int status; }
+                AppleResponse arsp = _gson.fromJson(rsp, AppleResponse.class);
+                if (arsp.status != 0) {
+                    log.warning("Non-zero 'status' field in App Store verification server response",
+                                "sku", sku, "rcpt", receipt, "rsp", rsp);
+                    throw new ServiceException("e.invalid_receipt");
+                }
+                // otherwise we're good to go, just return from the function
+
+            } finally {
+                conn.disconnect();
+            }
+
+        } catch (Exception e) {
+            log.warning("Failed to validate AppStore receipt", "sku", sku, "rcpt", receipt, e);
+            throw new ServiceException("e.internal_error");
+        }
     }
 
     protected void validateTestReceipt (String sku, String receipt) throws ServiceException {
@@ -96,6 +151,10 @@ public class PurchaseLogic
     protected final BaseEncoding _base64 = BaseEncoding.base64();
     protected final EverythingApp _app;
     protected final PublicKey _playStoreKey;
+
+    protected final Gson _gson = new GsonBuilder().
+        setLongSerializationPolicy(LongSerializationPolicy.STRING).
+        create();
 
     @Inject protected RedemptionRepository _redeemRepo;
 }
