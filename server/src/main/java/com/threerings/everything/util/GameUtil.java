@@ -39,6 +39,8 @@ public class GameUtil
             freeFlips += 1;
         }
 
-        return Math.min(GameCodes.MAX_FREE_FLIPS, freeFlips);
+        // cap them at MAX_FREE_FLIPS (including existing free flips), but don't subtract flips for
+        // players that have accumulated more than MAX_FREE_FLIPS
+        return Math.max(0, Math.min(GameCodes.MAX_FREE_FLIPS - record.freeFlips, freeFlips));
     }
 }
