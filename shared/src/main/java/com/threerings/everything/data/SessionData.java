@@ -50,6 +50,9 @@ public class SessionData
     /** Gifts awaiting this player, if any. */
     public List<ThingCard> gifts;
 
+    /** Notices to deliver to the player. */
+    public List<Notice> notices;
+
     /** The number of grids that this player has consumed. */
     public int gridsConsumed;
 

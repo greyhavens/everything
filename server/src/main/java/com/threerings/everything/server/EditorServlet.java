@@ -27,7 +27,6 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PendingSeries;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.rpc.EditorService;
-import com.threerings.everything.rpc.GameCodes;
 import com.threerings.everything.server.GameLogic;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.server.persist.ThingRepository;

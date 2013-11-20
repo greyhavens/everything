@@ -23,7 +23,7 @@ public class EverythingServlet extends EveryServiceServlet
 {
     // from interface EverythingService
     public SessionData validateSession (String version, int tzOffset) throws ServiceException {
-        return _logic.validateSession(getThreadLocalRequest(), getUser(), tzOffset);
+        return _logic.validateSession(getThreadLocalRequest(), getUser(), tzOffset, false);
     }
 
     // from interface EverythingService

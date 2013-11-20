@@ -38,7 +38,7 @@ import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.FriendStatus;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
-import com.threerings.everything.rpc.GameCodes;
+import com.threerings.everything.server.Rewards;
 
 import static com.threerings.everything.Log.log;
 
@@ -189,7 +189,7 @@ public class PlayerRepository extends DepotRepository
         record.timezone = timezone;
         record.joined = new Timestamp(System.currentTimeMillis());
         record.lastSession = record.joined;
-        record.coins = GameCodes.NEW_USER_FREE_COINS;
+        record.coins = Rewards.NEW_USER_FREE_COINS;
         insert(record);
         return record;
     }

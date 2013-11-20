@@ -2,16 +2,13 @@
 // The Everything Game - slot machine plus encyclopedia equals educational fun!
 // Copyright © 2010-2012 Three Rings Design, Inc.
 
-package com.threerings.everything.rpc;
+package com.threerings.everything.server;
 
 /**
  * Contains codes and constants pertaining to the Everything gameplay.
  */
 public final class GameCodes
 {
-    /** The number of free coins given to a new player. */
-    public static final int NEW_USER_FREE_COINS = 2000;
-
     /** The number of free flips earned during the first day that a player is away. */
     public static final int DAILY_FREE_FLIPS = 5;
 

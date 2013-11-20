@@ -7,7 +7,7 @@ package com.threerings.everything.tests;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import com.threerings.everything.rpc.GameCodes;
+import com.threerings.everything.server.GameCodes;
 import com.threerings.everything.server.persist.PlayerRecord;
 import com.threerings.everything.util.GameUtil;
 

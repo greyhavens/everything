@@ -51,6 +51,8 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.News;
+import com.threerings.everything.data.Notice;
+import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.PlayerStats;
 import com.threerings.everything.data.SessionData;
@@ -70,7 +72,8 @@ import static com.threerings.everything.Log.log;
 @Singleton
 public class EverythingLogic
 {
-    public SessionData validateSession (HttpServletRequest req, OOOUser user, int tzOffset)
+    public SessionData validateSession (HttpServletRequest req, OOOUser user, int tzOffset,
+                                        boolean mobileClient)
         throws ServiceException
     {
         SessionData data = new SessionData();
@@ -83,6 +86,7 @@ public class EverythingLogic
         data.facebookAppId = _fbconf.getFacebookAppId();
         data.likes = Lists.newArrayList();
         data.dislikes = Lists.newArrayList();
+        data.notices = Lists.newArrayList(); // we may add notices below
 
         if (user == null) {
             log.info("Have no user, allowing guest", "tzOffset", tzOffset);
@@ -182,6 +186,17 @@ public class EverythingLogic
                 ExternalAuther.FACEBOOK, user.userId);
             if (fbinfo != null) {
                 updateFacebookInfo(player, fbinfo.right);
+            }
+
+            // if they're logging in via the mobile client for the first time, award them some
+            // coins and notify them of their bounty
+            if (mobileClient && !player.isSet(Player.Flag.PLAYED_MOBILE)) {
+                Notice n = Rewards.playedMobile();
+                log.info("Granting 'played mobile' bonus", "who", player.who(), "coins", n.coins);
+                data.notices.add(n);
+                _playerRepo.grantCoins(player.userId, n.coins);
+                data.coins += n.coins;
+                _playerRepo.updateFlag(player, Player.Flag.PLAYED_MOBILE, true);
             }
         }
 

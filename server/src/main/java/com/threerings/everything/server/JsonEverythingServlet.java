@@ -53,7 +53,7 @@ public class JsonEverythingServlet extends JsonServiceServlet {
                 _extAuthRepo.updateExternalSession(ExternalAuther.FACEBOOK, fbId, args.fbToken);
             }
             log.info("Validating session", "authTok", authTok, "user", user);
-            return _everyLogic.validateSession(req, user, args.tzOffset);
+            return _everyLogic.validateSession(req, user, args.tzOffset, true);
 
         } else if ("/getRecentFeed".equals(method)) {
             return _everyLogic.getRecentFeed(requirePlayer());

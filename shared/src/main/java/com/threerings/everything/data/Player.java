@@ -17,7 +17,10 @@ public class Player
     /** Contains information on a player's flags. */
     public enum Flag {
         /** Indicates that this player has an extra daily free flip. */
-        EXTRA_FLIP(0);
+        EXTRA_FLIP(0),
+
+        /** Indicates that this player has logged in from the mobile client. */
+        PLAYED_MOBILE(1);
 
         /** Returns the bitmask associated with this flag. */
         public int getMask () {

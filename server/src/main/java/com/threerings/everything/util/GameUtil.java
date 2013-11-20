@@ -5,7 +5,7 @@
 package com.threerings.everything.util;
 
 import com.threerings.everything.data.Player;
-import com.threerings.everything.rpc.GameCodes;
+import com.threerings.everything.server.GameCodes;
 import com.threerings.everything.server.persist.PlayerRecord;
 
 /**
