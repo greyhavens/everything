@@ -10,7 +10,7 @@ package com.threerings.everything.rpc;
 public final class GameCodes
 {
     /** The number of free coins given to a new player. */
-    public static final int NEW_USER_FREE_COINS = 100;
+    public static final int NEW_USER_FREE_COINS = 2000;
 
     /** The number of free flips earned during the first day that a player is away. */
     public static final int DAILY_FREE_FLIPS = 5;
