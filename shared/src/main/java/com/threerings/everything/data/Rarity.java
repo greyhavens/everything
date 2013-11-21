@@ -13,16 +13,16 @@ import com.samskivert.util.ByteEnum;
  */
 public enum Rarity implements ByteEnum
 {
-    I(0, 10, "Grows on trees"),
-    II(1, 20, "Very common"),
-    III(2, 35, "Common"),
-    IV(3, 55, "Fairly common"),
-    V(4, 90, "Uncommon"),
-    VI(5, 145, "Fairly rare"),
-    VII(6, 235, "Rare"),
+    I   (0,  10, "Grows on trees"),
+    II  (1,  20, "Very common"),
+    III (2,  35, "Common"),
+    IV  (3,  55, "Fairly common"),
+    V   (4,  90, "Uncommon"),
+    VI  (5, 145, "Fairly rare"),
+    VII (6, 235, "Rare"),
     VIII(7, 380, "Very rare"),
-    IX(8, 615, "Ultra rare"),
-    X(9, 995, "Mythical");
+    IX  (8, 615, "Ultra rare"),
+    X   (9, 995, "Mythical");
 
     /** Cards considered rare enough to be exciting. */
     public static final EnumSet<Rarity> BONUS = EnumSet.of(V, VI, VII, VIII, IX, X);
