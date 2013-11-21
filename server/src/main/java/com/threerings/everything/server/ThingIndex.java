@@ -61,8 +61,7 @@ public class ThingIndex
         for (ThingList rareList : _byrare.values()) {
             rareList.shuffle();
         }
-        log.info("Updated things index",
-            "things", _things.size(), "tweight", _things.totalWeight());
+        log.info("Updated things index", "things", _things.size(), "tweight", _things.totalWeight());
     }
 
     /**
@@ -182,8 +181,7 @@ public class ThingIndex
         ThingList rareList = _byrare.get(rarity);
         ThingList selected = rareList.copyWith(fromIds);
         if (selected.size() > 0) {
-            log.debug("Picking rare thing from selection", "rarity", rarity,
-                      "selected", selected);
+            log.debug("Picking rare thing from selection", "rarity", rarity, "selected", selected);
             into.add(pickWeightedThing(selected));
         } else {
             log.debug("Picking rare thing from full set", "rarity", rarity);
@@ -357,23 +355,19 @@ public class ThingIndex
 
         // if the thing list is now empty, there's no point in continuing
         if (things.size() == 0) {
-            log.warning("Failed to select things (usually non-critical)",
-                "desired", count, "into.size()", into.size());
+            log.warning("Failed to select things (usually non-critical)", "desired", count,
+                        "into.size()", into.size());
             return;
         }
 
         // select the requested number of random things
         for (int added = 0, missed = 0; added < count; ) {
             int thingId = pickWeightedThing(things);
-            if (!excludeIds.contains(thingId) && into.add(thingId)) {
-                added++;
-
-            } else if (++missed >= MAX_SELECT_ITERS) {
+            if (!excludeIds.contains(thingId) && into.add(thingId)) added++;
+            else if (++missed >= MAX_SELECT_ITERS) {
                 if (added == 0) {
                     log.warning("Spinning while not selecting things!", "forceCopy", forceCopy);
-                    if (forceCopy) {
-                        return; // oh, that's bad
-                    }
+                    if (forceCopy) return; // oh, that's bad
                 }
                 // we're spinning our wheels trying to pick something, let's try again with a copy
                 // of the ThingList that excludes stuff we can't use
@@ -538,14 +532,14 @@ public class ThingIndex
 
     /** ThingLists by rarity (BONUS rarities only). May be weighted. */
     protected Map<Rarity, ThingList> _byrare = Maps.newEnumMap(Rarity.class);
-
-    protected Random _rando = new Random();
-
     { // initialize the _byrare map
         for (Rarity rarity : Rarity.BONUS) {
             _byrare.put(rarity, new ThingList());
         }
     }
+
+    /** Used for picking random things. */
+    protected Random _rando = new Random();
 
     /** Used to avoid infinite loopage. */
     protected static final int MAX_SELECT_ITERS = 256;
