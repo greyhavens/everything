@@ -120,8 +120,9 @@ public class ThingIndex
      * Computes the set of all needed thing ids given the supplied collection. Needed is a card in
      * a series the player is collecting but do not have.
      */
-    public Set<Integer> computeNeeded (Multimap<Integer, Integer> collection)
+    public Set<Integer> computeNeeded (Multimap<Integer, Integer> collection, Rarity maxRarity)
     {
+        int maxR = maxRarity.ordinal();
         Set<Integer> needed = Sets.newHashSet();
         for (Map.Entry<Integer, Collection<Integer>> entry : collection.asMap().entrySet()) {
             int catId = entry.getKey();
@@ -129,7 +130,7 @@ public class ThingIndex
             if (catList != null) {
                 Collection<Integer> heldIds = entry.getValue();
                 for (ThingInfo info : catList) {
-                    if (!heldIds.contains(info.thingId)) {
+                    if (!heldIds.contains(info.thingId) && info.rarity.ordinal() <= maxR) {
                         needed.add(info.thingId);
                     }
                 }
@@ -142,29 +143,31 @@ public class ThingIndex
      * Selects the specified number of things from the index weighted properly according to their
      * rarity. Things in the supplied exclusion set will not be chosen.
      */
-    public void selectThings (int count, Set<Integer> excludeIds, Set<Integer> into)
+    public void selectThings (int count, Rarity maxRarity, Set<Integer> excludeIds,
+                              Set<Integer> into)
     {
         log.debug("Selecting " + count + " things from entire collection " + _things.size());
-        selectThings(_things, count, excludeIds, into);
+        selectThings(_things.copyWithRarityCap(maxRarity), count, excludeIds, into);
     }
 
     /**
      * Selects the specified number of things from the subset of things in the specified set of
      * categories.
      */
-    public void selectThingsFrom (Set<Integer> catIds, int count, Set<Integer> into)
+    public void selectThingsFrom (Set<Integer> catIds, int count, Rarity maxRarity,
+                                  Set<Integer> into)
     {
-        selectThingsFrom(catIds, count, Collections.<Integer>emptySet(), into);
+        selectThingsFrom(catIds, count, maxRarity, Collections.<Integer>emptySet(), into);
     }
 
     /**
      * Selects the specified number of things from the subset of things in the specified set of
      * categories, excluding any things in the supplied exclusion set.
      */
-    public void selectThingsFrom (
-        Set<Integer> catIds, int count, Set<Integer> excludeIds, Set<Integer> into)
+    public void selectThingsFrom (Set<Integer> catIds, int count, Rarity maxRarity,
+                                  Set<Integer> excludeIds, Set<Integer> into)
     {
-        ThingList things = getCategoryThings(catIds, Rarity.I);
+        ThingList things = getCategoryThings(catIds, Rarity.I, maxRarity);
         log.debug("Selecting " + count + " things from " + catIds, "things", things.size(),
                   "excluding", excludeIds);
         selectThings(things, count, excludeIds, into);
@@ -214,7 +217,7 @@ public class ThingIndex
     {
         Set<Integer> into = Sets.newHashSet();
         // pick a rare gift from a category they collect
-        ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY);
+        ThingList things = getCategoryThings(ownedCats, Rarity.MIN_GIFT_RARITY, Rarity.X);
         if (things.size() >= 1) {
             selectThings(things, 1, heldRares, into);
         }
@@ -312,16 +315,17 @@ public class ThingIndex
         return thingIds;
     }
 
-    protected ThingList getCategoryThings (Set<Integer> catIds, Rarity minRarity)
+    protected ThingList getCategoryThings (Set<Integer> catIds, Rarity minRarity, Rarity maxRarity)
     {
+        int minR = minRarity.ordinal(), maxR = maxRarity.ordinal();
         ThingList things = new ThingList();
         for (int catId : catIds) {
             ThingList catList = _bycat.get(catId);
             if (catList != null) {
                 for (ThingInfo info : catList) {
-                    if (info.rarity.ordinal() >= minRarity.ordinal()) {
-                        things.add(info);
-                    }
+                    int r = info.rarity.ordinal();
+                    if (r < minR || r > maxR) continue;
+                    things.add(info);
                 }
             }
         }
@@ -331,22 +335,21 @@ public class ThingIndex
     /**
      * Select things from the specified list.
      */
-    protected void selectThings (
-        ThingList things, int count, Set<Integer> excludeIds, Set<Integer> into)
+    protected void selectThings (ThingList things, int count, Set<Integer> excludeIds,
+                                 Set<Integer> into)
     {
         selectThings(things, count, excludeIds, into, false);
     }
 
     /**
-     * Select things from the specified list, optionally forcing the list to copy itself
-     * excluding the ids already in excludeIds or into.
+     * Select things from the specified list, optionally forcing the list to copy itself excluding
+     * the ids already in excludeIds or into.
      */
-    protected void selectThings (
-        ThingList things, int count, Set<Integer> excludeIds, Set<Integer> into, boolean forceCopy)
+    protected void selectThings (ThingList things, int count, Set<Integer> excludeIds,
+                                 Set<Integer> into, boolean forceCopy)
     {
         if (forceCopy ||
-                (((excludeIds.size() + into.size()) / (float)things.size()) >=
-                     EXCLUDE_COPY_THRESHOLD)) {
+            (((excludeIds.size() + into.size()) / (float)things.size()) >= EXCLUDE_COPY_THRESHOLD)) {
             // make a copy without the stuff we've already excluded or selected
             things = things.copyWithout(excludeIds).copyWithout(into);
             excludeIds = Collections.emptySet();
@@ -369,12 +372,11 @@ public class ThingIndex
                 if (added == 0) {
                     log.warning("Spinning while not selecting things!", "forceCopy", forceCopy);
                     if (forceCopy) {
-                        // oh, that's bad
-                        return;
+                        return; // oh, that's bad
                     }
                 }
-                // we're spinning our wheels trying to pick something, let's try again
-                // with a copy of the ThingList that excludes stuff we can't use
+                // we're spinning our wheels trying to pick something, let's try again with a copy
+                // of the ThingList that excludes stuff we can't use
                 selectThings(things, count - added, excludeIds, into, true);
                 return;
             }
@@ -503,6 +505,20 @@ public class ThingIndex
             ThingList that = new ThingList();
             for (ThingInfo info : this) {
                 that.add(info.copyWeighted(weights));
+            }
+            return that;
+        }
+
+        public ThingList copyWithRarityCap (Rarity maxRarity) {
+            if (maxRarity == Rarity.X) {
+                return this;
+            }
+            int maxR = maxRarity.ordinal();
+            ThingList that = new ThingList();
+            for (ThingInfo info : this) {
+                if (info.rarity.ordinal() <= maxR) {
+                    that.add(info);
+                }
             }
             return that;
         }

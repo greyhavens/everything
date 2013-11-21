@@ -53,8 +53,8 @@ public class TestSelectGridThings extends TestBase
 
         log.info("Selecting grid", "for", player.who(), "pup", pup);
         try {
-            log.info("Selected grid",
-                "grid", _gameLogic.selectGridThings(player, pup, Maps.<Integer, Float>newHashMap()));
+            log.info("Selected grid", "grid", _gameLogic.selectGridThings(
+                         player, 10, pup, Maps.<Integer, Float>newHashMap()));
         } catch (ServiceException se) {
             log.warning("Failed to select grid", "cause", se.getMessage());
         }

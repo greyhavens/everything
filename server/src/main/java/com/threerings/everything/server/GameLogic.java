@@ -95,7 +95,7 @@ public class GameLogic
             grid.userId = player.userId;
             grid.gridId = (previous == null) ? 1 : previous.gridId + 1;
             grid.status = GridStatus.NORMAL;
-            grid.thingIds = selectGridThings(player, pup, weights);
+            grid.thingIds = selectGridThings(player, grid.gridId, pup, weights);
             grid.expires = player.calculateNextExpires();
             // now that we successfully selected things for our grid, consume the powerup
             if (pup != Powerup.NOOP && !_gameRepo.consumePowerupCharge(player.userId, pup)) {
@@ -431,11 +431,18 @@ public class GameLogic
      * things will be selected using our most recently loaded snapshot of the thing database based
      * on the aggregate rarities of all of the things in that snapshot.
      */
-    public int[] selectGridThings (PlayerRecord player, Powerup pup, Map<Integer, Float> weights)
+    public int[] selectGridThings (PlayerRecord player, int gridId, Powerup pup,
+                                   Map<Integer, Float> weights)
         throws ServiceException
     {
         ThingIndex index = _thingLogic.getThingIndex();
-        Set<Integer> thingIds = Sets.newHashSet();
+        Set<Integer> thingIds = Sets.newHashSet(); // we'll fill this with selected things
+
+        // determine the max rarity for this grid; newbies are rarity capped to lessen the
+        // likelihood that they blow rapidly through their initial coin grant; we want to stretch
+        // that out a bit so that they are more comfortable playing the game before the have to
+        // choose between leaving cards unflipped or coughing up monies
+        Rarity maxRarity = (gridId > NEWBIE_GRIDS) ? Rarity.X : Rarity.V;
 
         // load up this player's collection summary, identify incomplete series
         Multimap<Integer, Integer> collection = _gameRepo.loadCollection(player.userId, index);
@@ -461,25 +468,23 @@ public class GameLogic
         index = index.copyWeighted(weights);
 
         // determine which cards this player needs to complete their collections
-        Set<Integer> needed = index.computeNeeded(collection);
+        Set<Integer> needed = index.computeNeeded(collection, maxRarity);
 
         // we want to give them one card of high rarity that they need, if they used a powerup that
         // guarantees a card of a particular rarity, attempt to satisfy that with a needed card
-        if (pup.getBonusRarity() != null) {
-            index.pickThingOf(pup.getBonusRarity(), needed, thingIds);
-        } else {
-            // if we're not using a rarity powerup, pick a bonus needed card for the grid
-            index.pickBonusThing(needed, thingIds);
-        }
+        if (pup.getBonusRarity() != null) index.pickThingOf(pup.getBonusRarity(), needed, thingIds);
+        // if we're not using a rarity powerup, pick a bonus needed card for the grid
+        else index.pickBonusThing(needed, thingIds);
         boolean gotNeeded = (thingIds.size() > 0) && needed.contains(thingIds.iterator().next());
-        log.info("Selected rare thing", "for", player.who(), "rarity", pup.getBonusRarity(),
-                 "needed", needed.size(), "gotNeeded", gotNeeded, "ids", thingIds);
+        log.info("Selected rare thing", "for", player.who(), "maxRarity", maxRarity,
+                 "pupRarity", pup.getBonusRarity(), "needed", needed.size(), "gotNeeded", gotNeeded,
+                 "ids", thingIds);
 
         // compute the number of cards in the grid that should be selected from the set of cards
         // that are needed by the player (in series they are collecting but don't already have)
         int neededGimmes = computeNeededGimmes(player.coins, gotNeeded, haveCats.size());
         if (neededGimmes > 0) {
-            index.selectThingsFrom(haveCats, neededGimmes, haveIds, thingIds);
+            index.selectThingsFrom(haveCats, neededGimmes, maxRarity, haveIds, thingIds);
             log.info("Selected needed cards", "for", player.who(), "count", neededGimmes,
                      "ids", thingIds);
         }
@@ -501,21 +506,22 @@ public class GameLogic
             break;
         }
         if (fromCollected > 0) {
-            index.selectThingsFrom(haveCats, fromCollected, thingIds);
+            index.selectThingsFrom(haveCats, fromCollected, maxRarity, thingIds);
             log.info("Selected cards from collection", "for", player.who(),
-                     "haveCats", haveCats.size(), "count", fromCollected, "ids", thingIds);
+                     "haveCats", haveCats.size(), "count", fromCollected, "maxRarity", maxRarity,
+                     "ids", thingIds);
         }
 
         // if they requested all new cards, load up the things they own
-        Set<Integer> excludeIds =
-            (pup == Powerup.ALL_NEW_CARDS) ? haveIds : Collections.<Integer>emptySet();
+        Set<Integer> excludeIds = (pup == Powerup.ALL_NEW_CARDS) ? haveIds :
+            Collections.<Integer>emptySet();
 
         // now select the remainder randomly from all possible things
         int randoCount = Grid.SIZE - thingIds.size();
         if (randoCount > 0) {
-            index.selectThings(randoCount, excludeIds, thingIds);
+            index.selectThings(randoCount, maxRarity, excludeIds, thingIds);
             log.info("Selected random cards", "for", player.who(), "count", randoCount,
-                     "excluded", excludeIds.size(), "ids", thingIds);
+                     "maxRarity", maxRarity, "excluded", excludeIds.size(), "ids", thingIds);
         }
 
         // sanity check that we don't have too many things
@@ -746,4 +752,7 @@ public class GameLogic
 
     /** One hour in milliseconds. */
     protected static final long HOUR = 60*60*1000L;
+
+    /** For the first five grids, we treat a player as a newbie and restrict their grid rarities. */
+    protected static final int NEWBIE_GRIDS = 5;
 }

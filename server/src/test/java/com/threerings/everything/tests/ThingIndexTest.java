@@ -40,7 +40,7 @@ public class ThingIndexTest
         ThingIndex index = new ThingIndex(mapCategories(things), things.values());
         // create a random collection
         Set<Integer> ids = Sets.newHashSet(), exclude = Sets.newHashSet();
-        index.selectThings(25, ids, exclude);
+        index.selectThings(25, Rarity.X, ids, exclude);
         // compute owned categories and held rares
         Set<Integer> ownedCats = Sets.newHashSet(), heldRares = Sets.newHashSet();
         for (int thingId : ids) {
