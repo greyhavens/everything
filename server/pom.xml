@@ -207,7 +207,7 @@
               <!-- don't use the separate-process socket-using worker factory -->
               <!-- as that causes a bunch of warnings during the Heroku build -->
               <extraJvmArgs>
-                -mx512m \
+                -mx384m \
                 -Dgwt.jjs.permutationWorkerFactory=com.google.gwt.dev.ThreadedPermutationWorkerFactory
               </extraJvmArgs>
             </configuration>
