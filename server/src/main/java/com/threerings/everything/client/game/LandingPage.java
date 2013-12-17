@@ -83,11 +83,12 @@ public class LandingPage extends FlowPanel
         // add links to the mobile version
         FluentTable mobile = new FluentTable(5, 0, "Mobile");
         mobile.add().setText("Play Everything on your Android phone or tablet!", "Text").
-            right().setText("Everything coming soon for iOS!", "Text").
+            right().setText("Play Everything on your iPhone or iPad!", "Text").
             right().setText("Meet other Everything players in our Google+ Community!", "Text").
             add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL,
                                        "_top")).
-            right().setWidget(new Image("images/appstore.svg"), "iOS").
+            right().setWidget(new Anchor("<img src='images/appstore.svg'/>", true, APPSTORE_URL,
+                                         "_top")).
             right().setHTML(GOOGPLUS_LINK);
         add(mobile);
         add(Widgets.newShim(5, 5));
@@ -158,6 +159,7 @@ public class LandingPage extends FlowPanel
 
     protected static final String PLAYSTORE_URL =
         "https://play.google.com/store/apps/details?id=com.threerings.everything";
+    protected static final String APPSTORE_URL = "https://itunes.apple.com/app/id670486442";
     protected static final String GOOGPLUS_LINK =
         "<a href='https://plus.google.com/u/0/communities/115671345917573066171?prsrc=3' " +
         "rel='publisher' target='_top' style='text-decoration:none;'>" +
