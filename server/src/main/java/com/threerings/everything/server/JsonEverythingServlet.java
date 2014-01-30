@@ -83,7 +83,12 @@ public class JsonEverythingServlet extends JsonServiceServlet {
             User user = fbclient.fetchObject("me", User.class, Parameter.with("fields", "id, name"));
             return user.getId();
         } catch (FacebookException fbe) {
-            log.warning("Failed to resolve Facebook user", "fbToken", fbToken, fbe);
+            if (fbe.getMessage().contains("Session has expired")) {
+                log.info("Facebook session expired. Telling client to reauth.", "fbToken", fbToken,
+                         "err", fbe.getMessage());
+            } else {
+                log.warning("Failed to resolve Facebook user", "fbToken", fbToken, fbe);
+            }
             throw new ServiceException(EverythingService.E_FACEBOOK_DOWN);
         }
     }
