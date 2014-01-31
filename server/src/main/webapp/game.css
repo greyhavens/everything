@@ -285,6 +285,11 @@
   font-size: 18px;
 }
 
+.landing .CardBox {
+  margin: auto;
+  display: table;
+}
+
 .landing .Mobile {
   margin: 0px auto;
   text-align: center;

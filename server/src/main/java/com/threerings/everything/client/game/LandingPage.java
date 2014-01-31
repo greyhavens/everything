@@ -88,7 +88,8 @@ public class LandingPage extends FlowPanel
 
         } else if (mode instanceof Mode.ShowCard) {
             addInstructions(false);
-            final FlowPanel box = new FlowPanel();
+            add(Widgets.newShim(5, 5));
+            final FlowPanel box = Widgets.newFlowPanel("CardBox");
             box.add(Widgets.newLabel("Loading..."));
             add(box);
             _gamesvc.getCard(((Mode.ShowCard)mode).ident, new PanelCallback<Card>(box) {
