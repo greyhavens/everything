@@ -15,12 +15,15 @@ if [ -f etc/everything.conf ]; then
 fi
 
 # if we're running locally and have JRebel, wire it up
-REBEL_HOME=$HOME/ops/jrebel
+if [ -z "$REBEL_HOME" ]; then
+    REBEL_HOME=$HOME/ops/jrebel
+fi
 if [ -f $REBEL_HOME/jrebel.jar ]; then
     REBEL_ARGS="-noverify -javaagent:$REBEL_HOME/jrebel.jar"
+fi
 
 # if we're running on Heroku, wire up New Relic
-elif [ ! -z "NEW_RELIC_APP_NAME" ]; then
+if [ ! -z "NEW_RELIC_APP_NAME" ]; then
     NEW_RELIC_ARGS=-javaagent:lib/newrelic.jar
     echo "Host: $HOST"
 fi
