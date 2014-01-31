@@ -57,6 +57,8 @@ public class LandingPage extends FlowPanel
         } else if (isGuest) {
             addInstructions();
             add(Widgets.newHTML(ctx.getFacebookAddLink("Start playing now!"), "CTA", "machine"));
+            add(Widgets.newShim(5, 5));
+            addMobileLinks();
             return;
         }
 
@@ -80,16 +82,7 @@ public class LandingPage extends FlowPanel
         add(Widgets.newShim(10, 10));
 
         // add links to the mobile version
-        FluentTable mobile = new FluentTable(5, 0, "Mobile");
-        mobile.add().setText("Play Everything on your Android phone or tablet!", "Text").
-            right().setText("Play Everything on your iPhone or iPad!", "Text").
-            right().setText("Meet other Everything players in our Google+ Community!", "Text").
-            add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL,
-                                       "_top")).
-            right().setWidget(new Anchor("<img src='images/appstore.svg'/>", true, APPSTORE_URL,
-                                         "_top")).
-            right().setHTML(GOOGPLUS_LINK);
-        add(mobile);
+        addMobileLinks();
         add(Widgets.newShim(5, 5));
 
         add(new MyFeedPanel(ctx));
@@ -106,6 +99,20 @@ public class LandingPage extends FlowPanel
         // Strangely, this doesn't seem to be necessary. Maybe we're getting handled
         // by the header?
         XFBML.parse(this);
+    }
+
+    protected void addMobileLinks ()
+    {
+        FluentTable mobile = new FluentTable(5, 0, "Mobile");
+        mobile.add().setText("Play Everything on your Android phone or tablet!", "Text").
+            right().setText("Play Everything on your iPhone or iPad!", "Text").
+            right().setText("Meet other Everything players in our Google+ Community!", "Text").
+            add().setWidget(new Anchor("<img src='images/googleplay.png'/>", true, PLAYSTORE_URL,
+                                       "_top")).
+            right().setWidget(new Anchor("<img src='images/appstore.svg'/>", true, APPSTORE_URL,
+                                         "_top")).
+            right().setHTML(GOOGPLUS_LINK);
+        add(mobile);
     }
 
     protected void addInstructions ()
