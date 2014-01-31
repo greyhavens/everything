@@ -37,6 +37,11 @@ body, body a {
   color: #442D17;
 }
 
+#client {
+  margin: auto;
+  display: table;
+}
+
 .infoLabel {
   font-size: 18px;
   padding: 25px;
