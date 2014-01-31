@@ -156,7 +156,7 @@ public class LandingPage extends FlowPanel
         int ii = 0;
         if (showFacebook) {
             addLink(mobile, ii++, "Play Everything in your web browser on Facebook!",
-                    "images/facebook.png", ctx.getFacebookAddURL("show_card", Page.CARD));
+                    "images/facebook.png", ctx.getFacebookAddURL("show_card", Page.LANDING));
         }
         addLink(mobile, ii++, "Play Everything on your Android phone or tablet!",
                 "images/googleplay.png", PLAYSTORE_URL);
