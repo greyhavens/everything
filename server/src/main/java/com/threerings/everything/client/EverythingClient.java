@@ -224,10 +224,13 @@ public class EverythingClient
         // these are OK to view as a guest
         switch (args.page) {
         case ATTRACTOR:
-            setContent(new LandingPage(this, args.get(0, 0), args.get(1, 0)));
+            setContent(LandingPage.attractor(this, args.get(0, 0), args.get(1, 0)));
             return;
         case LANDING:
-            setContent(new LandingPage(this, _news));
+            setContent(LandingPage.news(this, _news));
+            return;
+        case CARD:
+            setContent(LandingPage.card(this, args.get(0, 0), args.get(1, 0), args.get(2, 0L)));
             return;
         case CREDITS:
             setContent(new CreditsPage(this));
@@ -251,7 +254,7 @@ public class EverythingClient
 
         // otherwise guests see the "add this app to play" button
         if (getMe().isGuest()) {
-            setContent(new LandingPage(this, _news));
+            setContent(LandingPage.news(this, _news));
             return;
         }
 
@@ -320,7 +323,7 @@ public class EverythingClient
         }
 
         // otherwise default to displaying the landing panel
-        setContent(new LandingPage(this, _news));
+        setContent(LandingPage.news(this, _news));
     }
 
     protected void gotSessionData (SessionData data)

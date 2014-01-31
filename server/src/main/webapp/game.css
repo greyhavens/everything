@@ -288,7 +288,10 @@
 .landing .Mobile {
   margin: 0px auto;
   text-align: center;
-  width: 550px;
+}
+
+.landing .Mobile td {
+  max-width: 190px;
 }
 
 .landing .Arrow {

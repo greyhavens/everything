@@ -132,6 +132,19 @@ public class Args
         }
     }
 
+    /**
+     * Returns the argument at the specified index or the default value if no argument or a
+     * non-integer argument was provided at that index.
+     */
+    public long get (int index, long defval)
+    {
+        try {
+            return (index < _args.length) ? Long.parseLong(_args[index]) : defval;
+        } catch (Exception e) {
+            return defval;
+        }
+    }
+
     protected static Page parsePage (String pagestr)
     {
         try {

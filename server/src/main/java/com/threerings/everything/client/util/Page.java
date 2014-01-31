@@ -10,7 +10,7 @@ package com.threerings.everything.client.util;
 public enum Page
 {
     // all-access pages
-    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS, TOS, ATTRACTOR,
+    LANDING, FLIP, BROWSE, SHOP, GET_COINS, FRIENDS, CREDITS, TOS, ATTRACTOR, CARD,
 
     // editor pages
     EDIT_INTRO, EDIT_CATS, EDIT_PENDING, EDIT_SERIES, EDIT_FAQ,
