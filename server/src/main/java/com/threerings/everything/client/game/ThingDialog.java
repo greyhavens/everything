@@ -16,6 +16,7 @@ import com.threerings.everything.data.Card;
 import com.threerings.everything.data.Category;
 import com.threerings.everything.data.PlayerName;
 
+import com.threerings.everything.client.util.Args;
 import com.threerings.everything.client.util.Context;
 import com.threerings.everything.client.util.Page;
 
@@ -82,13 +83,11 @@ public class ThingDialog
     }
 
     /**
-     * Displays a feed dialog for posting an "attractor" card to recruit new players.
-     * The specified callback will be called with 'true' if they ended up posting the story.
+     * Displays a feed dialog for posting an "attractor" card to recruit new players. The specified
+     * callback will be called with 'true' if they ended up posting the story.
      */
-    public static void showAttractor (
-        Context ctx, Card card, final AsyncCallback<Boolean> callback)
+    public static void showAttractor (Context ctx, Card card, final AsyncCallback<Boolean> callback)
     {
-//        String joinURL = ctx.getEverythingURL(
         String joinURL = ctx.getFacebookAddURL(
             "post", Page.ATTRACTOR, card.thing.thingId, ctx.getMe().userId);
         String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
@@ -125,8 +124,8 @@ public class ThingDialog
         String prompt, final AsyncCallback<Boolean> callback)
     {
         String vector = "post";
-        String cardURL = ctx.getEverythingURL(vector, Page.BROWSE, owner.userId,
-                                              card.thing.categoryId);
+        String cardURL = GWT.getHostPageBaseURL() + "#" + Args.createLinkToken(
+            Page.CARD, card.owner.userId, card.thing.thingId, card.received);
         String everyURL = ctx.getEverythingURL(vector, Page.LANDING);
         String imageURL = GWT.getHostPageBaseURL() + "cardimg?thing=" + card.thing.thingId;
         showDialog(targetId, title, card.thing.descrip,
@@ -154,7 +153,7 @@ public class ThingDialog
             method: "stream.publish",
             attachment: {
                 name: title,
-                href: everyURL,
+                href: cardURL,
                 description: descrip,
                 media: [{ type: "image",
                           src: imageURL,
