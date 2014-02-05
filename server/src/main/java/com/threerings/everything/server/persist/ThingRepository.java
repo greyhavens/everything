@@ -106,19 +106,6 @@ public class ThingRepository extends DepotRepository
     }
 
     /**
-     * Loads all categories that are not yet marked active.
-     */
-    public Sequence<Category> loadNonActiveCategories ()
-    {
-        Set<Integer> catIds = Sets.newHashSet();
-        catIds.addAll(from(CategoryRecord.class).
-                      join(CategoryRecord.CATEGORY_ID.join(ThingRecord.CATEGORY_ID)).
-                      where(CategoryRecord.STATE.notEq(Category.State.ACTIVE)).
-                      groupBy(CategoryRecord.CATEGORY_ID).select(CategoryRecord.CATEGORY_ID));
-        return loadCategories(catIds);
-    }
-
-    /**
      * Loads all leaf categories created by the specified player.
      */
     public Iterable<Category> loadCategoriesBy (int creatorId)
