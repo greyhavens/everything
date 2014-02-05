@@ -30,18 +30,18 @@ import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.SessionData;
 
 import com.threerings.everything.client.admin.EditNewsPage;
-import com.threerings.everything.client.admin.PlayersPage;
 import com.threerings.everything.client.admin.StatsPage;
 import com.threerings.everything.client.editor.EditCatsPage;
 import com.threerings.everything.client.editor.EditFAQPage;
 import com.threerings.everything.client.editor.EditIntroPage;
 import com.threerings.everything.client.editor.EditPendingPage;
 import com.threerings.everything.client.editor.EditSeriesPage;
+import com.threerings.everything.client.editor.InDevPage;
 import com.threerings.everything.client.game.BrowsePage;
+import com.threerings.everything.client.game.BuyCoinsPage;
 import com.threerings.everything.client.game.CreditsPage;
 import com.threerings.everything.client.game.FlipPage;
 import com.threerings.everything.client.game.FriendsPage;
-import com.threerings.everything.client.game.BuyCoinsPage;
 import com.threerings.everything.client.game.LandingPage;
 import com.threerings.everything.client.game.ShopPage;
 import com.threerings.everything.client.game.TermsPage;
@@ -294,6 +294,12 @@ public class EverythingClient
             case EDIT_PENDING:
                 setContent(new EditPendingPage(this));
                 return;
+            case EDIT_INDEV:
+                if (!(_content instanceof InDevPage)) {
+                    setContent(new InDevPage(this));
+                }
+                ((InDevPage)_content).setMode(args.get(0, ""));
+                return;
             case EDIT_FAQ:
                 setContent(new EditFAQPage(this));
                 return;
@@ -310,9 +316,6 @@ public class EverythingClient
             switch (args.page) {
             case ADMIN_STATS:
                 setContent(new StatsPage(this));
-                return;
-            case ADMIN_PLAYERS:
-                setContent(new PlayersPage(this));
                 return;
             case ADMIN_NEWS:
                 setContent(new EditNewsPage(this, _news));

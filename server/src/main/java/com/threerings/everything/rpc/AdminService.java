@@ -14,7 +14,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.threerings.app.client.ServiceException;
 
-import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.ThingStats;
@@ -37,13 +36,6 @@ public interface AdminService extends RemoteService
         /** The status of our thing database. */
         public ThingStats stats;
 
-        /** Categories that have not been activated. */
-        public List<Category> pendingCategories;
-    }
-
-    /** Provides results for {@link #getRegiStats}. */
-    public static class RegiStatsResult implements IsSerializable
-    {
         /** A map of registrations per day. */
         public SortedMap<Date, Integer> regcounts;
 
@@ -55,11 +47,6 @@ public interface AdminService extends RemoteService
      * Returns the current admin stats data.
      */
     StatsResult getStats () throws ServiceException;
-
-    /**
-     * Returns data on recent registration activity.
-     */
-    RegiStatsResult getRegiStats () throws ServiceException;
 
     /**
      * Returns details for the specified player.

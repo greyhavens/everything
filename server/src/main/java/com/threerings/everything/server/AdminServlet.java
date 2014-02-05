@@ -4,22 +4,15 @@
 
 package com.threerings.everything.server;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import com.threerings.app.client.ServiceException;
 import com.threerings.user.OOOUser;
 
-import com.threerings.everything.data.Category;
 import com.threerings.everything.data.Player;
 import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.rpc.AdminService;
@@ -40,25 +33,6 @@ public class AdminServlet extends EveryServiceServlet
         requireAdmin();
         StatsResult result = new StatsResult();
         result.stats = _thingRepo.loadStats();
-
-        // load all categories; filter out non-active and those that are parents
-        Set<Integer> parentIds = Sets.newHashSet();
-        Map<Integer,Category> cats = Maps.newHashMap();
-        for (Category cat : _thingRepo.loadAllCategories()) {
-            if (cat.state != Category.State.ACTIVE) cats.put(cat.categoryId, cat);
-            parentIds.add(cat.parentId);
-        }
-        cats.keySet().removeAll(parentIds);
-        result.pendingCategories = Lists.newArrayList(cats.values());
-        Collections.sort(result.pendingCategories);
-        return result;
-    }
-
-    // from interface AdminService
-    public RegiStatsResult getRegiStats () throws ServiceException
-    {
-        requireAdmin();
-        RegiStatsResult result = new RegiStatsResult();
         result.regcounts = _playerRepo.summarizeRegis(REG_COUNT_DAYS);
         result.players = _playerRepo.loadRecentPlayers(MAX_RECENTS).toList();
         return result;

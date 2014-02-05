@@ -38,6 +38,8 @@ public class HeaderPanel extends FlowPanel
             extras.add(Args.createInlink("Taxonomy", Page.EDIT_CATS));
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Pending", Page.EDIT_PENDING));
+            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
+            extras.add(Args.createInlink("In Devel", Page.EDIT_INDEV));
         } else if (ctx.getGridsConsumed() >= Context.EXPERIENCED_GRIDS) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Editors", Page.EDIT_INTRO));
@@ -49,8 +51,6 @@ public class HeaderPanel extends FlowPanel
         if (ctx.isMaintainer()) {
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("Stats", Page.ADMIN_STATS));
-            extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
-            extras.add(Args.createInlink("Players", Page.ADMIN_PLAYERS));
             extras.add(Widgets.newHTML("&nbsp;&nbsp;", "inline"));
             extras.add(Args.createInlink("News", Page.ADMIN_NEWS));
         }

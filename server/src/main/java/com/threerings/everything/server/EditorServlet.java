@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +26,7 @@ import com.threerings.everything.data.CategoryComment;
 import com.threerings.everything.data.Created;
 import com.threerings.everything.data.FeedItem;
 import com.threerings.everything.data.PendingSeries;
+import com.threerings.everything.data.PlayerName;
 import com.threerings.everything.data.Thing;
 import com.threerings.everything.rpc.EditorService;
 import com.threerings.everything.server.GameLogic;
@@ -96,6 +98,41 @@ public class EditorServlet extends EveryServiceServlet
             ps.category = names.get(topcats.get(subcatId));
             ps.voters = Sets.newHashSet(votes.get(cat.categoryId));
             result.add(ps);
+        }
+        return result;
+    }
+
+    // from interface EditorService
+    public InDevResult loadInDevSeries () throws ServiceException
+    {
+        requireEditor();
+
+        // load all categories; note which categories are parents of some other category
+        Set<Integer> parentIds = Sets.newHashSet();
+        Set<Integer> creatorIds = Sets.newHashSet();
+        Map<Integer,Category> cats = Maps.newHashMap();
+        for (Category cat : _thingRepo.loadAllCategories()) {
+            cats.put(cat.categoryId, cat);
+            creatorIds.add(cat.creator.userId);
+            parentIds.add(cat.parentId);
+        }
+
+        // load up the creator names
+        Map<Integer,PlayerName> creatorNames = _playerRepo.loadPlayerNames(creatorIds);
+
+        // do the filtering and collating and wrap it up into our nice result
+        InDevResult result = new InDevResult();
+        result.categories = Lists.newArrayList();
+        for (Category cat : cats.values()) {
+            if (cat.state == Category.State.IN_DEVELOPMENT && !parentIds.contains(cat.categoryId)) {
+                cat.creator = creatorNames.get(cat.creator.userId);
+                result.categories.add(cat);
+            }
+        }
+        result.parents = Lists.newArrayList();
+        for (Integer parentId : parentIds) {
+            Category cat = cats.get(parentId);
+            if (cat != null) result.parents.add(cat);
         }
         return result;
     }

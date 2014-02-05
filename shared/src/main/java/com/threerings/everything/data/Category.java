@@ -5,6 +5,7 @@
 package com.threerings.everything.data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.samskivert.util.ByteEnum;
 
@@ -72,6 +73,24 @@ public class Category
             buf.append(cat.name);
         }
         return buf.toString();
+    }
+
+    /**
+     * Returns an HTML snippet that will display cat -> cat -> cat for the supplied leaf category,
+     * resolving its parent categories via {@code parents}.
+     */
+    public static String getHierarchy (Category leaf, Map<Integer,Category> parents) {
+        StringBuilder buf = new StringBuilder();
+        addCategory(buf, leaf, parents);
+        return buf.toString();
+    }
+    private static void addCategory (StringBuilder buf, Category cat, Map<Integer,Category> pars) {
+        Category par = pars.get(cat.parentId);
+        if (par != null) {
+            addCategory(buf, par, pars);
+            buf.append(" ").append(SEP_CHAR).append(" ");
+        }
+        buf.append(cat.name);
     }
 
     /**

@@ -64,3 +64,8 @@
   height: 1px;
   background: #000000;
 }
+
+/** InDevPage styles */
+.indev .Pending {
+  font-weight: bold;
+}

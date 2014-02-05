@@ -51,6 +51,17 @@ public interface EditorService extends RemoteService
         public List<Thing> things;
     }
 
+    /** Provides results for {@link #loadInDevSeries}. */
+    public static class InDevResult implements IsSerializable
+    {
+        /** Categories that are in development. */
+        public List<Category> categories;
+
+        /** The parents of the in-dev categories (and their parents). This is so the UI can
+         * reconstruct the hierarchy for display. */
+        public List<Category> parents;
+    }
+
     /**
      * Loads all of the categories with the specified parent. Specifying a parentId of 0 will load
      * all top-level categories.
@@ -66,6 +77,11 @@ public interface EditorService extends RemoteService
      * Loads the list of series pending approval.
      */
     List<PendingSeries> loadPendingSeries () throws ServiceException;
+
+    /**
+     * Loads the list of series that are in development.
+     */
+    InDevResult loadInDevSeries () throws ServiceException;
 
     /**
      * Creates a new category with the specified configuration.

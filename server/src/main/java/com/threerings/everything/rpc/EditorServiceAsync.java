@@ -32,6 +32,11 @@ public interface EditorServiceAsync
     void loadPendingSeries (AsyncCallback<List<PendingSeries>> callback);
 
     /**
+     * The async version of {@link EditorService#loadInDevSeries}.
+     */
+    void loadInDevSeries (AsyncCallback<EditorService.InDevResult> callback);
+
+    /**
      * The async version of {@link EditorService#createCategory}.
      */
     void createCategory (Category category, AsyncCallback<Integer> callback);
