@@ -5,6 +5,7 @@ object EverythingBuild extends samskivert.MavenBuild {
 
   override val globalSettings = Seq(
     crossPaths      := false,
+    javacOptions    ++= Seq("-Xlint", "-Xlint:-serial", "-source", "1.6", "-target", "1.6"),
     scalacOptions   ++= Seq("-unchecked", "-deprecation", "-feature",
                             "-language:implicitConversions"),
     fork in Compile := true,
