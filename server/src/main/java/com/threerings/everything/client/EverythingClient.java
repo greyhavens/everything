@@ -234,9 +234,6 @@ public class EverythingClient
         case CREDITS:
             setContent(new CreditsPage(this));
             return;
-        case TOS:
-            setContent(new TermsPage());
-            return;
         case BROWSE:
             if (args.get(0, getMe().userId) != 0) {
                 if (!(_content instanceof BrowsePage)) {
