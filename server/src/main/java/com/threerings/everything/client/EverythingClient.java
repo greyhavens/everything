@@ -44,7 +44,6 @@ import com.threerings.everything.client.game.FlipPage;
 import com.threerings.everything.client.game.FriendsPage;
 import com.threerings.everything.client.game.LandingPage;
 import com.threerings.everything.client.game.ShopPage;
-import com.threerings.everything.client.game.TermsPage;
 import com.threerings.everything.client.util.Args;
 import com.threerings.everything.client.util.CategoriesModel;
 import com.threerings.everything.client.util.Context;
