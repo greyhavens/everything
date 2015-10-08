@@ -89,8 +89,7 @@ public class EverythingClient
             _wrapper = Widgets.newFlowPanel(
                 Widgets.newSimplePanel("content", content),
                 Widgets.newImage("images/page_cap.png", "endcap"),
-                Widgets.newHTML("Everything's " +
-                    "<a href=\"http://www.threerings.net/about/privacy.html\">Privacy Policy</a>"));
+                Widgets.newHTML("Everything's <a href=\"/privacy.html\">Privacy Policy</a>"));
             RootPanel.get(CLIENT_DIV).add(_wrapper);
         }
     }
