@@ -1,7 +1,6 @@
 //
-// samskivert library - useful routines for java programs
-// Copyright (C) 2001-2012 Michael Bayne, et al.
-// http://github.com/samskivert/samskivert/blob/master/COPYING
+// The Everything Game - slot machine plus encyclopedia equals educational fun!
+// Copyright © 2009-2015 Grey Havens, LLC
 
 package com.samskivert.util;
 
