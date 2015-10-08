@@ -40,9 +40,7 @@ public class CreditsPage extends DataPanel<EverythingService.CreditsResult>
     {
         add(Widgets.newLabel("The Everything Game", "Title"));
         String copy = "2009-" + DateUtil.getYear(new Date());
-        add(Widgets.newFlowPanel(
-                "Subtitle", Widgets.newHTML("Copyright &copy; " + copy + " ", "inline"),
-                new Anchor("http://www.threerings.net/", "Three Rings", "_blank")));
+        add(Widgets.newHTML("Copyright &copy; " + copy + " Grey Havens, LLC.", "Subtitle"));
 
         FluentTable peeps = new FluentTable(10, 0, "Peeps");
         peeps.add().setWidgets(Widgets.newLabel("Design:"), personLink(data.design)).
