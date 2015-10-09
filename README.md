@@ -26,7 +26,8 @@ http://www.gwtproject.org/articles/superdevmode.html
 
 ## Shipping
 
-To ship the code to the Everything Candidate deployment, do:
+If your name is MDB and you have the right git remotes set up, and the proper privileges, you can
+ship code to the Everything Candidate deployment like so:
 
     % git push staging
 
@@ -47,4 +48,4 @@ You can view the server logs thusly:
 
     heroku logs -t --app everything
 
-Don't forget to do a plain old `git push` to upload your commits to the OOO Git repository as well!
+Don't forget to do a plain old `git push` to upload your commits to the Github repo as well!
