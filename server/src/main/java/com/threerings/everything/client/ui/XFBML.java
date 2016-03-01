@@ -106,7 +106,7 @@ public class XFBML
      */
     public static Widget newProfilePic (long facebookId)
     {
-        // TODO: wrap this in a link to their profile: http://www.facebook.com/profile.php?id=fbid
+        // TODO: wrap this in a link to their profile: https://www.facebook.com/profile.php?id=fbid
         return newTag("profile-pic", "uid", ""+facebookId, "linked", "false");
     }
 

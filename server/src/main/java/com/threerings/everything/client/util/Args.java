@@ -63,7 +63,7 @@ public class Args
      */
     public static Anchor createMessageAnchor (PlayerName name)
     {
-        return new Anchor("http://www.facebook.com/message.php?id=" + name.facebookId,
+        return new Anchor("https://www.facebook.com/message.php?id=" + name.facebookId,
                           "Send message", "_blank");
     }
 

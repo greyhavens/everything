@@ -109,7 +109,7 @@ public class EverythingClient
     // from interface Context
     public String getFacebookAddURL (String vector, Page page, Object... args)
     {
-        return "http://www.facebook.com/dialog/oauth?client_id=" + _data.facebookAppId +
+        return "https://www.facebook.com/dialog/oauth?client_id=" + _data.facebookAppId +
             "&redirect_uri=" + URL.encodeQueryString(getEverythingURL(vector, page, args));
     }
 
