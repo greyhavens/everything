@@ -61,12 +61,12 @@ public class HeaderPanel extends FlowPanel
 
         FluentTable links = new FluentTable(8, 0, "Links");
         links.add().setWidget(Args.createLink("News", Page.LANDING), "machine").
-            right().setWidget(Args.createLink("Flip Cards", Page.FLIP), "machine").
+            // right().setWidget(Args.createLink("Flip Cards", Page.FLIP), "machine").
             right().setWidget(Args.createLink("Your Collection", Page.BROWSE), "machine").
-            right().setWidget(Args.createLink("Shop", Page.SHOP), "machine").
-            right().setWidget(Args.createLink("Get Coins", Page.GET_COINS), "machine").
-            right().setWidget(Args.createLink("Friends", Page.FRIENDS), "machine").
-            right().setWidget(Args.createLink("Credits", Page.CREDITS), "machine");
+            // right().setWidget(Args.createLink("Shop", Page.SHOP), "machine").
+            // right().setWidget(Args.createLink("Get Coins", Page.GET_COINS), "machine").
+            right().setWidget(Args.createLink("Friends", Page.FRIENDS), "machine")/*.
+            right().setWidget(Args.createLink("Credits", Page.CREDITS), "machine")*/;
         add(links);
     }
 

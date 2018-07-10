@@ -108,31 +108,31 @@ public class LandingPage extends FlowPanel
             return;
         }
 
-        if (ctx.isNewbie()) {
+        /*if (ctx.isNewbie()) {
             // show extra help for a new players
             addInstructions(true);
             add(Widgets.newShim(10, 10));
 
-        } else if (mode instanceof Mode.ShowNews) {
+        } else*/ if (mode instanceof Mode.ShowNews) {
             Mode.ShowNews nmode = (Mode.ShowNews)mode;
-            if (newsNotStale(nmode.news.get())) {
+            // if (newsNotStale(nmode.news.get())) {
                 String time = DateUtil.formatDateTime(nmode.news.get().reported);
                 add(Widgets.newLabel(_msgs.newsTitle(time), "Title", "machine"));
                 add(Widgets.newHTML(formatNews(nmode.news.get().text), "Text"));
                 add(Widgets.newShim(10, 10));
-            }
+            // }
         }
 
-        // at this point, nobody is a guest
-        Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
-        link.addStyleName("BigFlip");
-        link.addStyleName("machine");
-        add(link);
-        add(Widgets.newShim(10, 10));
+        // // at this point, nobody is a guest
+        // Widget link = Args.createLink(_msgs.introFlip(), Page.FLIP);
+        // link.addStyleName("BigFlip");
+        // link.addStyleName("machine");
+        // add(link);
+        // add(Widgets.newShim(10, 10));
 
-        // add links to the mobile version
-        addMobileLinks(ctx, false);
-        add(Widgets.newShim(5, 5));
+        // // add links to the mobile version
+        // addMobileLinks(ctx, false);
+        // add(Widgets.newShim(5, 5));
 
         add(new MyFeedPanel(ctx));
 
